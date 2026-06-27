@@ -85,10 +85,13 @@ yuanforge/
 │   │   ├── vibecoding-workflow.md  # 核心引擎
 │   │   ├── project-bootstrap.md    # 项目初始化
 │   │   └── project-memory.md       # 记忆管理
-│   ├── docs/                    # 项目记忆
+│   ├── docs/                    # 项目记忆（项目大脑）
+│   │   ├── PROGRESS.md          # 当前进度（最重要）
 │   │   ├── ARCHITECTURE.md      # 架构记录
+│   │   ├── PITFALLS.md          # 踩坑记录（回环学习输入）
 │   │   ├── DECISIONS.md         # 技术决策 (ADR)
-│   │   └── GLOSSARY.md          # 术语表
+│   │   ├── GLOSSARY.md          # 术语表
+│   │   └── SESSION_LOG.md       # 会话日志
 │   └── plans/                   # 实现计划存档
 └── templates/                   # 项目模板
 ```

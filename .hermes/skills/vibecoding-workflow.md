@@ -14,16 +14,36 @@ version: 1.0.0
 ## 触发条件
 
 用户说以下任何一句时激活：
-- "开始开发 XX"
-- "实现 XX 功能"
-- "build XX"
-- "做一个 XX 项目"
-- "@严格模式 开发 XX"
-- "@快速模式 原型 XX"
+- "开始开发 XX" / "实现 XX 功能" / "build XX" / "做一个 XX 项目"
+- "@严格模式 开发 XX" / "@快速模式 原型 XX" / "继续开发" / "继续上次的"
+
+激活后 **首先加载项目记忆**（见下方 Agent 加载流程）。
 
 ---
 
 ## 完整流程
+
+### Agent 启动：加载项目记忆
+
+```
+[Agent 启动]
+    │
+    ├── 1. read_file(".hermes/docs/PROGRESS.md")    ← 必读
+    │      获悉：当前 Phase/Stage/Task、阻塞项、下一步
+    │
+    ├── 2. read_file(".hermes/docs/ARCHITECTURE.md") ← 必读
+    │      了解系统全貌
+    │
+    ├── 3. read_file(".hermes/docs/PITFALLS.md")     ← 必读
+    │      避开已知陷阱
+    │
+    ├── 4. 如果是继续开发（PROGRESS 显示有进行中 Plan）：
+    │      read_file(".hermes/plans/当前 Plan")
+    │
+    └── 5. 继续下面 Phase 流程
+```
+
+### Pipeline 总览
 
 ```
 用户需求
@@ -37,11 +57,14 @@ version: 1.0.0
 │ 3. 分析需求 → 技术选型 → 架构设计             │
 │ 4. 产出 Implementation Plan                   │
 │ 5. 保存到 .hermes/plans/                      │
+│ 6. 更新 PROGRESS.md、DECISIONS.md             │
 │                                               │
 │ 输出：Plan + 技术选型理由                      │
 └────────────────────┬─────────────────────────┘
                      │
                      ▼
+              [G1: Plan Gate]
+                     │
               用户确认 Plan？
                      │
             ┌────────┴────────┐
@@ -55,14 +78,19 @@ version: 1.0.0
                       │ for each Task in Plan:        │
                       │   ┌──────────────────────┐    │
                       │   │ 2a. Coder (TDD 实现)  │    │
-                      │   │ 2b. Reviewer (Spec)   │──┐ │
+                      │   │ 2b. G2 Spec Review    │──┐ │
                       │   │    ├─ PASS → next     │  │ │
                       │   │    └─ FAIL → fix → 2b │  │ │
-                      │   │ 2c. Reviewer (Quality)│  │ │
+                      │   │ 2c. G2 Quality Review │  │ │
                       │   │    ├─ APPROVED → next │  │ │
                       │   │    └─ REJECT → fix→2c │  │ │
                       │   └──────────────────────┘    │
+                      │                               │
+                      │ 每个 Task 后更新 PROGRESS.md   │
+                      │ 踩坑立即记录 PITFALLS.md       │
                       └──────────────┬───────────────┘
+                                     │
+                                [G3: Integration Gate]
                                      │
                                      ▼
                       ┌──────────────────────────────┐
@@ -70,7 +98,22 @@ version: 1.0.0
                       │                               │
                       │ 1. Tester — 补充集成测试       │
                       │ 2. DevOps — 配置 CI/CD         │
-                      │ 3. 更新项目文档                 │
+                      │ 3. 更新 ARCHITECTURE/DECISIONS │
+                      └──────────────┬───────────────┘
+                                     │
+                                [G4: Release Gate]
+                                     │
+                                     ▼
+                      ┌──────────────────────────────┐
+                      │ Phase 4: 回顾 (Retrospector)    │
+                      │                               │
+                      │ 1. 遍历 PITFALLS.md            │
+                      │ 2. 判断每个坑：                 │
+                      │    ├── 本项目特有 → 留在此文件  │
+                      │    ├── 领域通用 → 提炼为 Skill  │
+                      │    └── 框架通用 → 反馈到 Yuan   │
+                      │ 3. 记录 SESSION_LOG.md          │
+                      │ 4. 更新 PROGRESS.md → 已交付    │
                       └──────────────────────────────┘
 ```
 
@@ -197,19 +240,62 @@ Step D: Stage Gate 检查
 
 ---
 
+## Phase 4: 回顾阶段（详细）
+
+> Harness 的回环学习在此落地。
+
+### 4.1 遍历踩坑记录
+
+加载 `PITFALLS.md`，逐条检查「归档判断」：
+
+```
+for each PIT in PITFALLS.md:
+    if PIT.归档判断 == "本项目特有":
+        → 留在此文件，不操作
+    
+    if PIT.归档判断 == "提炼为 Skill":
+        → 如果是新领域 → skill_manage(action='create', ...)
+        → 如果是已有 Skill 的补充 → skill_manage(action='patch', ...)
+        → 在 PITFALLS.md 中标注「已归档至 Skill: <name>」
+    
+    if PIT.归档判断 == "反馈到 Yuan":
+        → 评估是否需要修改铁律或流程 Skill
+        → 修改后提交到 YuanForge 仓库
+```
+
+### 4.2 写会话日志
+
+追加 `SESSION_LOG.md`：
+```markdown
+### Session N: YYYY-MM-DD — [项目名] 交付
+
+- **完成:** 所有 Phase 1-3
+- **决策:** 见 DECISIONS.md
+- **踩坑:** PIT-001, PIT-002
+- **Skill 提炼:** [如有]
+- **Commit:** abc1234
+```
+
+### 4.3 更新进度
+
+`PROGRESS.md` 状态更新为「已交付」。
+
+---
+
 ## 铁律执行
 
-本 Skill 整个流程严格遵守 YuanForge 七条铁律：
+本 Skill 整个流程严格遵守 YuanForge 八条铁律：
 
 | 铁律 | 执行点 |
 |------|--------|
-| Ⅰ. 计划先行 | Phase 1 产 Plan，Phase 2 才开始 |
+| Ⅰ. 计划先行 | Phase 1 产 Plan |
 | Ⅱ. TDD 先行 | 每个 Task 内 Red → Green → Refactor |
-| Ⅲ. 两阶段审查 | 每个 Task 后 Spec Review → Quality Review |
+| Ⅲ. 两阶段审查 | 每个 Task 后 Spec → Quality |
 | Ⅳ. 原子提交 | 每个 Task 一个 Commit |
 | Ⅴ. 上下文隔离 | 每个 Task 新 Subagent |
-| Ⅵ. 文档即代码 | Phase 1 写 DECISIONS，Phase 3 更新文档 |
-| Ⅶ. 渐进式交付 | Task 顺序保证每步可运行 |
+| Ⅵ. 文档即代码 | Phase 1 写决策，Phase 3 更新文档 |
+| Ⅶ. 渐进式交付 | Task 顺序保证可运行 |
+| Ⅷ. 质量门禁 | G1→G2→G3→G4，Phase 4 归档 |
 
 ---
 
