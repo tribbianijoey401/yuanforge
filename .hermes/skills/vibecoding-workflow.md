@@ -116,10 +116,11 @@ version: 1.0.0
 
 ### 1.5 产出 Plan
 
-遵循 `writing-plans` skill 的规范：
-- Bite-sized tasks（2-5 分钟/个）
-- 每个 task 包含：目标、文件、代码、测试、验证
-- TDD 流程嵌入每个 task
+遵循 `plan-format.md` 的 Pipeline-as-Code 规范：
+- 定义 **Stage**（每个 Stage = 一组 Task + 一个 Gate）
+- 每个 Task 包含：`Objective` / `Files` / `Input` / `Output` / `Test` / `Gate Check`
+- 每个 Stage 出口定义 **Gate**：`Pass Criteria` + `Fail Action`
+- 标注 `Pitfalls`（已知陷阱，从经验中提取）
 
 保存路径：`.hermes/plans/YYYY-MM-DD_HHMMSS-<feature-slug>.md`
 
@@ -137,33 +138,32 @@ version: 1.0.0
 - 读 Plan 文件一次，提取所有 Task
 - 创建 TODO 列表追踪进度
 
-### 2.2 逐 Task 执行
+### 2.2 逐 Task 执行（含 Gate）
 
 对每个 Task：
 
 ```
 Step A: 派 Coder (新 subagent)
-  → 加载 coder agent persona
-  → 加载 TDD skill
-  → 提供 Task 完整上下文（不让他读 Plan 文件）
-  → 执行 TDD 循环
-  → 原子提交
+  → 加载 coder agent persona + TDD skill
+  → 提供 Task 完整上下文
+  → 执行 TDD → 原子提交
 
-Step B: Spec Compliance Review (新 subagent)
+Step B: Gate G2-TASK — Spec Review
   → 加载 reviewer agent persona
   → 对照 Plan 检查实现
-  → 输出 PASS 或 REQUEST_CHANGES
-  → REQUEST_CHANGES → 派 Coder 修复 → 重新审查
+  → PASS → 进入 Step C
+  → FAIL → Coder 修复 → 重新审查
+           → 同一 Task 连续 3 次 FAIL → 触发架构复盘
 
-Step C: Code Quality Review (新 subagent)
-  → 仅在 Step B PASS 后执行
-  → 检查代码质量
-  → 输出 APPROVED 或 list of issues
-  → issues → 派 Coder 修复 → 重新审查
+Step C: Gate G2-TASK — Quality Review
+  → 代码质量审查
+  → APPROVED → 标记 Task 完成 `[G2 ✓]`
+  → REJECT → Coder 修复 → 重新审查
 
-Step D: 标记 Task 完成
-  → 更新 TODO
-  → 进入下一个 Task
+Step D: Stage Gate 检查
+  → 当前 Stage 所有 Task 完成？
+    → 是 → 执行 Stage Gate（G1/G3/G4）
+    → 否 → 下一个 Task
 ```
 
 ### 2.3 快速模式

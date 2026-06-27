@@ -79,7 +79,8 @@ yuanforge/
 │   │   ├── tester.md            # 测试者：策略与覆盖
 │   │   └── devops.md            # 运维者：CI/CD + 部署
 │   ├── rules/
-│   │   └── iron-rules.md        # 七条铁律
+│   │   ├── iron-rules.md        # 八条铁律（含质量门禁）
+│   │   └── plan-format.md       # Plan 工程化格式规范
 │   ├── skills/
 │   │   ├── vibecoding-workflow.md  # 核心引擎
 │   │   ├── project-bootstrap.md    # 项目初始化
@@ -94,7 +95,7 @@ yuanforge/
 
 ---
 
-## 七条铁律
+## 八条铁律
 
 | # | 铁律 | 核心 |
 |---|------|------|
@@ -105,6 +106,7 @@ yuanforge/
 | Ⅴ | 上下文隔离 | 每个 Task 全新 Subagent |
 | Ⅵ | 文档即代码 | 决策必须落文档 |
 | Ⅶ | 渐进式交付 | 每步可运行 |
+| Ⅷ | 质量门禁 | G1→G2→G3→G4，不通过不前进 |
 
 详见 [`.hermes/rules/iron-rules.md`](.hermes/rules/iron-rules.md)
 
