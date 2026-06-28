@@ -1,249 +1,185 @@
-# Plan 工程化格式规范 (Pipeline as Code)
+# Plan 工程化格式规范
 
-> YuanForge 的 Implementation Plan 不是自由文本，而是一个**可被机器（Agent）精确解析和执行的工程化 Pipeline**。
-
----
-
-## Plan 结构总览
-
-```yaml
-# 一个完整的 Plan = 元信息 + Stage 序列 + Gate 定义
-
-Plan:
-  Meta:           # 元信息
-    feature:      # 功能名称
-    goal:         # 一句话目标
-    mode:         # strict | fast
-    stack:        # 技术栈决策（写入 DECISIONS.md）
-
-  Stages:         # 阶段序列（Pipeline）
-    - Stage: 1    # 每个 Stage = 一组 Task + 一个 Gate
-      purpose:    # Stage 目标
-      tasks:      # Task 列表
-      gate:       # Stage 出口 Gate
-
-  Gating:         # 全局门禁规则
-    max_retries:  # Task 审查最大重试次数（默认 3）
-```
+> Plan 不是给人类看的笔记，而是 Agent 军团的**作战指令书**。
+> 任何 Architect Agent 产出 Plan 时，必须严格遵守此格式。
+> Conductor Agent 依赖此格式解析 Task、构建 DAG、派发任务。
 
 ---
 
-## Plan 模板
+## Plan 文件结构
 
 ```markdown
-# [Feature Name] Implementation Plan
+# Plan: [功能名称]
 
-> **Pipeline ID:** YYYY-MM-DD_HHMMSS-<slug>
-> **Mode:** strict | fast
-> **Stack:** [语言] + [框架] + [数据库] + ...
-
----
-
-## Stage 1: 基础设施
-
-**Purpose:** 搭建项目骨架，为后续功能铺路
-**Gate:** G1-INFRA — 项目必须能启动、通过 health check
-
-### Task 1.1: [任务名]
-- **Objective:** [一句话目标]
-- **Files:** 
-  - Create: `path/to/file`
-  - Modify: `path/to/file`
-- **Input:** [依赖的前置 Task 或外部条件]
-- **Output:** [Task 产出的文件/功能]
-- **Test:** `pytest tests/path -v`
-- **Gate Check:** [G1-INFRA 的相关检查项]
-
-### Task 1.2: ...
+## 概况
+## 技术方案
+## 模块划分
+## Dispatch Plan
+### 依赖关系
+### 任务派发表
+## 质量门禁
 ```
 
 ---
 
-## Task 规范
+## 各段规范
 
-每个 Task 必须包含以下字段：
+### 1. 概况
 
-| 字段 | 必需 | 说明 |
+```markdown
+## 概况
+
+- **目标**: 一句话描述要交付什么
+- **创建时间**: YYYY-MM-DD
+- **Architect**: [产出此 Plan 的 Agent 角色]
+- **关联需求**: [用户原始需求摘要]
+```
+
+### 2. 技术方案
+
+```markdown
+## 技术方案
+
+### 技术栈选择
+
+| 层 | 选型 | 原因 |
+|----|------|------|
+| 语言 | Python 3.11 | xxx |
+| 框架 | FastAPI | xxx |
+| 数据库 | PostgreSQL | xxx |
+
+### 架构决策
+
+[关键决策简述，详细 ADR 见 docs/DECISIONS.md]
+```
+
+### 3. 模块划分
+
+```markdown
+## 模块划分
+
+| 模块 | 职责 | 对应 Task | 关键文件 |
+|------|------|----------|---------|
+| 用户模型 | 数据层 | task-002 | src/models/user.py |
+| 用户 API | 接口层 | task-003 | src/api/users.py |
+| 前端界面 | 展示层 | task-004 | src/ui/UserList.tsx |
+```
+
+### 4. Dispatch Plan（调度指令）
+
+这是 Plan 最关键的段落。Conductor Agent 读这一段就知道：
+- 有哪些 Task
+- 每个 Task 谁来做（role）
+- Task 之间的依赖关系（谁等谁）
+- 哪些 Task 可以并行
+
+#### 4.1 依赖关系（自然语言）
+
+```markdown
+### 依赖关系
+
+- task-002（数据模型）依赖 task-001 的 ARCHITECTURE.md，可与 task-004 并行
+- task-003（后端 API）依赖 task-002 的数据模型，不可在 task-002 完成前开始
+- task-004（前端界面）只依赖 task-001 的接口定义，与 task-003 可并行
+- task-005（集成测试）必须在 task-002、task-003、task-004 全部完成后触发
+- task-006（部署）依赖 task-005 通过
+```
+
+**规则：**
+- 用自然语言描述，不要用代码
+- 每行一个依赖声明
+- 明确说"可与 X 并行"来标记独立关系
+- Conductor 根据这段描述和下面的派发表，自行构建 DAG
+
+#### 4.2 任务派发表
+
+```markdown
+### 任务派发表
+
+| Task ID | 标题 | Role | 上游依赖 | 产出物 | 门禁 |
+|---------|------|------|---------|--------|------|
+| task-002 | 用户数据模型 | coder | task-001 | src/models/user.py, tests/models/ | G2 |
+| task-003 | 用户管理 API | coder | task-002 | src/api/users.py, tests/api/ | G2 |
+| task-004 | 用户管理前端 | coder | task-001 | src/ui/UserList.tsx, tests/ui/ | G2 |
+| task-005 | 用户系统集成测试 | tester | task-002,task-003,task-004 | tests/integration/ | G3 |
+| task-006 | 部署配置 | devops | task-005 | k8s/user-svc.yaml | G4 |
+```
+
+**字段说明：**
+
+| 字段 | 必填 | 说明 |
 |------|------|------|
-| `Objective` | ✅ | 一句话目标，Agent 用来判断是否完成 |
-| `Files` | ✅ | `Create:` / `Modify:` 精确路径 |
-| `Input` | ✅ | 前置依赖：依赖哪个 Task 的产出？ |
-| `Output` | ✅ | 交付物：文件/接口/功能 |
-| `Test` | ✅ | 验证命令 + 预期结果 |
-| `Gate Check` | ✅ | 对应 Gate 的具体检查项 |
-| `Code` | 推荐 | 关键代码骨架（非完整实现，给方向） |
-| `Pitfalls` | 推荐 | 已知陷阱（从过去项目经验中提取） |
+| **Task ID** | ✅ | `task-NNN` 格式，NNN 从 001 开始连续编号 |
+| **标题** | ✅ | 人类可读的 Task 描述 |
+| **Role** | ✅ | 角色名：`architect` / `coder` / `reviewer` / `tester` / `devops` |
+| **上游依赖** | ✅ | Task ID 列表，逗号分隔。无依赖填 `-` |
+| **产出物** | ✅ | 完成后的产出文件列表，逗号分隔 |
+| **门禁** | ✅ | 该 Task 触发的 Gate：G2（单 Task 审查）/ G3（集成测试）/ G4（部署） |
 
----
+**规则：**
+- **禁止**在 Task 字段中写自然语言需求 — Task 只是一个标识符，详细 spec 在 `dispatch/` 目录
+- Task ID 必须与 `dispatch/` 下的文件名对应（如 `task-002` ↔ `dispatch/task-002.yaml`）
+- 上游依赖必须精确列出所有前置 Task ID，禁止模糊依赖（如"等后端完成"）
+- 并联 Task 不互相列在依赖中
 
-## Gate 规范
-
-每个 Stage 出口有一个 Gate，格式：
+### 5. 质量门禁
 
 ```markdown
-## Gate: G<n>-<NAME>
+## 质量门禁
 
-**Position:** Stage <n> → Stage <n+1>
-**Owner:** [Architect | Reviewer | Tester | DevOps]
-
-**Pass Criteria (AND):**
-- [ ] 条件 1（可验证的）
-- [ ] 条件 2
-- [ ] 条件 3
-
-**Fail Action:**
-- On 1st failure: 回当前 Stage，修复后重试
-- On 3rd failure: 触发架构复盘（Architect 介入）
-
-**Artifacts Required:** [证明通过的文件/日志]
+| Gate | 检查内容 | 通过标准 | 执行者 |
+|------|---------|---------|--------|
+| G1 | Plan 完整性 | Dispatch Table 无遗漏、依赖正确、用户确认 | 用户 |
+| G2 | Task 级审查 | Spec 合规 + 代码质量 APPROVED | reviewer |
+| G3 | 集成测试 | `pytest tests/ -q` 全 PASS | tester |
+| G4 | 交付就绪 | CI 通过 + 文档齐全 + 部署配置 | devops |
 ```
 
 ---
 
-## 完整示例：「用户认证」的工程化 Plan
+## Plan 文件命名与存放
 
-```markdown
-# User Authentication — Implementation Plan
+```bash
+# 文件命名
+{YYYY-MM-DD}_{功能名}.md
 
-> **Pipeline ID:** 2026-06-27_210000-user-auth
-> **Mode:** strict
-> **Stack:** Python 3.11 + FastAPI + SQLite + bcrypt + JWT
-> 
-> **Gate Strategy:** G1(INFRA) → G2(TASK per-task) → G3(INTEG) → G4(RELEASE)
+# 示例
+2026-06-29_user-auth.md
+2026-06-30_payment-gateway.md
 
----
-
-## Stage 1: 基础设施
-
-**Purpose:** 搭建项目骨架，确保可运行
-**Gate:** G1-INFRA → 项目启动 + health check 通过
-
-### Task 1.1: 初始化 FastAPI 项目
-- **Objective:** 创建 FastAPI 项目骨架，含 health endpoint
-- **Files:**
-  - Create: `src/main.py`
-  - Create: `src/__init__.py`
-  - Create: `requirements.txt`
-- **Input:** 无
-- **Output:** `curl localhost:8000/health → {"status": "ok"}`
-- **Test:** `pytest tests/test_health.py -v`
-- **Gate Check:** [G1-INFRA] 项目启动不报错
-- **Pitfalls:** FastAPI 需要用 `async def`，别忘了 uvicorn
-
-### Task 1.2: 初始化数据库
-- **Objective:** 配置 SQLite + SQLAlchemy，创建 User 表
-- **Files:**
-  - Create: `src/database.py`
-  - Create: `src/models/user.py`
-- **Input:** Task 1.1（项目骨架）
-- **Output:** User 表可 CRUD
-- **Test:** `pytest tests/test_database.py -v`
-- **Gate Check:** [G1-INFRA] 数据库连接正常、migration 成功
-
-## Gate: G1-INFRA
-
-**Position:** Stage 1 → Stage 2
-**Owner:** Architect
-
-**Pass Criteria (AND):**
-- [ ] `uvicorn src.main:app` 无报错启动
-- [ ] `curl /health` 返回 200
-- [ ] 数据库 migration 成功
-- [ ] 所有 Stage 1 测试 PASS
-
-**Fail Action:** 回 Stage 1 对应 Task 修复
-**Artifacts Required:** `pytest tests/ -q` 输出
-
----
-
-## Stage 2: 核心功能
-
-**Purpose:** 实现注册 + 登录
-**Gate:** G2-TASK（每个 Task 后执行两阶段审查）
-
-### Task 2.1: 密码哈希工具
-- **Objective:** 实现 bcrypt 密码哈希和验证函数
-- **Files:**
-  - Create: `src/auth/hash.py`
-  - Create: `tests/test_hash.py`
-- **Input:** 无
-- **Output:** `hash_password()` / `verify_password()` 函数
-- **Test:** `pytest tests/test_hash.py -v`
-- **Gate Check:** [G2-TASK] Spec Review + Quality Review
-- **Code:**
-  ```python
-  import bcrypt
-  
-  def hash_password(password: str) -> str:
-      return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-  
-  def verify_password(password: str, hashed: str) -> bool:
-      return bcrypt.checkpw(password.encode(), hashed.encode())
-  ```
-- **Pitfalls:** bcrypt 的 `gensalt()` 默认 rounds=12，测试环境可能太慢
-
-### Task 2.2: 注册端点
-- **Objective:** POST /register 创建用户
-- **Files:**
-  - Create: `src/auth/router.py`
-  - Modify: `src/main.py`（挂载 router）
-  - Create: `tests/test_register.py`
-- **Input:** Task 1.2（数据库）+ Task 2.1（密码哈希）
-- **Output:** 注册端点可创建用户
-- **Test:** `pytest tests/test_register.py -v`
-- **Gate Check:** [G2-TASK] Spec Review + Quality Review
-
-## Gate: G3-INTEG
-
-**Position:** Stage 2 → Stage 3
-**Owner:** Tester
-
-**Pass Criteria (AND):**
-- [ ] 所有 Stage 2 Task 的 G2 全部 PASS
-- [ ] `pytest tests/ -q` 全量 PASS
-- [ ] 注册 → 登录 端到端流程可走通
-- [ ] 无未处理的 Review Issue
-
-**Fail Action:** 回对应 Task 修复
-**Artifacts Required:** 全量测试输出 + 端到端手动验证记录
-
----
-
-## Stage 3: 收尾
-
-### Task 3.1: 补充边界测试
-- **Objective:** 补充空输入、超长密码、SQL 注入等边界测试
-- **Input:** Stage 2 所有产出
-- **Test:** `pytest tests/ -v --cov=src/ --cov-report=term`
-
-### Task 3.2: CI 配置
-- **Objective:** GitHub Actions 自动运行测试
-- **Files:**
-  - Create: `.github/workflows/ci.yml`
-
-## Gate: G4-RELEASE
-
-**Position:** Stage 3 → 交付
-**Owner:** DevOps
-
-**Pass Criteria (AND):**
-- [ ] 集成测试 PASS
-- [ ] CI 配置可运行
-- [ ] ARCHITECTURE.md / DECISIONS.md 已更新
-- [ ] README 可运行指令准确
-
-**Artifacts Required:** CI 通过截图 + 文档 diff
+# 存放路径
+.yuanforge/plans/
 ```
 
 ---
 
-## Plan 与铁律的映射
+## 与 dispatch 目录的关系
 
-| Plan 元素 | 对应铁律 |
-|-----------|---------|
-| `Gate Check` 字段 | **Ⅷ. 质量门禁** |
-| `Test` 字段 + TDD 流程 | **Ⅱ. TDD 先行** |
-| `Input`/`Output` 字段 | **Ⅴ. 上下文隔离**（精确传递依赖） |
-| `Pitfalls` 字段 | **Ⅵ. 文档即代码**（经验沉淀） |
-| Stage 顺序设计 | **Ⅶ. 渐进式交付** |
-| Git commit 策略 | **Ⅳ. 原子提交** |
+Plan 中的 Task 是一个**索引**。每个 Task 的详细执行 spec 放在独立文件中，Plan 只做关联。
+
+```
+.yuanforge/
+├── plans/
+│   └── 2026-06-29_user-auth.md    ← Plan（含 Dispatch Table）
+└── dispatch/
+    ├── task-002-data-model.md      ← Task 详细 spec
+    ├── task-003-backend-api.md
+    ├── task-004-frontend-ui.md
+    ├── task-005-integration-test.md
+    └── task-006-deploy-config.md
+```
+
+**Plan 轻，Task 重。** Plan 让 Conductor 快速理解全貌，Task 文件让 Coder 获取完整上下文。
+
+---
+
+## 反模式（禁止）
+
+```markdown
+❌ 依赖关系写 "等后端好了再搞前端" — 用精确的 Task ID
+❌ Task 标题写 "实现用户登录功能，包括前端、后端、数据库" — 拆成多个 Task
+❌ 上游依赖写 "全部完成" — 列出具体 Task ID
+❌ 产出物写 "相关代码" — 列出具体文件路径
+❌ Dispatch Table 缺 Task — Conductor 无法调度
+❌ 同一个 Task 既是后端又是前端 — 违反上下文隔离（铁律 Ⅴ）
+```

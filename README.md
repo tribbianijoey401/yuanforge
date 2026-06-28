@@ -17,12 +17,13 @@
 │                                      │
 │  🔨 铁律 (Iron Rules)                │
 │  ─────────────────────               │
-│  七条不可违反的法则，约束所有 Agent    │
+│  九条不可违反的法则，约束所有 Agent    │
 │                                      │
 │  👷 Agent 军团                       │
 │  ─────────────────────               │
-│  Architect → Coder → Reviewer        │
-│  → Tester → DevOps                   │
+│  Architect → Conductor               │
+│  → Coder → Reviewer → Tester         │
+│  → DevOps                            │
 │                                      │
 │  🧰 Skill 武器库                     │
 │  ─────────────────────               │
@@ -57,11 +58,12 @@ git init && git add -A && git commit -m "init: from YuanForge"
 ```
 
 Yuan 会自动：
-1. **Architect** 分析需求 → 设计架构 → 产出 Plan
+1. **Architect** 分析需求 → 设计架构 → 产出 Plan（含 Dispatch Table）
 2. 你确认 Plan
-3. **Conductor** 调度 Coder → Reviewer → Tester → DevOps
-4. 每个 Task 经历完整的 TDD + 两阶段审查
-5. 交付可运行的代码
+3. **Conductor** 解析 Dispatch Table → 构建 DAG → 并行派发 Coder
+4. Coder → Reviewer → Tester → DevOps 逐层流转
+5. 每个 Task 经历完整的 TDD + 两阶段审查
+6. 交付可运行的代码
 
 ---
 
@@ -72,33 +74,50 @@ yuanforge/
 ├── README.md                    # 本文件
 ├── .gitignore
 ├── .hermes/                     # 框架核心
-│   ├── agents/                  # 5 个 Agent 角色定义
+│   ├── agents/                  # 5 个 Agent 角色定义（详细工作流）
 │   │   ├── architect.md         # 架构师：需求→设计→计划
 │   │   ├── coder.md             # 开发者：TDD 实现
 │   │   ├── reviewer.md          # 审查者：两阶段审查
 │   │   ├── tester.md            # 测试者：策略与覆盖
 │   │   └── devops.md            # 运维者：CI/CD + 部署
 │   ├── rules/
-│   │   ├── iron-rules.md        # 八条铁律（含质量门禁）
-│   │   └── plan-format.md       # Plan 工程化格式规范
-│   ├── skills/
+│   │   ├── iron-rules.md        # 九条铁律（含质量门禁 + 自主调度）
+│   │   ├── plan-format.md       # Plan 工程化格式（含 Dispatch Table）
+│   │   └── docs-framework.md    # docs/ 说明书框架规范
+│   ├── skills/                  # Skill 定义
 │   │   ├── vibecoding-workflow.md  # 核心引擎
 │   │   ├── project-bootstrap.md    # 项目初始化
-│   │   └── project-memory.md       # 记忆管理
-│   ├── docs/                    # 项目记忆（项目大脑）
-│   │   ├── PROGRESS.md          # 当前进度（最重要）
+│   │   ├── project-memory.md       # 记忆管理
+│   │   ├── writing-plans.md        # Plan 写作
+│   │   ├── subagent-driven-development.md  # Subagent 执行
+│   │   ├── test-driven-development.md      # TDD
+│   │   ├── systematic-debugging.md         # 系统调试
+│   │   └── requesting-code-review.md       # 代码审查
+│   ├── docs/                    # 框架自身记忆
+│   │   ├── PROGRESS.md          # 当前进度
 │   │   ├── ARCHITECTURE.md      # 架构记录
-│   │   ├── PITFALLS.md          # 踩坑记录（回环学习输入）
+│   │   ├── PITFALLS.md          # 踩坑记录
 │   │   ├── DECISIONS.md         # 技术决策 (ADR)
 │   │   ├── GLOSSARY.md          # 术语表
 │   │   └── SESSION_LOG.md       # 会话日志
 │   └── plans/                   # 实现计划存档
+├── contracts/                   # Agent 角色合约（入参/出参/边界）
+│   ├── conductor.md             # 调度者：读 Plan → DAG → 派发
+│   ├── architect.md             # 架构师合约
+│   ├── coder.md                 # 开发者合约
+│   ├── reviewer.md              # 审查者合约
+│   ├── tester.md                # 测试者合约
+│   └── devops.md                # 运维者合约
+├── protocols/                   # Agent 间协议
+│   ├── dispatch-table.md        # Dispatch Table 格式规范
+│   └── task-output.md           # Task 产出物格式规范
 └── templates/                   # 项目模板
+    └── plan-with-dispatch.md    # 含 Dispatch Table 的 Plan 模板
 ```
 
 ---
 
-## 八条铁律
+## 九条铁律
 
 | # | 铁律 | 核心 |
 |---|------|------|
@@ -110,6 +129,7 @@ yuanforge/
 | Ⅵ | 文档即代码 | 决策必须落文档 |
 | Ⅶ | 渐进式交付 | 每步可运行 |
 | Ⅷ | 质量门禁 | G1→G2→G3→G4，不通过不前进 |
+| Ⅸ | 自主调度 | Agent 按 Dispatch Table 自主派发 Agent |
 
 详见 [`.hermes/rules/iron-rules.md`](.hermes/rules/iron-rules.md)
 
@@ -119,7 +139,7 @@ yuanforge/
 
 | 模式 | 触发 | 规则 |
 |------|------|------|
-| **严格模式**（默认） | 不加标记 | 七条铁律全开 |
+| **严格模式**（默认） | 不加标记 | 九条铁律全开 |
 | **快速模式** | `@快速模式` | 放宽审查和提交，其余保持 |
 
 ---
