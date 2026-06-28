@@ -89,13 +89,13 @@
 
 > 架构决策、技术选型、术语定义必须落文档。不依赖口头传递。
 
-- 架构变更 → 更新 `ARCHITECTURE.md`
-- 技术决策 → 记录在 `DECISIONS.md`（ADR 格式）
-- 新术语/概念 → 加入 `GLOSSARY.md`
+- 架构变更 → 更新 `docs/ARCHITECTURE.md`
+- 技术决策 → 记录在 `docs/decisions/`（ADR-NNN 格式）
+- 新术语/概念 → 加入 `docs/glossary.md`
 - 文档和代码同步更新，同一个 Commit
 
 **反例：** "我们上次讨论过用 Redis 做缓存，你知道的吧" ❌  
-**正例：** `DECISIONS.md` 中有记录：「2026-06-27: 选择 Redis 作为缓存层，因为...」✅
+**正例：** `docs/decisions/ADR-002-redis-cache.md` 中有记录：「选择 Redis 作为缓存层，因为...」✅
 
 ---
 

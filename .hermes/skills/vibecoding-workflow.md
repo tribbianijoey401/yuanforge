@@ -1,6 +1,11 @@
 ---
 name: vibecoding-workflow
-description: "YuanForge 核心工作流引擎：从需求到交付的完整编排"
+description: >
+  YuanForge 核心工作流引擎。开发任何功能时加载。触发：用户说「开发」「实现」
+  「做项目」「继续」「build」、Phase 1 启动、Plan 确认后进入 Phase 2。
+  编排 Architect→Coder→Reviewer→Tester→DevOps 完整 4-Phase 流水线。
+  读写：PROGRESS（进度）、features/（功能文档）、decisions/（决策）、
+  pitfalls（踩坑）、bugs/（Bug 记录）。所有 Agent 的调度中心。
 version: 1.0.0
 ---
 
@@ -17,30 +22,31 @@ version: 1.0.0
 - "开始开发 XX" / "实现 XX 功能" / "build XX" / "做一个 XX 项目"
 - "@严格模式 开发 XX" / "@快速模式 原型 XX" / "继续开发" / "继续上次的"
 
-激活后 **首先加载项目记忆**（见下方 Agent 加载流程）。
+激活后 **首先加载项目说明书**：`docs/INDEX.md` → `docs/PROGRESS.md`。
 
 ---
 
 ## 完整流程
 
-### Agent 启动：加载项目记忆
+### Agent 启动：加载项目说明书
 
 ```
 [Agent 启动]
     │
-    ├── 1. read_file(".hermes/docs/PROGRESS.md")    ← 必读
+    ├── 1. read_file("docs/INDEX.md")                  ← 必读：入口
+    ├── 2. read_file("docs/PROGRESS.md")               ← 必读：进度
     │      获悉：当前 Phase/Stage/Task、阻塞项、下一步
     │
-    ├── 2. read_file(".hermes/docs/ARCHITECTURE.md") ← 必读
+    ├── 3. read_file("docs/ARCHITECTURE.md")           ← 必读：架构
     │      了解系统全貌
     │
-    ├── 3. read_file(".hermes/docs/PITFALLS.md")     ← 必读
+    ├── 4. read_file("docs/pitfalls.md")                 ← 必读：踩坑
     │      避开已知陷阱
     │
-    ├── 4. 如果是继续开发（PROGRESS 显示有进行中 Plan）：
+    ├── 5. 如果是继续开发（PROGRESS 显示有进行中 Plan）：
     │      read_file(".hermes/plans/当前 Plan")
     │
-    └── 5. 继续下面 Phase 流程
+    └── 6. 继续下面 Phase 流程
 ```
 
 ### Pipeline 总览
@@ -57,7 +63,7 @@ version: 1.0.0
 │ 3. 分析需求 → 技术选型 → 架构设计             │
 │ 4. 产出 Implementation Plan                   │
 │ 5. 保存到 .hermes/plans/                      │
-│ 6. 更新 PROGRESS.md、DECISIONS.md             │
+│ 6. 更新 PROGRESS.md、decisions/ 决策记录       │
 │                                               │
 │ 输出：Plan + 技术选型理由                      │
 └────────────────────┬─────────────────────────┘
@@ -86,8 +92,8 @@ version: 1.0.0
                       │   │    └─ REJECT → fix→2c │  │ │
                       │   └──────────────────────┘    │
                       │                               │
-                      │ 每个 Task 后更新 PROGRESS.md   │
-                      │ 踩坑立即记录 PITFALLS.md       │
+                      │ 每个 Task 后更新 docs/PROGRESS.md     │
+                      │ 踩坑立即记录 docs/pitfalls.md         │
                       └──────────────┬───────────────┘
                                      │
                                 [G3: Integration Gate]
@@ -98,7 +104,7 @@ version: 1.0.0
                       │                               │
                       │ 1. Tester — 补充集成测试       │
                       │ 2. DevOps — 配置 CI/CD         │
-                      │ 3. 更新 ARCHITECTURE/DECISIONS │
+                      │ 3. 更新 ARCHITECTURE / decisions/ / docs   │
                       └──────────────┬───────────────┘
                                      │
                                 [G4: Release Gate]
@@ -107,7 +113,7 @@ version: 1.0.0
                       ┌──────────────────────────────┐
                       │ Phase 4: 回顾 (Retrospector)    │
                       │                               │
-                      │ 1. 遍历 PITFALLS.md            │
+                      │ 1. 遍历 docs/pitfalls.md 和 docs/bugs/      │
                       │ 2. 判断每个坑：                 │
                       │    ├── 本项目特有 → 留在此文件  │
                       │    ├── 领域通用 → 提炼为 Skill  │
@@ -130,8 +136,8 @@ version: 1.0.0
 
 按需加载：
 - 对应技术栈 skill（如 python-fastapi）
-- `.hermes/docs/ARCHITECTURE.md`  — 现有架构
-- `.hermes/docs/DECISIONS.md`    — 已有技术决策
+- `docs/ARCHITECTURE.md`  — 现有架构
+- `docs/decisions/`    — 已有技术决策
 ```
 
 ### 1.2 需求分析
@@ -147,7 +153,7 @@ version: 1.0.0
 选择原则：
 - 语言无关 — 按任务选最合适的栈
 - 简单优先 — 能用简单的不用复杂的
-- 记录理由 — 每个选型写入 DECISIONS.md
+- 记录理由 — 每个选型写入 `decisions/`
 
 ### 1.4 架构设计
 
@@ -234,9 +240,9 @@ Step D: Stage Gate 检查
 
 ### 3.3 文档更新
 
-- 更新 `ARCHITECTURE.md`（如有架构变更）
-- 更新 `DECISIONS.md`（如有新决策）
-- 更新 `GLOSSARY.md`（如有新术语）
+- 更新 `docs/ARCHITECTURE.md`（如有架构变更）
+- 更新 `docs/decisions/`（如有新决策）
+- 更新 `docs/glossary.md`（如有新术语）
 
 ---
 
@@ -246,17 +252,17 @@ Step D: Stage Gate 检查
 
 ### 4.1 遍历踩坑记录
 
-加载 `PITFALLS.md`，逐条检查「归档判断」：
+加载 `docs/pitfalls.md` 和 `docs/bugs/`，逐条检查「归档判断」：
 
 ```
-for each PIT in PITFALLS.md:
+for each PIT in pitfalls.md:
     if PIT.归档判断 == "本项目特有":
         → 留在此文件，不操作
     
     if PIT.归档判断 == "提炼为 Skill":
         → 如果是新领域 → skill_manage(action='create', ...)
         → 如果是已有 Skill 的补充 → skill_manage(action='patch', ...)
-        → 在 PITFALLS.md 中标注「已归档至 Skill: <name>」
+        → 在 docs/pitfalls.md 中标注「已归档至 Skill: <name>」
     
     if PIT.归档判断 == "反馈到 Yuan":
         → 评估是否需要修改铁律或流程 Skill
@@ -270,7 +276,7 @@ for each PIT in PITFALLS.md:
 ### Session N: YYYY-MM-DD — [项目名] 交付
 
 - **完成:** 所有 Phase 1-3
-- **决策:** 见 DECISIONS.md
+- **决策:** 见 decisions/
 - **踩坑:** PIT-001, PIT-002
 - **Skill 提炼:** [如有]
 - **Commit:** abc1234
@@ -278,7 +284,7 @@ for each PIT in PITFALLS.md:
 
 ### 4.3 更新进度
 
-`PROGRESS.md` 状态更新为「已交付」。
+`docs/PROGRESS.md` 状态更新为「已交付」。
 
 ---
 

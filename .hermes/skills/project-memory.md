@@ -1,6 +1,10 @@
 ---
 name: project-memory
-description: "Yuan 项目记忆体系：Agent 失忆也不怕，读完 Memory 即继任"
+description: >
+  维护 YuanForge 的 .hermes/docs/ 项目记忆体系时加载。触发：Phase 4 回顾、
+  需要归档 PITFALLS、写 SESSION_LOG、维护框架级记忆。负责 6 份 Memory 文件
+  的生命周期管理。注意：这是框架层记忆，不是项目 docs/（项目层规范见
+  docs-framework.md）。
 version: 2.0.0
 ---
 
@@ -8,6 +12,18 @@ version: 2.0.0
 
 > **Yuan 的项目大脑。** 上下文会压缩，会话会结束——但项目记忆永存。
 > 任何 Agent 首次加载项目时，读完 Memory 就知道一切。
+
+---
+
+## ⚠️ 两层 docs 体系区分
+
+| 目录 | 用途 | 谁维护 | 何时读取 |
+|------|------|--------|---------|
+| **`.hermes/docs/`** | YuanForge **框架自身**的记忆 | YuanForge 维护者 | 维护框架时 |
+| **`docs/`** | **具体项目**的说明书 | 项目 Agent 军团 | 开发项目时 |
+
+**本文档描述 `.hermes/docs/`（框架层）。**
+项目层的 `docs/` 规范见 [`.hermes/rules/docs-framework.md`](../rules/docs-framework.md)。
 
 ---
 
