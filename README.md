@@ -81,7 +81,7 @@ yuanforge/
 ├── AGENTS.md                    # 🆕 通用入口（跨平台）
 ├── README.md                    # 本文件
 ├── .gitignore
-├── docs/                        # 📚 项目说明书（生长层）
+├── docs/                        # 📚 项目说明书
 │   ├── INDEX.md                 # 入口 + 文档地图
 │   ├── PROGRESS.md              # 进度中枢
 │   ├── ARCHITECTURE.md          # 架构全景
@@ -89,12 +89,7 @@ yuanforge/
 │   ├── CONVENTIONS.md           # 规范约定
 │   ├── glossary.md              # 术语表
 │   ├── pitfalls.md              # 踩坑库
-│   ├── features/                # 功能文档（每功能一文件）
-│   │   └── _template.md
-│   ├── bugs/                    # Bug 记录（每 Bug 一文件）
-│   │   └── _template.md
-│   └── decisions/               # 决策日志（每决策一文件）
-│       └── _template.md
+│   └── 20260707-框架v2/          # 会话文件夹（按需创建）
 ├── .yuan/                       # 🔧 框架内核（平台无关）
 │   ├── agents/                  # 5 个 Agent 角色定义
 │   │   ├── architect.md
@@ -106,6 +101,11 @@ yuanforge/
 │   │   ├── iron-rules.md        # 九条铁律
 │   │   ├── plan-format.md       # Plan 工程化格式
 │   │   └── docs-framework.md    # docs/ 说明书体系规范
+│   ├── docs/                    # 📐 doc 规格书（4 份）
+│   │   ├── GLOBAL.md            # 全局文档规格
+│   │   ├── PROGRESS.md          # 进度文档规格
+│   │   ├── ARCHITECTURE.md      # 架构文档规格
+│   │   └── SESSION.md           # 会话文档规格
 │   ├── skills/                  # 9 个 Skill 定义
 │   │   ├── vibecoding-workflow.md
 │   │   ├── project-bootstrap.md
@@ -116,8 +116,6 @@ yuanforge/
 │   │   ├── test-driven-development.md
 │   │   ├── systematic-debugging.md
 │   │   └── requesting-code-review.md
-│   ├── docs/                    # 框架自身记忆
-│   │   └── SESSION_LOG.md       # 会话日志
 │   ├── platforms/               # 🆕 平台适配器
 │   │   ├── hermes.md            # Hermes 平台适配
 │   │   └── manual.md            # 通用/人工模式

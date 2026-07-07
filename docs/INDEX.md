@@ -9,6 +9,7 @@
 - **项目是什么:** 一套纯 Markdown 规则体系，让任何 Agent 平台都能按统一的工作流协作开发
 - **技术栈:** 无代码 — Markdown + Git
 - **当前状态:** 框架 v2.0，功能完整，持续迭代
+- **当前会话:** [20260707-框架v2](./20260707-框架v2/)
 - **下一步:** 实战验证 + 用户反馈优化
 
 ---
@@ -23,44 +24,38 @@
 | 写框架代码的规范 | → [CONVENTIONS.md](./CONVENTIONS.md) |
 | 查术语 | → [glossary.md](./glossary.md) |
 | 看踩过的坑 | → [pitfalls.md](./pitfalls.md) |
-| 看历史决策 | → [decisions/](./decisions/) |
-| 看功能记录 | → [features/](./features/) |
-| 查 Bug | → [bugs/](./bugs/) |
+| 看历史会话 | → [20260707-框架v2/](./20260707-框架v2/) |
 
 ---
 
 ## 📚 文档地图
 
-### 全局文档（每次必读）
+### 全局文档
 
 | 文档 | 何时读 | 优先级 |
 |------|--------|--------|
-| [PROGRESS.md](./PROGRESS.md) | 每次必读 | 🔴 必读 |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | 首次接手、架构变更时 | 🔴 必读 |
-| [pitfalls.md](./pitfalls.md) | 每次必读 | 🔴 必读 |
-| [SETUP.md](./SETUP.md) | 首次接手 | 🟡 按需 |
-| [CONVENTIONS.md](./CONVENTIONS.md) | 修改框架文件前 | 🟡 按需 |
+| [PROGRESS.md](./PROGRESS.md) | 每次必读 | 🔴 |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | 首次接手 | 🔴 |
+| [pitfalls.md](./pitfalls.md) | 每次必读 | 🔴 |
+| [SETUP.md](./SETUP.md) | 首次接手 | 🟡 |
+| [CONVENTIONS.md](./CONVENTIONS.md) | 修改框架文件前 | 🟡 |
 
-### 生长文档
+### 会话文件夹
 
-| 目录 | 内容 | 当前状态 |
-|------|------|---------|
-| [features/](./features/) | 框架功能演进记录 | 待填充 |
-| [bugs/](./bugs/) | 框架自身 Bug | 待填充 |
-| [decisions/](./decisions/) | 架构决策 (ADR) | 待填充 |
-| [glossary.md](./glossary.md) | 领域术语 | 已填充 |
-| [pitfalls.md](./pitfalls.md) | 开发踩坑 | 已填充 |
+| 会话 | 状态 |
+|------|------|
+| [20260707-框架v2](./20260707-框架v2/) | 🔨 进行中 |
 
 ---
 
 ## 🤖 Agent 接手阅读顺序
 
 ```
-1. INDEX.md (本文件)     → 知道有哪些文档
-2. PROGRESS.md           → 知道框架当前状态
-3. ARCHITECTURE.md       → 知道框架怎么设计的
-4. pitfalls.md           → 知道有哪些坑
-5. 按需进入 features/ bugs/ decisions/
+1. INDEX.md (本文件)       → 知道有哪些文档
+2. PROGRESS.md             → 知道框架当前状态
+3. ARCHITECTURE.md         → 知道框架怎么设计的
+4. pitfalls.md             → 知道有哪些坑
+5. 当前会话文件夹            → 了解本次会话的 Plan/产出
 ```
 
 ---
@@ -71,7 +66,7 @@
 |----|------|
 | GitHub | https://github.com/tribbianijoey401/yuanforge |
 | 框架内核 | `.yuan/` — Agent 角色、Skill、铁律、平台适配器 |
-| 项目模板 | `.yuan/templates/` — 供新项目复制的模板文件 |
+| 规格书 | `.yuan/docs/` — 4 份 doc 规格书 |
 
 ---
 

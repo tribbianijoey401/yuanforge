@@ -46,6 +46,6 @@
 
 **原因:** 设计时未区分「框架自身文档」和「项目模板」。
 
-**修复:** 模板迁至 `.yuan/templates/docs/`，docs/ 改为 YuanForge 自身真实文档。project-bootstrap 从 `.yuan/templates/docs/` 复制。
+**修复:** 模板并入 `.yuan/docs/` 规格书，docs/ 改为会话文件夹结构。
 
 **教训:** 框架自身的文档和给用户复制的模板必须分开放。
