@@ -18,13 +18,17 @@ Hermes 的系统提示会注入 `.yuan/rules/` 下的规则文件：
 
 ## 派发子 Agent（Conductor）
 
-使用 Hermes 的 `delegate_task` 工具：
+使用 Hermes 的 `delegate_task` 工具，按 12 人专家团合约派发：
 
 ```markdown
 # Conductor 的标准操作：
 1. 读取 Plan 中的 Dispatch Table
 2. 解析依赖关系 → 构建 DAG
-3. 为每个 ready Task 调用 delegate_task，context 含：
+3. 按调度决策表依次派发：
+   product-analyst → architect → frontend-dev/backend-dev
+   → spec-reviewer/security-auditor/quality-auditor/ux-reviewer (并行)
+   → tester → doc-engineer
+4. 为每个 ready Task 调用 delegate_task，context 含：
    - Task 详细 spec
    - 对应角色合约（contracts/）
    - 铁律引用
@@ -50,8 +54,8 @@ skill_view("test-driven-development")
 ## 追踪进度
 
 - `docs/PROGRESS.md` — 项目进度中枢
-- `.yuan/docs/SESSION_LOG.md` — 会话日志
-- `.yuan/plans/` — Plan 存档
+- `docs/YYYYMMDD-描述/SESSION_LOG.md` — 会话日志
+- `docs/YYYYMMDD-描述/TASK_BOARD.md` — 运行时任务板
 
 ---
 

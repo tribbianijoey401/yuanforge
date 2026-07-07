@@ -10,20 +10,20 @@
 
 ```
 你（导演）
-  │ "做一个 TODO API"
+  │ "我要做一个 xxx"
   ▼
 ┌──────────────────────────────────────┐
 │  YuanForge 元框架                     │
 │                                      │
 │  🔨 铁律 (Iron Rules)                │
 │  ─────────────────────               │
-│  九条不可违反的法则，约束所有 Agent    │
+│  九条不可违反的法则，含三档阻塞策略    │
 │                                      │
-│  👷 Agent 军团                       │
+│  👷 12 人专家团                       │
 │  ─────────────────────               │
-│  Architect → Conductor               │
-│  → Coder → Reviewer → Tester         │
-│  → DevOps                            │
+│  Product Analyst → Architect         │
+│  → Frontend/Backend Dev →            │
+│  4 审查官并行 → Tester → Doc Engineer │
 │                                      │
 │  🧰 Skill 武器库                     │
 │  ─────────────────────               │
@@ -41,12 +41,14 @@
 
 ## 快速开始
 
-### 1. 启动新项目
+### 1. 初始化项目
 
 ```bash
-cp -r yuanforge my-awesome-project
-cd my-awesome-project
-git init && git add -A && git commit -m "init: from YuanForge"
+# 从零开始
+./bin/yuanforge-init ./my-awesome-project --name "我的项目"
+
+# 嫁接到已有项目
+./bin/yuanforge-init ./existing-project --mode existing
 ```
 
 ### 2. 开始 Vibecoding
@@ -61,14 +63,14 @@ git init && git add -A && git commit -m "init: from YuanForge"
 | **Codex CLI** | `codex` 启动，说「read AGENTS.md，按 YuanForge 框架开发 TODO API」 |
 | **任何平台** | 参考 `.yuan/platforms/manual.md` — 人工协调也能走通全流程 |
 
-无论哪个平台，Yuan 的工作流都一样：
+无论哪个平台，YuanForge 的工作流都一样：
 
-1. **Architect** 分析需求 → 设计架构 → 产出 Plan（含 Dispatch Table）
-2. 你确认 Plan
-3. **Conductor** 解析 Dispatch Table → 构建 DAG → 并行派发 Coder
-4. Coder → Reviewer → Tester → DevOps 逐层流转
-5. 每个 Task 经历完整的 TDD + 两阶段审查
-6. 交付可运行的代码
+1. **Product Analyst** 澄清需求 → 用户故事 + 验收标准
+2. **Architect** 计划复盘 → 用户确认 → API 契约冻结 + Plan
+3. **Frontend Dev + Backend Dev** 并行 TDD 实现
+4. **4 审查官并行** → Spec/Security 为 Blocker，Quality/UX 为 Advisory
+5. **Tester** Hard Gate → 全量测试 PASS
+6. **Doc Engineer** 归档
 
 > 💡 不同平台的自动调度能力不同。Hermes/Claude Code 能自动 fork 子 Agent，Cursor 需要手动切换角色。详见 `.yuan/platforms/`。
 
@@ -78,55 +80,31 @@ git init && git add -A && git commit -m "init: from YuanForge"
 
 ```
 yuanforge/
-├── AGENTS.md                    # 🆕 通用入口（跨平台）
+├── AGENTS.md                    # 通用入口（跨平台），含 6 步开发流程
 ├── README.md                    # 本文件
-├── .gitignore
-├── docs/                        # 📚 项目说明书
-│   ├── INDEX.md                 # 入口 + 文档地图
-│   ├── PROGRESS.md              # 进度中枢
-│   ├── ARCHITECTURE.md          # 架构全景
-│   ├── SETUP.md                 # 环境指南
-│   ├── CONVENTIONS.md           # 规范约定
-│   ├── glossary.md              # 术语表
-│   ├── pitfalls.md              # 踩坑库
-│   └── 20260707-框架v2/          # 会话文件夹（按需创建）
-├── .yuan/                       # 🔧 框架内核（平台无关）
-│   ├── agents/                  # 5 个 Agent 角色定义
-│   │   ├── architect.md
-│   │   ├── coder.md
-│   │   ├── reviewer.md
-│   │   ├── tester.md
-│   │   └── devops.md
-│   ├── rules/
-│   │   ├── iron-rules.md        # 九条铁律
-│   │   ├── plan-format.md       # Plan 工程化格式
-│   │   └── docs-framework.md    # docs/ 说明书体系规范
-│   ├── docs/                    # 📐 doc 规格书（4 份）
-│   │   ├── GLOBAL.md            # 全局文档规格
-│   │   ├── PROGRESS.md          # 进度文档规格
-│   │   ├── ARCHITECTURE.md      # 架构文档规格
-│   │   └── SESSION.md           # 会话文档规格
-│   ├── skills/                  # 9 个 Skill 定义
-│   │   ├── vibecoding-workflow.md
-│   │   ├── project-bootstrap.md
-│   │   ├── project-audit.md
-│   │   ├── project-memory.md
-│   │   ├── writing-plans.md
-│   │   ├── subagent-driven-development.md
-│   │   ├── test-driven-development.md
-│   │   ├── systematic-debugging.md
-│   │   └── requesting-code-review.md
-│   ├── platforms/               # 🆕 平台适配器
-│   │   ├── hermes.md            # Hermes 平台适配
-│   │   └── manual.md            # 通用/人工模式
-│   └── plans/                   # 实现计划存档
-├── contracts/                   # Agent 角色合约
+├── bin/yuanforge-init           # 项目初始化脚本
+├── docs/                        # yuanforge 自身开发文档
+│   ├── INDEX.md
+│   ├── PROGRESS.md
+│   └── 20260707-框架v2/          # 会话文件夹
+├── .yuan/                       # 🔧 框架内核
+│   ├── docs/                    # 5 份说明书规格（GLOBAL/PROGRESS/ARCHITECTURE/SESSION/TASK_BOARD）
+│   ├── rules/                   # 九条铁律 + Plan 格式 + 文档体系
+│   ├── skills/                  # 9 个 Skill
+│   └── platforms/               # 平台适配器
+├── contracts/                   # 👷 12 个 Agent 角色合约
 │   ├── conductor.md
+│   ├── product-analyst.md
 │   ├── architect.md
-│   ├── coder.md
-│   ├── reviewer.md
+│   ├── ui-designer.md
+│   ├── frontend-dev.md
+│   ├── backend-dev.md
+│   ├── spec-reviewer.md
+│   ├── security-auditor.md
+│   ├── quality-auditor.md
+│   ├── ux-reviewer.md
 │   ├── tester.md
-│   └── devops.md
+│   └── doc-engineer.md
 ├── protocols/                   # Agent 间协议
 │   ├── dispatch-table.md
 │   └── task-output.md
@@ -147,7 +125,7 @@ yuanforge/
 | Ⅴ | 上下文隔离 | 每个 Task 全新 Subagent |
 | Ⅵ | 文档即代码 | 决策必须落文档 |
 | Ⅶ | 渐进式交付 | 每步可运行 |
-| Ⅷ | 质量门禁 | G1→G2→G3→G4，不通过不前进 |
+| Ⅷ | 质量门禁 | G1→G2→G3→G4，含三档阻塞策略 |
 | Ⅸ | 自主调度 | Agent 按 Dispatch Table 自主派发 Agent |
 
 详见 [`.yuan/rules/iron-rules.md`](.yuan/rules/iron-rules.md)
@@ -158,8 +136,8 @@ yuanforge/
 
 | 模式 | 触发 | 规则 |
 |------|------|------|
-| **严格模式**（默认） | 不加标记 | 九条铁律全开 |
-| **快速模式** | `@快速模式` | 放宽审查和提交，其余保持 |
+| **严格模式**（默认） | 不加标记 | 12 专家团全流程，九条铁律全开 |
+| **快速模式** | `@快速模式` | 跳过审查层（保留 Tester），其余保持 |
 
 ---
 
@@ -171,6 +149,7 @@ yuanforge/
 |-----------|------|
 | 一个 Agent 平台 | Hermes Agent / Cursor / Claude Code / Codex CLI / Copilot ... 任意一个 |
 | Git | 版本控制 |
+| Python 3（仅 `yuanforge-init`） | 项目初始化脚本 |
 | 无其他依赖 | 具体项目需要的运行时由 Agent 按需安装 |
 
 > YuanForge 是规则，不是代码。它不绑定语言、不绑定框架、不绑定平台。

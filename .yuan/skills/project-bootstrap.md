@@ -4,10 +4,8 @@ description: >
   创建新项目或嫁接现有项目时加载。触发：用户说「创建项目」「初始化」
   「用 YuanForge 启动」「新建项目」、从一个 idea 开始，或「嫁接 YuanForge」
   「给现有项目接入 Yuan」。两种模式：
-  ① 全新模式 — 复制元框架、创建 docs/ 说明书体系（含 features/bugs/decisions
-  子目录 + 模板）、初始化 Git。
-  ② 嫁接模式 — 将 .yuan/ contracts/ protocols/ templates/ AGENTS.md
-  复制到现有项目，然后触发 project-audit 审计现有代码并填充 docs/。
+  ① 全新模式 — 运行 yuanforge-init 初始化项目结构。
+  ② 嫁接模式 — 将框架文件复制到现有项目，然后触发 project-audit。
   读写：docs/ 全部初始创建（新模式）或审计填充（嫁接模式）。
 version: 2.0.0
 ---

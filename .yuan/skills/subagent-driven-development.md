@@ -42,12 +42,12 @@ Task N: {描述}
 │
 ├── 派 Coder Subagent
 │   ├── 上下文：Plan Task 描述 + features/NNN-xxx.md + pitfalls
-│   ├── 加载：coder persona + test-driven-development skill
+│   ├── 加载：frontend-dev / backend-dev persona + test-driven-development skill
 │   └── 等待 Coder 完成 → Commit
 │
 ├── Gate G2-TASK: Spec Review
 │   ├── 派 Reviewer Subagent
-│   ├── 加载：reviewer persona + requesting-code-review skill
+│   ├── 加载：spec-reviewer / security-auditor / quality-auditor / ux-reviewer persona
 │   ├── PASS → 进入 Quality Review
 │   └── FAIL → 退回 Coder（附差距列表）→ 最多 3 轮
 │

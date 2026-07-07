@@ -3,7 +3,7 @@ name: vibecoding-workflow
 description: >
 YuanForge 核心工作流引擎。开发任何功能时加载。触发：用户说「开发」「实现」
 「做项目」「继续」「build」、Phase 1 启动、Plan 确认后进入 Phase 2。
-编排 Architect→Coder→Reviewer→Tester→DevOps 完整 4-Phase 流水线。
+编排 12 人专家团完整流程：Product Analyst→Architect→Dev→4审查官→Tester→Doc Engineer。
 读写：PROGRESS（进度）、features/（功能文档）、decisions/（决策）、
 pitfalls（踩坑）、bugs/（Bug 记录）。所有 Agent 的调度中心。
 version: 1.0.0
@@ -156,7 +156,7 @@ version: 1.0.0
 ```markdown
 必加载：
 - `.yuan/rules/iron-rules.md`  — 铁律
-- `.yuan/agents/architect.md`  — 架构师角色
+- `contracts/architect.md`  — 架构师角色
 
 按需加载：
 - 对应技术栈 skill（如 python-fastapi）
@@ -216,13 +216,13 @@ version: 1.0.0
 对每个 Task：
 
 ```
-Step A: 派 Coder (新 subagent)
-→ 加载 coder agent persona + TDD skill
+Step A: 派 Dev (新 subagent)
+→ 加载 frontend-dev 或 backend-dev agent persona + TDD skill
 → 提供 Task 完整上下文
 → 执行 TDD → 原子提交
 
-Step B: Gate G2-TASK — Spec Review
-→ 加载 reviewer agent persona
+Step B: Gate G2 — 四审查官并行审查
+→ 加载 spec-reviewer / security-auditor / quality-auditor / ux-reviewer agent persona
 → 对照 Plan 检查实现
 → PASS → 进入 Step C
 → FAIL → Coder 修复 → 重新审查
@@ -258,7 +258,7 @@ Step D: Stage Gate 检查
 
 ### 3.2 CI/CD 配置
 
-- 加载 `devops` agent persona
+- 由 Conductor 执行 DevOps 交付模式（暂不开发独立 Agent）
 - 配置 GitHub Actions 或等价 CI
 - 编写 Dockerfile / docker-compose
 

@@ -96,13 +96,13 @@
 ```markdown
 ### 任务派发表
 
-| Task ID | 标题 | Role | 上游依赖 | 产出物 | 门禁 |
-|---------|------|------|---------|--------|------|
-| task-002 | 用户数据模型 | coder | task-001 | src/models/user.py, tests/models/ | G2 |
-| task-003 | 用户管理 API | coder | task-002 | src/api/users.py, tests/api/ | G2 |
-| task-004 | 用户管理前端 | coder | task-001 | src/ui/UserList.tsx, tests/ui/ | G2 |
-| task-005 | 用户系统集成测试 | tester | task-002,task-003,task-004 | tests/integration/ | G3 |
-| task-006 | 部署配置 | devops | task-005 | k8s/user-svc.yaml | G4 |
+| Task ID | 优 | 标题 | Role | 上游依赖 | ⏱超时 | 产出物 | 门禁 | 风险 |
+|---------|----|------|------|---------|-------|--------|------|------|
+| task-002 | P1 | 数据模型 | backend-dev | task-001 | 30 | src/models/user.py, tests/ | G2 | P1 |
+| task-003 | P1 | 用户管理 API | backend-dev | task-002 | 30 | src/api/users.py, tests/ | G2 | P1 |
+| task-004 | P1 | 用户管理前端 | frontend-dev | task-001 | 30 | src/ui/UserList.tsx, tests/ | G2 | P1 |
+| task-005 | P1 | 集成测试 | tester | task-003,task-004 | 20 | tests/integration/ | G3 | — |
+| task-006 | P2 | 文档归档 | doc-engineer | task-005 | 10 | docs/CHANGELOG.md | G4 | — |
 ```
 
 **字段说明：**
@@ -110,17 +110,14 @@
 | 字段 | 必填 | 说明 |
 |------|------|------|
 | **Task ID** | ✅ | `task-NNN` 格式，NNN 从 001 开始连续编号 |
+| **优** | ✅ | 优先级：P0=紧急, P1=高, P2=中(默认), P3=低 |
 | **标题** | ✅ | 人类可读的 Task 描述 |
-| **Role** | ✅ | 角色名：`architect` / `coder` / `reviewer` / `tester` / `devops` |
+| **Role** | ✅ | 角色名：`product-analyst` / `architect` / `ui-designer` / `frontend-dev` / `backend-dev` / `spec-reviewer` / `security-auditor` / `quality-auditor` / `ux-reviewer` / `tester` / `doc-engineer` |
 | **上游依赖** | ✅ | Task ID 列表，逗号分隔。无依赖填 `-` |
+| **⏱超时** | ✅ | 分钟数，Architect 覆写默认值 |
 | **产出物** | ✅ | 完成后的产出文件列表，逗号分隔 |
-| **门禁** | ✅ | 该 Task 触发的 Gate：G2（单 Task 审查）/ G3（集成测试）/ G4（部署） |
-
-**规则：**
-- **禁止**在 Task 字段中写自然语言需求 — Task 只是一个标识符，详细 spec 在 `dispatch/` 目录
-- Task ID 必须与 `dispatch/` 下的文件名对应（如 `task-002` ↔ `dispatch/task-002.yaml`）
-- 上游依赖必须精确列出所有前置 Task ID，禁止模糊依赖（如"等后端完成"）
-- 并联 Task 不互相列在依赖中
+| **门禁** | ✅ | 该 Task 触发的 Gate：G1 / G2 / G3 / G4 |
+| **风险** | ✅ | Product Analyst 产出：P0/P1/P2，决定 Security Auditor 投入 |
 
 ### 5. 质量门禁
 
@@ -129,10 +126,10 @@
 
 | Gate | 检查内容 | 通过标准 | 执行者 |
 |------|---------|---------|--------|
-| G1 | Plan 完整性 | Dispatch Table 无遗漏、依赖正确、用户确认 | 用户 |
-| G2 | Task 级审查 | Spec 合规 + 代码质量 APPROVED | reviewer |
-| G3 | 集成测试 | `pytest tests/ -q` 全 PASS | tester |
-| G4 | 交付就绪 | CI 通过 + 文档齐全 + 部署配置 | devops |
+| G1 | Plan 完整性 + 用户确认设计理解书 | Dispatch Table 无遗漏、依赖正确、用户确认 | 用户 |
+| G2 | 四审查官并行 | 🔴 Blocker 全部解决 | spec-reviewer, security-auditor, quality-auditor, ux-reviewer |
+| G3 | 集成测试 | 🟡 Hard Gate — 全量测试 PASS | tester |
+| G4 | 文档归档 | Doc Engineer 归档完成 | doc-engineer |
 ```
 
 ---
@@ -148,25 +145,23 @@
 2026-06-30_payment-gateway.md
 
 # 存放路径
-.yuanforge/plans/
+docs/YYYYMMDD-描述/PLAN.md
 ```
 
 ---
 
-## 与 dispatch 目录的关系
+## 与 Task Spec 的关系
 
-Plan 中的 Task 是一个**索引**。每个 Task 的详细执行 spec 放在独立文件中，Plan 只做关联。
+Plan 中的 Task 是一个**索引**。每个 Task 的详细执行 spec 放在会话文件夹中：
 
 ```
-.yuanforge/
-├── plans/
-│   └── 2026-06-29_user-auth.md    ← Plan（含 Dispatch Table）
-└── dispatch/
-    ├── task-002-data-model.md      ← Task 详细 spec
-    ├── task-003-backend-api.md
-    ├── task-004-frontend-ui.md
-    ├── task-005-integration-test.md
-    └── task-006-deploy-config.md
+docs/YYYYMMDD-描述/
+├── PLAN.md                              ← Plan（含 Dispatch Table）
+├── TASK_BOARD.md                        ← 运行时任务板
+├── SESSION_LOG.md
+├── FEATURE.md
+├── ADR-NNN.md
+└── BUG-NNN.md
 ```
 
 **Plan 轻，Task 重。** Plan 让 Conductor 快速理解全貌，Task 文件让 Coder 获取完整上下文。

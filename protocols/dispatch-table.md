@@ -53,41 +53,44 @@ Dispatch Table 永远是 Plan 文件的 `## Dispatch Plan` 段落，包含两个
 | 字段 | 必填 | 格式 | 说明 |
 |------|------|------|------|
 | **Task ID** | ✅ | `task-NNN` | NNN 从 001 开始，连续编号 |
+| **优先级** | ✅ | `P0/P1/P2/P3` | P0=紧急, P2=默认。Architect 设置 |
 | **标题** | ✅ | 人类可读 | 一句话描述 |
-| **Role** | ✅ | `architect` / `coder` / `reviewer` / `tester` / `devops` | 执行者角色 |
+| **Role** | ✅ | `product-analyst` / `architect` / `ui-designer` / `frontend-dev` / `backend-dev` / `spec-reviewer` / `security-auditor` / `quality-auditor` / `ux-reviewer` / `tester` / `doc-engineer` | 执行者角色 |
 | **上游依赖** | ✅ | Task ID 列表，逗号分隔 | 无依赖填 `-` |
+| **⏱超时(分)** | ✅ | 整数 | 默认: product-analyst=30, architect=120, ui-designer=60, dev=30, reviewer=15, security=30, quality=20, ux=15, tester=20, doc-engineer=10。Architect 可覆写 |
 | **产出物** | ✅ | 文件路径，逗号分隔 | 完成后产出的文件 |
-| **门禁** | ✅ | `G2` / `G3` / `G4` | 该 Task 对应的质量 Gate |
+| **门禁** | ✅ | `G1` / `G2` / `G3` / `G4` | 该 Task 对应的质量 Gate |
+| **风险标签** | 🆕 | `P0/P1/P2` | Product Analyst 产出，决定 Security Auditor 投入 |
 
 **示例：**
 ```markdown
 ### 任务派发表
 
-| Task ID | 标题 | Role | 上游依赖 | 产出物 | 门禁 |
-|---------|------|------|---------|--------|------|
-| task-002 | 用户数据模型 | coder | task-001 | src/models/user.py, tests/models/ | G2 |
-| task-003 | 用户管理 API | coder | task-002 | src/api/users.py, tests/api/ | G2 |
-| task-004 | 用户管理前端 | coder | task-001 | src/ui/UserList.tsx, tests/ui/ | G2 |
-| task-005 | 用户系统集成测试 | tester | task-002,task-003,task-004 | tests/integration/ | G3 |
-| task-006 | 部署配置 | devops | task-005 | k8s/user-svc.yaml | G4 |
+| Task ID | 优 | 标题 | Role | 上游依赖 | ⏱超时 | 产出物 | 门禁 | 风险 |
+|---------|----|------|------|---------|-------|--------|------|------|
+| task-001 | P0 | 需求澄清 | product-analyst | - | 30 | docs/xxxx/用户故事+验收标准.md | G1 | — |
+| task-002 | P0 | 架构设计 | architect | task-001 | 120 | docs/xxxx/PLAN.md, docs/ARCHITECTURE.md | G1 | — |
+| task-003 | P1 | 数据模型 | backend-dev | task-002 | 30 | src/models/user.py, tests/ | G2 | P1 |
+| task-004 | P1 | 用户管理 API | backend-dev | task-003 | 30 | src/api/users.py, tests/ | G2 | P1 |
+| task-005 | P1 | 用户管理前端 | frontend-dev | task-002 | 30 | src/ui/UserList.tsx, tests/ | G2 | P1 |
+| task-006 | P1 | 集成测试 | tester | task-004,task-005 | 20 | tests/integration/ | G3 | — |
+| task-007 | P2 | 文档归档 | doc-engineer | task-006 | 10 | docs/CHANGELOG.md | G4 | — |
 ```
 
 ---
 
-## 与 dispatch 目录的关系
+## 与 Task Spec 的关系
 
-Plan 中的 Task 是**索引**。每个 Task 的详细执行 spec 放在独立文件中：
+Plan 中的 Task 是**索引**。每个 Task 的详细执行 spec 放在会话文件夹中：
 
 ```
-.yuanforge/
-├── plans/
-│   └── 2026-06-29_user-auth.md         ← Plan（含 Dispatch Table）
-└── dispatch/
-    ├── task-002-data-model.md           ← Task 详细 spec
-    ├── task-003-backend-api.md
-    ├── task-004-frontend-ui.md
-    ├── task-005-integration-test.md
-    └── task-006-deploy-config.md
+docs/YYYYMMDD-描述/
+├── PLAN.md                              ← Plan（含 Dispatch Table）
+├── TASK_BOARD.md                        ← 运行时任务板
+├── SESSION_LOG.md
+├── FEATURE.md
+├── ADR-NNN.md
+└── BUG-NNN.md
 ```
 
 ---
@@ -112,5 +115,5 @@ Conductor 读 Dispatch Table 后的推理链：
 ❌ Task 标题写 "实现登录（含前后端+数据库）" → 拆成多个 Task
 ❌ 上游依赖写 "全部完成"                    → 列出具体 Task ID
 ❌ 产出物写 "相关代码"                       → 列出具体文件路径
-❌ 同一个 Task 既是 coder 又是 reviewer      → 违反铁律 Ⅲ/Ⅴ
+❌ 同一个 Task 既是 dev 又是 reviewer      → 违反铁律 Ⅲ/Ⅴ
 ```

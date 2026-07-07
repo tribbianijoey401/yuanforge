@@ -59,7 +59,7 @@ SESSION_LOG.md（收尾）
 
 优先级：P0=紧急, P1=高, P2=中(默认), P3=低。Architect 在 PLAN 中设置，Conductor 复制。
 
-默认超时：architect=120, coder=30, reviewer=15, tester=20, devops=15。Architect 可在 PLAN 中覆写。
+默认超时：product-analyst=30, architect=120, ui-designer=60, frontend-dev=30, backend-dev=30, spec-reviewer=15, security-auditor=30, quality-auditor=20, ux-reviewer=15, tester=20, doc-engineer=10。Architect 可在 PLAN 中覆写。
 
 ## 上下文传递
 

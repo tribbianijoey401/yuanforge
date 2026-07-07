@@ -27,8 +27,8 @@ YuanForge 是纯规则体系（Markdown），不是代码。核心思想：
 │ ├── plan-format.md    Plan 工程化格式       │
 │ └── docs-framework.md 说明书规范            │
 ├──────────────────────────────────────────┤
-│ 角色层（.yuan/agents/ + contracts/）       │
-│ ├── Architect/Coder/Reviewer/Tester/DevOps  │
+│ 角色层（contracts/）                       │
+│ ├── 12 人专家团                              │
 │ └── Conductor（调度中枢）                   │
 ├──────────────────────────────────────────┤
 │ 技能层（.yuan/skills/）                    │

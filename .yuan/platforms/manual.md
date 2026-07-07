@@ -49,13 +49,13 @@ YuanForge 定义了一套**角色分工 + 规则约束**的协作模式：
 
 ```bash
 # 终端 1 — Coder 执行 Task A
-# 告诉 Agent: "你是 Coder 角色（见 .yuan/agents/coder.md），执行 Task task-002"
+# 告诉 Agent: "你是 Frontend Dev 角色（见 contracts/frontend-dev.md），执行 Task task-004"
 
-# 终端 2 — Coder 执行 Task B（与 A 无依赖，可并行）
-# 告诉 Agent: "你是 Coder 角色，执行 Task task-003"
+# 终端 2 — Backend Dev 执行 Task B（与 A 无依赖，可并行）
+# 告诉 Agent: "你是 Backend Dev 角色（见 contracts/backend-dev.md），执行 Task task-003"
 
 # 终端 3 — 等 A 和 B 都完成后再启动
-# 告诉 Agent: "你是 Reviewer 角色（见 .yuan/agents/reviewer.md），审查 task-002 + task-003"
+# 告诉 Agent: "你是 Spec Reviewer 角色（见 contracts/spec-reviewer.md），审查 task-002 + task-003"
 ```
 
 ### 方法 B：顺序执行
@@ -63,7 +63,7 @@ YuanForge 定义了一套**角色分工 + 规则约束**的协作模式：
 ```bash
 # 同一个终端，按 DAG 拓扑顺序逐 Task 执行
 # 每个 Task 开始前，告诉 Agent 切换角色
-# 例："现在你是 Architect 角色，读 .yuan/agents/architect.md，执行 task-001"
+# 例："现在你是 Architect 角色，读 contracts/architect.md，执行 task-001"
 ```
 
 ### 方法 C：用 AGENTS.md 引导
