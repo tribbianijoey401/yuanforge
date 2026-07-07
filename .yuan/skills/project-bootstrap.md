@@ -509,7 +509,7 @@ git commit -m "init: project bootstrap from YuanForge"
 
 ### Step 5: 准备开发
 
-现在你可以对 Hermes Agent 说：
+现在你可以对 Agent 说：
 > "开始开发 [你的第一个功能]"
 
 Agent 将自动加载 `docs/INDEX.md` → `docs/PROGRESS.md` 启动工作流。
@@ -570,10 +570,10 @@ cp    yuanforge/AGENTS.md     ./
 
 ```bash
 mkdir -p docs/{features,bugs,decisions}
-cp yuanforge/docs/*.md            docs/
-cp yuanforge/docs/features/_template.md   docs/features/
-cp yuanforge/docs/bugs/_template.md       docs/bugs/
-cp yuanforge/docs/decisions/_template.md  docs/decisions/
+cp yuanforge/.yuan/templates/docs/*.md            docs/
+cp yuanforge/.yuan/templates/docs/features/_template.md   docs/features/
+cp yuanforge/.yuan/templates/docs/bugs/_template.md       docs/bugs/
+cp yuanforge/.yuan/templates/docs/decisions/_template.md  docs/decisions/
 ```
 
 此时 docs/ 都是空模板，内容待 Step G3 填充。

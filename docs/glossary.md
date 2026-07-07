@@ -17,7 +17,7 @@
 
 <!-- 按字母/拼音排序 -->
 
-- **Yuan（元锻造）：** 基于 Hermes Agent 的 Vibecoding 元框架，提供 Agent 角色、铁律和 Skill 体系
+- **Yuan（元锻造）：** 平台无关的 Vibecoding 元框架，定义 Agent 角色、铁律和 Skill 体系，任何 Agent 平台都能执行
 
 ---
 
