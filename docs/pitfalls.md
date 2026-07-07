@@ -1,4 +1,4 @@
-# 踩坑记录 (PITFALLS.md)
+# 踩坑记录 (pitfalls.md)
 
 > **每个坑都是一次学习机会。** 此文件记录本项目踩过的坑，防止重复犯错。
 > Agent 首次加载时必须阅读此文件。
@@ -9,7 +9,7 @@
 ## 坑的分类与归档策略
 
 ```
-踩坑了 → 记录到 PITFALLS.md
+踩坑了 → 记录到 pitfalls.md
               │
         Phase 4 回顾时判断：
               │
@@ -22,7 +22,7 @@
 
 | 坑的类型 | 归档策略 | 示例 |
 |---------|---------|------|
-| **本项目特有** | 留在 PITFALLS.md | "这个项目的 User 和 Profile 不拆开" |
+| **本项目特有** | 留在 pitfalls.md | "这个项目的 User 和 Profile 不拆开" |
 | **领域通用**（前端/后端/DB） | 提炼为 Skill | "FastAPI async handler 不能用同步 ORM" |
 | **框架通用**（流程问题） | 反馈到 Yuan 铁律/Skill | "Plan task 粒度太大导致审查困难" |
 

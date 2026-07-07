@@ -73,46 +73,55 @@ Yuan 会自动：
 yuanforge/
 ├── README.md                    # 本文件
 ├── .gitignore
-├── .hermes/                     # 框架核心
-│   ├── agents/                  # 5 个 Agent 角色定义（详细工作流）
-│   │   ├── architect.md         # 架构师：需求→设计→计划
-│   │   ├── coder.md             # 开发者：TDD 实现
-│   │   ├── reviewer.md          # 审查者：两阶段审查
-│   │   ├── tester.md            # 测试者：策略与覆盖
-│   │   └── devops.md            # 运维者：CI/CD + 部署
+├── docs/                        # 📚 项目说明书（生长层）
+│   ├── INDEX.md                 # 入口 + 文档地图
+│   ├── PROGRESS.md              # 进度中枢
+│   ├── ARCHITECTURE.md          # 架构全景
+│   ├── SETUP.md                 # 环境指南
+│   ├── CONVENTIONS.md           # 规范约定
+│   ├── glossary.md              # 术语表
+│   ├── pitfalls.md              # 踩坑库
+│   ├── features/                # 功能文档（每功能一文件）
+│   │   └── _template.md
+│   ├── bugs/                    # Bug 记录（每 Bug 一文件）
+│   │   └── _template.md
+│   └── decisions/               # 决策日志（每决策一文件）
+│       └── _template.md
+├── .hermes/                     # 🔧 框架引擎（不改动）
+│   ├── agents/                  # 5 个 Agent 角色定义
+│   │   ├── architect.md
+│   │   ├── coder.md
+│   │   ├── reviewer.md
+│   │   ├── tester.md
+│   │   └── devops.md
 │   ├── rules/
-│   │   ├── iron-rules.md        # 九条铁律（含质量门禁 + 自主调度）
-│   │   ├── plan-format.md       # Plan 工程化格式（含 Dispatch Table）
-│   │   └── docs-framework.md    # docs/ 说明书框架规范
-│   ├── skills/                  # Skill 定义
-│   │   ├── vibecoding-workflow.md  # 核心引擎
-│   │   ├── project-bootstrap.md    # 项目初始化
-│   │   ├── project-memory.md       # 记忆管理
-│   │   ├── writing-plans.md        # Plan 写作
-│   │   ├── subagent-driven-development.md  # Subagent 执行
-│   │   ├── test-driven-development.md      # TDD
-│   │   ├── systematic-debugging.md         # 系统调试
-│   │   └── requesting-code-review.md       # 代码审查
+│   │   ├── iron-rules.md        # 九条铁律
+│   │   ├── plan-format.md       # Plan 工程化格式
+│   │   └── docs-framework.md    # docs/ 说明书体系规范
+│   ├── skills/                  # 8 个 Skill 定义
+│   │   ├── vibecoding-workflow.md
+│   │   ├── project-bootstrap.md
+│   │   ├── project-memory.md
+│   │   ├── writing-plans.md
+│   │   ├── subagent-driven-development.md
+│   │   ├── test-driven-development.md
+│   │   ├── systematic-debugging.md
+│   │   └── requesting-code-review.md
 │   ├── docs/                    # 框架自身记忆
-│   │   ├── PROGRESS.md          # 当前进度
-│   │   ├── ARCHITECTURE.md      # 架构记录
-│   │   ├── PITFALLS.md          # 踩坑记录
-│   │   ├── DECISIONS.md         # 技术决策 (ADR)
-│   │   ├── GLOSSARY.md          # 术语表
 │   │   └── SESSION_LOG.md       # 会话日志
 │   └── plans/                   # 实现计划存档
-├── contracts/                   # Agent 角色合约（入参/出参/边界）
-│   ├── conductor.md             # 调度者：读 Plan → DAG → 派发
-│   ├── architect.md             # 架构师合约
-│   ├── coder.md                 # 开发者合约
-│   ├── reviewer.md              # 审查者合约
-│   ├── tester.md                # 测试者合约
-│   └── devops.md                # 运维者合约
+├── contracts/                   # Agent 角色合约
+│   ├── conductor.md
+│   ├── architect.md
+│   ├── coder.md
+│   ├── reviewer.md
+│   ├── tester.md
+│   └── devops.md
 ├── protocols/                   # Agent 间协议
-│   ├── dispatch-table.md        # Dispatch Table 格式规范
-│   └── task-output.md           # Task 产出物格式规范
-└── templates/                   # 项目模板
-    └── plan-with-dispatch.md    # 含 Dispatch Table 的 Plan 模板
+│   ├── dispatch-table.md
+│   └── task-output.md
+└── templates/
+    └── plan-with-dispatch.md
 ```
 
 ---
