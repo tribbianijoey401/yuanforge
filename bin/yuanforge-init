@@ -1,0 +1,319 @@
+#!/usr/bin/env python3
+"""YuanForge 项目初始化脚本
+
+用法:
+  yuanforge-init /path/to/new-project                    # 从零开始
+  yuanforge-init /path/to/new-project --name "我的项目"    # 指定项目名
+  yuanforge-init /path/to/existing --mode existing        # 嫁接已有项目
+  yuanforge-init /path/to/new-project --dry-run           # 预览不执行
+
+从零开始: 目标目录必须不存在或为空
+嫁接已有: 目标目录必须存在，只补缺不覆盖
+"""
+
+import argparse
+import os
+import shutil
+import sys
+import textwrap
+from pathlib import Path
+
+
+# ═══════════════════════════════════════════════════════════
+# 配置
+# ═══════════════════════════════════════════════════════════
+
+# 框架源目录（相对于本脚本的位置）
+SCRIPT_DIR = Path(__file__).resolve().parent
+SOURCE_ROOT = SCRIPT_DIR.parent  # yuanforge 根目录
+
+# 需要复制的框架模板目录/文件
+COPY_ITEMS = [
+    ".yuan",
+    "contracts",
+    "protocols",
+    "templates",
+    "AGENTS.md",
+]
+
+# docs/ 骨架文件（只有标题，内容由 Agent 填充）
+DOCS_SKELETON = {
+    "INDEX.md":         "# 文档索引\n",
+    "PROGRESS.md":      "# 项目进度\n\n> 当前 Phase: 初始化\n",
+    "ARCHITECTURE.md":  "# 系统架构\n",
+    "SETUP.md":         "# 环境搭建\n",
+    "CONVENTIONS.md":   "# 编码规范\n",
+    "glossary.md":      "# 术语表\n",
+    "pitfalls.md":      "# 踩坑记录\n",
+    "README.md":        None,  # 后面用项目名填充
+}
+
+# .gitignore 基础内容
+GITIGNORE_CONTENT = """\
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+.venv/
+venv/
+
+# Node.js
+node_modules/
+
+# 环境变量
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 构建产物
+build/
+*.log
+"""
+
+
+# ═══════════════════════════════════════════════════════════
+# 辅助函数
+# ═══════════════════════════════════════════════════════════
+
+def color(text: str, code: str) -> str:
+    """ANSI 颜色包装"""
+    colors = {"red": "31", "green": "32", "yellow": "33", "cyan": "36", "bold": "1"}
+    c = colors.get(code, "0")
+    return f"\033[{c}m{text}\033[0m"
+
+
+def copy_item(src: Path, dst: Path, dry_run: bool = False) -> str:
+    """复制单个文件或目录。返回状态: 'copied' | 'skipped' | 'conflict'"""
+    dst_path = dst / src.name
+
+    if dry_run:
+        if dst_path.exists():
+            return "conflict"
+        return "copied"
+
+    if src.is_dir():
+        if dst_path.exists():
+            shutil.rmtree(dst_path)
+        shutil.copytree(src, dst_path)
+    else:
+        shutil.copy2(src, dst_path)
+    return "copied"
+
+
+def generate_docs(target: Path, project_name: str, mode: str, dry_run: bool = False) -> dict:
+    """生成 docs/ 骨架。返回 {文件名: 动作}"""
+    docs_dir = target / "docs"
+    results = {}
+
+    if dry_run:
+        os.makedirs(docs_dir, exist_ok=True)
+    else:
+        docs_dir.mkdir(parents=True, exist_ok=True)
+
+    for filename, content in DOCS_SKELETON.items():
+        filepath = docs_dir / filename
+
+        if filename == "README.md":
+            content = f"# {project_name}\n\n> 项目描述（由 Agent 填充）\n"
+
+        if filepath.exists() and mode == "existing":
+            results[filename] = "skipped"
+            continue
+
+        if dry_run:
+            results[filename] = "created" if not filepath.exists() else "skipped"
+        else:
+            filepath.write_text(content, encoding="utf-8")
+            results[filename] = "created"
+
+    return results
+
+
+def generate_gitignore(target: Path, dry_run: bool = False) -> str:
+    """生成 .gitignore。返回状态"""
+    filepath = target / ".gitignore"
+
+    if filepath.exists():
+        return "skipped"
+
+    if not dry_run:
+        filepath.write_text(GITIGNORE_CONTENT, encoding="utf-8")
+    return "created"
+
+
+def print_new_project_help(project_name: str):
+    """从零开始项目的提示"""
+    print()
+    print(color("✅ YuanForge v2 初始化完成", "green"))
+    print(f"📂 {Path.cwd() / project_name if not os.path.isabs(project_name) else project_name}  模式: 从零开始")
+    print()
+    print(color("╔══════════════════════════════════════════╗", "cyan"))
+    print(color("║  🚀 下一步                                ║", "cyan"))
+    print(color("╠══════════════════════════════════════════╣", "cyan"))
+    print(color("║                                          ║", "cyan"))
+    print(color("║  向 Conductor 描述你的需求:               ║", "cyan"))
+    print(color("║                                          ║", "cyan"))
+    print(color('║  "我要做一个 xxx"                        ║', "cyan"))
+    print(color("║                                          ║", "cyan"))
+    print(color("║  Conductor 启动 12 人专家团:              ║", "cyan"))
+    print(color("║  Product Analyst → Architect →          ║", "cyan"))
+    print(color("║  Dev → 审查 → Tester → 归档              ║", "cyan"))
+    print(color("║                                          ║", "cyan"))
+    print(color("╚══════════════════════════════════════════╝", "cyan"))
+    print()
+
+
+def print_existing_project_help(project_path: str):
+    """嫁接已有项目的提示"""
+    print()
+    print(color("✅ YuanForge v2 嫁接完成", "green"))
+    print(f"📂 {project_path}  模式: 嫁接已有项目")
+    print()
+    print(color("╔══════════════════════════════════════════╗", "cyan"))
+    print(color("║  🚀 下一步                                ║", "cyan"))
+    print(color("╠══════════════════════════════════════════╣", "cyan"))
+    print(color("║                                          ║", "cyan"))
+    print(color("║  1. 先补全项目文档:                       ║", "cyan"))
+    print(color("║     「请审计当前项目，生成 docs/ 文档」    ║", "cyan"))
+    print(color("║     → Conductor 派出 project-audit       ║", "cyan"))
+    print(color("║     → 自动填充 ARCHITECTURE / SETUP /    ║", "cyan"))
+    print(color("║       CONVENTIONS / glossary / pitfalls  ║", "cyan"))
+    print(color("║                                          ║", "cyan"))
+    print(color("║  2. 再描述新需求:                         ║", "cyan"))
+    print(color("║     「在现有项目基础上，我要增加 xxx」      ║", "cyan"))
+    print(color("║     → Conductor 启动专家团开发             ║", "cyan"))
+    print(color("║                                          ║", "cyan"))
+    print(color("╚══════════════════════════════════════════╝", "cyan"))
+    print()
+
+
+# ═══════════════════════════════════════════════════════════
+# 主逻辑
+# ═══════════════════════════════════════════════════════════
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="YuanForge 项目初始化 — 从零开始或嫁接已有项目",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=textwrap.dedent("""\
+            示例:
+              yuanforge-init ./my-app                          从零开始
+              yuanforge-init ./my-app --name "用户认证系统"      指定项目名
+              yuanforge-init ./existing --mode existing         嫁接已有项目
+              yuanforge-init ./my-app --dry-run                 预览
+        """),
+    )
+    parser.add_argument("target", help="目标项目目录")
+    parser.add_argument("--name", default=None, help="项目名称（用于 README.md）")
+    parser.add_argument(
+        "--mode", choices=["new", "existing"], default="new",
+        help="new=从零开始(默认), existing=嫁接到已有项目",
+    )
+    parser.add_argument("--dry-run", action="store_true", help="只显示会做什么，不执行")
+    parser.add_argument("--force", action="store_true", help="跳过确认，直接执行")
+
+    args = parser.parse_args()
+    target = Path(args.target).resolve()
+    project_name = args.name or target.name
+
+    # 验证源目录存在
+    for item in COPY_ITEMS:
+        src = SOURCE_ROOT / item
+        if not src.exists():
+            print(color(f"✗ 框架文件缺失: {src}", "red"))
+            print("  请确保从 yuanforge 仓库根目录运行此脚本")
+            sys.exit(1)
+
+    # ═══ 模式验证 ═══
+    if args.mode == "new":
+        if target.exists():
+            if any(target.iterdir()):
+                print(color(f"✗ 目标目录已有文件: {target}", "red"))
+                print("  --mode new 要求目标目录不存在或为空")
+                print("  如果是已有项目，请使用 --mode existing")
+                sys.exit(1)
+    elif args.mode == "existing":
+        if not target.exists():
+            print(color(f"✗ 目标目录不存在: {target}", "red"))
+            print("  --mode existing 要求目标目录已存在")
+            sys.exit(1)
+
+    # ═══ 确认 ═══
+    if not args.force and not args.dry_run:
+        print()
+        print(f"  目标: {target}")
+        print(f"  模式: {'从零开始' if args.mode == 'new' else '嫁接已有项目'}")
+        print(f"  项目名: {project_name}")
+        print()
+        confirm = input("  确认? [Y/n] ").strip().lower()
+        if confirm and confirm != "y":
+            print("  已取消")
+            sys.exit(0)
+
+    # ═══ 执行 ═══
+    if args.dry_run:
+        print(color("\n🔍 预览模式 — 不会实际修改文件\n", "yellow"))
+
+    # 创建目标目录
+    if not args.dry_run:
+        target.mkdir(parents=True, exist_ok=True)
+
+    # 1. 复制框架文件
+    print(color("📋 复制框架文件:", "bold"))
+    for item in COPY_ITEMS:
+        src = SOURCE_ROOT / item
+        status = copy_item(src, target, args.dry_run)
+        if status == "conflict":
+            print(f"  ⚠ {item} → 将覆盖")
+        elif status == "skipped":
+            print(f"  · {item} → 跳过（已存在）")
+        else:
+            print(f"  ✓ {item}")
+
+    # 2. 生成 docs/
+    print(color("\n📄 生成 docs/ 骨架:", "bold"))
+    doc_results = generate_docs(target, project_name, args.mode, args.dry_run)
+    for filename, action in doc_results.items():
+        if action == "created":
+            print(f"  ✓ docs/{filename}")
+        else:
+            print(f"  · docs/{filename} → 跳过（已存在）")
+
+    # 3. 生成 .gitignore
+    print(color("\n📄 生成 .gitignore:", "bold"))
+    git_status = generate_gitignore(target, args.dry_run)
+    if git_status == "created":
+        print("  ✓ .gitignore")
+    else:
+        print("  · .gitignore → 跳过（已存在）")
+
+    # 4. git init (仅 new 模式)
+    if args.mode == "new" and not args.dry_run:
+        print(color("\n📦 git init:", "bold"))
+        import subprocess
+        result = subprocess.run(
+            ["git", "init"], cwd=target, capture_output=True, text=True
+        )
+        print(f"  {result.stdout.strip()}")
+
+    # ═══ 完成 ═══
+    if args.dry_run:
+        print(color("\n🔍 预览完成 — 以上操作不会实际执行", "yellow"))
+        return
+
+    if args.mode == "new":
+        print_new_project_help(str(target))
+    else:
+        print_existing_project_help(str(target))
+
+
+if __name__ == "__main__":
+    main()
