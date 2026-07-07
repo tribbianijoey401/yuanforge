@@ -9,7 +9,8 @@
 
 ```
 docs/YYYYMMDD-描述/
-├── PLAN.md           ← 本会话的 Plan
+├── PLAN.md           ← 本会话 Plan（Architect 产出，冻结）
+├── TASK_BOARD.md     ← 多 Agent 共享任务板（Conductor 创建，所有 Agent 读写）
 ├── SESSION_LOG.md    ← 本会话日志
 ├── FEATURE.md        ← 功能文档
 ├── ADR-NNN-xxx.md    ← 决策记录（可选，做决策时创建）

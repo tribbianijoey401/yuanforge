@@ -31,6 +31,7 @@ Plan 执行完毕后，Conductor 产出：
 
 ---
 
+| TASK_BOARD | 当前会话文件夹中的 TASK_BOARD.md | 从 PLAN.md 初始化任务行 + 维护状态 |
 ## 工作流规则
 
 ### 第一步：读 Plan，建 DAG

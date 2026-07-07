@@ -39,7 +39,8 @@ docs/ = 项目的结构化知识网络
 | [GLOBAL.md](../docs/GLOBAL.md) | INDEX / SETUP / CONVENTIONS / glossary / pitfalls |
 | [PROGRESS.md](../docs/PROGRESS.md) | PROGRESS.md |
 | [ARCHITECTURE.md](../docs/ARCHITECTURE.md) | ARCHITECTURE.md |
-| [SESSION.md](../docs/SESSION.md) | 会话文件夹内所有文档 |
+| [TASK_BOARD.md](../docs/TASK_BOARD.md) | TASK_BOARD.md — 多 Agent 共享任务板 |
+| [SESSION.md](../docs/SESSION.md) | 会话文件夹（PLAN/LOG/FEATURE/ADR/BUG） |
 
 ---
 

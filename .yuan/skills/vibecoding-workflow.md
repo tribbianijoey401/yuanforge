@@ -103,7 +103,7 @@ version: 1.0.0
 修改 Plan       ┌──────────────────────────────┐
 │ Phase 2: 执行 (Conductor)      │
 │                               │
-│ 加载 subagent-driven-dev skill │
+│ 加载 subagent-driven-dev skill + 读取 TASK_BOARD.md 找 🟢就绪 任务 │
 │                               │
 │ for each Task in Plan:        │
 │   ┌──────────────────────┐    │
@@ -116,7 +116,7 @@ version: 1.0.0
 │   │    └─ REJECT → fix→2c │  │ │
 │   └──────────────────────┘    │
 │                               │
-│ 每个 Task 后更新 docs/PROGRESS.md     │
+│ 每个 Task 后更新 TASK_BOARD.md（状态 + 上下文传递），然后更新 PROGRESS.md     │
 │ 踩坑立即记录 docs/pitfalls.md         │
 └──────────────┬───────────────┘
 │

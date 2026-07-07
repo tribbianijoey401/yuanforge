@@ -99,6 +99,30 @@ cat > docs/INDEX.md << 'EOF'
 1. 本文件 → 2. PROGRESS.md → 3. ARCHITECTURE.md → 4. pitfalls.md
 EOF
 
+# TASK_BOARD.md（空模板，Conductor 在 Phase 1 后填充）
+cat > docs/TASK_BOARD.md << 'EOF'
+# 任务板
+
+> 会话: 待定
+> 创建: YYYY-MM-DD HH:MM（Conductor）
+
+## 任务状态
+| ID | 任务 | 角色 | 依赖 | 状态 | 产出 |
+|----|------|------|------|------|------|
+
+## 上下文传递
+| 从 | 到 | 传递内容 |
+|----|-----|---------|
+
+## 返工记录
+| 任务 | 次数 | 原因 | 审查人 |
+|------|------|------|--------|
+
+## 阻塞
+| 时间 | 任务 | 原因 |
+|------|------|------|
+EOF
+
 # PROGRESS.md
 cat > docs/PROGRESS.md << 'EOF'
 # 项目进度
@@ -245,6 +269,7 @@ my-new-project/
 │   ├── pitfalls.md              # 踩坑库
 │   └── [YYYYMMDD-描述]/          # 会话文件夹（按需创建）
 │       ├── PLAN.md
+│       ├── TASK_BOARD.md
 │       ├── SESSION_LOG.md
 │       ├── FEATURE.md
 │       ├── ADR-NNN.md
