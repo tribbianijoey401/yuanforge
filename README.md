@@ -51,19 +51,26 @@ git init && git add -A && git commit -m "init: from YuanForge"
 
 ### 2. 开始 Vibecoding
 
-在 Hermes Agent 中说：
+**YuanForge 不绑定平台。** 选你习惯的 Agent 工具：
 
-```
-开始开发一个 TODO API
-```
+| 平台 | 操作 |
+|------|------|
+| **Hermes Agent** | 直接说「开发一个 TODO API」 |
+| **Cursor** | 打开项目，Agent 自动读取 `AGENTS.md`，说「按照 YuanForge 框架开发 TODO API」 |
+| **Claude Code** | `claude` 启动，自动加载 `AGENTS.md`，说「按 YuanForge 框架开发 TODO API」 |
+| **Codex CLI** | `codex` 启动，说「read AGENTS.md，按 YuanForge 框架开发 TODO API」 |
+| **任何平台** | 参考 `.yuan/platforms/manual.md` — 人工协调也能走通全流程 |
 
-Yuan 会自动：
+无论哪个平台，Yuan 的工作流都一样：
+
 1. **Architect** 分析需求 → 设计架构 → 产出 Plan（含 Dispatch Table）
 2. 你确认 Plan
 3. **Conductor** 解析 Dispatch Table → 构建 DAG → 并行派发 Coder
 4. Coder → Reviewer → Tester → DevOps 逐层流转
 5. 每个 Task 经历完整的 TDD + 两阶段审查
 6. 交付可运行的代码
+
+> 💡 不同平台的自动调度能力不同。Hermes/Claude Code 能自动 fork 子 Agent，Cursor 需要手动切换角色。详见 `.yuan/platforms/`。
 
 ---
 
@@ -159,8 +166,15 @@ yuanforge/
 
 ## 依赖
 
-- **Hermes Agent** — 运行时引擎
-- 不需要额外安装任何工具
+**YuanForge 不依赖任何特定工具。** 它是一套规则（Markdown 文件），任何能读懂规则、执行命令的 Agent 平台都能运行。
+
+| 你需要什么 | 说明 |
+|-----------|------|
+| 一个 Agent 平台 | Hermes Agent / Cursor / Claude Code / Codex CLI / Copilot ... 任意一个 |
+| Git | 版本控制 |
+| 无其他依赖 | 具体项目需要的运行时由 Agent 按需安装 |
+
+> YuanForge 是规则，不是代码。它不绑定语言、不绑定框架、不绑定平台。
 
 ---
 
