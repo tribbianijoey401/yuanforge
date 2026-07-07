@@ -25,7 +25,7 @@
 
 **没有 Plan 文件，禁止写任何代码。**
 
-- 任何代码修改前，必须有对应的 `.yuanforge/plans/` 下的 Plan 文件
+- 任何代码修改前，必须有对应的会话文件夹中的 PLAN.md（`docs/YYYYMMDD-描述/PLAN.md`）
 - Plan 由 Architect Agent 产出，用户确认后生效
 - 修复 Bug 也必须先写 Bug Report（在 Plan 中描述问题 + 修复方案）
 - 例外：`README.md`、文档、配置文件（不涉及代码逻辑的修改）

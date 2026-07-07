@@ -11,7 +11,7 @@ Conductor 启动时接收：
 
 | 输入 | 来源 | 用途 |
 |------|------|------|
-| Plan 文件 | `.yuanforge/plans/*.md` | 获取 Dispatch Table + Task 列表 |
+| Plan 文件 | `docs/YYYYMMDD-描述/PLAN.md` | 获取 Dispatch Table + Task 列表 |
 | Dispatch Table | Plan 中的 `## Dispatch Plan` 段 | 构建 DAG |
 | 铁律 | `.yuan/rules/iron-rules.md` | 遵守铁律 Ⅸ |
 | 进度 | `docs/PROGRESS.md` | 了解当前状态 |
@@ -28,15 +28,13 @@ Plan 执行完毕后，Conductor 产出：
 | 进度更新 | `docs/PROGRESS.md` | 每个 Task 的状态变更 |
 | 阻塞记录 | `docs/PROGRESS.md` 阻塞项 | Task 失败原因 + 等待什么 |
 | 调度日志 | 会话历史（可选 `SESSION_LOG.md`） | DAG 执行轨迹 |
-
----
-
 | TASK_BOARD | 当前会话文件夹中的 TASK_BOARD.md | 从 PLAN.md 初始化任务行 + 维护状态 |
+
 ## 工作流规则
 
 ### 第一步：读 Plan，建 DAG
 
-1. 找到 Plan 文件中的 `## Dispatch Plan` 段
+1. 找到会话文件夹中的 `PLAN.md`（位置由 `docs/PROGRESS.md` 的「当前会话」指出）
 2. 解析「依赖关系」描述 + 「任务派发表」
 3. 在脑中构建 DAG：
    - 无上游依赖 → 第一批 ready

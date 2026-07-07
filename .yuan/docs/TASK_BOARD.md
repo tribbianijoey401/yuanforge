@@ -55,7 +55,7 @@ SESSION_LOG.md（收尾）
 
 | ID | 任务 | 角色 | 依赖 | 状态 | 产出 |
 |----|------|------|------|------|------|
-| T01 | [任务名] | [architect/backend/frontend/reviewer/tester/devops] | [-] | [状态] | [文件路径] |
+| T01 | [任务名] | [architect/coder/reviewer/tester/devops] | [-] | [状态] | [文件路径] |
 
 ## 上下文传递
 
@@ -83,8 +83,7 @@ SESSION_LOG.md（收尾）
 | 值 | 说明 |
 |----|------|
 | architect | 架构设计 |
-| backend | 后端开发 |
-| frontend | 前端开发 |
+| coder | 代码实现 |
 | reviewer | 代码审查 |
 | tester | 测试 |
 | devops | 部署/CI |
@@ -101,6 +100,7 @@ SESSION_LOG.md（收尾）
 | 🔄 返工 | 审查不通过，退回重做 | Reviewer |
 | ❌ 阻塞 | 需人工介入 | Conductor |
 | ✅ 测试通过 | Tester 验证通过 | Tester |
+| ✅ 已部署 | DevOps 部署就绪 | DevOps |
 
 ---
 
@@ -142,6 +142,12 @@ Tester 测试:
   3. 通过 → ✅测试通过
   4. 不通过 → 🔄 返工
   ▼
+DevOps 部署:
+  1. 读 ✅测试通过 的行
+  2. CI/CD 配置检查 + 部署就绪验证
+  3. 通过 → ✅已部署
+  4. 不通过 → 🔄 返工（注明缺失项）
+  ▼
 Conductor 收尾:
   1. 全部任务 ✅ → 更新 SESSION_LOG.md
   2. PROGRESS.md 移至历史会话
@@ -163,12 +169,11 @@ Conductor 收尾:
 
 | 上游角色 | 下游角色 | 必传内容 |
 |---------|---------|---------|
-| architect | backend/frontend | API 风格、数据模型、关键决策（ADR 编号） |
-| backend | frontend | 接口签名、请求/响应格式、端点列表 |
-| frontend | backend | 需要的 API 格式变更 |
-| backend/frontend | reviewer | 产出文件路径、接口签名 |
+| architect | coder | API 风格、数据模型、关键决策（ADR 编号） |
+| coder（上游） | coder（下游） | 接口签名、请求/响应格式、端点列表 |
+| coder | reviewer | 产出文件路径、接口签名 |
 | reviewer | tester | 审查结果、重点关注项、已知风险点 |
-| backend/frontend | tester | API 签名、边界条件建议 |
+| coder | tester | API 签名、边界条件建议 |
 
 ### 禁止
 
@@ -213,7 +218,7 @@ Agent 启动时**不加载整个项目**，而是：
 | 角色 | 读 | 写 |
 |------|-----|-----|
 | Conductor | 全部 | 初始化任务行、promote 状态、写阻塞 |
-| Backend | 自己角色+🟢就绪的行 + 上下文 | 状态、上下文传递 |
-| Frontend | 自己角色+🟢就绪的行 + 上下文 | 状态、上下文传递 |
+| Coder | 自己角色+🟢就绪的行 + 上下文 | 状态、上下文传递 |
 | Reviewer | ✅完成的行 + 上下文 | 状态、返工记录 |
 | Tester | ✅审查通过的行 + 上下文 | 状态 |
+| DevOps | ✅测试通过的行 + 上下文 | 状态 |
