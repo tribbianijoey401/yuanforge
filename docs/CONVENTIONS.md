@@ -86,7 +86,7 @@ POST /api/users/register — 邮箱+密码注册，返回 JWT token
 
 ## 测试规范
 
-详见 [`.hermes/rules/iron-rules.md`](../.hermes/rules/iron-rules.md) 铁律 Ⅱ。
+详见 [`.yuan/rules/iron-rules.md`](../.yuan/rules/iron-rules.md) 铁律 Ⅱ。
 
 | 类型 | 范围 | 命名 |
 |------|------|------|

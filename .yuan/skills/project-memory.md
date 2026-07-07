@@ -1,7 +1,7 @@
 ---
 name: project-memory
 description: >
-  维护 YuanForge 的 .hermes/docs/ 项目记忆体系时加载。触发：Phase 4 回顾、
+  维护 YuanForge 的 .yuan/docs/ 项目记忆体系时加载。触发：Phase 4 回顾、
   需要归档 PITFALLS、写 SESSION_LOG、维护框架级记忆。负责 6 份 Memory 文件
   的生命周期管理。注意：这是框架层记忆，不是项目 docs/（项目层规范见
   docs-framework.md）。
@@ -19,11 +19,11 @@ version: 2.0.0
 
 | 目录 | 用途 | 谁维护 | 何时读取 |
 |------|------|--------|---------|
-| **`.hermes/docs/`** | YuanForge **框架自身**的记忆 | YuanForge 维护者 | 维护框架时 |
+| **`.yuan/docs/`** | YuanForge **框架自身**的记忆 | YuanForge 维护者 | 维护框架时 |
 | **`docs/`** | **具体项目**的说明书 | 项目 Agent 军团 | 开发项目时 |
 
-**本文档描述 `.hermes/docs/`（框架层）。**
-项目层的 `docs/` 规范见 [`.hermes/rules/docs-framework.md`](../rules/docs-framework.md)。
+**本文档描述 `.yuan/docs/`（框架层）。**
+项目层的 `docs/` 规范见 [`.yuan/rules/docs-framework.md`](../rules/docs-framework.md)。
 
 ---
 
@@ -54,20 +54,20 @@ version: 2.0.0
 ```
 [Agent 启动]
     │
-    ├── 1. read_file(".hermes/docs/PROGRESS.md")
+    ├── 1. read_file(".yuan/docs/PROGRESS.md")
     │      → 获悉：当前 Phase/Stage/Task、阻塞项、下一步
     │
-    ├── 2. read_file(".hermes/docs/ARCHITECTURE.md")
+    ├── 2. read_file(".yuan/docs/ARCHITECTURE.md")
     │      → 了解系统全貌
     │
-    ├── 3. read_file(".hermes/docs/PITFALLS.md")
+    ├── 3. read_file(".yuan/docs/PITFALLS.md")
     │      → 避开已知陷阱
     │
     ├── 4. 如果当前有 Plan：
-    │      read_file(".hermes/plans/当前 Plan")
+    │      read_file(".yuan/plans/当前 Plan")
     │      → 读取当前 Task 的详细规格
     │
-    └── 5. （可选）read_file(".hermes/docs/SESSION_LOG.md")
+    └── 5. （可选）read_file(".yuan/docs/SESSION_LOG.md")
            → 了解最近做了什么
 ```
 
@@ -84,7 +84,7 @@ version: 2.0.0
 | 当前 Phase | 2-执行 |
 | 当前 Stage | Stage 2: 核心功能 |
 | 当前 Task  | Task 2.2: 注册端点 |
-| 当前 Plan  | .hermes/plans/2026-06-27_user-auth.md |
+| 当前 Plan  | .yuan/plans/2026-06-27_user-auth.md |
 
 ## 已完成
 - [x] Task 1.1: 初始化项目
@@ -199,7 +199,7 @@ Phase 4: 回顾
 
 | 存什么 | 放哪 |
 |--------|------|
-| 项目进度、架构、决策、术语、踩坑 | → `.hermes/docs/*.md`（本体系） |
+| 项目进度、架构、决策、术语、踩坑 | → `.yuan/docs/*.md`（本体系） |
 | 用户偏好（简洁回复、语言） | → Hermes `memory` 工具 |
 | 环境配置（OS、路径、工具版本） | → Hermes `memory` 工具 |
 | 可复用的操作流程 | → Hermes `skill` 工具 |

@@ -12,7 +12,7 @@
 | **当前 Phase** | [1-架构 / 2-执行 / 3-收尾 / 4-回顾] |
 | **当前 Stage** | [Stage 名称] |
 | **当前 Task** | [Task 编号 + 名称] |
-| **当前 Plan** | `.hermes/plans/[文件名].md` |
+| **当前 Plan** | `.yuan/plans/[文件名].md` |
 | **模式** | [严格模式 / 快速模式] |
 | **最后更新** | YYYY-MM-DD |
 
@@ -70,4 +70,4 @@
 
 | Plan | 状态 | 关联 |
 |------|------|------|
-| `.hermes/plans/2026-06-27_user-auth.md` | 进行中 | Stage 2, Task 2.2 |
+| `.yuan/plans/2026-06-27_user-auth.md` | 进行中 | Stage 2, Task 2.2 |

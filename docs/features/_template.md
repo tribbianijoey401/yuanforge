@@ -23,7 +23,7 @@
 
 | 关系 | 文档 |
 |------|------|
-| 📋 Plan | `.hermes/plans/[文件名].md` |
+| 📋 Plan | `.yuan/plans/[文件名].md` |
 | 📋 决策 | [ADR-xxx 为什么](../decisions/ADR-xxx-xxx.md) |
 | 🏗 架构 | [ARCHITECTURE.md 相关模块](../ARCHITECTURE.md#模块-a-名称) |
 | 🐛 相关 Bug | [BUG-xxx](../bugs/BUG-xxx-xxx.md) |

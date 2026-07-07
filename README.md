@@ -71,6 +71,7 @@ Yuan 会自动：
 
 ```
 yuanforge/
+├── AGENTS.md                    # 🆕 通用入口（跨平台）
 ├── README.md                    # 本文件
 ├── .gitignore
 ├── docs/                        # 📚 项目说明书（生长层）
@@ -87,7 +88,7 @@ yuanforge/
 │   │   └── _template.md
 │   └── decisions/               # 决策日志（每决策一文件）
 │       └── _template.md
-├── .hermes/                     # 🔧 框架引擎（不改动）
+├── .yuan/                       # 🔧 框架内核（平台无关）
 │   ├── agents/                  # 5 个 Agent 角色定义
 │   │   ├── architect.md
 │   │   ├── coder.md
@@ -109,6 +110,9 @@ yuanforge/
 │   │   └── requesting-code-review.md
 │   ├── docs/                    # 框架自身记忆
 │   │   └── SESSION_LOG.md       # 会话日志
+│   ├── platforms/               # 🆕 平台适配器
+│   │   ├── hermes.md            # Hermes 平台适配
+│   │   └── manual.md            # 通用/人工模式
 │   └── plans/                   # 实现计划存档
 ├── contracts/                   # Agent 角色合约
 │   ├── conductor.md
@@ -140,7 +144,7 @@ yuanforge/
 | Ⅷ | 质量门禁 | G1→G2→G3→G4，不通过不前进 |
 | Ⅸ | 自主调度 | Agent 按 Dispatch Table 自主派发 Agent |
 
-详见 [`.hermes/rules/iron-rules.md`](.hermes/rules/iron-rules.md)
+详见 [`.yuan/rules/iron-rules.md`](.yuan/rules/iron-rules.md)
 
 ---
 

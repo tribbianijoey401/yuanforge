@@ -13,7 +13,7 @@ Conductor 启动时接收：
 |------|------|------|
 | Plan 文件 | `.yuanforge/plans/*.md` | 获取 Dispatch Table + Task 列表 |
 | Dispatch Table | Plan 中的 `## Dispatch Plan` 段 | 构建 DAG |
-| 铁律 | `.hermes/rules/iron-rules.md` | 遵守铁律 Ⅸ |
+| 铁律 | `.yuan/rules/iron-rules.md` | 遵守铁律 Ⅸ |
 | 进度 | `docs/PROGRESS.md` | 了解当前状态 |
 | 角色合约 | `contracts/*.md` | 了解每个角色的输入/输出/禁止 |
 

@@ -86,7 +86,7 @@ curl http://localhost:{port}/health
 
 ## 📚 文档联动规则
 
-> 详见 `.hermes/rules/docs-framework.md`
+> 详见 `.yuan/rules/docs-framework.md`
 
 ### 启动时必读（所有 Agent 通用）
 - [ ] `docs/PROGRESS.md`

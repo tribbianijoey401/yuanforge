@@ -61,15 +61,16 @@
 
 ## 🔗 框架层文档
 
-框架引擎（不改动）位于 `.hermes/`：
+框架内核（平台无关）位于 `.yuan/`：
 
 | 路径 | 内容 |
 |------|------|
-| `.hermes/rules/iron-rules.md` | 九条铁律 |
-| `.hermes/rules/plan-format.md` | Plan 工程化格式 |
-| `.hermes/rules/docs-framework.md` | 本说明书体系规范 |
-| `.hermes/agents/` | 5 个 Agent 角色定义 |
-| `.hermes/skills/` | 8 个 Skill 定义 |
+| `.yuan/rules/iron-rules.md` | 九条铁律 |
+| `.yuan/rules/plan-format.md` | Plan 工程化格式 |
+| `.yuan/rules/docs-framework.md` | 本说明书体系规范 |
+| `.yuan/agents/` | 5 个 Agent 角色定义 |
+| `.yuan/skills/` | 8 个 Skill 定义 |
+| `.yuan/platforms/` | 平台适配器 |
 
 ---
 

@@ -21,8 +21,8 @@
 ### Step 1: 加载上下文
 
 **必须加载：**
-- [ ] `.hermes/rules/iron-rules.md` — 铁律 Ⅰ Ⅵ Ⅶ
-- [ ] `.hermes/rules/docs-framework.md` — 文档规范
+- [ ] `.yuan/rules/iron-rules.md` — 铁律 Ⅰ Ⅵ Ⅶ
+- [ ] `.yuan/rules/docs-framework.md` — 文档规范
 - [ ] `docs/ARCHITECTURE.md` — 现有架构
 - [ ] `docs/decisions/` — 已有技术决策
 - [ ] `docs/pitfalls.md` — 已知陷阱
@@ -72,7 +72,7 @@
 遵循 `plan-format.md` 规范：
 - 定义 Stage（每个 Stage = 一组 Task + Gate）
 - 每个 Task：`Objective` / `Files` / `Test` / `Gate Check`
-- 保存到 `.hermes/plans/YYYY-MM-DD_HHMMSS-feature-name.md`
+- 保存到 `.yuan/plans/YYYY-MM-DD_HHMMSS-feature-name.md`
 
 ### Step 7: 提交确认
 
@@ -91,7 +91,7 @@
 
 ## 📚 文档联动规则
 
-> 详见 `.hermes/rules/docs-framework.md`
+> 详见 `.yuan/rules/docs-framework.md`
 
 ### 启动时必读（所有 Agent 通用）
 - [ ] `docs/PROGRESS.md`
@@ -144,7 +144,7 @@
 - 📋 决策: `docs/decisions/ADR-{NNN}-{name}.md`
 - 🏗 架构已更新: `docs/ARCHITECTURE.md`
 
-✅ Plan 已保存到 `.hermes/plans/{timestamp}-{name}.md`
+✅ Plan 已保存到 `.yuan/plans/{timestamp}-{name}.md`
 确认后进入 Phase 2。
 ```
 

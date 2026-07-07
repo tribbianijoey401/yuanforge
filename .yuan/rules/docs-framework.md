@@ -73,7 +73,7 @@ project/
 │       ├── _template.md      ← ADR 模板
 │       ├── ADR-001-xxx.md
 │       └── ADR-002-xxx.md
-└── .hermes/                  ← 框架引擎（不变）
+└── .yuan/                  ← 框架引擎（不变）
 ```
 
 ---
@@ -93,7 +93,7 @@ project/
 ```
 Feature 文档中应链接：
   → 关联的 ADR（为什么这样设计）
-  → 关联的 Plan（.hermes/plans/xxx.md）
+  → 关联的 Plan（.yuan/plans/xxx.md）
   → 关联的 Bug（哪些 Bug 是这个功能引起的）
   → ARCHITECTURE 中的相关模块
 
@@ -190,7 +190,7 @@ ADR 文档中应链接：
 
 | 关系 | 文档 |
 |------|------|
-| 📋 Plan | `.hermes/plans/[文件名].md` |
+| 📋 Plan | `.yuan/plans/[文件名].md` |
 | 📋 决策 | [ADR-xxx 为什么](../decisions/ADR-xxx-xxx.md) |
 | 🏗 架构 | [ARCHITECTURE.md 相关模块](../ARCHITECTURE.md#模块-a-名称) |
 | 🐛 相关 Bug | [BUG-xxx](../bugs/BUG-xxx-xxx.md) |
@@ -402,7 +402,7 @@ ADR 文档中应链接：
 | **当前 Phase** | 2-执行 |
 | **当前 Feature** | [FEAT-003 支付模块](./features/003-payment.md) |
 | **当前 Task** | Task 2.1: 支付回调 |
-| **当前 Plan** | `.hermes/plans/2026-06-28_payment.md` |
+| **当前 Plan** | `.yuan/plans/2026-06-28_payment.md` |
 
 ## 功能清单
 
@@ -494,8 +494,8 @@ Phase 4: 回顾
 | 规则 | 关系 |
 |------|------|
 | iron-rules.md | 铁律 Ⅵ「文档即代码」— 本文档是其具体实现 |
-| plan-format.md | Plan 存 `.hermes/plans/`，features/ 文档链接到对应 Plan |
-| project-memory skill | YuanForge 自身的 `.hermes/docs/` 记忆管理（与本文档区分） |
+| plan-format.md | Plan 存 `.yuan/plans/`，features/ 文档链接到对应 Plan |
+| project-memory skill | YuanForge 自身的 `.yuan/docs/` 记忆管理（与本文档区分） |
 | project-bootstrap skill | 入口：引用本文档创建初始 docs/ 结构 |
 
 ---

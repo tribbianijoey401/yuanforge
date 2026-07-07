@@ -44,7 +44,7 @@ version: 1.0.0
     │      避开已知陷阱
     │
     ├── 5. 如果是继续开发（PROGRESS 显示有进行中 Plan）：
-    │      read_file(".hermes/plans/当前 Plan")
+    │      read_file(".yuan/plans/当前 Plan")
     │
     └── 6. 继续下面 Phase 流程
 ```
@@ -62,7 +62,7 @@ version: 1.0.0
 │ 2. 加载 architect agent persona               │
 │ 3. 分析需求 → 技术选型 → 架构设计             │
 │ 4. 产出 Implementation Plan                   │
-│ 5. 保存到 .hermes/plans/                      │
+│ 5. 保存到 .yuan/plans/                      │
 │ 6. 更新 PROGRESS.md、decisions/ 决策记录       │
 │                                               │
 │ 输出：Plan + 技术选型理由                      │
@@ -131,8 +131,8 @@ version: 1.0.0
 
 ```markdown
 必加载：
-- `.hermes/rules/iron-rules.md`  — 铁律
-- `.hermes/agents/architect.md`  — 架构师角色
+- `.yuan/rules/iron-rules.md`  — 铁律
+- `.yuan/agents/architect.md`  — 架构师角色
 
 按需加载：
 - 对应技术栈 skill（如 python-fastapi）
@@ -171,7 +171,7 @@ version: 1.0.0
 - 每个 Stage 出口定义 **Gate**：`Pass Criteria` + `Fail Action`
 - 标注 `Pitfalls`（已知陷阱，从经验中提取）
 
-保存路径：`.hermes/plans/YYYY-MM-DD_HHMMSS-<feature-slug>.md`
+保存路径：`.yuan/plans/YYYY-MM-DD_HHMMSS-<feature-slug>.md`
 
 ### 1.6 用户确认
 

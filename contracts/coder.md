@@ -13,7 +13,7 @@
 | 上游产出物 | 上游 Task 的产出文件 | 知道有什么可用 |
 | 项目规范 | `docs/CONVENTIONS.md` | 写出合规范的代码 |
 | 已知陷阱 | `docs/PITFALLS.md` | 不重复踩坑 |
-| 铁律 | `.hermes/rules/iron-rules.md` | 遵守 Ⅱ/Ⅳ/Ⅴ |
+| 铁律 | `.yuan/rules/iron-rules.md` | 遵守 Ⅱ/Ⅳ/Ⅴ |
 
 ---
 

@@ -44,7 +44,7 @@ git commit -m "init: project bootstrap from YuanForge"
 
 ### Step 3: 创建 docs/ 说明书体系
 
-> 根据 `.hermes/rules/docs-framework.md` v2 规范创建项目结构化知识库。
+> 根据 `.yuan/rules/docs-framework.md` v2 规范创建项目结构化知识库。
 
 ```bash
 # 创建目录结构
@@ -354,7 +354,7 @@ cat > docs/features/_template.md << 'EOF'
 
 | 关系 | 文档 |
 |------|------|
-| 📋 Plan | `.hermes/plans/[文件名].md` |
+| 📋 Plan | `.yuan/plans/[文件名].md` |
 | 📋 决策 | [ADR-xxx](../decisions/ADR-xxx-xxx.md) |
 | 🏗 架构 | [ARCHITECTURE.md](../ARCHITECTURE.md#模块-x) |
 | 🐛 相关 Bug | [BUG-xxx](../bugs/BUG-xxx-xxx.md) |
@@ -530,7 +530,7 @@ my-new-project/
 │   │   └── _template.md
 │   └── decisions/              # 决策日志（每决策一文档）
 │       └── _template.md
-├── .hermes/                    # 框架引擎（不变）
+├── .yuan/                    # 框架引擎（不变）
 │   ├── agents/
 │   ├── rules/
 │   ├── skills/

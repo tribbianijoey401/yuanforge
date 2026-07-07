@@ -35,7 +35,7 @@ version: 1.0.0
 - `docs/ARCHITECTURE.md` — 架构全景
 - `docs/features/` — 已有功能文档（避免冲突）
 - `docs/pitfalls.md` — 已知陷阱
-- `.hermes/rules/plan-format.md` — Plan 格式规范
+- `.yuan/rules/plan-format.md` — Plan 格式规范
 
 ### Step 2: 分解 Task
 
@@ -53,7 +53,7 @@ version: 1.0.0
 
 ### Step 4: 保存 Plan
 
-路径：`.hermes/plans/YYYY-MM-DD_HHMMSS-feature-name.md`
+路径：`.yuan/plans/YYYY-MM-DD_HHMMSS-feature-name.md`
 
 ### Step 5: 更新文档
 

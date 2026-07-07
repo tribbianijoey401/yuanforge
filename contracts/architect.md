@@ -13,8 +13,8 @@
 | 现有架构 | `docs/ARCHITECTURE.md` | 不破坏已有设计 |
 | 已有决策 | `docs/DECISIONS.md` | 避免重复决策 |
 | 已知陷阱 | `docs/PITFALLS.md` | 避开已知坑 |
-| 铁律 | `.hermes/rules/iron-rules.md` | 遵守 Ⅰ/Ⅵ/Ⅶ |
-| Plan 格式 | `.hermes/rules/plan-format.md` | Plan 必须合规范 |
+| 铁律 | `.yuan/rules/iron-rules.md` | 遵守 Ⅰ/Ⅵ/Ⅶ |
+| Plan 格式 | `.yuan/rules/plan-format.md` | Plan 必须合规范 |
 
 ---
 
