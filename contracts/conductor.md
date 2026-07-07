@@ -78,9 +78,21 @@ Plan 执行完毕后，Conductor 产出：
 
 ### 第五步：完成
 
-- 所有 Task done → 触发 G3（派给 tester）
+- 所有 Task 终态 → 触发 G3（派给 tester）
 - G3 通过 → 触发 G4（派给 devops）
 - G4 通过 → Plan 完成
+- 填 SESSION_LOG「任务完成情况」表
+- 有未完成任务 → PROGRESS.md 标记"未完成"，指向下一会话
+
+### 跨会话启动
+
+当新会话是上一个会话的延续时：
+
+1. 读 PROGRESS.md → 找到上一个会话
+2. 读上一个会话的 SESSION_LOG「任务完成情况」表
+3. 提取非终态任务（🔨🔄⏳❌阻塞❌取消）
+4. 按 TASK_BOARD 继承规则：重置状态 + 重算依赖 + 复制上下文传递
+5. 初始化新 TASK_BOARD.md
 
 ---
 
