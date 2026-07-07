@@ -49,12 +49,36 @@ version: 1.0.0
     └── 6. 继续下面 Phase 流程
 ```
 
+### 判断是否需要 Phase 0
+
+检查 PROGRESS.md：
+- 状态为「初始化」或「空模板」→ **进入 Phase 0（审计）**
+- 状态为「就绪」或「开发中」→ **跳过 Phase 0，进入 Phase 1**
+
 ### Pipeline 总览
 
 ```
-用户需求
+用户需求 / 已有项目
    │
    ▼
+┌──────────────────────────────────────────────┐
+│ Phase 0: 审计（仅首次 / 嫁接项目）              │
+│                                               │
+│ 加载 project-audit skill                       │
+│                                               │
+│ 1. 覆盖扫描 — 文件树、技术栈、Git 历史         │
+│ 2. 架构分析 — 模块、数据流、入口点             │
+│ 3. 功能盘点 — 列出所有端点/功能                │
+│ 4. 决策回溯 — 从代码反推选型原因               │
+│ 5. 填充说明书 — ARCHITECTURE/PROGRESS/...     │
+│ 6. 差异报告 — docs vs 代码                     │
+│ 7. PROGRESS → 就绪                             │
+└────────────────────┬─────────────────────────┘
+                     │
+                     ▼
+              [Phase 0: 审计完成]
+                     │
+                     ▼
 ┌──────────────────────────────────────────────┐
 │ Phase 1: 架构 (Architect)                     │
 │                                               │
@@ -290,7 +314,7 @@ for each PIT in pitfalls.md:
 
 ## 铁律执行
 
-本 Skill 整个流程严格遵守 YuanForge 八条铁律：
+本 Skill 整个流程严格遵守 YuanForge 九条铁律：
 
 | 铁律 | 执行点 |
 |------|--------|
@@ -307,9 +331,10 @@ for each PIT in pitfalls.md:
 
 ## 相关 Skill
 
+- `project-audit` — 审计现有项目（Phase 0）
 - `writing-plans` — 写 Implementation Plan
 - `subagent-driven-development` — Subagent 执行引擎
 - `test-driven-development` — TDD 纪律
 - `requesting-code-review` — 代码审查
-- `project-bootstrap` — 项目初始化
+- `project-bootstrap` — 项目初始化（含嫁接模式）
 - `project-memory` — 项目记忆管理

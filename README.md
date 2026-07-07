@@ -106,9 +106,10 @@ yuanforge/
 │   │   ├── iron-rules.md        # 九条铁律
 │   │   ├── plan-format.md       # Plan 工程化格式
 │   │   └── docs-framework.md    # docs/ 说明书体系规范
-│   ├── skills/                  # 8 个 Skill 定义
+│   ├── skills/                  # 9 个 Skill 定义
 │   │   ├── vibecoding-workflow.md
 │   │   ├── project-bootstrap.md
+│   │   ├── project-audit.md
 │   │   ├── project-memory.md
 │   │   ├── writing-plans.md
 │   │   ├── subagent-driven-development.md

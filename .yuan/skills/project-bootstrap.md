@@ -1,11 +1,15 @@
 ---
 name: project-bootstrap
 description: >
-  创建新项目时加载。触发：用户说「创建项目」「初始化」「用 YuanForge 启动」
-  「新建项目」、从一个 idea 开始。从元框架复制模板、创建 docs/ 说明书体系
-  （含 features/bugs/decisions 子目录 + 模板）、初始化 Git。
-  读写：docs/ 全部初始创建。
-version: 1.0.0
+  创建新项目或嫁接现有项目时加载。触发：用户说「创建项目」「初始化」
+  「用 YuanForge 启动」「新建项目」、从一个 idea 开始，或「嫁接 YuanForge」
+  「给现有项目接入 Yuan」。两种模式：
+  ① 全新模式 — 复制元框架、创建 docs/ 说明书体系（含 features/bugs/decisions
+  子目录 + 模板）、初始化 Git。
+  ② 嫁接模式 — 将 .yuan/ contracts/ protocols/ templates/ AGENTS.md
+  复制到现有项目，然后触发 project-audit 审计现有代码并填充 docs/。
+  读写：docs/ 全部初始创建（新模式）或审计填充（嫁接模式）。
+version: 2.0.0
 ---
 
 # 项目启动 Skill
@@ -17,13 +21,17 @@ version: 1.0.0
 ## 触发条件
 
 用户说以下任何一句时激活：
-- "创建一个新项目"
-- "用 YuanForge 启动 XX 项目"
-- "初始化 XX"
+- "创建一个新项目" / "用 YuanForge 启动 XX 项目" / "初始化 XX"
+- "嫁接 YuanForge" / "给现有项目接入 Yuan" / "把 YuanForge 加到我的项目"
+- "这是半路项目" / "接手现有项目"
+
+激活后判断模式：
+- 用户无现有代码 → **模式一：全新项目**（Step 1-4）
+- 用户有现有项目 → **模式二：嫁接项目**（Step G1-G3）
 
 ---
 
-## 流程
+## 模式一：全新项目
 
 ### Step 1: 复制元框架
 
@@ -538,3 +546,81 @@ my-new-project/
 │   └── plans/
 └── src/                        # 源码（待创建）
 ```
+
+---
+
+## 模式二：嫁接现有项目
+
+> 当你已经有一个写了一半的项目，想把 YuanForge 框架接进去。
+
+### Step G1: 复制框架内核
+
+```bash
+# 在你的项目根目录执行（从 yuanforge 复制）
+cp -r yuanforge/.yuan        ./
+cp -r yuanforge/contracts     ./
+cp -r yuanforge/protocols     ./
+cp -r yuanforge/templates     ./
+cp    yuanforge/AGENTS.md     ./
+```
+
+> 如果项目已有 .gitignore，合并 yuanforge 的 .gitignore 内容，不要覆盖。
+
+### Step G2: 初始化 docs/ 说明书（空模板）
+
+```bash
+mkdir -p docs/{features,bugs,decisions}
+cp yuanforge/docs/*.md            docs/
+cp yuanforge/docs/features/_template.md   docs/features/
+cp yuanforge/docs/bugs/_template.md       docs/bugs/
+cp yuanforge/docs/decisions/_template.md  docs/decisions/
+```
+
+此时 docs/ 都是空模板，内容待 Step G3 填充。
+
+### Step G3: 审计现有代码 → 填充说明书
+
+**加载 `project-audit` skill，执行完整的 7 步审计流程：**
+
+```
+1. 覆盖扫描 → 识别技术栈、构建工具、Git 历史
+2. 架构分析 → 模块划分、数据流、入口点
+3. 功能盘点 → 列出所有已完成/进行中的功能
+4. 决策回溯 → 从依赖和注释反推技术决策
+5. 填充说明书 → 把审计结果写入 docs/
+6. 差异报告 → docs/ 描述 vs 实际代码的差异
+7. 更新 PROGRESS → 状态设为「就绪」
+```
+
+审计完成后，Agent 会输出一份审计报告，列出：
+- 已发现的所有功能
+- 已记录的技术决策
+- docs/ 与实际代码的差异
+- 下一步建议
+
+### Step G4: 首次 Commit
+
+```bash
+git add -A
+git commit -m "init: graft YuanForge framework + project audit"
+```
+
+### Step G5: 开始开发
+
+审计完成后，对 Agent 说：
+
+> "按照 YuanForge 框架，开发 [下一个功能]"
+
+Agent 会读取 docs/PROGRESS.md 了解当前进度，然后按 vibecoding-workflow 执行。
+
+---
+
+## 两种模式对比
+
+| 维度 | 模式一：全新 | 模式二：嫁接 |
+|------|------------|------------|
+| 适用场景 | 从 idea 开始 | 已有半路项目 |
+| 框架内核 | 从 yuanforge 复制 | 从 yuanforge 复制 |
+| docs/ 怎么填 | 空模板，等 Phase 1 | project-audit 审计填充 |
+| src/ | 空的，等开发 | 已有代码，不动 |
+| 触发 Skill | 直接创建 | 创建 + project-audit |

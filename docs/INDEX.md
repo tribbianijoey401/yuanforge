@@ -69,7 +69,7 @@
 | `.yuan/rules/plan-format.md` | Plan 工程化格式 |
 | `.yuan/rules/docs-framework.md` | 本说明书体系规范 |
 | `.yuan/agents/` | 5 个 Agent 角色定义 |
-| `.yuan/skills/` | 8 个 Skill 定义 |
+| `.yuan/skills/` | 9 个 Skill 定义 |
 | `.yuan/platforms/` | 平台适配器 |
 
 ---
