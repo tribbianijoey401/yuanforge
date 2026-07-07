@@ -33,7 +33,7 @@
     33|
     34|**必须加载：**
     35|- `docs/ARCHITECTURE.md` — 架构全景
-    36|- `docs/[当前会话]/ — 已有功能文档（避免冲突）
+    36|- 当前会话文件夹 — 已有功能文档（避免冲突）
     37|- `docs/pitfalls.md` — 已知陷阱
     38|- `.yuan/rules/plan-format.md` — Plan 格式规范
     39|
@@ -59,7 +59,7 @@
     59|
     60|```
     61|→ 更新 docs/PROGRESS.md：「当前 Plan」指向刚创建的 Plan
-    62|→ 创建 docs/[当前会话]/FEATURE.md（如 Architect 尚未创建）
+    62|→ 在当前会话文件夹中创建 FEATURE.md（如 Architect 尚未创建）
     63|```
     64|
     65|---

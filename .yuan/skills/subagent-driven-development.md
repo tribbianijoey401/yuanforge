@@ -30,7 +30,7 @@
     30|
     31|1. 读取 `docs/PROGRESS.md` — 当前 Plan 路径
     32|2. 读取 Plan 文件 — 所有 Task 列表
-    33|3. 读取 `docs/[当前会话]/FEATURE.md` — 当前功能文档
+    33|3. 读取 当前会话文件夹中的 FEATURE.md — 当前功能文档
     34|4. 创建 TODO 列表追踪全部 Task
     35|
     36|### Step 2: 逐 Task 执行

@@ -22,7 +22,7 @@
     22||------|------|
     23|| **Spec Review 结果** | PASS / REQUEST_CHANGES（附具体差距列表） |
     24|| **Quality Review 结果** | APPROVED / REJECT（附具体问题列表） |
-    25|| Bug 记录 | 发现 Bug 时创建 `docs/[当前会话]/BUG-NNN.md` |
+    25|| Bug 记录 | 发现 Bug 时创建 当前会话文件夹中的 BUG-NNN.md |
     26|
     27|---
     28|

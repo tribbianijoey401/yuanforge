@@ -22,7 +22,7 @@
     22|
     23|**必须加载：**
     24|- [ ] Plan 中当前 Task 的完整描述
-    25|- [ ] `docs/[当前会话]/FEATURE.md` — 当前功能的 Feature 文档
+    25|- [ ] 当前会话文件夹中的 FEATURE.md — 当前功能的 Feature 文档
     26|- [ ] `docs/CONVENTIONS.md` — 项目规范
     27|- [ ] `docs/pitfalls.md` — 已知陷阱
     28|
@@ -58,7 +58,7 @@
     58|
     59|### Step 6: 更新 Feature 文档
     60|
-    61|更新 `docs/[当前会话]/FEATURE.md` 中「修改的文件」表：
+    61|更新 当前会话文件夹中的 FEATURE.md 中「修改的文件」表：
     62|
     63|```markdown
     64|| `src/auth/login.py` | 新增 | 登录端点实现 |
@@ -96,14 +96,14 @@
     96|
     97|| 文档 | 操作 | 时机 |
     98||------|------|------|
-    99|| `docs/[当前会话]/FEATURE.md` | **更新「修改文件」表** | 每个 Task 完成后 |
-   100|| `docs/[当前会话]/BUG-NNN-xxx.md` | **创建** | 实现中发现 Bug 时（记录现象，根因留给 Debugger） |
+    99|| 当前会话文件夹中的 FEATURE.md | **更新「修改文件」表** | 每个 Task 完成后 |
+   100|| 当前会话文件夹中的 BUG-NNN-xxx.md | **创建** | 实现中发现 Bug 时（记录现象，根因留给 Debugger） |
    101|
    102|### 参阅
    103|
    104|| 文档 | 时机 |
    105||------|------|
-   106|| `docs/[当前会话]/FEATURE.md` | 理解当前功能设计 |
+   106|| 当前会话文件夹中的 FEATURE.md | 理解当前功能设计 |
    107|| `docs/CONVENTIONS.md` | 写代码前确认规范 |
    108|| `docs/ARCHITECTURE.md` | 理解模块关系 |
    109|
@@ -131,7 +131,7 @@
    131|`{commit_hash}` — `{commit_message}`
    132|
    133|### 文档已更新
-   134|- [ ] `docs/[当前会话]/FEATURE.md` — 修改文件表已更新
+   134|- [ ] 当前会话文件夹中的 FEATURE.md — 修改文件表已更新
    135|```
    136|
    137|---
