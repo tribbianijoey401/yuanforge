@@ -111,14 +111,46 @@ Phase 1 ── G1 ──→ Phase 2 ── G2 ──→ Phase 3 ── G3 ──
 
 | Gate | 检查内容 | 通过标准 | 不通过动作 |
 |------|---------|---------|-----------|
-| **G1** Plan Gate | Plan 完整、技术方案可行、Dispatch Table 无遗漏 | 用户确认 | 返回 Architect 修改 |
-| **G2** Task Gate | 每个 Task 通过两阶段审查 | Reviewer APPROVED | Coder 修复→重审 |
+| **G1** Plan Gate | Plan 完整 + 用户确认设计理解书 | Architect 反向输出设计理解书 → 用户确认 | 返回 Architect 修正 |
+| **G2** Task Gate | 四个审查官并行审查 | 🔴 Blocker 全部解决 + 🟡 Tester 全绿 | 打回对应 Dev 修复→重审 |
 | **G3** Integration Gate | 全量测试 PASS、集成环境可运行 | `pytest tests/ -q` 全绿 | 定位→修复→重跑 |
-| **G4** Release Gate | CI 通过、文档齐全、部署配置就绪 | 所有检查项 ✅ | 修复缺失项 |
+| **G4** Release Gate | 文档齐全、Doc Engineer 归档完成 | 所有检查项 ✅ | 修复缺失项 |
 
-- 禁止跳过任何 Gate
-- 禁止在 Gate 未通过时进入下一 Phase
-- 禁止"先过了再说，后面补"
+### G2 审查三档 + 并行规则
+
+```
+                    ┌── Spec Reviewer ──→ 🔴 Blocker (必须解决)
+Coder 完成 Task ──→ │
+                    ├── Security Auditor ──→ 🔴 Blocker (按 P0/P1/P2 分级执行)
+                    │
+                    ├── Quality Auditor ──→ 🟢 Advisory (DB+性能合并)
+                    │                          🟠 同类警告 ≥3 次 → 自动升级 🔴
+                    │
+                    └── UX Reviewer ──→ 🟢 Advisory (有界面时触发)
+                                            🟠 同类警告 ≥3 次 → 自动升级 🔴
+```
+
+**并行规则**：四个审查官同时启动。任意审查官发现 🔴 Blocker → 立即通知其他审查官暂停。Blocker 解决后 → Conductor 通知从断点恢复。
+
+### 阻塞三档定义
+
+| 档位 | 颜色 | 规则 | 持有者 |
+|------|------|------|--------|
+| **Blocker** | 🔴 | 不解决不能合入 | Spec Reviewer, Security Auditor |
+| **Hard Gate** | 🟡 | 必须全绿才能交付，但不阻塞其他审查 | Tester |
+| **Advisory** | 🟢 | 强烈建议，可记录豁免理由 | Quality Auditor, UX Reviewer |
+
+### Advisory 兜底升级
+🟠 警告类问题，同模块累计 ≥3 次同类型 → 自动升级为 🔴 Blocker，由 Architect 协助判定是否需要重构。
+
+### 安全分级（Security Auditor 三级投入）
+Conductor 依据 Product Analyst 的风险标签决定：
+
+| 风险等级 | Security Auditor 行为 |
+|---------|---------------------|
+| P0（高敏） | 全量审计：输入验证、权限、注入、加密、依赖漏洞 |
+| P1（标准） | 关键路径审计：认证、授权、敏感数据流 |
+| P2（低敏） | 跳过 |
 
 ---
 
@@ -143,8 +175,8 @@ Phase 1 ── G1 ──→ Phase 2 ── G2 ──→ Phase 3 ── G3 ──
 
 ### Conductor 禁止事项
 
-- ❌ 自己写代码（那是 coder 的事）
-- ❌ 自己审查代码（那是 reviewer 的事）
+- ❌ 自己写代码（那是 frontend-dev / backend-dev 的事）
+- ❌ 自己审查代码（那是 spec-reviewer / security-auditor 的事）
 - ❌ 跳过门禁
 - ❌ 猜上游产出物内容（让 Agent 自己去读文件）
 - ❌ 在 Task 未完成时提前创建下游 Task（等上游 done 再创建）
