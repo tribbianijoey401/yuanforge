@@ -22,8 +22,9 @@
 ### 正常模式：TDD Red → Green → Refactor
 
 1. 读 Task + API 契约 + UI 原型
-2. Red：写测试 → 确认 FAIL
-3. Green：写最小实现（精准复刻 UI 原型）
+2. **确认测试 seam：** 与 Architect 确认在哪个接口层写测试（组件 props？页面级？API mock？）。不在未约定 seam 上写测试。
+3. Red：写测试 → 确认 FAIL
+4. Green：写最小实现（精准复刻 UI 原型）
 4. 验证：全量测试 PASS
 5. 原子提交：一个 Task 一个 Commit
 6. 更新 TASK_BOARD 状态 + 写上下文传递
@@ -37,6 +38,7 @@
 **触发动作**：立即停止，向 Conductor 报告「进入 Debug 模式」
 
 **诊断协议包**（Conductor 注入）：
+0. **构建反馈循环** → 加载 `debug-feedback-loop` Skill，先让 Bug 可复现
 1. **隔离复现**：在最小单元测试中复现 Bug
 2. **二分定位**：通过注释/git diff 回退，确定引入 Bug 的精确变更
 3. **假设记录**：修复前写因果链 → `我认为问题在 [X]，因为 [Y]。验证方法: [Z]`

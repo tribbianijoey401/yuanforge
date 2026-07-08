@@ -65,6 +65,16 @@ Architect 收到 Product Analyst 的用户故事和验收标准后：
 | 基础设施方案 | 存储、缓存、消息队列等选型 |
 | Dispatch Table | 任务 ID、角色、依赖、门禁 |
 
+**每个模块产出后执行深度自检：**
+
+| 自检项 | 问题 |
+|--------|------|
+| 接口大小 | 这个模块暴露了多少个方法/参数？调用者必须知道多少东西才能用？ |
+| Deletion test | 删除这个模块后，复杂度是消失了还是分散到了 N 个调用者？如果分散了，说明它在承载真实逻辑。如果消失了，说明它是 pass-through — 砍掉。 |
+| Seam 真实性 | 这个 seam 是不是至少有一个真实的 adapter（而非只有 mock/test double）？一个 seam = 假设的；两个 seam = 真实的。 |
+
+LLM 的默认倾向是暴露所有细节（shallow module）——每个函数把参数全部透传。深度模块的标准是：大量行为藏在少量接口后面。如果接口几乎和实现一样复杂，说明不够深。
+
 ### 第三步：产出 Plan
 
 Plan 写入 `docs/YYYYMMDD-描述/PLAN.md`，含完整 Dispatch Table。

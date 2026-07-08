@@ -94,6 +94,8 @@
 ```
 收集所有审查结果
   │
+  ├─ 四个审查官的报告各自独立呈现 — 不合并、不重排序、不跨轴比较（铁律 Ⅷ 审查报告分离原则）
+  │
   ├─ 过滤 🔴 Blocker → 全部解决 → 否则打回对应 Dev
   │   └─ 任意 Blocker 出现 → 通知其他 Reviewer 暂停
   │      Blocker 解决 → 通知各 Reviewer 从断点恢复
@@ -128,8 +130,10 @@
 - Coder 对同一 Bug 连续尝试 ≥2 种修复方案均失败
 - Coder 报告"进入 Debug 模式"
 
-注入协议：
-1. **隔离复现**：强制在最小单元测试中复现 Bug
+**诊断协议包**（Conductor 注入）：
+
+0. **加载 `debug-feedback-loop` Skill：构建反馈循环** — 在隔离复现之前，必须先有一个能复现 Bug 的 tight loop。按 10 种方式逐级尝试（failing test → curl → CLI → headless → trace replay → harness → fuzz → bisect → differential → HITL），先让 Bug 可复现。
+1. **隔离复现**：在最小单元测试中复现 Bug
 2. **二分定位**：通过注释/git diff 回退，确定引入 Bug 的精确变更
 3. **假设记录**：修复前写「我认为问题在 [X]，因为 [Y]。验证: [Z]」→ 写入 BUG-NNN.md
 4. **并行通知**：将「Bug 模式摘要」发给 Architect，请其检查结构性缺陷
