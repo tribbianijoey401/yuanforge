@@ -83,14 +83,19 @@ yuanforge/
 ├── AGENTS.md                    # 通用入口（跨平台），含 6 步开发流程
 ├── README.md                    # 本文件
 ├── bin/yuanforge-init           # 项目初始化脚本
-├── docs/                        # yuanforge 自身开发文档
-│   ├── INDEX.md
-│   ├── PROGRESS.md
-│   └── 20260707-框架v2/          # 会话文件夹
+├── docs/                        # DocsOS 文档系统
+│   ├── object-model.yaml        # 知识对象 Schema
+│   ├── INDEX.md                 # 文档地图
+│   ├── PROGRESS.md              # 进度中枢
+│   ├── knowledge/               # 长期知识（features/decisions/pitfalls/modules）
+│   ├── workspace/               # 计划管理（backlog + roadmap）
+│   ├── policies/                # 系统规则（平台无关）
+│   ├── archive/                 # 已关闭 Workspace 快照
+│   └── 20260707-框架v2/          # 活跃 Workspace
 ├── .yuan/                       # 🔧 框架内核
-│   ├── docs/                    # 5 份说明书规格（GLOBAL/PROGRESS/ARCHITECTURE/SESSION/TASK_BOARD）
-│   ├── rules/                   # 九条铁律 + Plan 格式 + 文档体系
-│   ├── skills/                  # 9 个 Skill
+│   ├── docs/                    # 9 份说明书规格（OBJECT_MODEL/GRAPH/EVENTS/PROPOSAL/GLOBAL/PROGRESS/ARCHITECTURE/TASK_BOARD/SESSION）
+│   ├── rules/                   # 九条铁律 + Plan 格式
+│   ├── skills/                  # Skill 定义
 │   └── platforms/               # 平台适配器
 ├── contracts/                   # 👷 12 个 Agent 角色合约
 │   ├── conductor.md
@@ -110,6 +115,9 @@ yuanforge/
 │   └── task-output.md
 └── templates/
     └── plan-with-dispatch.md
+├── scripts/                     # 🛠 构建脚本
+│   └── build-graph.py           # Graph 自动生成
+└── proposals/                   # 📝 提案事务（Knowledge 写保护）
 ```
 
 ---

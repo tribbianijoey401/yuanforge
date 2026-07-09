@@ -122,11 +122,14 @@ cd my-project
 |--------|--------|
 | 了解当前状态 | [docs/PROGRESS.md](docs/PROGRESS.md) |
 | 了解知识对象定义 | [docs/object-model.yaml](docs/object-model.yaml) |
+| 了解所有功能 | [knowledge/features/](docs/knowledge/features/) |
+| 了解所有决策 | [knowledge/decisions/](docs/knowledge/decisions/) |
+| 避坑（Agent 必读） | [knowledge/pitfalls/](docs/knowledge/pitfalls/) |
 | 了解系统架构 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | 搭建环境 | [docs/SETUP.md](docs/SETUP.md) |
 | 写代码前的规范 | [docs/CONVENTIONS.md](docs/CONVENTIONS.md) |
 | 查术语 | [docs/glossary.md](docs/glossary.md) |
-| 避坑 | [docs/pitfalls.md](docs/pitfalls.md) |
+| 了解系统规则 | [policies/](docs/policies/) |
 | 完整文档地图 | [docs/INDEX.md](docs/INDEX.md) |
 
 ---

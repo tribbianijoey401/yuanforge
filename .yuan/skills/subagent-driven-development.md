@@ -91,7 +91,7 @@ Phase 2 全部 Stage 完成 → 更新 PROGRESS → 进入 Phase 3。
 
 ### 项目文档
 - features/：{当前功能文档路径} — 了解设计意图
-- pitfalls：docs/pitfalls.md — 避免已知坑
+- pitfalls：knowledge/pitfalls/ — 避免已知坑
 - CONVENTIONS：docs/CONVENTIONS.md — 代码规范
 
 ### 要求

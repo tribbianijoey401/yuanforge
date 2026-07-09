@@ -60,7 +60,7 @@ version: 2.0.0
     ├── 2. read_file("docs/ARCHITECTURE.md")
     │      → 了解系统全貌
     │
-    ├── 3. read_file("docs/pitfalls.md")
+    ├── 3. read_file("knowledge/pitfalls/")
     │      → 避开已知陷阱
     │
     ├── 4. 如果当前有 Plan：

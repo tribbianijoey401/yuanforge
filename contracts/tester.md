@@ -14,7 +14,7 @@
 | API 契约 | Architect 产出 | 验证接口一致性 |
 | 验收标准 | Product Analyst 产出 | 确认功能完整性 |
 | 架构设计 | `docs/ARCHITECTURE.md` | 设计集成测试 |
-| 已知陷阱 | `docs/pitfalls.md` | 重点覆盖已知坑 |
+| 已知陷阱 | `knowledge/pitfalls/` | 重点覆盖已知坑 |
 | 运行环境 | `docs/SETUP.md` | 确认测试环境 |
 
 ---

@@ -28,6 +28,8 @@
 2. DocsOS Phase 4: Events 结构化日志
 3. 实战验证
 
+> **待办任务** → [`workspace/backlog.md`](./workspace/backlog.md)
+
 ## 项目元信息
 
 | 项 | 值 |

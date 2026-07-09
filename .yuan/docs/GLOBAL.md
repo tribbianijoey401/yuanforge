@@ -1,6 +1,6 @@
 # GLOBAL — 全局文档规格书
 
-> 管辖 docs/ 下的全局文档：INDEX.md / SETUP.md / CONVENTIONS.md / glossary.md / pitfalls.md / knowledge/
+> 管辖 docs/ 下的全局文档：INDEX.md / SETUP.md / CONVENTIONS.md / glossary.md / knowledge/
 
 ---
 
@@ -161,7 +161,11 @@ cd [项目名]
 
 ---
 
-## 5. pitfalls.md
+## 5. pitfalls.md（已迁移 → knowledge/pitfalls/）
+
+> **⚠️ 此文档已迁移。** 新项目使用 `docs/knowledge/pitfalls/PIT-NNN.md`（对象实例，含 frontmatter）。
+> 全局 `docs/pitfalls.md` 在新项目初始化时不再创建（`yuanforge-init --clean` 会清理旧文件）。
+> 本格式规范保留作为蒸馏参考——从 BUG 蒸馏为 Pitfall 时，正文格式沿用此模板。
 
 ### 目的
 已知陷阱库，Agent 必读避免重复踩坑。

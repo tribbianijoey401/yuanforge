@@ -174,8 +174,11 @@
 6. **归档 Workspace**
    - 移动 `docs/YYYYMMDD-描述/` → `docs/archive/YYYYMMDD-描述/`
 
-7. **写入蒸馏报告**
-   - 在 SESSION_LOG 追加「知识蒸馏」段（蒸馏产出 / 未蒸馏 / 未完成任务）
+7. **写入蒸馏报告 + Events**
+   - 在 SESSION_LOG 追加「知识蒸馏」段
+   - 写 `DISTILLATION_COMPLETE` 事件（到 `docs/events/YYYYMMDD/events.jsonl`）
+   - 写 `KNOWLEDGE_UPDATED` 事件（每个蒸馏产出的对象一条）
+   - 运行 `python scripts/build-graph.py` 重建 Graph
 
 > 详见 `.yuan/docs/SESSION.md`「Workspace Close — 知识蒸馏」。
 

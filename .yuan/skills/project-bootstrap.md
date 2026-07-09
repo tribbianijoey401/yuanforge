@@ -204,11 +204,11 @@ cat > docs/glossary.md << 'EOF'
 | 缩写 | 全称 | 说明 |
 EOF
 
-# pitfalls.md
-cat > docs/pitfalls.md << 'EOF'
-# 踩坑记录
-
-暂无记录
+# pitfalls — 移入 knowledge/pitfalls/
+mkdir -p docs/knowledge/pitfalls
+cat > docs/knowledge/pitfalls/.gitkeep << 'EOF'
+# 蒸馏时 BUG 归档判断产生的 Pitfall 对象放在此目录
+# 格式见 .yuan/docs/GLOBAL.md §6 pitfalls/
 EOF
 
 # ARCHITECTURE.md（空模板，Architect 在 Phase 1 填写）
@@ -230,7 +230,7 @@ cat > docs/ARCHITECTURE.md << 'EOF'
 EOF
 ```
 
-> 完整的格式定义见 `.yuan/docs/` 4 份规格书。Agent 创建 docs 时应读取对应规格书确保格式正确。
+> 完整的格式定义见 `.yuan/docs/` 9 份规格书。Agent 创建 docs 时应读取对应规格书确保格式正确。
 
 ### Step 4: 首次 Commit
 
@@ -257,18 +257,21 @@ my-new-project/
 ├── README.md
 ├── .gitignore
 ├── AGENTS.md                    # 通用入口
-├── docs/                        # 📚 项目说明书
+├── docs/                        # 📚 DocsOS 文档系统
 │   ├── INDEX.md                 # 入口 + 文档地图
 │   ├── PROGRESS.md              # 进度中枢
 │   ├── ARCHITECTURE.md          # 架构全景
 │   ├── SETUP.md                 # 环境指南
 │   ├── CONVENTIONS.md           # 规范约定
 │   ├── glossary.md              # 术语表
-│   ├── pitfalls.md              # 踩坑库
-│   └── [YYYYMMDD-描述]/          # 会话文件夹（按需创建）
+│   ├── knowledge/               # 长期知识（features/decisions/pitfalls/modules）
+│   ├── workspace/               # 计划管理
+│   ├── policies/                # 系统规则
+│   └── [YYYYMMDD-描述]/          # 活跃 Workspace
 │       ├── PLAN.md
 │       ├── TASK_BOARD.md
 │       ├── SESSION_LOG.md
+│       ├── agents/              # Agent Snapshot（崩溃恢复）
 │       ├── FEATURE.md
 │       ├── ADR-NNN.md
 │       └── BUG-NNN.md

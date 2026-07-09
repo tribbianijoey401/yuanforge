@@ -34,7 +34,7 @@ version: 1.0.0
 **必须加载：**
 - `docs/ARCHITECTURE.md` — 架构全景
 - 当前会话文件夹 — 已有功能文档（避免冲突）
-- `docs/pitfalls.md` — 已知陷阱
+- `knowledge/pitfalls/` — 已知陷阱
 - `.yuan/rules/plan-format.md` — Plan 格式规范
 
 ### Step 2: 分解 Task

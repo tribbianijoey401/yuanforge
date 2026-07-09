@@ -39,7 +39,7 @@ version: 1.0.0
 
 1. 读 当前会话文件夹中找到关联 Feature 文档
 2. 读 Feature 文档中的「修改文件」表 → 定位可疑代码
-3. 读 `docs/pitfalls.md` → 确认非已知坑
+3. 读 `knowledge/pitfalls/` → 确认非已知坑
 4. 读 当前会话文件夹中的 ADR → 理解相关设计决策
 5. 更新 Bug 文档的「关联文档」部分
 
@@ -54,7 +54,7 @@ version: 1.0.0
 1. 写修复方案（最小改动）
 2. 写回归测试
 3. 更新 Bug 文档：「修复」+「教训」
-4. 如果新坑 → 追加 `docs/pitfalls.md`
+4. 如果新坑 → 追加 `knowledge/pitfalls/`
 
 ---
 

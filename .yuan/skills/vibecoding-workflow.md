@@ -40,7 +40,7 @@ version: 1.0.0
 ├── 3. read_file("docs/ARCHITECTURE.md")           ← 必读：架构
 │      了解系统全貌
 │
-├── 4. read_file("docs/pitfalls.md")                 ← 必读：踩坑
+├── 4. read_file("knowledge/pitfalls/")                 ← 必读：踩坑
 │      避开已知陷阱
 │
 ├── 5. 如果是继续开发（PROGRESS 显示有进行中 Plan）：
@@ -117,7 +117,7 @@ version: 1.0.0
 │   └──────────────────────┘    │
 │                               │
 │ 每个 Task 后更新 TASK_BOARD.md（状态 + 上下文传递），然后更新 PROGRESS.md     │
-│ 踩坑立即记录 docs/pitfalls.md         │
+│ 踩坑立即记录 knowledge/pitfalls/（蒸馏时 Conductor 生成）         │
 └──────────────┬───────────────┘
 │
 [G3: Integration Gate]
@@ -137,7 +137,7 @@ version: 1.0.0
 ┌──────────────────────────────┐
 │ Phase 4: 回顾 (Retrospector)    │
 │                               │
-│ 1. 遍历 docs/pitfalls.md 和当前会话文件夹中的 BUG 记录      │
+│ 1. 遍历 knowledge/pitfalls/ 和当前会话文件夹中的 BUG 记录      │
 │ 2. 判断每个坑：                 │
 │    ├── 本项目特有 → 留在此文件  │
 │    ├── 领域通用 → 提炼为 Skill  │
@@ -276,7 +276,7 @@ Step D: Stage Gate 检查
 
 ### 4.1 遍历踩坑记录
 
-加载 docs/pitfalls.md 和当前会话文件夹中的 BUG 记录，逐条检查「归档判断」：
+加载 knowledge/pitfalls/ 和当前会话文件夹中的 BUG 记录，逐条检查「归档判断」：
 
 ```
 for each PIT in pitfalls.md:
@@ -286,7 +286,7 @@ if PIT.归档判断 == "本项目特有":
 if PIT.归档判断 == "提炼为 Skill":
 → 如果是新领域 → skill_manage(action='create', ...)
 → 如果是已有 Skill 的补充 → skill_manage(action='patch', ...)
-→ 在 docs/pitfalls.md 中标注「已归档至 Skill: <name>」
+→ 在 knowledge/pitfalls/PIT-NNN.md 中标注「已归档至 Skill: <name>」
 
 if PIT.归档判断 == "反馈到 Yuan":
 → 评估是否需要修改铁律或流程 Skill

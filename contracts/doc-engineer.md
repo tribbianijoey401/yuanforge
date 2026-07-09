@@ -27,7 +27,7 @@
 | | 新增配置项 | `docs/SETUP.md` |
 | | 新增依赖 | `docs/SETUP.md` |
 | | 新术语 | `docs/glossary.md` |
-| | 踩坑经验 | `docs/pitfalls.md`（按类别归档） |
+| | 踩坑经验 | `knowledge/pitfalls/`（蒸馏时 Conductor 自动归档） |
 | **阶段整合**（Milestone 结束） | 架构概览图 | `docs/ARCHITECTURE.md` |
 | | 文档索引更新 | `docs/INDEX.md` |
 | | CHANGELOG 条目 | `docs/CHANGELOG.md` |
@@ -50,7 +50,10 @@
 Milestone（Phase）结束时：
 
 1. 遍历本 Milestone 所有 ADR → 生成决策时间线
-2. 遍历所有 BUG → 按类别归档到 `docs/pitfalls.md`
+2. 遍历所有 BUG → 归档判断：
+   - 会重复出现 → 提炼到 `knowledge/pitfalls/PIT-NNN.md`
+   - 一次性 → 保留在 `archive/YYYYMMDD-描述/` 中
+   - 可提炼为 Skill → 通知 Conductor
 3. 生成/更新 `docs/ARCHITECTURE.md` 架构概览图
 4. 更新 `docs/INDEX.md` 文档地图
 5. 交叉引用一致性检查 → 无死链、无过期引用

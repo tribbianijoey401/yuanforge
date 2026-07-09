@@ -62,7 +62,7 @@ version: 1.0.0
 │     ├── docs/glossary.md    ← 领域术语                │
 │     ├── 当前会话文件夹/         ← ADR-NNN.md 等        │
 │     ├── 当前会话文件夹/         ← FEATURE.md        │
-│     └── docs/pitfalls.md    ← （如有已知坑）          │
+│     └── knowledge/pitfalls/    ← （如有已知坑）          │
 │                                                      │
 │  Step 6: 差异报告                                    │
 │     ├── docs/ 描述的 vs 实际代码的差异                │
@@ -286,7 +286,7 @@ grep -r "TODO\|FIXME\|HACK\|NOTE\|为什么\|因为" --include="*.py" --include=
 - 如果是 SaaS → Tenant/Workspace/Subscription...
 ```
 
-### 5.8 pitfalls.md
+### 5.8 pitfalls — 见 knowledge/pitfalls/
 
 ```
 保留模板。如果用户提到了已知坑，填写。

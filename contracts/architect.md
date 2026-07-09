@@ -13,7 +13,7 @@
 | 风险标签 | Product Analyst 产出 | P0/P1/P2 — 决定安全策略 |
 | 现有架构 | `docs/ARCHITECTURE.md` | 不破坏已有设计 |
 | 已有决策 | 会话中的 ADR | 避免重复决策 |
-| 已知陷阱 | `docs/pitfalls.md` | 避开已知坑 |
+| 已知陷阱 | `knowledge/pitfalls/` | 避开已知坑 |
 | 铁律 | `.yuan/rules/iron-rules.md` | 遵守 Ⅰ/Ⅵ/Ⅶ |
 | Plan 格式 | `.yuan/rules/plan-format.md` | Plan 必须合规范 |
 
