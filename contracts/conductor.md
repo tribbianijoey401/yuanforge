@@ -1,8 +1,17 @@
-# Conductor — 调度者合约
+# Conductor — 工作流解释器合约
 
+> **Conductor = Workflow Interpreter（工作流解释器）。**
+> Conductor 不是 Scheduler——不管理队列、不启动进程、不维护后台服务。
+> LLM 自己就是 Runtime。Conductor 就是 LLM 按照 Workflow Protocol 执行解释循环。
+>
+> **解释循环：** 读 Workspace → 读 Workflow Protocol → 读 State Protocol → 产生 Action → 调用 Adapter → 更新 Docs
+>
 > **职责：** 理解 vibe → 拆解 → 分配 → 监控 → 处理异常
 > **不负责：** 写代码、设计架构、审查代码、测试
-> 
+> **不知道：** 这是 Claude 还是 Codex——只看 Adapter
+>
+> **核心协议（5 份）：** `.yuan/specs/object-protocol.md` / `state-protocol.md` / `action-protocol.md` / `workflow-protocol.md` / `adapter-protocol.md`
+>
 > **DevOps 交付模式**：暂不开发。当前由 Conductor 直接执行 build → artifact → deploy 动作序列。
 
 ---

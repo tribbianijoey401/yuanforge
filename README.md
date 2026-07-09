@@ -1,7 +1,7 @@
 # 🔨 YuanForge
 
-> **元锻造** — 可复制的 Vibecoding 项目母体。
-> 基于 Harness 工程理念：驾驭 Agent、编排 Skill、铁律驱动。
+> **元锻造** — 可复制的 Protocol-First 元框架。
+> LLM 即 Runtime：不构建 Agent/Scheduler/Daemon，只定义协议。
 > 一套框架，生产无数项目。
 
 ---
@@ -29,9 +29,14 @@
 │  ─────────────────────               │
 │  每个技术栈封装为 Skill，Agent 按需加载│
 │                                      │
-│  📚 项目记忆 (Docs)                  │
+│  📚 Docs（唯一状态）                  │
 │  ─────────────────────               │
 │  架构、决策、术语 — 永不丢失的知识     │
+│                                      │
+│  📐 5 份协议                          │
+│  ─────────────────────               │
+│  Object / State / Action             │
+│  / Workflow / Adapter                │
 └──────────────────────────────────────┘
 ```
 
@@ -93,7 +98,8 @@ yuanforge/
 │   ├── archive/                 # 已关闭 Workspace 快照
 │   └── 20260707-框架v2/          # 活跃 Workspace
 ├── .yuan/                       # 🔧 框架内核
-│   ├── docs/                    # 12 份说明书规格（OBJECT_MODEL/GRAPH/EVENTS/PROPOSAL/GLOBAL/PROGRESS/ARCHITECTURE/TASK_BOARD/SESSION）
+│   ├── specs/                   # 5 份核心协议（Object/State/Action/Workflow/Adapter）
+│   ├── docs/                    # 9 份文档格式规格书
 │   ├── rules/                   # 九条铁律 + Plan 格式
 │   ├── skills/                  # Skill 定义
 │   └── platforms/               # 平台适配器
@@ -116,7 +122,8 @@ yuanforge/
 └── templates/
     └── plan-with-dispatch.md
 ├── scripts/                     # 🛠 构建脚本
-│   └── build-graph.py           # Graph 自动生成
+│   ├── build-graph.py           # Graph 自动生成
+│   └── pre-commit               # 确定性校验（YAML/frontmatter/Proposal）
 └── proposals/                   # 📝 提案事务（Knowledge 写保护）
 ```
 

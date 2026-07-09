@@ -1,5 +1,12 @@
-# PROMOTION — 知识晋升管线规格书
+---
+name: promotion
+description: "知识晋升管线 — Workspace Close 时将长期知识从 Runtime 提取到 Knowledge。FEATURE→features/, ADR→decisions/, BUG→pitfalls(if repeatable)。确定性规则：EXTRACT→VALIDATE→PROPOSE→MERGE。Conductor 在 Phase 6 执行。"
+version: 1.0.0
+---
 
+# promotion — 知识晋升管线
+
+> **定位**：Skill（可复用方法），不是协议。被 workflow-protocol Phase 6 调用。
 > 定义从 Workspace 到 Knowledge 的确定性晋升流程。
 > 所有长期知识必须经过同一管线。禁止 Runtime 直接修改 Knowledge。
 

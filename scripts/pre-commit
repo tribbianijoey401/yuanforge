@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+"""YuanForge pre-commit hook — 确定性校验。
+
+保证 LLM 永远不会污染 Docs。
+
+校验项:
+  1. YAML syntax — object-model.yaml + 所有 frontmatter
+  2. Enum validation — object_type/status/confidence/lifecycle 合法值
+  3. Frontmatter completeness — 必填字段检查
+  4. Proposal validation — Proposal 必填字段
+"""
+
+import sys
+import os
+import re
+import subprocess
+from pathlib import Path
+
+REPO_ROOT = Path(subprocess.check_output(
+    ['git', 'rev-parse', '--show-toplevel'], text=True
+).strip())
+
+# ── 1. Changed files ──────────────────────────────────────────────
+
+changed = subprocess.check_output(
+    ['git', 'diff', '--cached', '--name-only', '--diff-filter=ACM'],
+    text=True
+).strip().split('\n')
+
+changed = [f for f in changed if f]  # filter empty
+
+if not changed:
+    sys.exit(0)
+
+# ── 2. YAML validation ────────────────────────────────────────────
+
+yaml_files = [f for f in changed if f.endswith(('.yaml', '.yml'))]
+
+if yaml_files:
+    import yaml
+    for f in yaml_files:
+        path = REPO_ROOT / f
+        try:
+            with open(path) as fh:
+                yaml.safe_load(fh)
+        except yaml.YAMLError as e:
+            print(f"❌ YAML syntax error in {f}: {e}")
+            sys.exit(1)
+
+# ── 3. Frontmatter validation ─────────────────────────────────────
+
+VALID_OBJECT_TYPES = {'feature', 'decision', 'pitfall', 'module'}
+VALID_CONFIDENCE = {'verified', 'stale', 'draft', 'deprecated'}
+VALID_LIFECYCLE = {'knowledge'}
+VALID_FEATURE_STATUS = {'draft', 'designed', 'implemented', 'verified', 'deprecated'}
+VALID_DECISION_STATUS = {'proposed', 'accepted', 'deprecated', 'superseded'}
+VALID_PITFALL_STATUS = {'active', 'resolved', 'archived'}
+VALID_MODULE_STATUS = {'active', 'deprecated'}
+
+REQUIRED_FIELDS = {'id', 'object_type', 'lifecycle', 'owner', 'status', 'summary', 'confidence'}
+
+md_files = [f for f in changed if f.endswith('.md')]
+
+for f in md_files:
+    path = REPO_ROOT / f
+    if not path.exists():
+        continue
+    content = path.read_text()
+    
+    # Check for YAML frontmatter
+    if not content.startswith('---'):
+        continue
+    
+    # Extract frontmatter
+    parts = content.split('---', 2)
+    if len(parts) < 3:
+        continue
+    
+    try:
+        import yaml
+        fm = yaml.safe_load(parts[1])
+    except Exception:
+        continue  # not YAML frontmatter
+    
+    if not fm or not isinstance(fm, dict):
+        continue
+    
+    # Skip non-knowledge files (specs, rules, contracts, etc.)
+    object_type = fm.get('object_type', '')
+    if object_type not in VALID_OBJECT_TYPES:
+        continue
+    
+    # ── 3a. Required fields ──
+    missing = REQUIRED_FIELDS - set(fm.keys())
+    if missing:
+        print(f"❌ {f}: missing required frontmatter fields: {missing}")
+        sys.exit(1)
+    
+    # ── 3b. Enum validation ──
+    if fm['object_type'] not in VALID_OBJECT_TYPES:
+        print(f"❌ {f}: invalid object_type '{fm['object_type']}'")
+        sys.exit(1)
+    
+    if fm['confidence'] not in VALID_CONFIDENCE:
+        print(f"❌ {f}: invalid confidence '{fm['confidence']}'")
+        sys.exit(1)
+    
+    if fm['lifecycle'] not in VALID_LIFECYCLE:
+        print(f"❌ {f}: invalid lifecycle '{fm['lifecycle']}'")
+        sys.exit(1)
+    
+    # ── 3c. Type-specific status validation ──
+    status = fm['status']
+    if object_type == 'feature' and status not in VALID_FEATURE_STATUS:
+        print(f"❌ {f}: invalid feature status '{status}'")
+        sys.exit(1)
+    elif object_type == 'decision' and status not in VALID_DECISION_STATUS:
+        print(f"❌ {f}: invalid decision status '{status}'")
+        sys.exit(1)
+    elif object_type == 'pitfall' and status not in VALID_PITFALL_STATUS:
+        print(f"❌ {f}: invalid pitfall status '{status}'")
+        sys.exit(1)
+    elif object_type == 'module' and status not in VALID_MODULE_STATUS:
+        print(f"❌ {f}: invalid module status '{status}'")
+        sys.exit(1)
+
+# ── 4. Proposal validation ────────────────────────────────────────
+
+proposal_files = [f for f in changed if 'proposals/' in f and f.endswith('.md')]
+
+for f in proposal_files:
+    path = REPO_ROOT / f
+    if not path.exists():
+        continue
+    content = path.read_text()
+    if not content.startswith('---'):
+        print(f"❌ {f}: proposal missing frontmatter")
+        sys.exit(1)
+    
+    parts = content.split('---', 2)
+    if len(parts) < 3:
+        print(f"❌ {f}: proposal frontmatter malformed")
+        sys.exit(1)
+    
+    try:
+        import yaml
+        fm = yaml.safe_load(parts[1])
+    except Exception as e:
+        print(f"❌ {f}: proposal YAML error: {e}")
+        sys.exit(1)
+    
+    prop_required = {'id', 'status', 'target_object', 'change_type', 'summary'}
+    missing = prop_required - set(fm.keys())
+    if missing:
+        print(f"❌ {f}: proposal missing required fields: {missing}")
+        sys.exit(1)
+    
+    valid_change_types = {'distill', 'update', 'deprecate'}
+    if fm.get('change_type') not in valid_change_types:
+        print(f"❌ {f}: invalid change_type '{fm.get('change_type')}'")
+        sys.exit(1)
+
+# ── All good ───────────────────────────────────────────────────────
+
+print("✓ YuanForge pre-commit: all validations passed")
+sys.exit(0)

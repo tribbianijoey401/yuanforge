@@ -110,6 +110,7 @@ cd my-project
 
 | 文件 | 内容 |
 |------|------|
+| [.yuan/specs/](.yuan/specs/) | **5 份协议** — Object / State / Action / Workflow / Adapter |
 | [.yuan/rules/iron-rules.md](.yuan/rules/iron-rules.md) | **九条铁律** — 含三档阻塞策略，所有 Agent 必读 |
 | [.yuan/rules/plan-format.md](.yuan/rules/plan-format.md) | Plan 工程化格式（含 Dispatch Table） |
 | [.yuan/docs/](.yuan/docs/) | docs/ 说明书体系规范（TASK_BOARD、SESSION 等） |
