@@ -129,7 +129,7 @@ SESSION_LOG.md（收尾）
 | ❌ 阻塞 | 需人工介入 | Conductor |
 | ❌ 取消 | 任务被废弃，不再执行 | Conductor |
 | ✅ 测试通过 | Tester 验证通过 | Tester |
-| ✅ 已部署 | DevOps 部署就绪 | DevOps |
+| ✅ 已部署 | Doc Engineer 归档完成 | Doc Engineer |
 
 ### 优先级
 

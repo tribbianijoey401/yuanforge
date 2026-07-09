@@ -1,7 +1,7 @@
 ---
 name: test-driven-development
 description: >
-  Coder 写代码时加载。触发：Phase 2 执行 Task、Coder subagent 启动、
+  Dev 写代码时加载。触发：Phase 2 执行 Task、Dev subagent 启动、
   用户说「写测试」「TDD」、需要写实现代码。强制 Red→Green→Refactor 循环，
   禁止先写代码后补测试。读写：features/当前（更新修改文件表）、
   CONVENTIONS（代码规范）、bugs/（测试失败时记录 Bug 文档）。
@@ -17,9 +17,9 @@ version: 1.0.0
 
 ## 触发条件
 
-- Coder subagent 启动（Phase 2 执行 Task）
+- Dev subagent 启动（Phase 2 执行 Task）
 - 用户说「写测试」「TDD」
-- Coder 准备写代码时自动加载
+- Dev 准备写代码时自动加载
 
 ---
 

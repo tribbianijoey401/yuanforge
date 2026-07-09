@@ -1,10 +1,10 @@
 # Task 产出物协议
 
-> Coder/Reviewer/Tester 完成 Task 后，按此规范输出结果。Conductor 依此判断 Task 是否通过。
+> Dev/Reviewer/Tester 完成 Task 后，按此规范输出结果。Conductor 依此判断 Task 是否通过。
 
 ---
 
-## Coder 产出物
+## Dev 产出物
 
 ### 1. 代码文件
 

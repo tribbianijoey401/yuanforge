@@ -19,7 +19,7 @@ version: 1.0.0
 
 ## 触发条件
 
-- 测试失败（Tester / Coder 发现）
+- 测试失败（Tester / Dev 发现）
 - 用户说「有个 Bug」「报错了」「修一下」
 - Agent 执行中遇到异常
 - Reviewer 发现需要根因分析的问题

@@ -46,7 +46,7 @@ docs/ = 项目的结构化知识网络
 
 ## Agent × 文档 职责矩阵
 
-| 文档 | Conductor | Architect | Coder | Reviewer | Tester | DevOps |
+| 文档 | Conductor | Architect | Frontend/Backend Dev | Reviewer | Tester | Doc Engineer |
 |------|-----------|-----------|-------|----------|--------|--------|
 | INDEX.md | M | R | R | R | R | R |
 | PROGRESS.md | **M** | R | R | R | R | R |

@@ -164,7 +164,7 @@ docs/YYYYMMDD-描述/
 └── BUG-NNN.md
 ```
 
-**Plan 轻，Task 重。** Plan 让 Conductor 快速理解全貌，Task 文件让 Coder 获取完整上下文。
+**Plan 轻，Task 重。** Plan 让 Conductor 快速理解全貌，Task 文件让 Dev 获取完整上下文。
 
 ---
 

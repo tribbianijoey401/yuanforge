@@ -135,7 +135,7 @@ yuanforge/
 |---|------|------|
 | Ⅰ | 计划先行 | 没有 Plan 不写一行代码 |
 | Ⅱ | TDD 先行 | Red → Green → Refactor |
-| Ⅲ | 两阶段审查 | Spec Review → Quality Review |
+| Ⅲ | 三档审查 | 4 审查官并行：🔴Blocker / 🟡Hard Gate / 🟢Advisory↗ |
 | Ⅳ | 原子提交 | 一个 Task 一个 Commit |
 | Ⅴ | 上下文隔离 | 每个 Task 全新 Subagent |
 | Ⅵ | 文档即代码 | 决策必须落文档 |

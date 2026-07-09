@@ -12,7 +12,7 @@
 >
 > **核心协议（5 份）：** `.yuan/specs/object-protocol.md` / `state-protocol.md` / `action-protocol.md` / `workflow-protocol.md` / `adapter-protocol.md`
 >
-> **DevOps 交付模式**：暂不开发。当前由 Conductor 直接执行 build → artifact → deploy 动作序列。
+> **Doc Engineer / 部署**：暂不独立开发。当前由 Conductor 直接执行 build → artifact → deploy 动作序列。
 
 ---
 
@@ -136,8 +136,8 @@
 ### 诊断协议包注入（Debug 模式）
 
 触发条件：
-- Coder 对同一 Bug 连续尝试 ≥2 种修复方案均失败
-- Coder 报告"进入 Debug 模式"
+- Dev 对同一 Bug 连续尝试 ≥2 种修复方案均失败
+- Dev 报告"进入 Debug 模式"
 
 **诊断协议包**（Conductor 注入）：
 

@@ -11,7 +11,7 @@
 |---|------|-----------|
 | Ⅰ | 计划先行 | 没有 Plan 不写一行代码 |
 | Ⅱ | TDD 先行 | Red → Green → Refactor |
-| Ⅲ | 两阶段审查 | Spec Compliance → Code Quality |
+| Ⅲ | 三档审查 | 4 审查官并行：🔴Blocker / 🟡Hard Gate / 🟢Advisory↗ |
 | Ⅳ | 原子提交 | 一个 Task 一个 Commit |
 | Ⅴ | 上下文隔离 | 每个 Task 全新 Subagent |
 | Ⅵ | 文档即代码 | 决策必须落文档 |
@@ -68,14 +68,17 @@
 
 ---
 
-## 铁律 Ⅲ — 两阶段审查
+## 铁律 Ⅲ — 三档审查
 
-**每个 Task 完成后，必须经过两阶段审查。**
+**每个 Task 完成后，必须经过 4 审查官并行审查：🔴Blocker / 🟡Hard Gate / 🟢Advisory↗。**
 
-- **第一阶段：Spec Compliance Review** — 实现是否完全符合 Task Spec？有遗漏？有超出？
-- **第二阶段：Code Quality Review** — 代码质量、错误处理、安全问题、测试覆盖
-- 审查由 Reviewer Agent 执行，不能由 Coder 自己审查
-- 任一阶段未通过 → Coder 修复 → 重新审查 → 直到通过
+- **四个审查官同时启动**：Spec Reviewer (🔴) + Security Auditor (🔴) + Quality Auditor (🟢) + UX Reviewer (🟢)
+- Spec Reviewer：对照验收标准 + API 契约，不通过 → Blocker
+- Security Auditor：按 P0/P1/P2 分级投入，不通过 → Blocker
+- Quality Auditor：代码质量 + 性能 + DB，同类 3 次警告 → 自动升级 Blocker
+- UX Reviewer：有界面时触发，还原度审查，同类 3 次 → 自动升级
+- 审查由对应的 Reviewer Agent 执行，不能由 Dev 自己审查
+- 任意 Blocker → 通知其他审查官暂停 → 解决后断点恢复
 - 三次审查未通过 → 在 PROGRESS.md 标记阻塞，Conductor 通知用户
 
 ---
@@ -95,7 +98,7 @@
 
 **每个 Task 由全新 Subagent 执行，不继承上一 Task 的上下文。**
 
-- 每个 Coder Agent 只知道自己 Task 的 spec + 上游产出物引用
+- 每个 Dev Agent 只知道自己 Task 的 spec + 上游产出物引用
 - 不依赖"上一个 Agent 记得什么"
 - Subagent 通过读取项目文档（PROGRESS.md、ARCHITECTURE.md）了解上下文
 - 项目记忆是 Agent 之间唯一的持久化通信渠道
@@ -145,7 +148,7 @@ Phase 1 ── G1 ──→ Phase 2 ── G2 ──→ Phase 3 ── G3 ──
 
 ```
                     ┌── Spec Reviewer ──→ 🔴 Blocker (必须解决)
-Coder 完成 Task ──→ │
+Dev 完成 Task ──→ │
                     ├── Security Auditor ──→ 🔴 Blocker (按 P0/P1/P2 分级执行)
                     │
                     ├── Quality Auditor ──→ 🟢 Advisory (DB+性能合并)

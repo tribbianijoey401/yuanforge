@@ -109,7 +109,7 @@ docs/YYYYMMDD-描述/
 
 > 会话: [YYYYMMDD-描述]
 > 状态: [完成]
-> 负责角色: [Architect/Coder]
+> 负责角色: [Architect/Frontend/Backend Dev]
 
 ## 需求描述
 [一句话]
@@ -135,7 +135,7 @@ docs/YYYYMMDD-描述/
 | 阶段 | 操作 | 执行者 |
 |------|------|--------|
 | Phase 1 | 创建，填需求+设计 | Architect |
-| Phase 2 完成 | 补充修改文件+API | Coder |
+| Phase 2 完成 | 补充修改文件+API | Frontend/Backend Dev |
 
 ---
 
@@ -228,11 +228,11 @@ docs/YYYYMMDD-描述/
 4. Architect 填 PLAN.md + FEATURE.md（需求+设计）
 5. 做决策时 → 创建 ADR-NNN.md
     ↓ G1 ✓ → Phase 2
-6. Coder 执行，遇 Bug → 创建 BUG-NNN.md
+6. Frontend/Backend Dev 执行，遇 Bug → 创建 BUG-NNN.md
     ↓ Phase 2 进行中
 7. Conductor 渐进更新 SESSION_LOG「任务完成情况」表（每次任务终态时）
     ↓ Phase 2 完成
-8. Coder 更新 FEATURE.md（修改文件+API）
+8. Frontend/Backend Dev 更新 FEATURE.md（修改文件+API）
 9. Conductor 更新 SESSION_LOG.md（完成/决策/踩坑）
     ↓ Phase 4
 10. Conductor 遍历 BUG → 归档判断 → PROGRESS 更新

@@ -1,7 +1,7 @@
 # 🚀 环境指南 (SETUP.md)
 
 > **本文件回答："怎么把项目跑起来？"**
-> DevOps Agent 负责维护此文件。首次接手项目时必读。
+> Doc Engineer 负责维护此文件。首次接手项目时必读。
 
 ---
 
@@ -56,7 +56,7 @@ YuanForge 不绑定平台。选你习惯的 Agent 工具：
 1. Architect 分析需求 → 设计架构 → 产出 Plan
 2. 你确认 Plan
 3. Conductor 解析 Dispatch Table → 并行派发 Agent
-4. Coder → Reviewer → Tester → DevOps 逐层流转
+4. Dev → 4 Reviewers → Tester → Doc Engineer 逐层流转
 5. 交付可运行代码
 
 ---

@@ -115,6 +115,51 @@ limitations:
 
 ---
 
+## Action 映射（Adapter Protocol §三）
+
+本平台如何实现 8 个统一 Action：
+
+```yaml
+platform: hermes
+transport: hermes-subagent
+
+dispatch:
+  implementation: delegate_task
+  notes: "同步派发子 Agent，父 Agent 等待完成。context 含角色合约 + Knowledge 引用 + 上游产出物"
+  max_concurrent: 3
+
+review:
+  implementation: delegate_task
+  notes: "以对应 Reviewer 角色派发子 Agent，注入验收标准 + diff"
+
+snapshot:
+  implementation: write_file
+  notes: "写入 agents/<role>.yaml，记录当前步骤 + 文件修改 + 推理摘要"
+
+checkpoint:
+  implementation: write_file + terminal(git)
+  notes: "Workspace 全量状态写入 archive/"
+
+recover:
+  implementation: conductor_loop
+  notes: "Conductor 在新会话中执行崩溃检测 → 回退 🔨→🟢 → 通知用户"
+
+archive:
+  implementation: terminal(mv)
+  notes: "mv docs/YYYYMMDD-描述/ → docs/archive/"
+
+promote:
+  implementation: conductor_loop + terminal(python)
+  notes: "Conductor 执行蒸馏 Checklist → 写 Knowledge 对象 → 运行 build-graph.py"
+
+limitations:
+  - "delegate_task 是同步的，父 Agent 等待子 Agent 完成"
+  - "子 Agent 无父会话记忆，必须通过 context 传递全部信息"
+  - "max_concurrent_children=3，可配置 delegation.max_concurrent_children"
+```
+
+---
+
 ## 工具映射
 
 | YuanForge 概念 | Hermes 工具 |

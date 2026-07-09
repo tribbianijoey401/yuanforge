@@ -98,8 +98,8 @@ cd [项目名]
 ### 生命周期
 | 阶段 | 操作 | 执行者 |
 |------|------|--------|
-| Phase 1 | 创建 | DevOps |
-| 依赖变更时 | 更新 | DevOps |
+| Phase 1 | 创建 | Doc Engineer |
+| 依赖变更时 | 更新 | Doc Engineer |
 
 ---
 

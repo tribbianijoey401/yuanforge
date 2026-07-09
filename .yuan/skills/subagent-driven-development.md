@@ -1,109 +1,141 @@
 ---
 name: subagent-driven-development
 description: >
-Phase 2 执行 Plan 时加载。触发：Plan 确认后进入 Phase 2、Conductor 需要
-逐 Task 派发 Coder→Reviewer 子流程、用户说「执行 Plan」「开始实现」。
-管理 TODO 列表、派发 Subagent（Coder→Reviewer）、追踪 G2 Gate 状态。
-读写：PROGRESS（每 Task 更新）、features/当前（上下文传递给 Subagent）、
-Plan（读取 Task 描述）。
-version: 1.0.0
+  Phase 2-5 执行引擎。Conductor 按 Dispatch Table 派发 Task 到 12 人专家团。
+  触发：Plan 确认后进入 Phase 2、用户说「执行 Plan」「开始实现」。
+  管理 TASK_BOARD、派发 Subagent（并行 Dev → 并行 4 审查官 → Tester → Doc Engineer）。
+version: 2.0.0
 ---
 
 # Subagent 驱动开发 Skill
 
-> **YuanForge 的 Phase 2 执行引擎。**
-> 读取 Plan → 逐 Task 派发 Subagent → 追踪 Gate 状态。
+> **YuanForge 的 Phase 2-5 执行引擎。**
+> Conductor = Workflow Interpreter：读 Workflow Protocol → 读 TASK_BOARD → 产生 Action → 委托 Adapter。
 
 ---
 
 ## 触发条件
 
-- Phase 2 启动：Plan 确认后
-- Conductor 激活：需要逐 Task 执行
-- 用户说「执行 Plan」「开始实现」「继续下一个 Task」
+- Plan 确认（G1 通过）→ 进入 Phase 2
+- Conductor 激活：需要按 Dispatch Table 逐批派发
+- 用户说「执行 Plan」「开始实现」「继续」
 
 ---
 
-## 流程
+## 执行流程
 
-### Step 1: 加载 Plan
-
-1. 读取 `docs/PROGRESS.md` — 当前 Plan 路径
-2. 读取 Plan 文件 — 所有 Task 列表
-3. 读取 当前会话文件夹中的 FEATURE.md — 当前功能文档
-4. 创建 TODO 列表追踪全部 Task
-
-### Step 2: 逐 Task 执行
-
-对每个 Task：
+### Phase 2: 方案设计
 
 ```
-Task N: {描述}
-│
-├── 派 Coder Subagent
-│   ├── 上下文：Plan Task 描述 + features/NNN-xxx.md + pitfalls
-│   ├── 加载：frontend-dev / backend-dev persona + test-driven-development skill
-│   └── 等待 Coder 完成 → Commit
-│
-├── Gate G2-TASK: Spec Review
-│   ├── 派 Reviewer Subagent
-│   ├── 加载：spec-reviewer / security-auditor / quality-auditor / ux-reviewer persona
-│   ├── PASS → 进入 Quality Review
-│   └── FAIL → 退回 Coder（附差距列表）→ 最多 3 轮
-│
-├── Gate G2-TASK: Quality Review
-│   ├── APPROVED → 标记 Task 完成 `[G2 ✓]`
-│   └── REJECT → 退回 Coder → 最多 3 轮
-│
-└── 更新 PROGRESS → 下一个 Task
+1. Dispatch(product-analyst)
+   输入: 用户 vibe / 一句话需求
+   产出: 用户故事 + 验收标准 + 风险标签(P0/P1/P2)
+   → 用户确认
+
+2. Dispatch(architect)
+   输入: 用户故事 + 验收标准
+   动作: 计划复盘 → 设计理解书 → 用户确认 → API 契约 freeze + Plan(含 Dispatch Table)
+   并行: Dispatch(ui-designer) — 有界面时
+   → [G1: Plan Gate] 用户确认 Plan
 ```
 
-### Step 3: Stage Gate 检查
+### Phase 3: 开发实现
 
-当前 Stage 所有 Task 完成 → 执行 Stage Gate（G1/G3/G4）。
+```
+1. Conductor 初始化 TASK_BOARD（从 Plan 的 Dispatch Table）
+2. 找出所有 🟢就绪 Task → 并行派发
+   - Dispatch(frontend-dev) × N  (并行)
+   - Dispatch(backend-dev) × N   (并行)
+   硬前提: API 契约已 freeze
 
-### Step 4: Phase 完成
+3. 每个 Task Complete → Dependency Check → Promote 下游
+4. 超时回退: 🔨→🟢 (attempts++)
+5. attempts ≥ 3 → ❌阻塞
 
-Phase 2 全部 Stage 完成 → 更新 PROGRESS → 进入 Phase 3。
+异常:
+  - ≥2 次修复失败 → 注入诊断协议包（Debug 模式）
+  - 需变更契约 → 回退 Dispatch(architect)
+```
+
+### Phase 4: 质量审查
+
+```
+所有 Dev Task ✅完成 → 同时派发 4 审查官
+
+  Dispatch(spec-reviewer)    [🔴 Blocker]
+  Dispatch(security-auditor)  [🔴 Blocker]
+  Dispatch(quality-auditor)   [🟢 Advisory↗]
+  Dispatch(ux-reviewer)       [🟢 Advisory↗]
+
+并发规则:
+  - 任意 Blocker → 通知其他审查官暂停 → 解决后断点恢复
+  - 审查报告各自独立呈现
+
+Task 状态:
+  - ✅完成 → ✅审查通过 (PASS)
+  - ✅完成 → 🔄返工 (FAIL) → 回 Dev 修复
+  - 🔄返工 ≥ 3 次 → ❌阻塞
+```
+
+### Phase 5: 测试验证
+
+```
+前提: 所有 🔴 Blocker 已解决
+
+Dispatch(tester)
+  [🟡 Hard Gate] 全量测试必须 PASS
+
+修复回路:
+  - 仅逻辑错误 → 回 Dev → Tester
+  - 涉接口/权限 → 回 Architect + Spec + Security
+  - 涉依赖/数据 → 回 Architect + Spec + Quality
+```
+
+### Phase 6: 归档
+
+```
+Dispatch(doc-engineer)
+  - 增量: 合入主干时异步更新
+  - 阶段: Milestone 结束全局归档
+
+Conductor 蒸馏:
+  - Promote → Archive → 重建 Graph
+```
 
 ---
 
-## 📚 文档读写规则
+## TASK_BOARD 管理
 
-| 阶段 | 读 | 写 |
-|------|-----|-----|
-| 加载 Plan | Plan 文件, features/当前, PROGRESS, pitfalls | - |
-| 每次 Task 完成 | - | PROGRESS（当前 Task → ✓） |
-| 每次 Stage 完成 | - | PROGRESS（Gate 标注） |
-| 传递上下文给 Subagent | features/当前, pitfalls, CONVENTIONS | - |
+| 操作 | 谁 | 时机 |
+|------|-----|------|
+| 初始化 | Conductor | Phase 3 开始，从 Dispatch Table 复制 |
+| 领取 Task | Agent | 找到自己角色 + 🟢就绪 的行 |
+| 更新状态 | Agent | 🔨→✅ 完成时 |
+| Promote 下游 | Conductor | 每次 Task Complete 后重算依赖 |
+| 巡检 | Conductor | 持续：超时回退、阻塞升级、更新快照 |
+| 上下文传递 | Agent | 完成时追加「上下文传递」行 |
 
 ---
 
 ## Subagent 上下文模板
 
-派 Coder 时注入：
+派发 Dev Agent 时注入：
 
 ```markdown
-## Task 上下文
+## Task: T{N}
 
-### Plan 要求
-{Task 完整描述}
+### 目标
+{Task summary}
 
-### 项目文档
-- features/：{当前功能文档路径} — 了解设计意图
-- pitfalls：knowledge/pitfalls/ — 避免已知坑
-- CONVENTIONS：docs/CONVENTIONS.md — 代码规范
+### 验收标准
+- {criterion 1}
+- {criterion 2}
 
-### 要求
-- TDD: Red → Green → Refactor
-- 完成后更新 features/ 的「修改文件」表
-- 遇问题创建 bugs/ 文档
-- 原子提交
+### 必读
+- 角色合约: contracts/{role}.md
+- 铁律: .yuan/rules/iron-rules.md
+- 上游产出: {file paths}
+
+### 产出
+- {expected output files}
 ```
-
-## 快速模式
-
-`@快速模式` 下：
-- 跳过 Spec Review（只做 Quality）
-- 允许多 Task 合并提交
-- G3/G4 可选

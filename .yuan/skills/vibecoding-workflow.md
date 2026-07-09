@@ -1,17 +1,17 @@
 ---
 name: vibecoding-workflow
 description: >
-YuanForge 核心工作流引擎。开发任何功能时加载。触发：用户说「开发」「实现」
-「做项目」「继续」「build」、Phase 1 启动、Plan 确认后进入 Phase 2。
-编排 12 人专家团完整流程：Product Analyst→Architect→Dev→4审查官→Tester→Doc Engineer。
-读写：PROGRESS（进度）、features/（功能文档）、decisions/（决策）、
-pitfalls（踩坑）、bugs/（Bug 记录）。所有 Agent 的调度中心。
-version: 1.0.0
+  YuanForge 核心工作流。开发任何功能时加载。触发：用户说「开发」「实现」
+  「做项目」「继续」「build」、Phase 1 启动、Plan 确认后进入 Phase 2。
+  编排 12 人专家团完整流程：Product Analyst→Architect→Dev→4审查官→Tester→Doc Engineer。
+  遵循 5 份协议（.yuan/specs/）+ 九条铁律。Conductor = Workflow Interpreter。
+version: 2.0.0
 ---
 
 # YuanForge 核心工作流
 
-> **这是元框架的「引擎」** — 定义了从用户需求到可交付代码的完整流程。
+> **这是元框架的 Workflow Protocol 实现。** Conductor = Workflow Interpreter：
+> 读 Workspace → 读 Workflow Protocol → 读 State Protocol → 产生 Action → 调 Adapter → 更新 Docs。
 > 所有 YuanForge 项目必须遵循此工作流。
 
 ---
@@ -26,27 +26,23 @@ version: 1.0.0
 
 ---
 
-## 完整流程
-
-### Agent 启动：加载项目说明书
+## Agent 启动：加载最小安全上下文
 
 ```
 [Agent 启动]
 │
-├── 1. read_file("docs/INDEX.md")                  ← 必读：入口
-├── 2. read_file("docs/PROGRESS.md")               ← 必读：进度
-│      获悉：当前 Phase/Stage/Task、阻塞项、下一步
+├── 1. read_file("docs/PROGRESS.md")               ← 必读：进度（~500B）
+│      获悉：当前 Phase/Stage、阻塞项、下一步
 │
-├── 3. read_file("docs/ARCHITECTURE.md")           ← 必读：架构
-│      了解系统全貌
+├── 2. read_file("docs/ARCHITECTURE.md")           ← 必读：架构
 │
-├── 4. read_file("knowledge/pitfalls/")                 ← 必读：踩坑
+├── 3. read_file("docs/knowledge/pitfalls/")       ← 必读：踩坑
 │      避开已知陷阱
 │
-├── 5. 如果是继续开发（PROGRESS 显示有进行中 Plan）：
-│      read_file(".yuan/plans/当前 Plan")
+├── 4. 如果继续开发（PROGRESS 有进行中 Plan）：
+│      读 docs/YYYYMMDD-描述/TASK_BOARD.md
 │
-└── 6. 继续下面 Phase 流程
+└── 5. 继续下面 Phase 流程
 ```
 
 ### 判断是否需要 Phase 0
@@ -55,7 +51,9 @@ version: 1.0.0
 - 状态为「初始化」或「空模板」→ **进入 Phase 0（审计）**
 - 状态为「就绪」或「开发中」→ **跳过 Phase 0，进入 Phase 1**
 
-### Pipeline 总览
+---
+
+## Pipeline 总览
 
 ```
 用户需求 / 已有项目
@@ -76,265 +74,258 @@ version: 1.0.0
 └────────────────────┬─────────────────────────┘
 │
 ▼
-[Phase 0: 审计完成]
-│
-▼
 ┌──────────────────────────────────────────────┐
-│ Phase 1: 架构 (Architect)                     │
+│ Phase 1: 需求分析 (Product Analyst)            │
 │                                               │
-│ 1. 加载 iron-rules.md（铁律入脑）             │
-│ 2. 加载 architect agent persona               │
-│ 3. 分析需求 → 技术选型 → 架构设计             │
-│ 4. 产出 Implementation Plan                   │
-│ 5. 保存到 .yuan/plans/                      │
-│ 6. 更新 PROGRESS.md、decisions/ 决策记录       │
-│                                               │
-│ 输出：Plan + 技术选型理由                      │
+│ 1. 用户给出 vibe / 一句话需求                  │
+│ 2. Product Analyst 产出:                       │
+│    - 用户故事                                  │
+│    - 验收标准（可验证）                         │
+│    - 风险标签(P0/P1/P2)                        │
+│ 3. 用户确认                                    │
 └────────────────────┬─────────────────────────┘
 │
 ▼
-[G1: Plan Gate]
-│
-用户确认 Plan？
-│
-┌────────┴────────┐
-│ 否              │ 是
-▼                 ▼
-修改 Plan       ┌──────────────────────────────┐
-│ Phase 2: 执行 (Conductor)      │
-│                               │
-│ 加载 subagent-driven-dev skill + 读取 TASK_BOARD.md 找 🟢就绪 任务 │
-│                               │
-│ for each Task in Plan:        │
-│   ┌──────────────────────┐    │
-│   │ 2a. Coder (TDD 实现)  │    │
-│   │ 2b. G2 Spec Review    │──┐ │
-│   │    ├─ PASS → next     │  │ │
-│   │    └─ FAIL → fix → 2b │  │ │
-│   │ 2c. G2 Quality Review │  │ │
-│   │    ├─ APPROVED → next │  │ │
-│   │    └─ REJECT → fix→2c │  │ │
-│   └──────────────────────┘    │
-│                               │
-│ 每个 Task 后更新 TASK_BOARD.md（状态 + 上下文传递），然后更新 PROGRESS.md     │
-│ 踩坑立即记录 knowledge/pitfalls/（蒸馏时 Conductor 生成）         │
-└──────────────┬───────────────┘
-│
-[G3: Integration Gate]
+┌──────────────────────────────────────────────┐
+│ Phase 2: 方案设计 (Architect)                  │
+│                                               │
+│ 1. Architect 计划复盘                          │
+│ 2. 输出「设计理解书」（核心实体+数据流+交互+推导链）│
+│ 3. Conductor 审视推导链 → 用户确认              │
+│ 4. API 契约 freeze + 数据模型 + Plan(含 Dispatch Table) │
+│ 5. [有界面] UI Designer 并行 → 视觉规范+原型    │
+│                                               │
+│ [G1: Plan Gate] 用户确认 Plan                  │
+└────────────────────┬─────────────────────────┘
 │
 ▼
-┌──────────────────────────────┐
-│ Phase 3: 收尾                   │
-│                               │
-│ 1. Tester — 补充集成测试       │
-│ 2. DevOps — 配置 CI/CD         │
-│ 3. 更新 ARCHITECTURE / decisions/ / docs   │
-└──────────────┬───────────────┘
-│
-[G4: Release Gate]
+┌──────────────────────────────────────────────┐
+│ Phase 3: 开发实现 (Frontend Dev + Backend Dev) │
+│                                               │
+│ Conductor 初始化 TASK_BOARD → 并行派发:         │
+│   - Frontend Dev × N (并行)                    │
+│   - Backend Dev × N (并行)                     │
+│                                               │
+│ 硬前提: API 契约已 freeze                      │
+│ 异常: ≥2次修复失败 → Debug 模式(诊断协议包)      │
+│ 超时回退: 🔨→🟢 (attempts++), ≥3→❌阻塞       │
+└────────────────────┬─────────────────────────┘
 │
 ▼
-┌──────────────────────────────┐
-│ Phase 4: 回顾 (Retrospector)    │
-│                               │
-│ 1. 遍历 knowledge/pitfalls/ 和当前会话文件夹中的 BUG 记录      │
-│ 2. 判断每个坑：                 │
-│    ├── 本项目特有 → 留在此文件  │
-│    ├── 领域通用 → 提炼为 Skill  │
-│    └── 框架通用 → 反馈到 Yuan   │
-│ 3. 记录 SESSION_LOG.md          │
-│ 4. 更新 PROGRESS.md → 已交付    │
-└──────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│ Phase 4: 质量审查 (4 审查官并行)                │
+│                                               │
+│ 四个审查官同时启动:                             │
+│   ├─ Spec Reviewer     🔴 Blocker             │
+│   ├─ Security Auditor  🔴 Blocker (P0/P1/P2)  │
+│   ├─ Quality Auditor   🟢 Advisory↗           │
+│   └─ UX Reviewer       🟢 Advisory↗           │
+│                                               │
+│ 审查报告各自独立呈现                            │
+│ 任意 Blocker → 通知其他暂停 → 解决后断点恢复     │
+│ 🟠 ≥3 → 自动升级 🔴                           │
+└────────────────────┬─────────────────────────┘
+│
+▼
+┌──────────────────────────────────────────────┐
+│ Phase 5: 测试验证 (Tester)                     │
+│                                               │
+│ [🟡 Hard Gate] 全量测试 PASS                   │
+│ 失败 → 修复回路路由:                            │
+│   逻辑 → Dev / 接口→Architect / 依赖→Architect  │
+│                                               │
+│ [G3: Integration Gate]                        │
+└────────────────────┬─────────────────────────┘
+│
+▼
+┌──────────────────────────────────────────────┐
+│ Phase 6: 知识蒸馏 (Conductor + Doc Engineer)   │
+│                                               │
+│ 1. Dispatch(doc-engineer) — 增量归档+阶段整合   │
+│ 2. Conductor 蒸馏:                             │
+│    - FEATURE → knowledge/features/            │
+│    - ADR → knowledge/decisions/               │
+│    - BUG → 判断 → knowledge/pitfalls/ 或跳过   │
+│    - 未完成任务 → workspace/backlog.md         │
+│ 3. Promote → Archive → 重建 Graph              │
+│                                               │
+│ [G4: Release Gate]                            │
+└──────────────────────────────────────────────┘
 ```
 
 ---
 
-## Phase 1: 架构阶段（详细）
+## Phase 1: 需求分析（详细）
 
-### 1.1 加载上下文
+### 1.1 Product Analyst
 
-```markdown
-必加载：
-- `.yuan/rules/iron-rules.md`  — 铁律
-- `contracts/architect.md`  — 架构师角色
-
-按需加载：
-- 对应技术栈 skill（如 python-fastapi）
-- `docs/ARCHITECTURE.md`  — 现有架构
-- 当前会话文件夹中的 ADR — 已有技术决策
-```
-
-### 1.2 需求分析
+**必加载**：`contracts/product-analyst.md` — 角色合约
 
 分析维度：
 - **功能需求：** 用户要什么？
 - **边界条件：** 什么不算在内？
 - **非功能需求：** 性能、安全、可扩展性？
-- **约束条件：** 时间、资源、技术限制？
+- **风险识别：** P0=高敏 / P1=标准 / P2=低敏
 
-### 1.3 技术选型
-
-选择原则：
-- 语言无关 — 按任务选最合适的栈
-- 简单优先 — 能用简单的不用复杂的
-- 记录理由 — 每个选型写入 `decisions/`
-
-### 1.4 架构设计
-
-输出：
-- 系统架构概述（2-3 句）
-- 模块划分
-- 数据流
-- 目录结构
-
-### 1.5 产出 Plan
-
-遵循 `plan-format.md` 的 Pipeline-as-Code 规范：
-- 定义 **Stage**（每个 Stage = 一组 Task + 一个 Gate）
-- 每个 Task 包含：`Objective` / `Files` / `Input` / `Output` / `Test` / `Gate Check`
-- 每个 Stage 出口定义 **Gate**：`Pass Criteria` + `Fail Action`
-- 标注 `Pitfalls`（已知陷阱，从经验中提取）
-
-保存路径：`.yuan/plans/YYYY-MM-DD_HHMMSS-<feature-slug>.md`
-
-### 1.6 用户确认
-
-展示 Plan 摘要，等待用户确认或修改。
+**产出**：用户故事 + 验收标准 + 风险标签
+**Gate**：用户确认
 
 ---
 
-## Phase 2: 执行阶段（详细）
+## Phase 2: 方案设计（详细）
 
-### 2.1 加载 Conductor 模式
+### 2.1 Architect 计划复盘
 
-使用 `subagent-driven-development` skill 执行 Plan：
-- 读 Plan 文件一次，提取所有 Task
-- 创建 TODO 列表追踪进度
+**必加载**：`contracts/architect.md` + `iron-rules.md`
 
-### 2.2 逐 Task 执行（含 Gate）
+流程：
+1. 读用户故事 + 验收标准
+2. 输出「设计理解书」
+3. Conductor 审视推导链完整性
+4. 用户确认 → API 契约 freeze + Plan(含 Dispatch Table)
+5. [有界面] UI Designer 并行
 
-对每个 Task：
+### 2.2 产出 Plan
 
-```
-Step A: 派 Dev (新 subagent)
-→ 加载 frontend-dev 或 backend-dev agent persona + TDD skill
-→ 提供 Task 完整上下文
-→ 执行 TDD → 原子提交
-
-Step B: Gate G2 — 四审查官并行审查
-→ 加载 spec-reviewer / security-auditor / quality-auditor / ux-reviewer agent persona
-→ 对照 Plan 检查实现
-→ PASS → 进入 Step C
-→ FAIL → Coder 修复 → 重新审查
-→ 同一 Task 连续 3 次 FAIL → 触发架构复盘
-
-Step C: Gate G2-TASK — Quality Review
-→ 代码质量审查
-→ APPROVED → 标记 Task 完成 `[G2 ✓]`
-→ REJECT → Coder 修复 → 重新审查
-
-Step D: Stage Gate 检查
-→ 当前 Stage 所有 Task 完成？
-→ 是 → 执行 Stage Gate（G1/G3/G4）
-→ 否 → 下一个 Task
-```
-
-### 2.3 快速模式
-
-`@快速模式` 下：
-- 跳过 Step B（Spec Review）
-- Step C 只检查 Critical Issues
-- 允许多个 task 合并提交
+遵循 `plan-format.md` 规范：
+- 定义 Task（含 role/depends/output/timeout）
+- Dispatch Table 完整（Architect 必须声明每个 Task 的角色、依赖、产出物）
+- Plan 含技术选型理由（写入 ADR）
 
 ---
 
-## Phase 3: 收尾阶段（详细）
+## Phase 3: 开发实现（详细）
 
-### 3.1 集成测试
+### 3.1 Conductor 初始化 TASK_BOARD
+
+- 从 Plan 的 Dispatch Table 提取所有 Task
+- 所有 Task 初始状态 = ⏳等待
+- 无依赖 Task = 🟢就绪
+
+### 3.2 并行派发
+
+- 所有 🟢就绪 Task 同时派发
+- Frontend Dev + Backend Dev 各自独立上下文
+- 每个 Dev Agent 加载：角色合约 + TDD skill + 上游产出物 + pitfalls
+
+### 3.3 超时 + 巡检
+
+- Conductor 定期巡检 🔨进行中 的 Task
+- 超时 → 🔨→🟢 (attempts++)
+- 同任务 3 次超时 → ❌阻塞
+
+### 3.4 Debug 模式
+
+触发：≥2 次修复失败
+→ Conductor 注入诊断协议包：隔离复现 → 二分定位 → 假设记录 → 并行通知 Architect
+
+---
+
+## Phase 4: 质量审查（详细）
+
+### 4.1 加载审查官
+
+每个审查官加载对应合约 + 铁律 Ⅲ + 铁律 Ⅷ：
+
+```
+Spec Reviewer     → contracts/spec-reviewer.md
+Security Auditor  → contracts/security-auditor.md
+Quality Auditor   → contracts/quality-auditor.md
+UX Reviewer       → contracts/ux-reviewer.md
+```
+
+### 4.2 双轨运行
+
+所有审查官同时执行：
+- 合规路径：逐条对照验收标准/安全清单/质量规范/UI 原型
+- 对抗路径：主动构造边界条件、异常输入、极端场景
+
+### 4.3 审查结果
+
+```
+PASS → ✅审查通过 → 下游 🟢就绪
+BLOCKER → 🔄返工 → Dev 修复
+🟠 Advisory ≥ 3 次 → 自动升级 🔴 Blocker
+```
+
+---
+
+## Phase 5: 测试验证（详细）
+
+### 5.1 Tester
 
 - 加载 `tester` agent persona
 - 补充集成测试和边界测试
-- 运行完整测试套件
+- 🟡 Hard Gate：全量测试 PASS
 
-### 3.2 CI/CD 配置
+### 5.2 修复回路
 
-- 由 Conductor 执行 DevOps 交付模式（暂不开发独立 Agent）
-- 配置 GitHub Actions 或等价 CI
-- 编写 Dockerfile / docker-compose
-
-### 3.3 文档更新
-
-- 更新 `docs/ARCHITECTURE.md`（如有架构变更）
-- 更新当前会话文件夹中的 ADR（如有新决策）
-- 更新 `docs/glossary.md`（如有新术语）
+| 问题类型 | 回退 |
+|---------|------|
+| 仅逻辑错误 | Dev → Tester |
+| 涉接口/权限 | Architect + Spec + Security |
+| 涉依赖/数据 | Architect + Spec + Quality |
 
 ---
 
-## Phase 4: 回顾阶段（详细）
+## Phase 6: 知识蒸馏（详细）
 
-> Harness 的回环学习在此落地。
+### 6.1 Doc Engineer
 
-### 4.1 遍历踩坑记录
+增量：合入主干时异步更新 API/数据/配置/依赖文档
+阶段：Milestone 结束 → 概览图+索引+一致性检查
 
-加载 knowledge/pitfalls/ 和当前会话文件夹中的 BUG 记录，逐条检查「归档判断」：
+### 6.2 Conductor 蒸馏
 
-```
-for each PIT in pitfalls.md:
-if PIT.归档判断 == "本项目特有":
-→ 留在此文件，不操作
+1. FEATURE.md → knowledge/features/FEAT-NNN.md
+2. ADR → knowledge/decisions/ADR-NNN.md
+3. BUG → 会重复 → knowledge/pitfalls/，一次性 → 留在 archive
+4. 未完成 → workspace/backlog.md
+5. Archive Workspace
+6. 运行 build-graph.py
 
-if PIT.归档判断 == "提炼为 Skill":
-→ 如果是新领域 → skill_manage(action='create', ...)
-→ 如果是已有 Skill 的补充 → skill_manage(action='patch', ...)
-→ 在 knowledge/pitfalls/PIT-NNN.md 中标注「已归档至 Skill: <name>」
+### 6.3 回环学习
 
-if PIT.归档判断 == "反馈到 Yuan":
-→ 评估是否需要修改铁律或流程 Skill
-→ 修改后提交到 YuanForge 仓库
-```
-
-### 4.2 写会话日志
-
-追加 `SESSION_LOG.md`：
-```markdown
-### Session N: YYYY-MM-DD — [项目名] 交付
-
-- **完成:** 所有 Phase 1-3
-- **决策:** 见 decisions/
-- **踩坑:** PIT-001, PIT-002
-- **Skill 提炼:** [如有]
-- **Commit:** abc1234
-```
-
-### 4.3 更新进度
-
-`docs/PROGRESS.md` 状态更新为「已交付」。
+遍历 knowledge/pitfalls/：
+- 项目特有 → 留在此文件
+- 领域通用 → 提炼为 Skill
+- 框架通用 → 反馈到 YuanForge
 
 ---
 
 ## 铁律执行
 
-本 Skill 整个流程严格遵守 YuanForge 九条铁律：
-
 | 铁律 | 执行点 |
 |------|--------|
-| Ⅰ. 计划先行 | Phase 1 产 Plan |
+| Ⅰ. 计划先行 | Phase 2 产 Plan |
 | Ⅱ. TDD 先行 | 每个 Task 内 Red → Green → Refactor |
-| Ⅲ. 两阶段审查 | 每个 Task 后 Spec → Quality |
+| Ⅲ. 三档审查 | Phase 4 四审查官并行 |
 | Ⅳ. 原子提交 | 每个 Task 一个 Commit |
 | Ⅴ. 上下文隔离 | 每个 Task 新 Subagent |
-| Ⅵ. 文档即代码 | Phase 1 写决策，Phase 3 更新文档 |
+| Ⅵ. 文档即代码 | Phase 2 写决策，Phase 6 蒸馏更新 |
 | Ⅶ. 渐进式交付 | Task 顺序保证可运行 |
-| Ⅷ. 质量门禁 | G1→G2→G3→G4，Phase 4 归档 |
+| Ⅷ. 质量门禁 | G1→G2→G3→G4 |
+| Ⅸ. 自主调度 | Conductor 按 Dispatch Table 派发 |
+
+---
+
+## 两种模式
+
+| 模式 | 触发 | 门禁 |
+|------|------|------|
+| 严格模式（默认） | 不加标记 | G1+G2+G3+G4 全开，12 专家团全流程 |
+| 快速模式 | `@快速模式` | 仅 G1 + 跳过 Phase 4（保留 Tester） |
 
 ---
 
 ## 相关 Skill
 
 - `project-audit` — 审计现有项目（Phase 0）
-- `writing-plans` — 写 Implementation Plan
+- `project-bootstrap` — 项目初始化（含嫁接模式）
+- `writing-plans` — Plan 写作规范
 - `subagent-driven-development` — Subagent 执行引擎
 - `test-driven-development` — TDD 纪律
-- `requesting-code-review` — 代码审查
-- `project-bootstrap` — 项目初始化（含嫁接模式）
-- `project-memory` — 项目记忆管理
+- `requesting-code-review` — 四审查官并行审查
+- `promotion` — 知识晋升管线
+- `grilling` — 结构化逼问循环
+- `debug-feedback-loop` — Debug 诊断协议包

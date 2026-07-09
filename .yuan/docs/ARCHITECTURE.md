@@ -59,7 +59,7 @@
 |------|------|--------|
 | Phase 1 | 创建，填技术栈 + 模块划分 | Architect |
 | 架构变更时 | 更新对应模块 | Architect |
-| Phase 3 | 检查是否与代码一致 | DevOps |
+| Phase 3 | 检查是否与代码一致 | Doc Engineer |
 
 ---
 

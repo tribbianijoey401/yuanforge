@@ -62,8 +62,8 @@ AGENTS.md → Agent 加载 .yuan/rules/ → 读 docs/PROGRESS.md
   ↓
 Phase 0: project-audit（审计现有项目，仅首次）
 Phase 1: Architect 产出 Plan（含 Dispatch Table）
-Phase 2: Conductor 解析 DAG → 派发 Coder/Reviewer
-Phase 3: Tester + DevOps 收尾
+Phase 2: Conductor 解析 DAG → 派发 Dev/Reviewer
+Phase 3: Tester + Doc Engineer 收尾
 Phase 4: 回顾归档 → 提炼 Skill / 改进铁律
 ```
 
