@@ -144,6 +144,41 @@
 - SESSION_LOG「完成」「决策」「踩坑」「产出物」段汇总（任务表已在执行中渐进填写完毕）
 - 有未完成任务 → PROGRESS.md 标记"未完成"，指向下一会话
 
+### 第六步：知识蒸馏（Workspace Close）
+
+所有 Task 终态后，执行知识蒸馏——把长期有价值的知识从 Runtime 提取到 Knowledge 层。
+
+**蒸馏流程：
+
+1. **FEATURE.md → knowledge/features/FEAT-NNN.md**
+   - 创建对象实例文件（含完整 frontmatter）
+   - frontmatter 字段：id / object_type / lifecycle / owner / status / summary / depends / verified_commit / confidence
+   - 正文：需求描述（2-3句）+ 设计思路 + API 端点 + 关键文件
+   - status 设为 `verified`，verified_commit 取当前 HEAD
+
+2. **ADR-NNN.md → knowledge/decisions/ADR-NNN.md**
+   - 完整复制正文，加对象 frontmatter
+   - 保留原始 ADR 编号
+
+3. **BUG-NNN.md → 归档判断 → knowledge/pitfalls/PIT-NNN.md 或留 archive**
+   - 会重复出现 → 蒸馏为 Pitfall 对象（填 severity / type / cause / fix）
+   - 一次性 → 不蒸馏，留在 Workspace 归档中
+   - 判断标准：根因是否通用？修复模式是否值得新 Agent 提前知道？
+
+4. **PLAN.md 未完成任务 → workspace/backlog.md**
+   - 所有非终态 Task ID 追加到 backlog
+
+5. **TASK_BOARD.md / SESSION_LOG.md：不蒸馏**
+   - Runtime 状态和 Human 日志，随 Workspace 归档在 archive/ 中
+
+6. **归档 Workspace**
+   - 移动 `docs/YYYYMMDD-描述/` → `docs/archive/YYYYMMDD-描述/`
+
+7. **写入蒸馏报告**
+   - 在 SESSION_LOG 追加「知识蒸馏」段（蒸馏产出 / 未蒸馏 / 未完成任务）
+
+> 详见 `.yuan/docs/SESSION.md`「Workspace Close — 知识蒸馏」。
+
 ### 巡检（持续后台）
 
 - 定期扫描 TASK_BOARD 中所有 `🔨 进行中` 的任务
@@ -191,3 +226,5 @@
 - ❌ 在 Task 未完成时创建下游 Task
 - ❌ Task 失败不重试直接放弃
 - ❌ 跳过计划复盘（Architect 的设计理解书必须用户确认）
+- ❌ 会话关闭时不执行蒸馏（只归档不提取 = 知识永远困在 Workspace 里）
+- ❌ 蒸馏时省略 frontmatter（没有 id / object_type / confidence 的知识无法被索引）

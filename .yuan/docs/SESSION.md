@@ -234,7 +234,164 @@ docs/YYYYMMDD-描述/
 9. Conductor 更新 SESSION_LOG.md（完成/决策/踩坑）
     ↓ Phase 4
 10. Conductor 遍历 BUG → 归档判断 → PROGRESS 更新
-11. 会话完成，PROGRESS 移至历史会话
+11. Conductor 知识蒸馏（Workspace Close）:
+    a. FEATURE.md → knowledge/features/FEAT-NNN.md（对象实例，含 frontmatter）
+    b. ADR-NNN.md → knowledge/decisions/ADR-NNN.md（完整保留 + frontmatter）
+    c. BUG-NNN.md → 归档判断:
+       └─ 会重复出现 → knowledge/pitfalls/PIT-NNN.md（对象实例）
+       └─ 一次性 → 留在 Workspace 中归档
+    d. 未完成任务 → workspace/backlog.md 更新
+12. Conductor 归档: 移动会话文件夹 → archive/YYYYMMDD-描述/
+```
+
+### 蒸馏后的目录效果
+
+```
+蒸馏前（Workspace 活跃时）:
+  docs/
+    YYYYMMDD-描述/          ← 唯一的 Workspace（通常 1 个）
+      FEATURE.md            原始格式
+      ADR-NNN.md
+      BUG-NNN.md
+  
+蒸馏后（Workspace Close 后）:
+  docs/
+    knowledge/               ← 长期知识（蒸馏产物，逐次增长）
+      features/FEAT-NNN.md  对象实例，含完整 frontmatter
+      decisions/ADR-NNN.md
+      pitfalls/PIT-NNN.md
+    archive/                 ← 已关闭 Workspace 快照
+      YYYYMMDD-描述/
+        FEATURE.md          原始格式（保留作为追溯）
+        ...
+```
+
+---
+
+## Workspace Close — 知识蒸馏
+
+### 目的
+
+Workspace 的价值不在 Workspace 本身，在它产出的**事实**。蒸馏就是把长期有价值的知识从 Runtime 中提取出来，沉淀到 Knowledge 层，再丢弃运行垃圾。
+
+```
+蒸馏 ≠ 归档
+
+归档 = 把整个文件夹冻起来 → "以后可能会需要" → 永远增长
+蒸馏 = 提取有价值的事实 → 丢弃运行垃圾 → Knowledge 线性增长，Archive 不膨胀
+```
+
+### 蒸馏规则
+
+| 源文件 | 蒸馏去向 | 动作 | 执行者 |
+|--------|---------|------|--------|
+| FEATURE.md | `knowledge/features/FEAT-NNN.md` | **重新创建为对象实例**：填完整 frontmatter（id/object_type/owner/status/summary/depends/verified_commit/confidence），正文精简为需求描述+设计思路+API+修改文件 | Conductor |
+| ADR-NNN.md | `knowledge/decisions/ADR-NNN.md` | **完整复制 + 加 frontmatter**：保留背景/决策/备选方案/后果，加对象元数据 | Conductor |
+| BUG-NNN.md | **归档判断** → `knowledge/pitfalls/PIT-NNN.md` 或留在 archive | 会重复出现 → 蒸馏为 Pitfall 对象（填 severity/type/cause/fix）。一次性 → 不蒸馏，留在 Workspace 归档中 | Conductor |
+| PLAN.md | `workspace/backlog.md` | 未完成任务的 Task ID 追加到 backlog | Conductor |
+| TASK_BOARD.md | — | **不蒸馏**。Runtime 状态，随 Workspace 归档 | — |
+| SESSION_LOG.md | — | **不蒸馏**。Human 日志，随 Workspace 归档 | — |
+
+### FEATURE.md → knowledge/features/ 转换示例
+
+**蒸馏前**（Workspace 中的 FEATURE.md）：
+```markdown
+# FEATURE: 用户认证系统
+> 会话: 20260709-用户认证
+> 状态: 完成
+> 负责角色: Architect
+
+## 需求描述
+实现 JWT 认证，含 token 刷新
+
+## 设计思路
+bcrypt 哈希 + JWT access/refresh token 双 token 模式
+...
+```
+
+**蒸馏后**（knowledge/features/FEAT-AUTH.md）：
+```yaml
+---
+id: FEAT-AUTH
+object_type: feature
+lifecycle: knowledge
+owner: architect
+status: verified
+summary: "JWT-based authentication with refresh token rotation"
+depends: [ADR-003]
+verified_commit: a1b2c3d
+confidence: verified
+updated_by: conductor
+updated_at: "2026-07-09T17:00:00Z"
+acceptance_criteria:
+  - "用户可用 email+password 注册并获取 JWT"
+  - "Token 过期后可用 refresh token 刷新"
+api_endpoints:
+  - POST /auth/register
+  - POST /auth/login
+  - POST /auth/refresh
+files:
+  - src/auth/handler.py
+  - src/auth/service.py
+  - tests/auth/test_login.py
+session: "20260709-用户认证系统"
+---
+# Feature: 用户认证系统
+
+## 需求描述
+实现 JWT 认证，含 token 刷新。
+
+## 设计思路
+bcrypt 哈希 + JWT access/refresh token 双 token 模式。
+详见 ADR-003。
+
+## API 端点
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | /auth/register | 注册 |
+| POST | /auth/login | 登录 |
+| POST | /auth/refresh | 刷新 token |
+
+## 关联
+- Plan: [archive/20260709-用户认证/PLAN.md](../archive/20260709-用户认证/PLAN.md)
+- ADR: [ADR-003](../knowledge/decisions/ADR-003.md)
+```
+
+### BUG → Pitfall 判断标准
+
+| 问题 | 回答"是"→ 蒸馏 | 回答"否"→ 留在 Archive |
+|------|:---:|:---:|
+| 这个 Bug 的根因会在其他项目中重复出现吗？ | → knowledge/pitfalls/ | → archive 保留 |
+| 这个 Bug 的修复模式值得新 Agent 提前知道吗？ | → knowledge/pitfalls/ | → archive 保留 |
+| 这个 Bug 的教训可以形成一条规则吗？ | → 提炼 Skill | → archive 保留 |
+
+### 蒸馏报告格式
+
+Conductor 在蒸馏完成后，在 SESSION_LOG 中追加蒸馏报告：
+
+```markdown
+## 知识蒸馏
+
+> 蒸馏时间: YYYY-MM-DD HH:MM
+> 蒸馏者: Conductor
+
+### 蒸馏产出
+| 源 | 目标 | 类型 | ID |
+|----|------|------|-----|
+| FEATURE.md | knowledge/features/ | feature | FEAT-AUTH |
+| ADR-003.md | knowledge/decisions/ | decision | ADR-003 |
+| BUG-005.md | knowledge/pitfalls/ | pitfall | PIT-012 |
+
+### 未蒸馏
+| 源 | 原因 |
+|----|------|
+| BUG-006.md | 一次性环境问题，不会重复 |
+| TASK_BOARD.md | Runtime 状态，不蒸馏 |
+
+### 未完成任务
+| Task ID | 状态 | 已写入 |
+|---------|------|--------|
+| T05 | 🔨进行中 | workspace/backlog.md |
 ```
 
 ---

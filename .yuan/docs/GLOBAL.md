@@ -1,6 +1,6 @@
 # GLOBAL — 全局文档规格书
 
-> 管辖 docs/ 下 5 个全局文档：INDEX.md / SETUP.md / CONVENTIONS.md / glossary.md / pitfalls.md
+> 管辖 docs/ 下的全局文档：INDEX.md / SETUP.md / CONVENTIONS.md / glossary.md / pitfalls.md / knowledge/
 
 ---
 
@@ -192,3 +192,195 @@ cd [项目名]
 |------|------|--------|
 | 踩坑时 | 追加 | 全体 |
 | Phase 4 | 遍历归档判断 → 提炼 Skill | Conductor |
+
+---
+
+## 6. knowledge/ — 知识对象目录
+
+### 目的
+保存从 Workspace 蒸馏出的长期知识对象。每个文件是一个对象实例，通过 YAML frontmatter 声明身份。
+
+### 目录结构
+
+```
+docs/knowledge/
+├── features/         ← Feature 对象（FEAT-NNN.md）
+├── decisions/        ← Decision 对象（ADR-NNN.md）
+├── pitfalls/         ← Pitfall 对象（PIT-NNN.md）
+└── modules/          ← Module 对象（MOD-NNN.md）
+```
+
+> **对象 Schema 定义**见 `docs/object-model.yaml`。每个文件的 frontmatter 必须符合对应 `object_type` 的字段要求。
+
+### 格式规则
+
+**所有 knowledge/ 文件的共同要求**：
+
+1. 必须以 YAML frontmatter 开头（`---` 包围）
+2. frontmatter 必须包含 `id`、`object_type`、`lifecycle`、`owner`、`status`、`summary`、`confidence`
+3. `object_type` 决定正文格式（feature=需求+API+文件，decision=背景+决策+后果，etc.）
+4. `verified_commit` 建议填写，用于过期检测
+5. 正文是精简后的长期版本——蒸馏时从 Workspace 的 FEATURE.md / ADR.md 精简而来
+
+### 各子目录格式
+
+#### features/
+
+**命名**：`FEAT-{简短名}.md`。如 `FEAT-AUTH.md`。
+
+```markdown
+---
+id: FEAT-xxx
+object_type: feature
+lifecycle: knowledge
+owner: architect
+status: verified
+summary: "一句话描述此功能"
+depends: [ADR-003]
+verified_commit: abc123
+confidence: verified
+---
+
+# Feature: [功能名称]
+
+## 需求描述
+[从 FEATURE.md 提炼，2-3 句话]
+
+## 设计思路
+[关键设计决策 + ADR 引用]
+
+## API 端点
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | /xxx | xxx |
+
+## 关键文件
+- src/xxx/handler.py
+- tests/xxx/test.py
+```
+
+#### decisions/
+
+**命名**：`ADR-NNN.md`（保留原始 ADR 编号）。
+
+```markdown
+---
+id: ADR-NNN
+object_type: decision
+lifecycle: knowledge
+owner: architect
+status: accepted
+date: YYYY-MM-DD
+summary: "一句话描述此决策"
+depends: []
+supersedes: ADR-xxx  (可选)
+confidence: verified
+---
+
+# ADR-NNN: [决策标题]
+
+## 背景
+[原 ADR 背景]
+
+## 决策
+[原 ADR 决策 + 理由]
+
+## 备选方案
+| 方案 | 优点 | 缺点 |
+|------|------|------|
+| A | | |
+| B（✅） | | |
+
+## 后果
+- 正面: [...]
+- 负面: [...]
+```
+
+#### pitfalls/
+
+**命名**：`PIT-NNN.md`（递增编号）。
+
+```markdown
+---
+id: PIT-NNN
+object_type: pitfall
+lifecycle: knowledge
+owner: [发现者角色]
+status: active
+severity: blocker|warning|info
+type: backend|frontend|db|deploy|process|env
+summary: "一句话描述此陷阱"
+verified_commit: abc123
+confidence: verified
+---
+
+# PIT-NNN: [陷阱标题]
+
+## 现象
+[从 BUG-NNN.md 提炼]
+
+## 根因
+[简短一句话]
+
+## 修复
+[简短一句话]
+
+## 教训
+[Agent 应该怎么做来避免？]
+```
+
+#### modules/
+
+**命名**：`MOD-{简短名}.md`。如 `MOD-AUTH.md`。
+
+```markdown
+---
+id: MOD-xxx
+object_type: module
+lifecycle: knowledge
+owner: architect
+status: active
+summary: "一句话描述此模块"
+depends: [MOD-xxx, ADR-xxx]
+language: python
+framework: FastAPI
+directory: src/auth/
+features: [FEAT-AUTH, FEAT-LOGIN]
+confidence: verified
+---
+
+# Module: [模块名称]
+
+## 职责
+[此模块负责什么]
+
+## 关键文件
+- src/auth/handler.py — API 处理器
+- src/auth/service.py — 业务逻辑
+
+## 关联 Feature
+- FEAT-AUTH — 用户认证
+- FEAT-LOGIN — 登录 UI
+```
+
+### 生命周期
+
+| 阶段 | 操作 | 执行者 |
+|------|------|--------|
+| Workspace Close | 蒸馏产生新的 knowledge 文件 | Conductor |
+| 知识更新时 | 通过 Proposal 修改（未来 Phase） | Agent |
+| HEAD != verified_commit | 标记 confidence=stale | Agent / Conductor |
+| Phase 4 | 检查 knowledge/ 一致性 | Conductor |
+
+### 与 INDEX.md 的关系
+
+INDEX.md 的「文档地图」应包含 knowledge/ 导航：
+
+```markdown
+| 你想… | 读这个 |
+|--------|--------|
+| 了解所有功能 | → knowledge/features/ |
+| 了解所有决策 | → knowledge/decisions/ |
+| 避坑 | → knowledge/pitfalls/（Agent 必读） |
+| 了解模块结构 | → knowledge/modules/ |
+```
