@@ -59,6 +59,62 @@ skill_view("test-driven-development")
 
 ---
 
+## 平台能力描述符
+
+```yaml
+platform: hermes
+version: "1.0"
+
+capabilities:
+  subagent:
+    supported: true
+    max_concurrent: 3
+    tool: delegate_task
+  parallel:
+    supported: true
+    max_concurrent: 3
+  filesystem:
+    supported: true
+    operations: [read, write, patch, search, list]
+    tools: [read_file, write_file, patch, search_files]
+  shell:
+    supported: true
+    background: true
+    tool: terminal
+  approval:
+    supported: true
+  patch:
+    supported: true
+    tool: patch
+  persistent_session:
+    supported: true
+    tool: memory
+  knowledge_graph:
+    supported: false
+    fallback: "grep knowledge/ frontmatter + manual graph build"
+  event_store:
+    supported: true
+    fallback: "JSONL append via terminal"
+  git:
+    supported: true
+    tool: terminal
+
+execution:
+  strategies: [parallel, sequential, interactive]
+  defaults:
+    max_retry: 3
+    timeout_buffer_minutes: 5
+    checkpoint_interval_minutes: 5
+
+limitations:
+  - "delegate_task 是同步的，父 Agent 等待子 Agent 完成"
+  - "子 Agent 无父会话记忆，必须通过 context 传递全部信息"
+  - "max_concurrent_children=3，可配置 delegation.max_concurrent_children"
+  - "无原生 Graph 查询，需 grep + JSON 解析模拟"
+```
+
+---
+
 ## 工具映射
 
 | YuanForge 概念 | Hermes 工具 |

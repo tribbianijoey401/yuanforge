@@ -93,7 +93,7 @@ yuanforge/
 │   ├── archive/                 # 已关闭 Workspace 快照
 │   └── 20260707-框架v2/          # 活跃 Workspace
 ├── .yuan/                       # 🔧 框架内核
-│   ├── docs/                    # 9 份说明书规格（OBJECT_MODEL/GRAPH/EVENTS/PROPOSAL/GLOBAL/PROGRESS/ARCHITECTURE/TASK_BOARD/SESSION）
+│   ├── docs/                    # 12 份说明书规格（OBJECT_MODEL/GRAPH/EVENTS/PROPOSAL/GLOBAL/PROGRESS/ARCHITECTURE/TASK_BOARD/SESSION）
 │   ├── rules/                   # 九条铁律 + Plan 格式
 │   ├── skills/                  # Skill 定义
 │   └── platforms/               # 平台适配器

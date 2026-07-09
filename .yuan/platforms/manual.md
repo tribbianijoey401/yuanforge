@@ -5,6 +5,53 @@
 
 ---
 
+## 平台能力描述符
+
+```yaml
+platform: manual
+version: "1.0"
+
+capabilities:
+  subagent:
+    supported: false
+    fallback: "人工模拟：一个人扮演一个 Agent 角色，串行执行"
+  parallel:
+    supported: false
+    fallback: "所有 Task 串行执行"
+  filesystem:
+    supported: true
+    fallback: "人工创建/编辑文件"
+  shell:
+    supported: true
+    fallback: "人工执行命令"
+  approval:
+    supported: true
+  patch:
+    supported: false
+    fallback: "人工编辑文件"
+  persistent_session:
+    supported: false
+    fallback: "PROGRESS.md + SESSION_LOG 作为跨会话桥梁"
+  knowledge_graph:
+    supported: false
+    fallback: "人工浏览 knowledge/ 目录"
+  event_store:
+    supported: true
+    fallback: "人工追加 JSONL 行"
+  git:
+    supported: true
+    fallback: "人工执行 git 命令"
+
+execution:
+  strategies: [sequential, manual]
+  defaults:
+    max_retry: 1
+    timeout_buffer_minutes: 0
+    checkpoint_interval_minutes: 0
+```
+
+---
+
 ## 核心概念速览
 
 YuanForge 定义了一套**角色分工 + 规则约束**的协作模式：
