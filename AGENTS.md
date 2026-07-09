@@ -120,7 +120,8 @@ cd my-project
 
 | 你想… | 读这里 |
 |--------|--------|
-| 了解项目当前状态 | [docs/PROGRESS.md](docs/PROGRESS.md) |
+| 了解当前状态 | [docs/PROGRESS.md](docs/PROGRESS.md) |
+| 了解知识对象定义 | [docs/object-model.yaml](docs/object-model.yaml) |
 | 了解系统架构 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | 搭建环境 | [docs/SETUP.md](docs/SETUP.md) |
 | 写代码前的规范 | [docs/CONVENTIONS.md](docs/CONVENTIONS.md) |

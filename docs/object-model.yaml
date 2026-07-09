@@ -1,0 +1,251 @@
+# DocsOS Object Model — 知识对象 Schema 定义
+# 
+# 本文件定义所有知识对象的类型、字段、生命周期和关系。
+# 每个 Markdown 文件的 frontmatter 都是此 Schema 的一个实例。
+#
+# 设计铁律:
+#   Object Model 是 source of truth，Markdown 只是序列化。
+#   Graph 从 frontmatter 自动构建，永不手工维护。
+
+version: "1.0"
+description: "知识对象类型定义。字段分 shared（所有对象共用）和 per-type（特定类型独有）。"
+
+# ─────────── 共用字段 ───────────
+shared_fields:
+  id:
+    type: string
+    description: "全局唯一标识符。格式: {TYPE}-{NNN}，如 FEAT-AUTH, ADR-003, PIT-012"
+    required: true
+  
+  object_type:
+    type: enum
+    values: [feature, decision, pitfall, module]
+    description: "对象类型，决定 specific_fields 使用哪个 schema"
+    required: true
+  
+  lifecycle:
+    type: enum
+    values: [knowledge, runtime, event]
+    description: "数据生命周期。knowledge=长期事实, runtime=会话级, event=不可变"
+    required: true
+  
+  owner:
+    type: string
+    description: "负责此对象的主要角色（architect/product-analyst/backend-dev 等）"
+    required: true
+  
+  status:
+    type: string
+    description: "对象状态，取值由 object_type 的状态机决定"
+    required: true
+  
+  depends:
+    type: array
+    items: string
+    description: "依赖的其他对象 ID 列表。如 [ADR-001, FEAT-LOGIN]"
+    required: false
+    default: []
+  
+  parent:
+    type: string
+    description: "父对象 ID（用于子功能/子模块）。无父对象则省略"
+    required: false
+  
+  children:
+    type: array
+    items: string
+    description: "子对象 ID 列表。从 parent 字段反向推导时自动填充"
+    required: false
+    default: []
+  
+  verified_commit:
+    type: string
+    description: "此知识最后验证时对应的 git commit hash。Agent 检测 HEAD != verified_commit → STALE"
+    required: false
+  
+  confidence:
+    type: enum
+    values: [verified, stale, draft, deprecated]
+    description: "知识可信度。verified=已验证与代码一致, stale=可能过期, draft=未完成, deprecated=已废弃"
+    required: true
+    default: draft
+  
+  updated_by:
+    type: string
+    description: "最后更新者的 Agent 角色"
+    required: false
+  
+  updated_at:
+    type: datetime
+    format: ISO8601
+    description: "最后更新时间"
+    required: false
+  
+  summary:
+    type: string
+    description: "一句话摘要，用于索引和 Graph 节点标签"
+    required: true
+    max_length: 200
+
+# ─────────── 各类型独有字段 + 状态机 ───────────
+object_types:
+  
+  # ─── Feature ───
+  feature:
+    description: "一个功能。对应当前 FEATURE.md，蒸馏后进入 knowledge/features/"
+    specific_fields:
+      acceptance_criteria:
+        type: array
+        items: string
+        description: "验收标准列表（Product Analyst 产出）"
+        required: false
+      
+      api_endpoints:
+        type: array
+        items: string
+        description: "此功能涉及的 API 端点（如 POST /auth/login）"
+        required: false
+      
+      files:
+        type: array
+        items: string
+        description: "关键源文件路径列表"
+        required: false
+      
+      session:
+        type: string
+        description: "实现此功能的会话文件夹名（YYYYMMDD-描述），用于追溯"
+        required: false
+    
+    status_machine:
+      - draft: "Product Analyst 创建，需求尚未设计"
+      - designed: "Architect 完成设计，验收标准已冻结"
+      - implemented: "Dev 完成实现，代码已提交"
+      - verified: "审查通过 + 测试通过，verified_commit 已记录"
+      - deprecated: "功能已废弃，不再维护"
+    
+    valid_transitions:
+      draft: [designed]
+      designed: [implemented, draft]
+      implemented: [verified, implemented]
+      verified: [deprecated, implemented]
+      deprecated: []
+  
+  # ─── Decision (ADR) ───
+  decision:
+    description: "一个架构决策。对应 ADR-NNN.md，蒸馏后进入 knowledge/decisions/"
+    specific_fields:
+      date:
+        type: date
+        format: YYYY-MM-DD
+        description: "决策日期"
+        required: true
+      
+      supersedes:
+        type: string
+        description: "此决策取代的旧 ADR ID（如 ADR-001）"
+        required: false
+      
+      superseded_by:
+        type: string
+        description: "取代此决策的新 ADR ID"
+        required: false
+      
+      alternatives:
+        type: array
+        description: "被拒绝的备选方案（含名称 + 拒绝原因）"
+        required: false
+      
+      consequences:
+        type: object
+        properties:
+          positive: { type: array, items: string }
+          negative: { type: array, items: string }
+        description: "决策后果：正面 + 负面"
+        required: false
+    
+    status_machine:
+      - proposed: "决策已提出，等待评审"
+      - accepted: "决策已采纳，当前有效"
+      - deprecated: "决策不再适用，但不被特定新决策取代"
+      - superseded: "被新决策取代（见 superseded_by）"
+    
+    valid_transitions:
+      proposed: [accepted]
+      accepted: [deprecated, superseded]
+      deprecated: []
+      superseded: []
+  
+  # ─── Pitfall ───
+  pitfall:
+    description: "一个已知陷阱。对应 BUG-NNN.md 中「会重复出现」的归档，蒸馏后进入 knowledge/pitfalls/"
+    specific_fields:
+      severity:
+        type: enum
+        values: [blocker, warning, info]
+        description: "严重程度。blocker=阻断, warning=绕路, info=提醒"
+        required: true
+      
+      type:
+        type: enum
+        values: [backend, frontend, db, deploy, process, env]
+        description: "陷阱所属领域"
+        required: true
+      
+      cause:
+        type: string
+        description: "根因（简短一句话）"
+        required: false
+      
+      fix:
+        type: string
+        description: "修复方法（简短一句话）"
+        required: false
+      
+      session:
+        type: string
+        description: "发现此坑的会话文件夹名，用于追溯原始 BUG-NNN 文件"
+        required: false
+    
+    status_machine:
+      - active: "陷阱仍然存在，Agent 需注意"
+      - resolved: "陷阱已被修复，保留作为历史教训"
+      - archived: "不再相关的历史教训"
+    
+    valid_transitions:
+      active: [resolved]
+      resolved: [archived, active]
+      archived: [active]
+  
+  # ─── Module ───
+  module:
+    description: "一个系统模块。对应 ARCHITECTURE.md 中模块划分表的每一行，统一管理模块间依赖"
+    specific_fields:
+      language:
+        type: string
+        description: "主要编程语言"
+        required: false
+      
+      framework:
+        type: string
+        description: "使用的框架"
+        required: false
+      
+      directory:
+        type: string
+        description: "模块根目录（如 src/auth/）"
+        required: false
+      
+      features:
+        type: array
+        items: string
+        description: "此模块包含的 Feature ID 列表"
+        required: false
+    
+    status_machine:
+      - active: "模块当前存在且活跃"
+      - deprecated: "模块已废弃/移除"
+    
+    valid_transitions:
+      active: [deprecated]
+      deprecated: []
