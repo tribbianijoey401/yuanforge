@@ -272,15 +272,15 @@ grep events/$(date +%Y%m%d)/events.jsonl
 
 ## 七、各角色职责
 
-| 角色 | 写什么事件 |
-|------|-----------|
-| Conductor | TASK_STATUS_CHANGED / DISTILLATION_COMPLETE / WORKSPACE_CLOSED / CRASH_RECOVERED / ERROR_OCCURRED |
-| Dev Agent | TASK_STATUS_CHANGED（领取 + 完成时） |
-| Reviewer | REVIEW_RESULT |
-| Architect | API_CHANGED / KNOWLEDGE_UPDATED（契约变更时） |
-| Doc Engineer | KNOWLEDGE_UPDATED（归档更新时） |
+| 角色 | 写什么事件 | 强制？ |
+|------|-----------|:---:|
+| Conductor | TASK_STATUS_CHANGED / DISTILLATION_COMPLETE / WORKSPACE_CLOSED / CRASH_RECOVERED / ERROR_OCCURRED | ✅ 强制 |
+| Dev Agent | TASK_STATUS_CHANGED（领取 + 完成时） | — Tier 1/2 自动，Tier 3 由 Conductor 写 |
+| Reviewer | REVIEW_RESULT | — Tier 1/2 自动，Tier 3 由 Conductor 写 |
+| Architect | API_CHANGED / KNOWLEDGE_UPDATED（契约变更时） | — 按需 |
+| Doc Engineer | KNOWLEDGE_UPDATED（归档更新时） | — 按需 |
 
-> **当前阶段**：Events 写入是可选的增强。Conductor 在关键节点写入，其他 Agent 暂不强制。未来 Proposal 层实现后，Knowledge 变更自动产生事件。
+> **Conductor 的 Event 写入是强制项。** 违反铁律 Ⅵ「文档即代码」—— 状态变更不记录事件 = 事实丢失。每次 Task 状态变更、审查完成、Workspace 关闭、崩溃恢复、超时/异常，Conductor 必须追加对应事件。写入方式见 conductor.md「Event 写入」段。
 
 ---
 

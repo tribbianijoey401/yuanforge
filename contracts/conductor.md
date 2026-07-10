@@ -29,6 +29,24 @@
 
 ---
 
+## 前置：平台探测
+
+**在每次派发决策前，Conductor 必须探测当前平台的可用能力，决定使用哪个 Tier 派发。**
+
+| 工具 | 探测方法 | 可用 → Tier |
+|------|---------|------------|
+| `delegate_task` | 检查工具列表中是否有 delegate_task | **Tier 1**（子 Agent） |
+| `terminal(background=true)` | 检查 terminal 是否支持 background 模式 | **Tier 2**（后台进程） |
+| 无以上工具 | 以上都不可用 | **Tier 3**（角色切换，兜底） |
+
+**硬规则：**
+1. 探测结果写入 TASK_BOARD「派发日志」段首行（`探测结果: Tier=N`）
+2. 整个会话使用相同 Tier，不混合
+3. 优先使用最高可用 Tier — Tier 1 > Tier 2 > Tier 3
+4. **禁止在 Tier 1/2 可用时降级到 Tier 3**（Tier 3 仅当平台无 subagent 且无后台进程时使用）
+
+---
+
 ## 默认调度决策表
 
 ```
@@ -68,7 +86,74 @@
 
 ---
 
-## 工作流规则
+## 三级派发决策
+
+Conductor 按探测到的最高可用 Tier 派发每个 Task。以下定义三个 Tier 的派发协议。
+
+### Tier 1：subagent 派发（优先）
+
+**条件：** `delegate_task` 工具可用
+
+| 步骤 | 动作 |
+|------|------|
+| 1. 写 TASK_BOARD「派发日志」 | `[时间] [T-ID] Tier 1 → [角色] 开始` |
+| 2. 调用 `delegate_task` | goal=任务描述，context=角色合约路径 + Knowledge 引用 + 上游产出物路径 |
+| 3. 子 Agent 执行 | 子 Agent 自动加载角色合约 + 铁律，执行任务 |
+| 4. 子 Agent 返回 | return value 自动进入 Conductor 上下文 |
+| 5. 更新 TASK_BOARD | 子 Agent 更新状态行 + 上下文传递 |
+| 6. 写 Event | Conductor 写 `TASK_STATUS_CHANGED` 事件 |
+
+### Tier 2：后台进程派发
+
+**条件：** `terminal(background=true)` 可用但 `delegate_task` 不可用
+
+| 步骤 | 动作 |
+|------|------|
+| 1. 写 TASK_BOARD「派发日志」 | `[时间] [T-ID] Tier 2 → [角色] 开始` |
+| 2. 调用 `terminal(background=true, notify_on_complete=true)` | 命令行注入角色合约路径 + 上下文 |
+| 3. 进程执行 | 后台运行，完成后自动通知 Conductor |
+| 4. 解析输出 | Conductor 从进程输出中提取 Task 结果 |
+| 5. 更新 TASK_BOARD | Conductor 更新状态行 + 上下文传递 |
+| 6. 写 Event | Conductor 写 `TASK_STATUS_CHANGED` 事件 |
+
+### Tier 3：角色切换派发（兜底）
+
+**条件：** Tier 1 和 Tier 2 都不可用
+
+**核心原理：** 同一个 Agent 会话内切换 persona，用 TASK_BOARD 作为状态桥梁。
+
+| 步骤 | 动作 | 执行者 |
+|------|------|--------|
+| 1. 加载 `role-switch` Skill | 获取角色切换协议 | Conductor |
+| 2. 写 TASK_BOARD「Conductor 调度状态」 | 标记「正在派发 T-ID → 角色」 | Conductor |
+| 3. 写「派发日志」 | `[时间] [T-ID] Tier 3 → [角色] 开始` | Conductor |
+| 4. 加载目标角色合约 + 铁律 | 构建目标 persona | Conductor |
+| 5. 切换 persona | 「你现在是 {role}。读 TASK_BOARD 获取任务上下文。」 | Conductor |
+| 6. 执行任务 | Agent 以目标角色身份执行（读 TASK_BOARD → 执行 → 写 TASK_BOARD） | Agent（目标角色） |
+| 7. 写产出 + 审查结果 | 更新 TASK_BOARD 状态行、上下文传递、审查结果表 | Agent（目标角色） |
+| 8. 切换回 Conductor | 「你现在是 Conductor。读 TASK_BOARD 决定下一步。」 | Agent（切换） |
+| 9. 读 TASK_BOARD | 获取任务执行结果 → 决定下一步 | Conductor |
+| 10. 写 Event | `TASK_STATUS_CHANGED` 事件 | Conductor |
+
+> **⚠️ Tier 3 的局限性：** ① 串行执行，无法并行派发多个子 Agent；② 上下文共享，超长对话可能导致 token 耗尽；③ 角色切换依赖 LLM 自律 — 如果 Agent 忘记切换回 Conductor，状态链断裂。**Tier 3 是兜底，不是设计目标。**
+
+### Event 写入（所有 Tier 通用）
+
+每次 Task 状态变更时，Conductor 必须追加事件到当天的 `docs/events/YYYYMMDD/events.jsonl`：
+
+| 时机 | 事件类型 | 写入者 |
+|------|---------|--------|
+| Task 领取（🔨进行中） | `TASK_STATUS_CHANGED` | Conductor |
+| Task 完成（✅完成） | `TASK_STATUS_CHANGED` | Conductor |
+| 审查完成 | `REVIEW_RESULT` | Reviewer（Tier 1/2）/ Conductor（Tier 3） |
+| 蒸馏完成 | `DISTILLATION_COMPLETE` + `KNOWLEDGE_UPDATED` | Conductor |
+| Workspace 关闭 | `WORKSPACE_CLOSED` | Conductor |
+| 崩溃恢复 | `CRASH_RECOVERED` | Conductor |
+| 超时/异常 | `ERROR_OCCURRED` | Conductor |
+
+> **写入方式：** `echo '<json>' >> docs/events/$(date +%Y%m%d)/events.jsonl`。逐条追加，不批量。
+
+---
 
 ### 第一步：Product Analyst 澄清需求
 
