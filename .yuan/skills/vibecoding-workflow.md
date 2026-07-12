@@ -4,7 +4,7 @@ description: >
   YuanForge 核心工作流。开发任何功能时加载。触发：用户说「开发」「实现」
   「做项目」「继续」「build」、Phase 1 启动、Plan 确认后进入 Phase 2。
   编排 12 人专家团完整流程：Product Analyst→Architect→Dev→4审查官→Tester→Doc Engineer。
-  遵循 5 份协议（.yuan/specs/）+ 九条铁律。Conductor = Workflow Interpreter。
+  遵循 5 份协议（.yuan/specs/）+ 十条铁律。Conductor = Workflow Interpreter。
 version: 2.0.0
 ---
 
@@ -305,7 +305,8 @@ BLOCKER → 🔄返工 → Dev 修复
 | Ⅵ. 文档即代码 | Phase 2 写决策，Phase 6 蒸馏更新 |
 | Ⅶ. 渐进式交付 | Task 顺序保证可运行 |
 | Ⅷ. 质量门禁 | G1→G2→G3→G4 |
-| Ⅸ. 自主调度 | Conductor 按 Dispatch Table 派发 |
+| Ⅸ. 自主调度 | Conductor 按调度循环派发 |
+| Ⅹ. 循环收敛 | 每个循环必须有闸门，不得"直到正确为止" |
 
 ---
 

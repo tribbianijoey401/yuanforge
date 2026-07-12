@@ -41,6 +41,20 @@ docs/events/
 
 **触发**：TASK_BOARD 中任务状态变更时。
 
+**枚举的子类型**（`payload.change_type` 字段）：
+
+| change_type | 状态转换 | 含义 |
+|------------|---------|------|
+| DISPATCH | 🟢→🔨 | Conductor 派发 Task 到 Agent |
+| COMPLETE | 🔨→✅ | Agent 完成 Task |
+| REWORK | ✅→🔄 | 审查不通过，打回返工 |
+| BLOCK | 任意→❌ | Task 被阻塞 |
+| UNBLOCK | ❌→🟢 | 阻塞解除 |
+| TIMEOUT | 🔨→🟢 | 超时回退 |
+| PASS_REVIEW | ✅→✅审查通过 | 审查通过 |
+| PASS_TEST | ✅审查通过→✅测试通过 | 测试通过 |
+| DEPLOY | ✅测试通过→✅已部署 | 部署完成 |
+
 ```json
 {
   "type": "TASK_STATUS_CHANGED",
@@ -49,6 +63,7 @@ docs/events/
   "actor": "backend-dev",
   "payload": {
     "task_id": "T03",
+    "change_type": "COMPLETE",
     "old_status": "🔨进行中",
     "new_status": "✅完成",
     "reason": "实现完成，测试全部通过",
@@ -56,6 +71,8 @@ docs/events/
   }
 }
 ```
+
+> **注：** conductor.md 中引用的 `DISPATCH`、`COMPLETE`、`REVIEW`、`REWORK`、`BLOCK` 均为本文 `TASK_STATUS_CHANGED` 事件的 `change_type` 子类型。
 
 ### 3.2 KNOWLEDGE_UPDATED
 

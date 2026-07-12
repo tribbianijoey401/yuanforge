@@ -5,7 +5,7 @@
 
 ---
 
-## 九条铁律
+## 十条铁律
 
 | # | 铁律 | 一句话核心 |
 |---|------|-----------|
@@ -17,7 +17,8 @@
 | Ⅵ | 文档即代码 | 决策必须落文档 |
 | Ⅶ | 渐进式交付 | 每步可运行 |
 | Ⅷ | 质量门禁 | G1→G2→G3→G4，不通过不前进 |
-| Ⅸ | 自主调度 | Agent 按 Dispatch Table 自主派发 Agent |
+| Ⅸ | 自主调度 | Conductor 按调度循环自主派发 Agent |
+| Ⅹ | 循环收敛 | 每个循环必须有闸门，不得"直到正确为止" |
 
 ---
 
@@ -206,20 +207,19 @@ Conductor 依据 Product Analyst 的风险标签决定：
 
 ## 铁律 Ⅸ — 自主调度
 
-**Conductor Agent 按 Plan 中的 Dispatch Table，自主将 Task 派发给对应 Role 的 Agent。**
+**Conductor Agent 按调度循环（见 Workflow Protocol「五、Conductor 调度循环」），自主将 Task 派发给对应 Role 的 Agent。**
 
 ### 调度规则
 
 1. **Plan 必须含 Dispatch Table** — Architect 产出 Plan 时，必须声明每个 Task 的 role、依赖关系、产出物
 2. **Conductor 构建 DAG** — 解析 Dispatch Table，识别依赖关系，找出所有 ready Task（上游依赖全部完成）
 3. **并行派发** — 所有互不依赖的 Task 必须并行派发，不能串行等
-4. **平台自适应** — Conductor 根据当前运行环境自主选择调度方式：
-   - 有 `delegate_task` 工具 → 用它并行 fork 子 Agent
-   - 有 `kanban_create` 工具 → 创建看板任务，让 Kanban 调度器自动拉取
-   - 只有 `terminal` → 用后台子进程 spawn
-   - 在 CI 环境（检测到 CI 环境变量）→ 触发下游 job
-   - **Conductor 不需要判断哪种"更好"** — 有就用，有多个则选最轻量的
-5. **失败处理** — 任何 Task 失败后重试，最多 3 次。3 次仍失败 → block，在 PROGRESS.md 记录阻塞原因，通知用户
+4. **平台自适应** — Conductor 按 Tier 1/2/3 选择最优派发方式：
+   - Tier 1: `delegate_task`（子 Agent，优先）
+   - Tier 2: `terminal(background=true)`（后台进程）
+   - Tier 3: role-switch（同一 Agent 切换角色，仅兜底）
+   - **禁止在 Tier 1/2 可用时降级到 Tier 3**
+5. **循环收敛** — 每个重复执行的操作有闸门限制（见铁律 Ⅹ）
 6. **自动流转** — Task 完成后，Conductor 检查是否有新的 ready Task，有则立即派发
 7. **Gates 不跳** — 所有 Task 完成后，Conductor 触发 G3 集成测试 → G4 部署
 
@@ -230,6 +230,74 @@ Conductor 依据 Product Analyst 的风险标签决定：
 - ❌ 跳过门禁
 - ❌ 猜上游产出物内容（让 Agent 自己去读文件）
 - ❌ 在 Task 未完成时提前创建下游 Task（等上游 done 再创建）
+
+### 死循环保护
+
+Conductor 每次巡检时检查以下三项，任一触发 → 通知用户，暂停当前 Feature：
+
+| 检查 | 条件 | 动作 |
+|------|------|------|
+| 空闲检测 | 30 分钟无 TASK_BOARD 状态变化 | 通知用户："暂停中，无状态变化" |
+| 抖动检测 | 同一 Task 连续 dispatch ≥3 次且无产出 | ❌阻塞，通知用户 |
+| 摇晃检测 | 同一 Task 🔄返工 → ✅完成 → 🔄返工 ≥2 次 | 升级架构问题，回 Architect |
+
+---
+
+## 铁律 Ⅹ — 循环收敛
+
+**每个循环必须有明确的闸门和退出条件，禁止无条件重试。不允许"直到正确为止"——这等于没有定义。**
+
+### 循环定义
+
+YuanForge 中所有循环分为 7 个环，按嵌套层级 L0→L4 组织：
+
+```
+L0 项目循环: backlog → Feature → archive → backlog
+ └─ L1 Feature 流水线循环（Conductor 元循环）: 读 TASK_BOARD → 选 Task → Dispatch → 等结果 → 更新状态 → 回到读
+      ├─ L2-1 TDD 循环: Red → Green → Refactor
+      ├─ L2-2 审查修正循环: Review → 返工 → Review（最多 3 轮）
+      ├─ L2-3 修复回路: Tester 失败 → 诊断 → 路由 → 修复 → 重测（最多 3 轮）
+      │    └─ L3-1 Debug 循环: 构建反馈循环 → 二分定位 → 修复 → verify（最多 5 轮）
+      ├─ L3-2 Grilling 循环: 一次一问 → 等反馈 → 探索边界（用户"可以了" = 退出）
+      └─ L4 Promotion 循环: EXTRACT → VALIDATE → PROPOSE → MERGE
+```
+
+### 闸门规则
+
+| 环 | max_iterations | on_exceed |
+|----|:---:|------|
+| L1 Feature 流水线 | ∞（Feature 完成 = 退出） | 空闲 30min → 通知用户 |
+| L2-2 审查修正 | 3 | escalate_to_user |
+| L2-3 修复回路 | 3 | escalate_to_user |
+| L3-1 Debug | 5 | 标记 known issue → 跳过此 Task |
+| L3-2 Grilling | ∞（用户驱动退出） | — |
+| L4 Promotion | 4 阶段线性推进 | PROPOSE 失败 → 人工审批 |
+
+### 内环失败 → 外环降级规则
+
+内环 exceed gate → 外环收到信号 → 外环决定：
+
+| 内环失败 | 外环处理 |
+|---------|---------|
+| 审查修正 3 轮不通过 | 通知用户，此 Task 暂停，继续其他 Task |
+| 修复回路 3 轮不通过 | 通知用户，可能需重新设计 |
+| Debug 5 轮不通过 | 标记 known issue，跳过此 Task，回退 🟢→❌阻塞 |
+
+**禁止：** 内环 exceed → 自动重试（那等于没有 gate）。
+**禁止：** Conductor 替用户决定"再试一轮"（那是越权）。
+
+### 原因指针
+
+每个非终态 Task 必须携带原因指针——指向 docs/ 中的原始证据，让下个 Agent 自己检查状态就能知道为什么在这里、该做什么。
+
+| 状态 | 原因指针指向 | 证据文件 |
+|------|-------------|---------|
+| 🔄返工 | TASK_BOARD::审查结果 段 | workspace/审查报告/T{id}-review-{role}-r{round}.md |
+| ❌阻塞 | TASK_BOARD::阻塞记录 段 | TASK_BOARD.md 阻塞记录表 |
+| 🔨超时回退 | events/*.jsonl | 最近 DISPATCH 事件 |
+| 🟢就绪 | TASK_BOARD::上下文传递 段 | 上游产出文件 |
+
+**Conductor 不转述。Conductor 只导航。** Agent 顺着指针自己去读原文，不依赖摘要。
 
 ---
 
@@ -246,8 +314,8 @@ Agent 违反铁律时：
 
 | 模式 | 触发方式 | 生效铁律 | 说明 |
 |------|---------|---------|------|
-| **严格模式**（默认） | 不加标记 | 全部 Ⅰ-Ⅸ，12 专家团全流程 | 生产级质量 |
-| **快速模式** | `@快速模式` | Ⅰ + Ⅱ + Ⅶ + Ⅸ；跳过审查层 4 人（保留 Tester） | 原型验证 |
+| **严格模式**（默认） | 不加标记 | 全部 Ⅰ-Ⅹ，12 专家团全流程 | 生产级质量 |
+| **快速模式** | `@快速模式` | Ⅰ + Ⅱ + Ⅶ + Ⅸ + Ⅹ；跳过审查层 4 人（保留 Tester） | 原型验证 |
 
 ---
 

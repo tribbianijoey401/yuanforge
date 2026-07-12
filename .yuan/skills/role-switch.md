@@ -74,7 +74,7 @@ Agent（切换回 Conductor persona）：
 
 3. 写 Event → echo TASK_STATUS_CHANGED >> events.jsonl
 
-4. 按调度决策表决定下一步
+4. 按调度循环决定下一步（见 Workflow Protocol「五、Conductor 调度循环」）
 ```
 
 ---

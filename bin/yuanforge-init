@@ -494,17 +494,12 @@ def main():
             print("  --mode existing 要求目标目录已存在")
             sys.exit(1)
 
-    # ── 版本检测 ──
+    # ── 版本信息（仅展示，不阻止同步）──
     from_version = ""
     if args.mode == "existing":
         from_version = read_target_version(target)
-        if from_version == FRAMEWORK_VERSION and not args.clean:
-            print(color(f"✓ 框架已是最新版本 ({FRAMEWORK_VERSION})", "green"))
-            if not args.force:
-                print("  用 --force 强制重新同步")
-            sys.exit(0)
         if from_version and from_version != "none":
-            print(color(f"  {from_version} → {FRAMEWORK_VERSION}", "yellow"))
+            print(color(f"  当前框架版本: {from_version} → {FRAMEWORK_VERSION}", "yellow"))
 
     # ── 确认 ──
     if not args.force and not args.dry_run:

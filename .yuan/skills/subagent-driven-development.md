@@ -1,7 +1,7 @@
 ---
 name: subagent-driven-development
 description: >
-  Phase 2-5 执行引擎。Conductor 按 Dispatch Table 派发 Task 到 12 人专家团。
+  Phase 2-5 执行引擎。Conductor 按调度循环派发 Task 到 12 人专家团。
   触发：Plan 确认后进入 Phase 2、用户说「执行 Plan」「开始实现」。
   管理 TASK_BOARD、派发 Subagent（并行 Dev → 并行 4 审查官 → Tester → Doc Engineer）。
 version: 2.0.0
@@ -17,7 +17,7 @@ version: 2.0.0
 ## 触发条件
 
 - Plan 确认（G1 通过）→ 进入 Phase 2
-- Conductor 激活：需要按 Dispatch Table 逐批派发
+- Conductor 激活：需要按调度循环逐批派发
 - 用户说「执行 Plan」「开始实现」「继续」
 
 ---

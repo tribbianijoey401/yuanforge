@@ -22,15 +22,14 @@ Conductor 是 Workflow 的解释器，不是 Scheduler。
 
 ---
 
-## 二、完整流程
+## 二、DAG 拓扑
+
+YuanForge 的开发流程不是线性 pipeline——它是一个有向无环图（DAG），包含 5 个 Phase 和 7 个循环。
 
 ```
-User Story (vibe / 一句话需求)
-  │
-  ▼
 Phase 1: 需求分析（Product Analyst）
   │ 产出: 用户故事 + 验收标准 + 风险标签(P0/P1/P2)
-  │
+  │ 内含: L3-2 Grilling 循环（一次一问，用户确认 = 退出）
   ▼
 Phase 2: 方案设计（Architect）
   │ 动作: 计划复盘 → 设计理解书 → 用户确认 → API 契约冻结 → Plan
@@ -39,25 +38,54 @@ Phase 2: 方案设计（Architect）
   ▼
 Phase 3: 开发实现（Frontend Dev + Backend Dev 并行）
   │ 硬前提: API 契约已 freeze
+  │ 每个 Task 内含: L2-1 TDD 循环（Red→Green→Refactor）
   │
   ▼
-Phase 4: 质量审查（4 Reviewer 并行）
-  ├─ Spec Reviewer     [🔴 Blocker]
-  ├─ Security Auditor  [🔴 Blocker]
-  ├─ Quality Auditor   [🟢 Advisory↗]
-  └─ UX Reviewer       [🟢 Advisory↗]
+┌─────────────────────────────────────────────────────────┐
+│ Phase 3-4: 审查修正 DAG（有回路！）                      │
+│                                                         │
+│   Task ✅完成                                            │
+│     │                                                   │
+│     ▼                                                   │
+│   4 审查官并行                                         │
+│   ┌── Spec Reviewer  [🔴 Blocker]                      │
+│   ├── Security Auditor [🔴 Blocker]                    │
+│   ├── Quality Auditor [🟢 Advisory↗]                   │
+│   └── UX Reviewer     [🟢 Advisory↗]                   │
+│     │                                                   │
+│     ├─ 全部通过 → Phase 5                              │
+│     └─ 有 Blocker ──→ L2-2 审查修正循环 ──→ 返工      │
+│                          │                              │
+│                          ▼                              │
+│                       Dev 修复                          │
+│                          │                              │
+│                          ▼                              │
+│                       重新审查                          │
+│                          │                              │
+│                          ├─ 通过 → Phase 5              │
+│                          └─ 仍失败 → 回到审查修正循环   │
+│                              (最多 3 轮 → escalate)      │
+└─────────────────────────────────────────────────────────┘
   │
   ▼
 Phase 5: 测试验证（Tester）
-  │ [🟡 Hard Gate]
+  │ [🟡 Hard Gate] 全量测试 PASS
+  │
+  ├─ PASS → Phase 6
+  └─ FAIL ──→ L2-3 修复回路 ──→ 诊断 → 路由 → 修复 → 重测
+                │                   (最多 3 轮 → escalate)
+                │
+                └──→ 内嵌 L3-1 Debug 循环
+                     (Dev ≥2 次失败触发，最多 5 轮)
   │
   ▼
 Phase 6: 知识蒸馏（Conductor）
   │ Workspace Close → Promote → Archive
+  │ 内含: L4 Promotion 循环（EXTRACT→VALIDATE→PROPOSE→MERGE）
   │ [G4: Distillation Gate]
   │
   ▼
-Done
+Done → 回到 L0 项目循环（backlog → 下一个 Feature）
 ```
 
 ---
@@ -208,42 +236,163 @@ Gate G4:
 
 ---
 
-## 四、Conductor 的工作流解释循环
+## 四、循环定义
+
+### L0 · 项目循环
 
 ```
-Conductor 的每次循环:
+scope: L0
+trigger: PROGRESS.md 有未完成的 Feature
+body: 选 Feature → 创建 Workspace → 执行 L1 Feature 循环 → 归档 → 回到 backlog
+gate: 无 max_iterations（backlog 耗尽 = 项目完成）
+carry: knowledge/pitfalls/ 跨 Feature 共享
+```
 
-  1. 读 Workspace 状态
-     - 当前 Phase
-     - Task 状态（TASK_BOARD.md）
-     - 状态快照（Git HEAD / 脏文件 / 活跃 Agent）
+### L1 · Feature 流水线循环（Conductor 元循环）
 
-  2. 读 Workflow Protocol（本文）
-     - 当前 Phase 的下一步是什么？
+```
+scope: L1
+trigger: Workspace 创建完成
+body:
+  loop:
+    read TASK_BOARD              # 找 🟢就绪 的任务
+    if 无就绪:
+      if 有 🔄返工 → 路由到修复回路（L2-3）
+      if 有 ❌阻塞 且 可自动解除 → 解除阻塞
+      if 全部 ✅已部署 → break（进入 Phase 6）
+      else → 等待（用户操作/超时回退）
+    select 最优 Task             # DAG 拓扑序中无依赖未满足的最早任务
+    dispatch                     # 通过 Adapter Tier 1/2/3
+    wait                         # 等 Agent 完成
+    read 产出                    # 状态标记 + 路径，不读内容
+    update TASK_BOARD            # 状态 + 原因指针 + 审查结果
+    write Event Log              # 每次迭代写事件
+    goto loop
+gate:
+  max_iterations: ∞（Feature 完成 = 退出）
+  死循环保护: 见 iron-rules.md 铁律 Ⅹ「死循环保护」
+carry:
+  跨会话恢复时读 TASK_BOARD + Event Log 重建状态
+```
 
-  3. 读 State Protocol
-     - 哪些 Task 满足转换条件？
+### L2-1 · TDD 循环
 
-  4. 产生 Action
-     - Dispatch / Review / Promote / Archive / Recover
+```
+scope: L2（内嵌在 Dev 中）
+trigger: Dev 收到 Task（Dispatch）
+body: Red（写测试 → FAIL）→ Green（写实现 → PASS）→ Blue（重构 → STILL PASS）
+gate: Red→Green→Blue 线性推进，不会反向。Blue 阶段 max 3 次重构失败 → 跳过重构，mark 技术债
+carry: 不需要——Dev 是同一 Agent 同一会话
+```
 
-  5. 调用 Platform Adapter
-     - adapter.dispatch(task, context)
-     - adapter.review(task, criteria)
-     - ...
+### L2-2 · 审查修正循环
 
-  6. 更新 Docs
-     - TASK_BOARD.md
-     - PROGRESS.md
-     - SESSION_LOG.md
+```
+scope: L2
+trigger: Dev 标记 Task ✅完成
+body:
+  四个审查官并行启动
+  → 审查报告写入 TASK_BOARD「审查结果」段  ← 关键：必须落盘！
+  → Conductor 读所有报告
+  → if 任意 🔴Blocker:
+      Conductor 向其他审查官发暂停信号
+      写 TASK_BOARD 原因指针 → 审查结果#T{id}-r{round}
+      Dispatch 原 Dev → 修复 → 回到审查
+  → if 仅 🟡🟢:
+      审查通过 → exit
+gate:
+  max_iterations: 3
+  同一审查官连续 2 次报同一类 Blocker → 升级架构问题 → 回 Architect
+  on_exceed: escalate_to_user
+carry:
+  原因指针 → 审查报告文件路径（Dev 按需加载完整审查报告）
+```
 
-  7. 写 Events
-     - 状态变更事件
+### L2-3 · 修复回路
+
+```
+scope: L2
+trigger: Tester 返回 ❌
+body:
+  Tester 诊断失败类型 → 写入 TASK_BOARD 原因指针
+  Conductor 读失败类型，路由：
+    → 逻辑缺陷 → Dispatch 原 Dev（回 L2-1 TDD）
+    → 接口/权限缺陷 → 通知 Architect + Spec Reviewer + Security Auditor
+    → 依赖问题 → 通知 Architect + Spec Reviewer + Quality Auditor
+  → 问题修复 → 重新进入 L2-2 审查 → 审查通过 → 重新进入测试
+gate: max_iterations: 3; on_exceed: escalate_to_user
+carry: Tester 写入「失败类型 + 具体症状」→ Conductor 路由决策落盘
+```
+
+### L3-1 · Debug 循环
+
+```
+scope: L3（内嵌在 L2-3 中）
+trigger: Dev ≥2 次修复失败，猜测代替逻辑
+body: 详见 debug-feedback-loop Skill
+  Phase 0: 构建反馈循环（10 种方式）
+  Phase 1: 隔离 → 二分定位 → 假设记录 → 并行通知 Architect → 修复 → verify
+gate: max_iterations: 5; on_exceed: 标记 known issue → 跳过此 Task
+carry: 「假设记录 + 诊断结论」→ TASK_BOARD 原因指针
+```
+
+### L3-2 · Grilling 循环
+
+```
+scope: L3（内嵌在 Product Analyst / Architect 中）
+trigger: 需求存在模糊点
+body: 详见 grilling Skill。一次一问 → 等反馈 → 探索边界
+gate: max_iterations: ∞（用户驱动，"可以了" = 退出）
+carry: 不需要——与用户对话，同一 Agent
+```
+
+### L4 · Promotion 循环
+
+```
+scope: L4
+trigger: Phase 6 开始（所有 Task ✅已部署）
+body: 详见 promotion Skill。EXTRACT → VALIDATE → PROPOSE → MERGE
+gate: 4 阶段线性推进；PROPOSE 失败 → 人工审批
+carry: 按蒸馏 Checklist 逐步推进
 ```
 
 ---
 
-## 五、巡检循环
+## 五、Conductor 调度循环
+
+Conductor 是一个事件循环，不是一次性表格：
+
+```
+while true:
+    1. READ — 读 TASK_BOARD 全部行，扫描状态列
+    2. FIND — 找可执行任务：
+       a. 🟢就绪 + 依赖全部满足 → 可派发
+       b. 🔄返工 → 进入审查修正循环（L2-2）
+       c. ❌阻塞 → 检查是否可自动解除
+       d. 全部 ✅已部署 → break（进入 Phase 6）
+    3. SELECT — 从可派发任务中选优先级最高的：
+       优先级 = DAG 拓扑序（依赖少的先执行）
+    4. DISPATCH — 通过 Adapter 派发（Tier 1/2/3）
+    5. WAIT — 等 Agent 返回结果
+    6. DIGEST — 读产出物状态标记 + 路径，不读内容
+    7. UPDATE — 更新 TASK_BOARD 状态 + 原因指针 + 审查结果
+    8. LOG — 写 Event Log（DISPATCH / COMPLETE / REVIEW / REWORK / BLOCK）
+    9. GOTO 1
+```
+
+### 跨会话恢复
+
+新 Conductor 启动时：
+1. 读 PROGRESS.md → 找到当前 Workspace
+2. 读 TASK_BOARD → 扫描全部状态
+3. 读 Event Log（最近 20 条）→ 了解刚才发生了什么
+4. 回退 🔨进行中 → 🟢就绪（上一个 Conductor 可能崩溃）
+5. 检查 Git working tree → 脏则 stash
+6. 进入调度循环 step 1
+
+---
+
+## 六、巡检循环
 
 ```
 Conductor 持续巡检:
@@ -257,7 +406,9 @@ Conductor 持续巡检:
 
 ---
 
-## 六、跨会话继承
+## 七、跨会话继承
+
+> **详细恢复逻辑见「五、Conductor 调度循环 → 跨会话恢复」。本节仅保留继承的核心规则。**
 
 ```
 新会话启动:
@@ -280,7 +431,7 @@ Conductor 持续巡检:
 
 ---
 
-## 七、两种执行模式
+## 八、两种执行模式
 
 | 模式 | 触发 | 差异 |
 |------|------|------|
@@ -289,7 +440,7 @@ Conductor 持续巡检:
 
 ---
 
-## 八、与其他协议的关系
+## 九、与其他协议的关系
 
 | 协议 | 本协议如何使用 |
 |------|--------------|

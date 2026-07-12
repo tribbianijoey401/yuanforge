@@ -29,7 +29,7 @@ execution:
 
 ## 核心概念速览
 
-YuanForge 定义了一套 **Protocol-First** 协作模式：5 份协议 + 12 人专家团 + 九条铁律。
+YuanForge 定义了一套 **Protocol-First** 协作模式：5 份协议 + 12 人专家团 + 十条铁律。
 
 ### 12 人专家团
 
@@ -48,7 +48,7 @@ YuanForge 定义了一套 **Protocol-First** 协作模式：5 份协议 + 12 人
 | Doc Engineer | — | 增量归档 + 阶段整合 |
 | Conductor | — | 工作流解释器：读 Protocol → 产生 Action → 调 Adapter |
 
-### 九条铁律
+### 十条铁律
 
 必读 `.yuan/rules/iron-rules.md` + `.yuan/specs/`（5 份协议）。核心要点：
 
@@ -60,7 +60,8 @@ YuanForge 定义了一套 **Protocol-First** 协作模式：5 份协议 + 12 人
 6. **文档即代码** — 决策必须落 docs/
 7. **渐进式交付** — 每步可运行
 8. **质量门禁** — G1→G2→G3→G4，含三档阻塞策略
-9. **自主调度** — 按 Dispatch Table 派发
+9. **自主调度** — Conductor 按调度循环派发
+10. **循环收敛** — 每个循环必须有闸门，不得"直到正确为止"
 
 ---
 

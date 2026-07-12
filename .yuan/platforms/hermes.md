@@ -23,8 +23,8 @@ Hermes 的系统提示会注入 `.yuan/rules/` 下的规则文件：
 ```markdown
 # Conductor 的标准操作：
 1. 读取 Plan 中的 Dispatch Table
-2. 解析依赖关系 → 构建 DAG
-3. 按调度决策表依次派发：
+2. 解析依赖关系，构建 DAG
+3. 按调度循环派发（见 Workflow Protocol「五、Conductor 调度循环」）：
    product-analyst → architect → frontend-dev/backend-dev
    → spec-reviewer/security-auditor/quality-auditor/ux-reviewer (并行)
    → tester → doc-engineer

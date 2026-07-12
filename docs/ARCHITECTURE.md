@@ -23,7 +23,7 @@ YuanForge 是纯规则体系（Markdown），不是代码。核心思想：
 │ └── README.md     人类阅读的入口            │
 ├──────────────────────────────────────────┤
 │ 规则层（.yuan/rules/）                     │
-│ ├── iron-rules.md     九条铁律             │
+│ ├── iron-rules.md     十条铁律             │
 │ ├── plan-format.md    Plan 工程化格式       │
 │ └── docs-framework.md 说明书规范            │
 ├──────────────────────────────────────────┤
