@@ -1,3 +1,4 @@
 yuanforge/
 .yuan/plans/
 docs/graph/index.json
+__pycache__/
