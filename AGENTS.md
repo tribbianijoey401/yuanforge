@@ -94,8 +94,15 @@
    并行: UI Designer（有界面时）→ 视觉规范/原型
   │
   ▼
+2.5. Design Reviewer（设计审计官）← 新增
+   输入: API 契约 + 数据模型 + Plan
+   动作: 审查设计合理性（API/数据模型/架构/安全设计/需求覆盖）
+   档位: 🔴 Blocker — 设计缺陷不解决不能进入开发
+   打回: Architect 修正（最多 2 轮）
+  │
+  ▼
 3. Frontend Dev + Backend Dev（并行）
-   硬前提: API 契约已 freeze，Dev 不得修改契约
+   硬前提: API 契约已 freeze + 设计审查已通过，Dev 不得修改契约
    产出: TDD 实现（Red→Green→Refactor）
    Debug: ≥2次修复失败 → 注入诊断协议包（隔离→二分→假设）+ 通知 Architect
   │
@@ -154,6 +161,7 @@
 | Product Analyst | contracts/product-analyst.md | — | vibe→用户故事+验收标准+风险标签 |
 | Architect | contracts/architect.md | — | 计划复盘→API契约冻结+Plan |
 | UI Designer | contracts/ui-designer.md | — | 视觉规范+交互原型(有界面时) |
+| Design Reviewer 🆕 | contracts/design-reviewer.md | 🔴 Blocker | 审查API契约+数据模型+架构设计 |
 | Frontend Dev | contracts/frontend-dev.md | — | 前端TDD实现+Debug模式 |
 | Backend Dev | contracts/backend-dev.md | — | 后端TDD实现+Debug模式 |
 | Spec Reviewer | contracts/spec-reviewer.md | 🔴 Blocker | 对照验收标准+API契约 |

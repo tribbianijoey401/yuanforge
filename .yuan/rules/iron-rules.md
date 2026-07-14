@@ -16,7 +16,7 @@
 | Ⅴ | 上下文隔离 | 每个 Task 全新 Subagent |
 | Ⅵ | 文档即代码 | 决策必须落文档 |
 | Ⅶ | 渐进式交付 | 每步可运行 |
-| Ⅷ | 质量门禁 | G1→G2→G3→G4，不通过不前进 |
+|| Ⅷ | 质量门禁 | G1→G1.5→G2→G3→G4，不通过不前进 |
 | Ⅸ | 自主调度 | Conductor 按调度循环自主派发 Agent |
 | Ⅹ | 循环收敛 | 每个循环必须有闸门，不得"直到正确为止" |
 
@@ -135,15 +135,16 @@
 **四个 Gates 依次通过，不跳闸、不倒灌。**
 
 ```
-Phase 1 ── G1 ──→ Phase 2 ── G2 ──→ Phase 3 ── G3 ──→ Phase 4 ── G4 ──→ 交付
+Phase 1 ── G1 ──→ Phase 2 ── G1.5 ──→ Phase 2.5 ── G2 ──→ Phase 3 ── G3 ──→ Phase 4 ── G4 ──→ 交付
 ```
 
-| Gate | 检查内容 | 通过标准 | 不通过动作 |
-|------|---------|---------|-----------|
-| **G1** Plan Gate | Plan 完整 + 用户确认设计理解书 | Architect 反向输出设计理解书 → 用户确认 | 返回 Architect 修正 |
-| **G2** Task Gate | 四个审查官并行审查 | 🔴 Blocker 全部解决 + 🟡 Tester 全绿 | 打回对应 Dev 修复→重审 |
-| **G3** Integration Gate | 全量测试 PASS、集成环境可运行 | `pytest tests/ -q` 全绿 | 定位→修复→重跑 |
-| **G4** Release Gate | 文档齐全、Doc Engineer 归档完成 | 所有检查项 ✅ | 修复缺失项 |
+|| Gate | 检查内容 | 通过标准 | 不通过动作 ||
+|------|---------|---------|-----------||
+| **G1** Plan Gate | Plan 完整 + 用户确认设计理解书 | Architect 反向输出设计理解书 → 用户确认 | 返回 Architect 修正 ||
+| **G1.5** Design Gate 🆕 | API 契约 + 数据模型 + 架构设计审查 | Design Reviewer 输出审查报告，🔴 Blocker 全部解决 | 打回 Architect 修正（最多 2 轮），2 轮不通过 → 通知用户人工决策 ||
+| **G2** Task Gate | 四个审查官并行审查 | 🔴 Blocker 全部解决 + 🟡 Tester 全绿 | 打回对应 Dev 修复→重审 ||
+| **G3** Integration Gate | 全量测试 PASS、集成环境可运行 | `pytest tests/ -q` 全绿 | 定位→修复→重跑 ||
+| **G4** Release Gate | 文档齐全、Doc Engineer 归档完成 | 所有检查项 ✅ | 修复缺失项 ||
 
 ### G2 审查三档 + 并行规则
 
