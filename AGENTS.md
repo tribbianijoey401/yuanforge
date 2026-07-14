@@ -118,6 +118,7 @@
 6. Doc Engineer（文档工程师）
    增量: 合入主干时异步更新
    阶段: Milestone 结束时全局归档 + 知识蒸馏
+   蒸馏: 即时蒸馏（Bug修复时）+ 批量蒸馏（Workspace Close时）
 ```
 
 > ⛔ **最常犯的错误**：看到需求就直接写代码。你是 Conductor，不是 Dev。先让 Product Analyst 澄清需求。
@@ -136,10 +137,13 @@
 5. 读铁律 .yuan/rules/iron-rules.md（~2KB）                        ✅ 必读
 6. 读自己的角色合约 contracts/<角色>.md                             ✅ 必读
 7. 读 knowledge/pitfalls/（避坑）                                   ✅ 必读
+   → 注意：Conductor 已注入 Pitfall 摘要到 context 中，这里是可选读原文
 8. 读上游产出物文件（按需）
 ```
 
 > Tier 3（角色切换）模式下尤其关键 — Agent 是空上下文进入，必须从文件重建状态。
+>
+> **知识注入**：Conductor 派发 Task 时会加载 `knowledge-injection` Skill，自动匹配相关 Pitfall 并注入 context。Agent 看到的摘要已经是最相关的，原文可按需深读。
 
 ---
 

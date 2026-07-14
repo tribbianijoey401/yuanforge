@@ -41,6 +41,8 @@ docs/events/
 
 **触发**：TASK_BOARD 中任务状态变更时。
 
+**设计原则**：记录"为什么变"，不记录"变成了什么"（后者在 TASK_BOARD 中）。
+
 **枚举的子类型**（`payload.change_type` 字段）：
 
 | change_type | 状态转换 | 含义 |
@@ -64,19 +66,26 @@ docs/events/
   "payload": {
     "task_id": "T03",
     "change_type": "COMPLETE",
-    "old_status": "🔨进行中",
-    "new_status": "✅完成",
     "reason": "实现完成，测试全部通过",
     "commit": "a1b2c3d"
   }
 }
 ```
 
-> **注：** conductor.md 中引用的 `DISPATCH`、`COMPLETE`、`REVIEW`、`REWORK`、`BLOCK` 均为本文 `TASK_STATUS_CHANGED` 事件的 `change_type` 子类型。
+> **优化点**：移除了 `old_status` / `new_status` 字段。TASK_BOARD 才是状态的唯一真相源，Event 只记录变更原因。如果需要状态回放，从 TASK_BOARD + Event reason 联合推断。
+
+> **错误信息**：如果变更伴随错误，在 payload 中添加 `error` 字段：
+> ```json
+> {"type": "TASK_STATUS_CHANGED", "payload": {"task_id": "T05", "change_type": "BLOCK", "reason": "阻塞", "error": "SDK 端点未配置"}}
+> ```
+
+> **注**：conductor.md 中引用的 `DISPATCH`、`COMPLETE`、`REVIEW`、`REWORK`、`BLOCK` 均为本文 `TASK_STATUS_CHANGED` 事件的 `change_type` 子类型。
 
 ### 3.2 KNOWLEDGE_UPDATED
 
 **触发**：knowledge/ 文件被创建或修改时（蒸馏或手动更新）。
+
+**优化**：此事件类型已合并到 `DISTILLATION_COMPLETE` 中。仅在**非蒸馏场景**下手动更新 knowledge 时使用（如手动添加 Pitfall）。
 
 ```json
 {
@@ -85,14 +94,15 @@ docs/events/
   "session": "20260709-用户认证",
   "actor": "conductor",
   "payload": {
-    "action": "distilled",
-    "object_id": "FEAT-AUTH",
-    "object_type": "feature",
-    "status": "verified",
-    "file": "knowledge/features/FEAT-AUTH.md",
-    "source_session": "20260709-用户认证"
+    "action": "manual_add",
+    "object_id": "PIT-013",
+    "object_type": "pitfall",
+    "file": "knowledge/pitfalls/PIT-013.md"
   }
 }
+```
+
+> **注意**：蒸馏产生的知识变更不再单独写 KNOWLEDGE_UPDATED 事件。`DISTILLATION_COMPLETE` 已包含完整的产出列表。
 ```
 
 ### 3.3 API_CHANGED
@@ -119,6 +129,8 @@ docs/events/
 
 **触发**：审查官完成审查时。
 
+**优化**：只记录结论摘要和最重要的 1-2 条对抗发现。完整报告在 TASK_BOARD「审查结果」段。
+
 ```json
 {
   "type": "REVIEW_RESULT",
@@ -129,15 +141,23 @@ docs/events/
     "task_id": "T03",
     "gate": "🔴Blocker",
     "verdict": "passed",
-    "issues_found": 0,
+    "top_findings": [
+      "对抗测试: 构造了 3 个边界输入（空字符串、null、超长字段），全部通过",
+      "合规检查: 验收标准 AC-1 ~ AC-5 全部覆盖"
+    ],
     "adversarial_attempts": 3
   }
 }
 ```
 
+> **优化点**：移除了 `issues_found` 字段。改为 `top_findings`（最重要的 1-2 条发现），让人不看 TASK_BOARD 就能知道"这次审查过了没，发现了什么"。
+```
+
 ### 3.5 DISTILLATION_COMPLETE
 
 **触发**：Workspace Close 蒸馏完成时。
+
+**优化**：此事件已合并 `KNOWLEDGE_UPDATED` 的信息，包含完整的知识产出列表。
 
 ```json
 {
@@ -148,7 +168,8 @@ docs/events/
   "payload": {
     "outputs": [
       {"type": "feature", "id": "FEAT-AUTH"},
-      {"type": "decision", "id": "ADR-003"}
+      {"type": "decision", "id": "ADR-003"},
+      {"type": "pitfall", "id": "PIT-012"}
     ],
     "not_distilled": [
       {"source": "BUG-006.md", "reason": "一次性环境问题"}
@@ -156,6 +177,7 @@ docs/events/
     "backlog_items": ["T05"]
   }
 }
+```
 ```
 
 ### 3.6 WORKSPACE_CLOSED
@@ -196,23 +218,11 @@ docs/events/
 }
 ```
 
-### 3.8 ERROR_OCCURRED
+### 3.8 ERROR_OCCURRED（已废弃）
 
-**触发**：系统错误时（超时/异常中断/不可恢复错误）。
-
-```json
-{
-  "type": "ERROR_OCCURRED",
-  "timestamp": "2026-07-09T14:45:00Z",
-  "session": "20260709-用户认证",
-  "actor": "conductor",
-  "payload": {
-    "error_type": "timeout",
-    "task_id": "T03",
-    "attempt": 2,
-    "details": "超过 30 分钟未完成，回退🟢"
-  }
-}
+> **已合并到其他事件**。错误信息现在作为 `payload.error` 字段附加到对应事件中。
+> 例如：TASK_STATUS_CHANGED 的 BLOCK 类型可以携带 error 字段。
+> 此事件类型保留仅供向后兼容，新代码不应再使用。
 ```
 
 ---
@@ -291,13 +301,15 @@ grep events/$(date +%Y%m%d)/events.jsonl
 
 | 角色 | 写什么事件 | 强制？ |
 |------|-----------|:---:|
-| Conductor | TASK_STATUS_CHANGED / DISTILLATION_COMPLETE / WORKSPACE_CLOSED / CRASH_RECOVERED / ERROR_OCCURRED | ✅ 强制 |
+| Conductor | TASK_STATUS_CHANGED / DISTILLATION_COMPLETE / WORKSPACE_CLOSED / CRASH_RECOVERED | ✅ 强制 |
 | Dev Agent | TASK_STATUS_CHANGED（领取 + 完成时） | — Tier 1/2 自动，Tier 3 由 Conductor 写 |
 | Reviewer | REVIEW_RESULT | — Tier 1/2 自动，Tier 3 由 Conductor 写 |
 | Architect | API_CHANGED / KNOWLEDGE_UPDATED（契约变更时） | — 按需 |
 | Doc Engineer | KNOWLEDGE_UPDATED（归档更新时） | — 按需 |
 
-> **Conductor 的 Event 写入是强制项。** 违反铁律 Ⅵ「文档即代码」—— 状态变更不记录事件 = 事实丢失。每次 Task 状态变更、审查完成、Workspace 关闭、崩溃恢复、超时/异常，Conductor 必须追加对应事件。写入方式见 conductor.md「Event 写入」段。
+> **Conductor 的 Event 写入是强制项。** 违反铁律 Ⅵ「文档即代码」—— 状态变更不记录事件 = 事实丢失。每次 Task 状态变更、审查完成、Workspace 关闭、崩溃恢复，Conductor 必须追加对应事件。写入方式见 conductor.md「Event 写入」段。
+
+> **优化**：`ERROR_OCCURRED` 已合并到其他事件的 `error` 字段。`KNOWLEDGE_UPDATED` 仅在非蒸馏场景下手动更新 knowledge 时使用，蒸馏产生的知识变更由 `DISTILLATION_COMPLETE` 统一记录。
 
 ---
 
@@ -305,9 +317,9 @@ grep events/$(date +%Y%m%d)/events.jsonl
 
 | 阶段 | 操作 | 执行者 |
 |------|------|--------|
-| 任务状态变更 | 追加 TASK_STATUS_CHANGED | Conductor / Dev |
-| 审查完成 | 追加 REVIEW_RESULT | Reviewer |
-| 蒸馏完成 | 追加 DISTILLATION_COMPLETE + KNOWLEDGE_UPDATED | Conductor |
+| 任务状态变更 | 追加 TASK_STATUS_CHANGED（只写 reason，不写 old/new status） | Conductor / Dev |
+| 审查完成 | 追加 REVIEW_RESULT（只写 verdict + top findings） | Reviewer |
+| 蒸馏完成 | 追加 DISTILLATION_COMPLETE（包含知识产出列表） | Conductor |
 | Workspace 关闭 | 追加 WORKSPACE_CLOSED | Conductor |
 | 崩溃恢复 | 追加 CRASH_RECOVERED | Conductor |
 | 每日 | 自动按日期创建新 events.jsonl | Conductor |
