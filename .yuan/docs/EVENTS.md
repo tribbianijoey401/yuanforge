@@ -225,6 +225,31 @@ docs/events/
 > 此事件类型保留仅供向后兼容，新代码不应再使用。
 ```
 
+### 3.9 SESSION_EXITED
+
+**触发**：会话退出协议执行完成时。
+
+**设计原则**：记录"为什么退出"和"退出了什么状态"，作为下次会话恢复的入口锚点。
+
+```json
+{
+  "type": "SESSION_EXITED",
+  "timestamp": "2026-07-14T18:30:00Z",
+  "session": "20260714-用户认证",
+  "actor": "conductor",
+  "payload": {
+    "phase": "Phase 4",
+    "completed_tasks": ["T01", "T02"],
+    "remaining_tasks": ["T03"],
+    "reason": "用户说「明天继续」",
+    "last_dispatch": "T03 → backend-dev",
+    "review_summary": "4 审查官全部通过"
+  }
+}
+```
+
+> **与 WORKSPACE_CLOSED 的区别**：SESSION_EXITED 是会话级退出（可能还有未完成的任务），WORKSPACE_CLOSED 是 Feature 级完全关闭（所有任务终态 + 蒸馏完成）。一个 Feature 可能有多个 SESSION_EXITED，但只有一个 WORKSPACE_CLOSED。
+
 ---
 
 ## 四、事件存储规则
@@ -299,9 +324,9 @@ grep events/$(date +%Y%m%d)/events.jsonl
 
 ## 七、各角色职责
 
-| 角色 | 写什么事件 | 强制？ |
+|| 角色 | 写什么事件 | 强制？ |
 |------|-----------|:---:|
-| Conductor | TASK_STATUS_CHANGED / DISTILLATION_COMPLETE / WORKSPACE_CLOSED / CRASH_RECOVERED | ✅ 强制 |
+| Conductor | TASK_STATUS_CHANGED / DISTILLATION_COMPLETE / WORKSPACE_CLOSED / CRASH_RECOVERED / SESSION_EXITED | ✅ 强制 |
 | Dev Agent | TASK_STATUS_CHANGED（领取 + 完成时） | — Tier 1/2 自动，Tier 3 由 Conductor 写 |
 | Reviewer | REVIEW_RESULT | — Tier 1/2 自动，Tier 3 由 Conductor 写 |
 | Architect | API_CHANGED / KNOWLEDGE_UPDATED（契约变更时） | — 按需 |
@@ -315,11 +340,12 @@ grep events/$(date +%Y%m%d)/events.jsonl
 
 ## 八、生命周期
 
-| 阶段 | 操作 | 执行者 |
+|| 阶段 | 操作 | 执行者 |
 |------|------|--------|
 | 任务状态变更 | 追加 TASK_STATUS_CHANGED（只写 reason，不写 old/new status） | Conductor / Dev |
 | 审查完成 | 追加 REVIEW_RESULT（只写 verdict + top findings） | Reviewer |
 | 蒸馏完成 | 追加 DISTILLATION_COMPLETE（包含知识产出列表） | Conductor |
 | Workspace 关闭 | 追加 WORKSPACE_CLOSED | Conductor |
 | 崩溃恢复 | 追加 CRASH_RECOVERED | Conductor |
+| 会话退出 | 追加 SESSION_EXITED（phase + completed/remaining + reason） | Conductor |
 | 每日 | 自动按日期创建新 events.jsonl | Conductor |
