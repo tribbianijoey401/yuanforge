@@ -88,7 +88,7 @@ DOCS_SKELETON_DIRS = [
 DOCS_SKELETON_FILES = {
     "object-model.yaml":  "# 知识对象 Schema — 从 yuanforge 框架模板复制\n",
     "INDEX.md":           "# 文档索引\n",
-    "PROGRESS.md":        "# 项目进度\n\n> 当前 Phase: 初始化\n",
+    "PROGRESS.md":        "# 项目进度\n\n> 当前 Phase: 初始化\n\n## 会话日志\n\n> 每次会话退出时自动追加。最多保留最近 10 条，超出删除最旧。\n\n| 日期 | 会话ID | 最后Phase | 完成Task | 遗留Task | 备注 |\n|------|--------|-----------|----------|----------|------ |\n",
     "ARCHITECTURE.md":    "# 系统架构\n",
     "SETUP.md":           "# 环境搭建\n",
     "CONVENTIONS.md":     "# 编码规范\n",

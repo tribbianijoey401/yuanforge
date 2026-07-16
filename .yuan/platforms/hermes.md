@@ -178,3 +178,39 @@ limitations:
 - Hermes 的 `delegate_task` 是 **同步**的 — 父 Agent 等待子 Agent 完成
 - 最多 3 个并行子 Agent（可配置 `delegation.max_concurrent_children`）
 - 子 Agent 没有父会话的记忆 — 必须通过 context 传递全部信息
+
+---
+
+## 会话退出钩子
+
+Hermes 平台的退出信号检测机制。
+
+### 触发方式
+
+| 方式 | 检测逻辑 | 说明 |
+|------|---------|------|
+| 用户主动 | 消息包含「暂停」「明天继续」「先停了」「save progress」关键词 | 在 AGENTS.md 模式判定中处理 |
+| 空闲检测 | Conductor 巡检发现 30 分钟无状态变化 | 见 conductor.md「死循环保护」 |
+| 自然结束 | 所有 Phase 完成（TASK_BOARD 全部 ✅） | 调度循环 break 后触发 |
+| 平台中断 | cronjob 定时扫描活跃会话 | 后台守护进程触发 |
+
+### 执行流程
+
+```
+Hermes 退出钩子:
+    1. Conductor 检测到退出信号
+    2. 执行退出协议（见 contracts/conductor.md「退出协议」）
+    3. 可选：发送通知到用户
+       - 如果用户通过 QQ/Telegram 等消息平台接入
+       - 发送: "会话已保存进度。下次启动会自动恢复。"
+```
+
+### 实现建议
+
+对于 Hermes 平台，退出协议的执行由 Conductor 在消息处理完成后自动触发：
+
+1. **消息级退出**：用户发送包含退出关键词的消息 → 模式判定识别为「暂停类」→ 触发退出协议
+2. **会话级退出**：Hermes gateway 检测到会话长时间空闲 → 触发 cronjob 扫描 → 对活跃会话执行 checkpoint
+3. **计划退出**：所有 Phase 完成后 → Conductor 自动执行退出协议 → 更新会话日志
+
+> 注意：Hermes 的消息处理是请求-响应模式，不是长会话。退出协议应该在**消息处理完成后**、**返回响应之前**执行。
