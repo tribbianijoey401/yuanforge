@@ -8,6 +8,7 @@
   2. Enum validation — object_type/status/confidence/lifecycle 合法值
   3. Frontmatter completeness — 必填字段检查
   4. Proposal validation — Proposal 必填字段
+  5. Anchor integrity — 分段锚点完整性检查
 """
 
 import sys
@@ -159,6 +160,74 @@ for f in proposal_files:
     if fm.get('change_type') not in valid_change_types:
         print(f"❌ {f}: invalid change_type '{fm.get('change_type')}'")
         sys.exit(1)
+
+# ── 5. Anchor integrity ───────────────────────────────────────────
+
+# Define required anchors per file
+REQUIRED_ANCHORS = {
+    '.yuan/rules/iron-rules.md': [f'<SECTION-END:{i}>' for i in range(1, 11)],
+    'contracts/conductor.md': [
+        '<SECTION-END:conductor-schedule>',
+        '<SECTION-END:conductor-tier>',
+        '<SECTION-END:conductor-forbidden>',
+        '<SECTION-END:conductor-exit>',
+        '<SECTION-END:conductor-session-log>',
+    ],
+    '.yuan/docs/TASK_BOARD.md': [
+        '<SECTION-END:tb-statuses>',
+        '<SECTION-END:tb-snapshot>',
+        '<SECTION-END:tb-context>',
+        '<SECTION-END:tb-faults>',
+        '<SECTION-END:tb-rework>',
+        '<SECTION-END:tb-blocked>',
+        '<SECTION-END:tb-reviews>',
+        '<SECTION-END:tb-schedule>',
+        '<SECTION-END:tb-dispatch-log>',
+        '<SECTION-END:tb-agent-startup>',
+        '<SECTION-END:tb-fields>',
+        '<SECTION-END:tb-lifecycle>',
+        '<SECTION-END:tb-context-rules>',
+        '<SECTION-END:tb-rework-rules>',
+        '<SECTION-END:tb-cancel-rules>',
+        '<SECTION-END:tb-timeout-rules>',
+        '<SECTION-END:tb-cross-session>',
+        '<SECTION-END:tb-isolation>',
+        '<SECTION-END:tb-roles>',
+        '<SECTION-END:tb-concurrency>',
+        '<SECTION-END:tb-final>',
+    ],
+    '.yuan/docs/SESSION.md': [
+        '<SECTION-END:session-distill>',
+        '<SECTION-END:session-crash-recovery>',
+        '<SECTION-END:session-snapshot>',
+        '<SECTION-END:session-id>',
+        '<SECTION-END:session-final>',
+    ],
+}
+
+# Only check files that are staged for commit
+staged_files = set(changed)
+
+for filepath, required_anchors in REQUIRED_ANCHORS.items():
+    if filepath not in staged_files:
+        continue
+    
+    path = REPO_ROOT / filepath
+    if not path.exists():
+        print(f"⚠️  {filepath}: file not found, skipping anchor check")
+        continue
+    
+    content = path.read_text()
+    missing = []
+    for anchor in required_anchors:
+        if anchor not in content:
+            missing.append(anchor)
+    
+    if missing:
+        print(f"❌ {filepath}: missing required anchors: {missing}")
+        sys.exit(1)
+    else:
+        print(f"  ✓ {filepath}: all {len(required_anchors)} anchors present")
 
 # ── All good ───────────────────────────────────────────────────────
 

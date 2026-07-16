@@ -46,6 +46,25 @@
 
 ---
 
+## 铁律速查（L0 骨架）
+
+| 编号 | 铁律 | 触发阶段 | Conductor 注入目标 |
+|:---:|------|---------|-----------------|
+| Ⅰ | 计划先行 | Phase 1 设计前 | Architect, PA |
+| Ⅱ | TDD 先行 | Phase 2 开发前 | Frontend Dev, Backend Dev |
+| Ⅲ | 三档审查 | Phase 2 审查前 | 全部审查官 |
+| Ⅳ | 原子提交 | 每次 Dev 完成 | Frontend Dev, Backend Dev |
+| Ⅴ | 上下文隔离 | 每次派发 | 全部 Agent |
+| Ⅵ | 文档即代码 | 每次状态变更 | Doc Engineer, Conductor |
+| Ⅶ | 渐进式交付 | Phase 2 开发 | Frontend Dev, Backend Dev |
+| Ⅷ | 质量门禁 | Phase 2 审查 | 全部审查官 |
+| Ⅸ | 自主调度 | Conductor 每次循环 | Conductor |
+| Ⅹ | 循环收敛 | 审查/修复/Debug | Spec Reviewer, Tester, Dev |
+
+> **速查表只负责索引，不替代详细规则。** 具体执行时必须等待 Conductor 注入对应铁律的详细内容（见 `.yuan/rules/iron-rules.md` 分段锚点）。
+
+---
+
 ## 🔄 会话恢复（自动）
 
 如果 `docs/PROGRESS.md` 存在：

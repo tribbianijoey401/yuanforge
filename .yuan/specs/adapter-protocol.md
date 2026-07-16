@@ -33,6 +33,13 @@ Adapter Protocol 就是让每个平台回答同一个问题：
 
 每个平台 Adapter 必须实现以下 8 个方法。其中 `dispatch` 有三个 Tier 实现：
 
+> **Conductor 注入规则：** Conductor 在派发任务前，必须通过 `read_file` 能力获取所需文件的全文（铁律详细段、角色合约、规格书段），并注入到子 Agent 上下文中。`read_file` 是平台无关的抽象接口，Adapter 负责将其翻译为平台的具体实现：
+> - Hermes: `read_file(path, offset, limit)` → 读取文件指定行范围
+> - Claude Code: `Read` tool → 读取文件
+> - Codex CLI: `open_file` → 打开文件
+> - Cursor: `Read` tool → 读取文件
+> - Manual: 人工读取文件
+
 ```
 dispatch(task: Task, context: Context) → void
   语义: 派发一个 Task 到 Agent

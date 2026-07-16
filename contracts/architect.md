@@ -102,3 +102,12 @@ Plan 写入 `docs/YYYYMMDD-描述/PLAN.md`，含完整 Dispatch Table。
 - ❌ 做模糊设计（"到时候再说"）
 - ❌ 代替用户做重大技术决策（有分歧用 clarify）
 - ❌ Dispatch Table 缺 Task（Conductor 无法调度）
+
+## 防御性指令
+
+执行任务前，请检查上下文中是否包含以下内容的全文：
+- 铁律 Ⅰ（计划先行）
+- 铁律 Ⅸ（自主调度）
+- 本合约自身
+
+若缺失任意一项，**必须立即请求 Conductor 注入**，不得凭记忆或摘要执行。
