@@ -234,10 +234,7 @@ Advisory 升级规则:
   - 同模块 🟠 警告 ≥ 3 次 → 强制升级 🔴 Blocker
 ```
 
-### Phase 5: 测试验证
-
-```
-输入: 所有 Blocker 已解决 + 审查通过
+### Phase 4b: Tester（测试验证）
 触发: Phase 4 完成后
 
 Action Sequence:

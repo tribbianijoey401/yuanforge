@@ -65,6 +65,28 @@
 
 ---
 
+## 根本原则（高于一切）
+
+| 原则 | 一句话 |
+|------|--------|
+| **LLM 即 Runtime** | 没有后台调度器，每次 LLM 推理就是一次 Tick |
+| **Docs 即 State** | 所有状态持久化为 Markdown 文件，而非内存数据库 |
+| **Intent 即 Trigger** | 用户自然语言驱动，无需记忆命令 |
+| **Protocol over Platform** | 定义"做什么"，不定义"怎么做" |
+
+---
+
+## Loop Engineering 原则
+
+| # | 原则 | 一句话 |
+|---|------|--------|
+| 1 | **Goal 不存储，只推导** | Goal 是 Task 的 `group_id`，不是 Runtime 对象 |
+| 2 | **Loop 不持久，只推进** | 每次 Loop 是一次有限状态推进，结束即销毁 |
+| 3 | **Checkpoint 不累积** | 长期经验进 Knowledge，Checkpoint 保持几 KB |
+| 4 | **Metrics 只观测** | 指标用于评估协议，不驱动协议 |
+
+---
+
 ## 🔄 会话恢复（自动）
 
 如果 `docs/PROGRESS.md` 存在：
@@ -242,6 +264,26 @@
 | Ⅷ | 质量门禁 | G1→G2(四审查并行)→G3→G4 |
 | Ⅸ | 自主调度 | Conductor 按调度循环自主派发 |
 | Ⅹ | 循环收敛 | 每个循环必须有闸门，不得"直到正确为止" |
+
+---
+
+## 根本原则（最高优先级）
+
+| 原则 | 一句话 |
+|------|--------|
+| **LLM 即 Runtime** | 没有后台调度器，每次 LLM 推理就是一次 Tick |
+| **Docs 即 State** | 所有状态持久化为 Markdown 文件，而非内存数据库 |
+| **Intent 即 Trigger** | 用户自然语言驱动，无需记忆命令 |
+| **Protocol over Platform** | 定义"做什么"，不定义"怎么做" |
+
+## Loop Engineering 原则
+
+| # | 原则 | 一句话 |
+|---|------|--------|
+| 1 | Goal 不存储，只推导 | Goal 是 Task 的 `group_id`，不是 Runtime 对象 |
+| 2 | Loop 不持久，只推进 | 每次 Loop 是一次有限状态推进，结束即销毁 |
+| 3 | Checkpoint 不累积 | 长期经验进 Knowledge，Checkpoint 保持几 KB |
+| 4 | Metrics 只观测 | 指标用于评估协议，不驱动协议 |
 
 ---
 

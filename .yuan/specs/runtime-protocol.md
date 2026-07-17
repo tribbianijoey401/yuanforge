@@ -160,5 +160,6 @@ ACTIVE → VERIFIED_FALSE → DISTILLED → ARCHIVED
 | Goal Protocol | Runtime 层服务于 Goal 层定义的意图 |
 | Object Protocol | Runtime 操作的对象（Task/Event/Checkpoint）由 Object Protocol 定义 |
 | State Protocol | Runtime 的状态转换由 State Protocol 定义 |
+| Action Protocol | Runtime 的 DISPATCH/WAIT/DIGEST 使用 Action Protocol 定义的 8 个标准动作 |
 | Workflow Protocol | Runtime 的 Loop 由 Workflow 的 Phase 驱动 |
-| Adapter Protocol | Runtime 的 DISPATCH/WAIT/DIGEST 通过 Adapter 执行 |
+| Adapter Protocol | Runtime 的 Action 通过 Adapter 翻译为平台实现 |
