@@ -92,6 +92,77 @@ Done → 回到 L0 项目循环（backlog → 下一个 Feature）
 
 ## 三、Phase 详解
 
+### Phase 0: Loop Engineering 概念定义
+
+> **本节定义 Loop Engineering 的核心概念，插入在所有 Phase 之前。**
+
+#### Goal Cluster（目标簇）
+
+```
+User Intent
+    │
+    ├─ Authentication
+    │    ├─ Login (goal=login)
+    │    ├─ Register (goal=register)
+    │    └─ Forgot Password (goal=forgot-password)
+    │
+    └─ Payment
+         ├─ Checkout (goal=checkout)
+         └─ Refund (goal=refund)
+```
+
+- **Goal** = Task 的 `goal` 字段分组，不是独立对象
+- **Goal Cluster** = 一组天然关联的 Goal（如 Authentication 下的 Login/Register/ForgotPassword）
+- 同一 Goal Cluster 的 Task 可以在同一个 Loop 内并行推进
+- 不同 Goal Cluster 之间完全隔离，不会混在同一 Loop
+
+#### Loop 定义
+
+Loop 是整个框架真正的 Runtime。每次 Loop 执行固定 7 步：
+
+```
+READ          — 读 TASK_BOARD 全部行，扫描状态列
+SELECT        — 从 Goal Cluster 中选取优先级最高的 READY Task
+EXECUTE       — Agent 执行 Task（通过 Adapter）
+VERIFY        — 验证产出物（Agent 自检 + 审查官对抗式审查）
+UPDATE        — 更新 TASK_BOARD 状态 + 原因指针 + 上下文传递
+CHECKPOINT    — 写 Checkpoint（事实 + 状态 + 下一步 + 失败假设）
+EXIT GATE     — 判断是否退出（见 Gate Protocol）
+```
+
+**关键约束**：
+- Loop 永远不知道"我要开发登录"，Loop 只知道"Task-17 READY"
+- Loop 不持久——每次 Loop 是一次有限状态推进，结束即销毁
+- Loop 绑定的不是单个 Goal，而是一个 **Active Goal Cluster**
+- 一个 Loop 只推进一个 Goal Cluster 内的 Task，不会跨 Cluster 上下文爆炸
+
+#### Exit Gate（退出条件）
+
+Loop 每轮最后必须判断以下任一条件，任一成立立即退出：
+
+| # | 条件 | 说明 |
+|---|------|------|
+| ① | Goal 完成 | 当前 Goal Cluster 所有 Task 终态 |
+| ② | Token Budget | 超出分配的 Token 上限 |
+| ③ | Time Budget | 超出分配的时间上限 |
+| ④ | 无 READY Task | 当前 Goal Cluster 无就绪 Task |
+| ⑤ | 等待用户 | 触发 Human Gate |
+| ⑥ | 等待平台 | 依赖外部平台响应 |
+| ⑦ | 人工确认点 | 架构冻结/安全异常/UI 选择/破坏性变更/生产发布 |
+
+**铁律**：Loop 永远是有限循环，不是无限 Agent。
+
+#### Workspace Close 蒸馏
+
+Workspace Close 时执行知识蒸馏：
+- FEATURE/ADR → knowledge/
+- BUG → 即时蒸馏为 PIT-NNN 或留 archive
+- 未完成任务 → workspace/backlog
+- 失败假设 → 蒸馏到 knowledge/pitfalls/
+- Checkpoint → 归档（只保留 ACTIVE 假设，DISTILLED 已移除）
+
+---
+
 ### Phase 1: 需求分析
 
 ```
@@ -274,6 +345,36 @@ gate:
 carry:
   跨会话恢复时读 TASK_BOARD + Event Log 重建状态
 ```
+
+### L1.5 · Loop 循环（Loop Engineering 新增）
+
+> **Loop 是 L1 的内部实现机制。每个 L1 迭代 = 一个 Loop。Loop 是框架真正的 Runtime。**
+
+```
+scope: L1.5（内嵌在 L1 中）
+trigger: L1 迭代开始
+body:
+  1. READ     — 读 TASK_BOARD 全部行，扫描状态列
+  2. SELECT   — 从当前 Goal Cluster 中选取优先级最高的 READY Task
+  3. EXECUTE  — Agent 执行 Task（通过 Adapter）
+  4. VERIFY   — 验证产出物（Agent 自检 + 审查官对抗式审查）
+  5. UPDATE   — 更新 TASK_BOARD 状态 + 原因指针 + 上下文传递
+  6. CHECKPOINT — 写 Checkpoint（事实 + 状态 + 下一步 + 失败假设）
+  7. EXIT GATE — 判断是否退出（7 个条件任一成立 → break）
+gate:
+  7 个 Exit Gate 条件（见 Phase 0 定义）
+  任一成立 → 立即退出 Loop
+carry:
+  Checkpoint → PROGRESS.md「会话日志」或 workspace/agents/
+  失败假设 → 蒸馏到 knowledge/pitfalls/（VERIFIED_FALSE → DISTILLED）
+  Metrics → Workspace Close 时计算（loop_count, reject_rate, 等）
+```
+
+**Loop 绑定规则**：
+- 每个 Loop 绑定一个 Active Goal Cluster
+- Loop 不知道"我要开发登录"，只知道"Task-17 READY"
+- Loop 不持久——每次 Loop 是一次有限状态推进，结束即销毁
+- 跨 Loop 通过 Checkpoint 恢复状态，不跨 Loop 继承上下文
 
 ### L2-1 · TDD 循环
 

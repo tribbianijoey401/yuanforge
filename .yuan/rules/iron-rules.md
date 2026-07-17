@@ -9,16 +9,33 @@
 
 | # | 铁律 | 一句话核心 |
 |---|------|-----------|
-| Ⅰ | 计划先行 | 没有 Plan 不写一行代码 |
+| Ⅰ | 计划先行 | 没有 Plan 不写代码 |
 | Ⅱ | TDD 先行 | Red → Green → Refactor |
-| Ⅲ | 三档审查 | 4 审查官并行：🔴Blocker / 🟡Hard Gate / 🟢Advisory↗ |
+| Ⅲ | 三档审查 | 🔴Blocker / 🟡Hard Gate / 🟢Advisory↗ |
 | Ⅳ | 原子提交 | 一个 Task 一个 Commit |
 | Ⅴ | 上下文隔离 | 每个 Task 全新 Subagent |
-| Ⅵ | 文档即代码 | 决策必须落文档 |
+| Ⅵ | 文档即代码 | 决策落文档 |
 | Ⅶ | 渐进式交付 | 每步可运行 |
-|| Ⅷ | 质量门禁 | G1→G1.5→G2→G3→G4，不通过不前进 |
-| Ⅸ | 自主调度 | Conductor 按调度循环自主派发 Agent |
+| Ⅷ | 质量门禁 | G1→G2(四审查并行)→G3→G4，不通过不前进 |
+| Ⅸ | 自主调度 | Conductor 按调度循环自主派发 |
 | Ⅹ | 循环收敛 | 每个循环必须有闸门，不得"直到正确为止" |
+
+---
+
+## Loop Engineering 四条原则
+
+> **Loop Engineering 是 YuanForge 的长期运行模型。** 它不新增 Runtime、不新增调度服务、不新增后台进程，只通过协议约束让 LLM 能够连续运行十几个小时而不失控。
+
+| # | 原则 | 一句话 |
+|---|------|--------|
+| 1 | **Goal 不存储，只推导** | Goal 是 Task 的 `group_id`，不是 Runtime 对象 |
+| 2 | **Loop 不持久，只推进** | 每次 Loop 是一次有限状态推进，结束即销毁 |
+| 3 | **Checkpoint 不累积，只保留工作集** | 长期经验进 Knowledge，Checkpoint 保持几 KB |
+| 4 | **Metrics 不参与决策，只负责观测** | 指标用于评估协议，不驱动协议 |
+
+**铁律**：这四条原则与十条铁律具有同等效力。违反任何一条原则 = 违反铁律。
+
+<SECTION-END:loop-principles>
 
 ---
 

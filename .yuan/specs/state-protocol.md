@@ -102,7 +102,7 @@ State Protocol 只关心：
 
 ---
 
-## 三、Workspace 状态机（4 状态）
+## 三、Workspace 状态机（4 → 5 状态）
 
 ```
 ┌─────────┐     [Phase 1 开始]     ┌───────────┐
@@ -122,6 +122,17 @@ State Protocol 只关心：
                     ┌───────────┐
                     │ archived  │  ← 终态
                     └───────────┘
+
+附加状态（从 executing 分支）：
+
+                    ┌───────────┐
+                    │waiting_user│  ← 等待用户输入（非终态）
+                    └─────┬─────┘
+                          │ [用户响应]
+                          ▼
+                    ┌───────────┐
+                    │ executing  │  ← 恢复执行
+                    └───────────┘
 ```
 
 ### 转换规则
@@ -132,6 +143,9 @@ State Protocol 只关心：
 | executing | distilling | 所有 Task 终态 |
 | executing | distilling | TTL 过期（强制蒸馏） |
 | distilling | archived | 蒸馏完成 |
+| executing | waiting_user | 触发 Human Gate（用户确认/权限/架构冻结等） |
+| waiting_user | executing | 用户响应后重新启动 Loop（非恢复，是新 Loop） |
+| waiting_user | distilling | TTL 过期（强制蒸馏，保留未完成任务到 backlog） |
 
 ---
 
@@ -229,6 +243,37 @@ executing → failed
 ```
 created → archived
 ```
+
+### Checkpoint 数据结构（Loop Engineering）
+
+Checkpoint 记录四类信息，永远保持几 KB 以内：
+
+| 字段 | 说明 |
+|------|------|
+| `verified_facts` | 已验证事实（如"API 正常"、"Redis 连接池配置正确"） |
+| `current_state` | 当前状态快照（如"Task-17 RUNNING"） |
+| `next_steps` | 下一步（如"等待 Reviewer"、"执行 TDD Red"） |
+| `failed_hypotheses` | 已失败假设（见下方生命周期） |
+
+### 失败假设生命周期
+
+```
+ACTIVE
+  ↓ [已验证不正确]
+VERIFIED_FALSE
+  ↓ [蒸馏到 knowledge/]
+DISTILLED
+  ↓ [归档]
+ARCHIVED
+```
+
+**规则**：
+- Checkpoint 只保留 `ACTIVE` 状态的假设（当前仍在怀疑的）
+- 假设一旦 `VERIFIED_FALSE`，立即蒸馏到 `knowledge/pitfalls/` 或留在当前 Checkpoint 的 `failed_hypotheses` 段
+- `DISTILLED` 状态的假设从 Checkpoint 中删除，不再占用空间
+- `ARCHIVED` 状态的假设随 Workspace 归档
+
+**目的**：LLM 最容易重复犯同一个错误。Checkpoint 记录失败假设，下次恢复时不会重新走上同一条死路。
 
 ---
 

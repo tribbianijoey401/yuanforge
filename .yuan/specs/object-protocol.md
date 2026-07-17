@@ -127,16 +127,18 @@ Runtime 对象回答了「项目正在做什么」。它们存放在 `docs/YYYYM
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|:---:|------|
-| `id` | string | ✅ | `T01` |
-| `role` | enum | ✅ | 12 角色之一 |
-| `priority` | enum | ✅ | P0 / P1 / P2 / P3 |
-| `status` | enum | ✅ | 见 State Protocol |
-| `summary` | string | ✅ | 任务描述 |
-| `depends_on` | array | — | 依赖的 Task ID |
-| `timeout_minutes` | int | ✅ | 超时阈值 |
-| `attempts` | int | ✅ | 当前尝试次数 |
-| `output_files` | array | — | 产出文件路径 |
-| `dispatch_context` | object | — | 派发注入的上下文 |
+|| `id` | string | ✅ | `T01` |
+|| `role` | enum | ✅ | 12 角色之一 |
+|| `priority` | enum | ✅ | P0 / P1 / P2 / P3 |
+|| `status` | enum | ✅ | 见 State Protocol |
+|| `summary` | string | ✅ | 任务描述 |
+|| `depends_on` | array | — | 依赖的 Task ID |
+|| `goal` | string | ✅ | Task 所属 Goal（逻辑分组，非独立对象） |
+|| `goal_cluster` | string | — | Task 所属 Goal Cluster（一组相关 Goal） |
+|| `timeout_minutes` | int | ✅ | 超时阈值 |
+|| `attempts` | int | ✅ | 当前尝试次数 |
+|| `output_files` | array | — | 产出文件路径 |
+|| `dispatch_context` | object | — | 派发注入的上下文 |
 
 **状态机**：11 状态 — 详见 State Protocol §二
 
@@ -202,6 +204,28 @@ Runtime 对象回答了「项目正在做什么」。它们存放在 `docs/YYYYM
 
 **状态机**：2 状态 — created → archived
 
+### 4.6 Workspace Metrics（循环遥测）
+
+**语义**：Workspace 级别的 Loop 执行质量观测。不参与决策，只负责回答三个问题：是否在收敛？哪些环节最容易卡住？哪些协议真正提升了长期运行能力？
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:---:|------|
+| `workspace_id` | string | ✅ | 所属 Workspace |
+| `loop_count` | int | ✅ | 总 Loop 执行次数 |
+| `avg_loop_duration_seconds` | float | — | 平均 Loop 持续时间 |
+| `avg_dispatches_per_loop` | float | — | 每次 Loop 平均派发数 |
+| `review_reject_rate` | float | — | 审查驳回率（返工次数/总审查次数） |
+| `retry_count` | int | — | 修复回路触发次数 |
+| `human_gate_count` | int | — | 人工介入点触发次数 |
+| `blocked_duration_seconds` | float | — | 总阻塞时间 |
+| `checkpoint_recovery_count` | int | — | Checkpoint 恢复次数 |
+| `knowledge_promotions` | int | — | 知识晋升次数 |
+| `failed_hypotheses_distilled` | int | — | 已蒸馏到 Knowledge 的失败假设数 |
+
+**写入时机**：Workspace Close 时由 Doc Engineer 计算并写入 `docs/YYYYMMDD-描述/workspace-metrics.md`。
+
+**用途**：仅用于评估协议效果，Conductor 不做基于 Metrics 的决策。
+
 ---
 
 ## 五、Event 对象
@@ -240,13 +264,31 @@ Workspace ──contains──→ Task[]
 
 Task ──triggers──→ Event (status change)
 Task ──references──→ Knowledge (via dispatch_context)
+Task ──belongs_to──→ Goal (derived: group by Task.goal)
+Task ──clustered_by──→ Goal Cluster (derived: group by Task.goal_cluster)
 
 Workspace ──closes──→ Checkpoint
 Checkpoint ──references──→ Knowledge outputs
 
 Proposal ──modifies──→ Knowledge
 Proposal ──produces──→ Event (KNOWLEDGE_UPDATED)
+
+Workspace ──measured_by──→ Workspace Metrics (computed at Close)
 ```
+
+### Goal 推导规则（Loop Engineering）
+
+> **Goal 不是 Runtime 对象，是 Task 的逻辑分组。**
+
+| 规则 | 推导方式 |
+|------|---------|
+| Goal 列表 | `group by Task.goal` 从 TASK_BOARD 导出 |
+| Goal DONE | 该 Goal 下所有 Task 均为终态 |
+| Goal ACTIVE | 至少一个 Task 处于非终态且非阻塞 |
+| Goal BLOCKED | 至少一个 Task 为 ❌阻塞 且无阻塞解除条件 |
+| Goal Cluster | `group by Task.goal_cluster` 导出 |
+
+**铁律**：禁止在代码中维护 `Goal.state` 字段。Goal 状态必须每次从 Task 状态实时推导。
 
 ---
 

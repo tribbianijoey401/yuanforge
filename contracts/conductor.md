@@ -22,21 +22,44 @@
 while true:
     1. READ — 读 TASK_BOARD 全部行，扫描状态列
     2. FIND — 🟢就绪→派发 / 🔄返工→审查修正(L2-2) / ❌阻塞→检查解除 / 全部✅→break
-    3. SELECT — DAG 拓扑序中优先级最高的
+    3. SELECT — DAG 拓扑序中优先级最高的（同 Goal Cluster 内）
     4. DISPATCH — Tier 1(delegate_task) > Tier 2(terminal bg) > Tier 3(role-switch)
     5. WAIT → DIGEST(读状态标记+路径，不读内容) → UPDATE(TASK_BOARD+原因指针+审查结果) → LOG(Event) → GOTO 1
 ```
 
-| 步骤 | 输入 | 输出 |
-|------|------|------|
-| READ | TASK_BOARD 全部行 | 状态扫描 |
-| FIND | 扫描结果 | 🟢就绪 / 🔄返工 / ❌阻塞 列表 |
-| SELECT | FIND 结果 | 优先级最高的 Task ID |
-| DISPATCH | SELECT 结果 | 子 Agent + 注入上下文 |
-| WAIT | DISPATCH 结果 | 完成/超时/阻塞 |
-| DIGEST | WAIT 结果 | 状态标记 + 产出路径 |
-| UPDATE | DIGEST 结果 | TASK_BOARD 状态变更 |
-| LOG | UPDATE 结果 | Event JSONL |
+### Loop Engineering 调度升级
+
+> **Conductor 的调度从 Task 级升级为 Goal Cluster 级。**
+
+每次 Loop 执行 7 步（L1.5）：
+
+```
+1. READ     — 读 TASK_BOARD 全部行
+2. SELECT   — 从当前 Active Goal Cluster 中选取优先级最高的 READY Task
+3. EXECUTE  — Agent 执行 Task（通过 Adapter）
+4. VERIFY   — 验证产出物（Agent 自检 + 审查官对抗式审查）
+5. UPDATE   — 更新 TASK_BOARD 状态 + 原因指针 + 上下文传递
+6. CHECKPOINT — 写 Checkpoint（事实 + 状态 + 下一步 + 失败假设）
+7. EXIT GATE — 判断是否退出（7 个条件任一成立 → break）
+```
+
+**Goal Cluster 选择规则**：
+- Conductor 从 TASK_BOARD 中 `group by goal_cluster` 导出所有活跃 Cluster
+- 选择包含最多 READY Task 的 Cluster 作为当前 Active Goal Cluster
+- 同一 Loop 内只派发该 Cluster 内的 Task，不跨 Cluster
+- 当前 Cluster 所有 Task 终态 → 选择下一个 Cluster
+
+**Checkpoint 管理**：
+- 每轮 Loop 结束后写 Checkpoint（事实 + 状态 + 下一步 + 失败假设）
+- Checkpoint 只保留 ACTIVE 状态的失败假设
+- VERIFIED_FALSE 的假设立即蒸馏到 knowledge/pitfalls/
+- Checkpoint 永远保持几 KB 以内
+
+**Metrics 收集**：
+- Conductor 维护 Loop 计数器（loop_count）
+- 每次 Loop 记录：持续时间、派发数、审查结果
+- Workspace Close 时 Doc Engineer 计算最终 Metrics
+- Metrics 仅用于评估协议效果，不参与决策
 
 <SECTION-END:conductor-schedule>
 
@@ -61,11 +84,11 @@ while true:
 
 **在每次派发决策前，Conductor 必须探测当前平台的可用能力，决定使用哪个 Tier 派发。**
 
-| 工具 | 探测方法 | 可用 → Tier |
-|------|---------|------------|
-| `delegate_task` | 检查工具列表中是否有 delegate_task | **Tier 1**（子 Agent） |
-| `terminal(background=true)` | 检查 terminal 是否支持 background 模式 | **Tier 2**（后台进程） |
-| 无以上工具 | 以上都不可用 | **Tier 3**（角色切换，兜底） |
+|| 工具 | 探测方法 | 可用 → Tier ||
+|------|---------|------------||
+| `delegate_task` | 检查工具列表中是否有 delegate_task | **Tier 1**（子 Agent） ||
+| `terminal(background=true)` | 检查 terminal 是否支持 background 模式 | **Tier 2**（后台进程） ||
+| 无以上工具 | 以上都不可用 | **Tier 3**（角色切换，兜底） ||
 
 **硬规则：**
 1. 探测结果写入 TASK_BOARD「派发日志」段首行（`探测结果: Tier=N`）
@@ -75,7 +98,29 @@ while true:
 
 ---
 
-## 调度循环（替代静态调度决策表）
+## Exit Gate 处理
+
+Loop 每轮最后必须判断以下 7 个条件，任一成立立即退出：
+
+| # | 条件 | 动作 |
+|---|------|------|
+| ① | Goal 完成 | 当前 Goal Cluster 所有 Task 终态 → 选择下一个 Cluster 或进入 Phase 6 |
+| ② | Token Budget | 超出分配 → 写 Checkpoint → 退出 |
+| ③ | Time Budget | 超出分配 → 写 Checkpoint → 退出 |
+| ④ | 无 READY Task | 当前 Goal Cluster 无就绪 Task → 检查阻塞解除条件 |
+| ⑤ | 等待用户 | 触发 Human Gate → Workspace 进入 WAITING_USER 状态 → 冻结 Checkpoint |
+| ⑥ | 等待平台 | 依赖外部平台响应 → 写 Checkpoint → 退出 |
+| ⑦ | 人工确认点 | 架构冻结/安全异常/UI 选择/破坏性变更/生产发布 → 触发 Human Gate |
+
+**Human Gate 规则**：
+- 触发 Human Gate 时，Workspace 进入 `WAITING_USER` 状态
+- Loop 已经结束，不是暂停——下次用户响应是新的 Loop
+- Checkpoint 冻结，不更新
+- 用户响应后，Conductor 启动新的 Loop（不是恢复旧 Loop）
+
+---
+
+## 三级派发决策
 
 Conductor 的核心行为是一个事件循环，不是一次性表格。每次迭代重新读状态、重新决策。
 
