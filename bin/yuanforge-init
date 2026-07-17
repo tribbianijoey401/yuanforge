@@ -33,7 +33,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parent
 SOURCE_ROOT = SCRIPT_DIR.parent
 
-FRAMEWORK_VERSION = "2.2.0"
+FRAMEWORK_VERSION = "2.7.0"
 
 # ── 框架子目录（粒度化，区分框架数据 vs 项目数据）──
 # 框架数据 — 从源完全同步（增/改/删）
@@ -45,7 +45,7 @@ FRAMEWORK_SUBDIRS = [
     ".yuan/platforms",
 ]
 
-# 框架顶层目录 — 从源完全同步（增/改/删，rmtree+copytree）
+# 框架顶层目录 — 改为增量同步（不再 rmtree+copytree，保护用户自定义文件）
 FRAMEWORK_TOP_DIRS = [
     "contracts",
     "protocols",
@@ -60,7 +60,9 @@ FRAMEWORK_FILES = [
 
 # 项目数据目录 — 更新时永不触碰
 PROTECTED_DIRS = [
-    ".yuan/plans",
+    ".yuan/skills/user-",  # 用户自定义 skill（目录名前缀）
+    "docs/knowledge/features/",  # 用户自定义知识
+    "docs/knowledge/modules/",
 ]
 
 # 所有框架同步项（用于验证源完整性）
@@ -103,11 +105,47 @@ DOCS_SKELETON_FILES = {
 
 # ── 已知的旧文件/目录（迁移时清理）──
 KNOWN_STALE_PATHS = [
-    "docs/pitfalls.md",                         # 旧版踩坑文件 → knowledge/pitfalls/
-    ".yuan/docs/RUNTIME_MODEL.md",              # 已吸收进 .yuan/specs/
-    ".yuan/docs/CAPABILITY.md",                 # 已吸收进 .yuan/specs/
-    ".yuan/docs/OBJECT_MODEL.md",               # 已吸收进 .yuan/specs/
-    ".yuan/docs/PROMOTION.md",                  # 已降级为 .yuan/skills/promotion.md
+    # 旧版踩坑文件 → knowledge/pitfalls/
+    "docs/pitfalls.md",
+    # .yuan/docs/ 下的旧文件 → 已吸收进 .yuan/specs/
+    ".yuan/docs/RUNTIME_MODEL.md",
+    ".yuan/docs/CAPABILITY.md",
+    ".yuan/docs/OBJECT_MODEL.md",
+    ".yuan/docs/PROMOTION.md",
+    # 旧版 workflows 文件 → 已吸收进 .yuan/specs/workflow-protocol.md
+    ".yuan/docs/workflows.md",
+    # 旧版 action 文件 → 已吸收进 .yuan/specs/action-protocol.md
+    ".yuan/docs/ACTION.md",
+    # 旧版 state 文件 → 已吸收进 .yuan/specs/state-protocol.md
+    ".yuan/docs/STATE.md",
+    # 旧版 object 文件 → 已吸收进 .yuan/specs/object-protocol.md
+    ".yuan/docs/OBJECT.md",
+    # 旧版 adapter 文件 → 已吸收进 .yuan/specs/adapter-protocol.md
+    ".yuan/docs/ADAPTER.md",
+    # 旧版铁律文件 → 已整合进 .yuan/rules/iron-rules.md
+    ".yuan/rules/rule-1.md",
+    ".yuan/rules/rule-2.md",
+    ".yuan/rules/rule-3.md",
+    ".yuan/rules/rule-4.md",
+    ".yuan/rules/rule-5.md",
+    ".yuan/rules/rule-6.md",
+    ".yuan/rules/rule-7.md",
+    ".yuan/rules/rule-8.md",
+    ".yuan/rules/rule-9.md",
+    ".yuan/rules/rule-10.md",
+    # 旧版协议目录 → 已整合进 .yuan/specs/
+    ".yuan/docs/PROTOCOL.md",
+    # 旧版 contracts 命名 → 已改为标准角色名
+    "contracts/lead-developer.md",
+    "contracts/tech-lead.md",
+    "contracts/dev-lead.md",
+    # 旧版 skills
+    ".yuan/skills/audit.md",
+    ".yuan/skills/checklist.md",
+    # 旧版 templates
+    "templates/task-template.md",
+    "templates/plan-template.md",
+    "templates/review-template.md",
 ]
 
 GITIGNORE_CONTENT = """\
@@ -561,15 +599,16 @@ def main():
                 if len(orphans) > 5:
                     print(f"      ... and {len(orphans) - 5} more (use --clean to remove)")
 
-    # ── 3. 同步框架顶层目录 ──
+    # ── 3. 同步框架顶层目录（增量同步，不清理孤儿保护用户自定义文件）──
     print(color("\n📋 同步框架 (contracts/protocols/templates/scripts):", "bold"))
     for topdir in FRAMEWORK_TOP_DIRS:
         src = SOURCE_ROOT / topdir
-        results = sync_framework_item(topdir, SOURCE_ROOT, target, args.dry_run, args.clean)
+        results = sync_framework_item(topdir, SOURCE_ROOT, target, args.dry_run, clean_orphans=False)
         added = sum(1 for v in results.values() if v == "added")
         updated = sum(1 for v in results.values() if v == "updated")
-        if added or updated:
-            print(f"  {topdir}/: +{added} ~{updated}")
+        skipped = sum(1 for v in results.values() if v == "skipped")
+        if added or updated or skipped:
+            print(f"  {topdir}/: +{added} ~{updated} ·{skipped}")
 
     # ── 4. 同步框架单文件 ──
     print(color("\n📋 同步框架文件:", "bold"))
