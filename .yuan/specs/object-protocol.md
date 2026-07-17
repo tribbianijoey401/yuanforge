@@ -135,6 +135,7 @@ Runtime 对象回答了「项目正在做什么」。它们存放在 `docs/YYYYM
 || `depends_on` | array | — | 依赖的 Task ID |
 || `goal` | string | ✅ | Task 所属 Goal（逻辑分组，非独立对象） |
 || `goal_cluster` | string | — | Task 所属 Goal Cluster（一组相关 Goal） |
+|| `acceptance` | string | ✅ | 验收标准（Given/When/Then 格式） |
 || `timeout_minutes` | int | ✅ | 超时阈值 |
 || `attempts` | int | ✅ | 当前尝试次数 |
 || `output_files` | array | — | 产出文件路径 |

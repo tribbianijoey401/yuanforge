@@ -23,9 +23,53 @@ LLM 自己就是 Runtime。
 
 Adapter Protocol 就是让每个平台回答同一个问题：
   「你如何执行 Dispatch？你如何执行 Review？...」
+
+Intent 即 Trigger：
+  用户通过自然语言表达意图，Conductor 解析意图并推进状态机。
+  无需记忆命令，只需说「开始」「确认」「修改」。
 ```
 
 **铁律**：平台只需要告诉 YuanForge「这些 Action 如何实现」——其余协议完全不用修改。
+
+---
+
+## 二、平台能力声明 (capability.yaml)
+
+> 每个平台 Adapter 必须声明自身能力，用于 Conductor 做调度决策。
+
+```yaml
+# 示例：Hermes 平台能力声明
+platform: hermes
+supports_goal: native | markdown   # 是否原生支持持久化 Goal
+supports_subagent: true | false    # 是否可派发独立子 Agent
+supports_resume: native | markdown # 是否原生恢复会话
+supports_async: true | false       # 是否支持后台运行
+```
+
+| 字段 | 说明 |
+|------|------|
+| `supports_goal` | `native`=平台原生支持 Goal 概念（如 Codex/Claude Code 的 /goal 命令）；`markdown`=需写入文件 |
+| `supports_subagent` | 是否可派发独立子 Agent |
+| `supports_resume` | 是否原生支持会话恢复 |
+| `supports_async` | 是否支持后台异步执行 |
+
+**Goal 适配**：
+- 若 `supports_goal: native`：Adapter 将 `Goal Activated` 事件翻译为平台命令
+- 若 `supports_goal: markdown`：Adapter 将 Goal 对象写入 `docs/runtime/current-goal.md`
+
+---
+
+## 三、意图解析表
+
+> 用户输入为自然语言。Conductor 根据**当前状态**映射允许的意图。
+
+| 当前状态 | 允许的意图 | 示例输入 |
+|----------|------------|----------|
+| `WAIT_PLAN_APPROVAL` | Approve, Modify, Cancel | "开始吧"、"这里改一下"、"不要了" |
+| `WAIT_REQUIREMENT_CONFIRM` | Confirm, Revise | "没问题"、"再加个需求" |
+| `WAIT_HUMAN_GATE` | Authorize, Abort | "确认删除"、"取消" |
+
+**规则**：若一个输入匹配多个合法迁移，Conductor 必须请求澄清。
 
 ---
 

@@ -118,6 +118,18 @@ Loop 每轮最后必须判断以下 7 个条件，任一成立立即退出：
 - Checkpoint 冻结，不更新
 - 用户响应后，Conductor 启动新的 Loop（不是恢复旧 Loop）
 
+### 意图解析
+
+> 用户通过自然语言表达意图。Conductor 根据**当前状态**映射允许的意图。
+
+| 当前状态 | 允许的意图 | 示例输入 |
+|----------|------------|----------|
+| `WAIT_PLAN_APPROVAL` | Approve, Modify, Cancel | "开始吧"、"这里改一下"、"不要了" |
+| `WAIT_REQUIREMENT_CONFIRM` | Confirm, Revise | "没问题"、"再加个需求" |
+| `WAIT_HUMAN_GATE` | Authorize, Abort | "确认删除"、"取消" |
+
+**规则**：若一个输入匹配多个合法迁移，Conductor 必须请求澄清。
+
 ---
 
 ## 三级派发决策

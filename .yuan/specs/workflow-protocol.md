@@ -24,68 +24,34 @@ Conductor 是 Workflow 的解释器，不是 Scheduler。
 
 ## 二、DAG 拓扑
 
-YuanForge 的开发流程不是线性 pipeline——它是一个有向无环图（DAG），包含 5 个 Phase 和 7 个循环。
+Workflow 是完成 Goal 的**静态路径模板**，定义标准阶段，不包含执行细节。
 
 ```
-Phase 1: 需求分析（Product Analyst）
-  │ 产出: 用户故事 + 验收标准 + 风险标签(P0/P1/P2)
-  │ 内含: L3-2 Grilling 循环（一次一问，用户确认 = 退出）
+Discover → Plan → Build → Verify → Promote
+```
+
+### 阶段总览
+
+```
+Phase 1: Discover（需求澄清）
+  │  Product Analyst 多轮追问 → 用户故事 + 验收标准 + 风险标签
+  │  [G1: 需求确认 Human Gate]
   ▼
-Phase 2: 方案设计（Architect）
-  │ 动作: 计划复盘 → 设计理解书 → 用户确认 → API 契约冻结 → Plan
-  │ [G1: Plan Gate]
-  │
+Phase 2: Plan（方案设计）
+  │  Architect 设计理解书 → 用户确认 → API 契约冻结 + Plan
+  │  [G2: 计划确认 Human Gate]
   ▼
-Phase 3: 开发实现（Frontend Dev + Backend Dev 并行）
-  │ 硬前提: API 契约已 freeze
-  │ 每个 Task 内含: L2-1 TDD 循环（Red→Green→Refactor）
-  │
+Phase 3: Build（开发实现）
+  │  Conductor 驱动 Loop 完成所有 Task
+  │  内含: L2-1 TDD 循环
   ▼
-┌─────────────────────────────────────────────────────────┐
-│ Phase 3-4: 审查修正 DAG（有回路！）                      │
-│                                                         │
-│   Task ✅完成                                            │
-│     │                                                   │
-│     ▼                                                   │
-│   4 审查官并行                                         │
-│   ┌── Spec Reviewer  [🔴 Blocker]                      │
-│   ├── Security Auditor [🔴 Blocker]                    │
-│   ├── Quality Auditor [🟢 Advisory↗]                   │
-│   └── UX Reviewer     [🟢 Advisory↗]                   │
-│     │                                                   │
-│     ├─ 全部通过 → Phase 5                              │
-│     └─ 有 Blocker ──→ L2-2 审查修正循环 ──→ 返工      │
-│                          │                              │
-│                          ▼                              │
-│                       Dev 修复                          │
-│                          │                              │
-│                          ▼                              │
-│                       重新审查                          │
-│                          │                              │
-│                          ├─ 通过 → Phase 5              │
-│                          └─ 仍失败 → 回到审查修正循环   │
-│                              (最多 3 轮 → escalate)      │
-└─────────────────────────────────────────────────────────┘
-  │
+Phase 4: Verify（质量验证）
+  │  4 审查官并行 + Tester Hard Gate
+  │  内含: L2-2 审查修正循环 + L2-3 修复回路 + L3-1 Debug 循环
   ▼
-Phase 5: 测试验证（Tester）
-  │ [🟡 Hard Gate] 全量测试 PASS
-  │
-  ├─ PASS → Phase 6
-  └─ FAIL ──→ L2-3 修复回路 ──→ 诊断 → 路由 → 修复 → 重测
-                │                   (最多 3 轮 → escalate)
-                │
-                └──→ 内嵌 L3-1 Debug 循环
-                     (Dev ≥2 次失败触发，最多 5 轮)
-  │
-  ▼
-Phase 6: 知识蒸馏（Conductor）
-  │ Workspace Close → Promote → Archive
-  │ 内含: L4 Promotion 循环（EXTRACT→VALIDATE→PROPOSE→MERGE）
-  │ [G4: Distillation Gate]
-  │
-  ▼
-Done → 回到 L0 项目循环（backlog → 下一个 Feature）
+Phase 5: Promote（知识蒸馏）
+  │  Workspace Close → Promote → Archive → 输出 Loop Metrics
+  │  [G4: 目标完成 Human Gate]
 ```
 
 ---
@@ -123,11 +89,11 @@ Loop 是整个框架真正的 Runtime。每次 Loop 执行固定 7 步：
 ```
 READ          — 读 TASK_BOARD 全部行，扫描状态列
 SELECT        — 从 Goal Cluster 中选取优先级最高的 READY Task
-EXECUTE       — Agent 执行 Task（通过 Adapter）
-VERIFY        — 验证产出物（Agent 自检 + 审查官对抗式审查）
+DISPATCH      — 注入合约+铁律+Goal摘要，派发给平台执行
+WAIT          — 等待 Agent 完成或超时/失败
+DIGEST        — 比对产出与验收标准，通过→DONE，否则→RETURN
 UPDATE        — 更新 TASK_BOARD 状态 + 原因指针 + 上下文传递
-CHECKPOINT    — 写 Checkpoint（事实 + 状态 + 下一步 + 失败假设）
-EXIT GATE     — 判断是否退出（见 Gate Protocol）
+CHECK (EXIT)  — 判断是否退出（7 个条件任一成立 → break）
 ```
 
 **关键约束**：
@@ -152,6 +118,14 @@ Loop 每轮最后必须判断以下任一条件，任一成立立即退出：
 
 **铁律**：Loop 永远是有限循环，不是无限 Agent。
 
+#### Loop 收敛闸门
+
+| 条件 | 动作 |
+|------|------|
+| 同一 Task 连续 2 次返工 | 通知 Architect 复审设计 |
+| 同一 Task 连续 3 次返工 | 标记 BLOCKED，触发 Human Gate |
+| 连续 3 个不同 Task 返工 | 暂停 Loop，请求用户确认方向 |
+
 #### Workspace Close 蒸馏
 
 Workspace Close 时执行知识蒸馏：
@@ -163,7 +137,7 @@ Workspace Close 时执行知识蒸馏：
 
 ---
 
-### Phase 1: 需求分析
+### Phase 1: Discover（需求澄清）
 
 ```
 输入: 用户原始需求（vibe）
@@ -183,7 +157,7 @@ Action Sequence:
   - 验收标准必须可验证（不能用「用户体验好」这种）
 ```
 
-### Phase 2: 方案设计
+### Phase 2: Plan（方案设计）
 
 ```
 输入: 用户故事 + 验收标准
@@ -210,7 +184,7 @@ Gate G1:
   - [有界面] 视觉规范 + 原型
 ```
 
-### Phase 3: 开发实现
+### Phase 3: Build（开发实现）
 
 ```
 输入: API 契约 + Plan
@@ -230,7 +204,7 @@ Action Sequence:
   - ≥2 次修复失败 → 注入诊断协议包（Debug 模式）
 ```
 
-### Phase 4: 质量审查
+### Phase 4: Verify（质量验证）
 
 ```
 输入: ✅完成的 Task + 审查标准
@@ -283,7 +257,7 @@ Gate G3:
   └──────────────────────────────────┘
 ```
 
-### Phase 6: 知识蒸馏
+### Phase 5: Promote（知识蒸馏）
 
 ```
 输入: 所有 Task 终态 + 测试全绿
@@ -356,14 +330,15 @@ trigger: L1 迭代开始
 body:
   1. READ     — 读 TASK_BOARD 全部行，扫描状态列
   2. SELECT   — 从当前 Goal Cluster 中选取优先级最高的 READY Task
-  3. EXECUTE  — Agent 执行 Task（通过 Adapter）
-  4. VERIFY   — 验证产出物（Agent 自检 + 审查官对抗式审查）
-  5. UPDATE   — 更新 TASK_BOARD 状态 + 原因指针 + 上下文传递
-  6. CHECKPOINT — 写 Checkpoint（事实 + 状态 + 下一步 + 失败假设）
-  7. EXIT GATE — 判断是否退出（7 个条件任一成立 → break）
+  3. DISPATCH — 注入合约+铁律+Goal摘要，派发给平台执行
+  4. WAIT     — 等待 Agent 完成或超时/失败
+  5. DIGEST   — 比对产出与验收标准，通过→DONE，否则→RETURN
+  6. UPDATE   — 更新 TASK_BOARD 状态 + 原因指针 + 上下文传递
+  7. CHECK    — 判断 Exit Gate（7 条件任一成立 → break）
 gate:
   7 个 Exit Gate 条件（见 Phase 0 定义）
-  任一成立 → 立即退出 Loop
+  Loop 收敛闸门：同一 Task 连续 2 次返工→通知 Architect；3 次→BLOCKED + Human Gate
+  连续 3 个不同 Task 返工→暂停 Loop，请求用户确认
 carry:
   Checkpoint → PROGRESS.md「会话日志」或 workspace/agents/
   失败假设 → 蒸馏到 knowledge/pitfalls/（VERIFIED_FALSE → DISTILLED）
