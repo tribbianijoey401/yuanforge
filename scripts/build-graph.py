@@ -85,7 +85,7 @@ def build_graph() -> dict:
 
         if not fm or "id" not in fm or "object_type" not in fm:
             if md_file.name != ".gitkeep":
-                warnings.append(f"⚠️  Skipped (no valid frontmatter): {rel_path}")
+                warnings.append(f"[WARN] Skipped (no valid frontmatter): {rel_path}")
             continue
 
         obj_id = str(fm.get("id", ""))
@@ -93,7 +93,7 @@ def build_graph() -> dict:
             continue
 
         if obj_id in node_ids:
-            warnings.append(f"❌ Duplicate ID: {obj_id} in {rel_path}")
+            warnings.append(f"[ERROR] Duplicate ID: {obj_id} in {rel_path}")
             continue
 
         node_ids.add(obj_id)
@@ -141,7 +141,7 @@ def build_graph() -> dict:
     # ── Integrity checks ──────────────────────────────────
     for edge in edges:
         if edge["to"] not in node_ids:
-            warnings.append(f"⚠️  Missing target: {edge['from']} → {edge['to']} ({edge['type']})")
+            warnings.append(f"[WARN] Missing target: {edge['from']} -> {edge['to']} ({edge['type']})")
 
     # ── Stats ─────────────────────────────────────────────
     by_type = {}
@@ -185,14 +185,14 @@ def main():
             for w in graph["warnings"]:
                 print(w)
             sys.exit(1)
-        print("✅ Graph integrity check passed.")
+        print("[OK] Graph integrity check passed.")
         return
 
     # Write
     GRAPH_DIR.mkdir(parents=True, exist_ok=True)
     GRAPH_FILE.write_text(json.dumps(graph, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
-    print(f"✅ Graph built: {graph['stats']['total_nodes']} nodes, {graph['stats']['total_edges']} edges")
+    print(f"[OK] Graph built: {graph['stats']['total_nodes']} nodes, {graph['stats']['total_edges']} edges")
     if graph["warnings"]:
         for w in graph["warnings"]:
             print(w)

@@ -50,7 +50,7 @@
 
 ### 架构决策
 
-[关键决策简述，详细 ADR 见 docs/DECISIONS.md]
+[关键决策简述，详细 ADR 见当前 Workspace 的 ADR-NNN.md；归档后见 docs/knowledge/decisions/]
 ```
 
 ### 3. 模块划分

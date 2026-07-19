@@ -143,11 +143,11 @@
 **任何技术决策、架构变更、踩坑经验，必须立即写入对应的文档。**
 
 - 架构变更 → `docs/ARCHITECTURE.md`
-- 技术选型 → `docs/DECISIONS.md`（ADR 格式）
-- 踩坑 → `docs/PITFALLS.md`
-- 新术语 → `docs/GLOSSARY.md`
+- 技术选型 → 当前 Workspace 的 `ADR-NNN.md`；归档后进入 `docs/knowledge/decisions/`
+- 踩坑 → 当前 Workspace 的 `BUG-NNN.md`；可复用经验归档到 `docs/knowledge/pitfalls/`
+- 新术语 → `docs/glossary.md`
 - 进度变更 → `docs/PROGRESS.md`
-- 如果 Agent 没有时间写文档 → 先记到 PITFALLS.md 最简版本，Phase 4 补充
+- 如果 Agent 没有时间写完整文档 → 先记到当前 Workspace 的 `BUG-NNN.md`，Phase 6 蒸馏
 
 <SECTION-END:6>
 
@@ -337,7 +337,7 @@ L0 项目循环: backlog → Feature → archive → backlog
 ## 违规处理
 
 Agent 违反铁律时：
-1. **首次违反** → 警告，记录到 PITFALLS.md
+1. **首次违反** → 警告，记录到当前 Workspace 的 `BUG-NNN.md`
 2. **同一 Task 内再次违反** → Task 标记失败，重试
 3. **同一 Plan 内累计 3 次** → block，等待用户介入
 

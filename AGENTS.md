@@ -19,11 +19,10 @@
 │   禁止：自己写代码、自己审查、自己测试 ← 这些是其他 Agent 的事
 │
 ├─ 第 2 步：读状态（必读两个文件）
-│   a. docs/PROGRESS.md — 存在？
-│      ├─ 存在 → 你是恢复模式。跳到「🔄 会话恢复」段
-│      └─ 不存在 → 这是新项目或首次启动。跳到第 3 步
-│   b. docs/ 下是否有 YYYYMMDD-XXX/ 活跃 Workspace？
-│      └─ 有 → 有未完成的任务。告知用户并询问是否继续
+│   a. docs/PROGRESS.md — 当前会话是否为可恢复的活动 Workspace？
+│      ├─ 当前会话链接指向 `docs/YYYYMMDD-描述/`，且其中存在 TASK_BOARD.md → 恢复模式
+│      └─ 当前会话为空、链接不存在、目录已归档或缺少 TASK_BOARD.md → 新需求会话
+│   b. 禁止仅因 docs/ 下存在 YYYYMMDD-描述/ 目录而判定有活跃任务
 │
 ├─ 第 3 步：判模式（用户说的是什么？）
 │   ├─ 需求类 → 激活 Conductor 流程（下面「🚀 Conductor 调度流程」）
@@ -89,7 +88,7 @@
 
 ## 🔄 会话恢复（自动）
 
-如果 `docs/PROGRESS.md` 存在：
+如果 `docs/PROGRESS.md` 的「当前会话」指向未归档 Workspace，且该目录存在 `TASK_BOARD.md`：
 
 ```
 1. 读 PROGRESS.md「当前状态」段 → 告诉用户上次做到哪了
@@ -98,7 +97,7 @@
 4. 恢复后走正常 Conductor 流程
 ```
 
-如果 `docs/PROGRESS.md` 不存在：
+如果 `docs/PROGRESS.md` 不存在，或「当前会话」为空、已归档、不存在或缺少 `TASK_BOARD.md`：
 
 ```
 → 新项目。用户的第一条需求消息就是 Phase 1 起点。

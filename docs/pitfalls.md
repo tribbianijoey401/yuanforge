@@ -1,51 +1,7 @@
-# YuanForge 踩坑记录
+# YuanForge 踩坑索引
 
-> YuanForge 自身开发中踩过的坑。
+> DocsOS 的长期陷阱知识以对象文件保存在 `docs/knowledge/pitfalls/`。本文件仅保留兼容入口，不再承载重复内容。
 
----
-
-## PIT-001: GitHub 中国环境推送 443 超时
-
-- **日期:** 2026-06-28
-- **类型:** 环境
-- **严重程度:** 🔴 阻断
-
-**现象:** `git push` 到 GitHub 持续超时，443 端口被墙。
-
-**原因:** 中国境内 GitHub HTTPS 直连不稳定。
-
-**修复:** 改用 SSH 协议（ed25519 密钥对 → 公钥加到 GitHub → `git remote set-url origin git@github.com:...`）。
-
-**教训:** 在中国境内部署的项目，优先配置 SSH remote。
-
----
-
-## PIT-002: gh-cli 国内下载极慢
-
-- **日期:** 2026-06-28
-- **类型:** 环境
-- **严重程度:** 🟡 绕路
-
-**现象:** `dnf install gh` 下载速度 ~13KB/s，出现 Content-Length mismatch。
-
-**原因:** GitHub 在中国无 CDN。
-
-**修复:** 优先使用阿里云/清华镜像，gh-cli 无缓存时手动下载安装。
-
-**教训:** 国内环境优先配置国内镜像源。
-
----
-
-## PIT-003: docs/ 模板与实际文档混淆
-
-- **日期:** 2026-07-07
-- **类型:** 流程
-- **严重程度:** 🟡 绕路
-
-**现象:** docs/ 文件既是 YuanForge 自身文档又是给项目复制的模板，内容混乱。
-
-**原因:** 设计时未区分「框架自身文档」和「项目模板」。
-
-**修复:** 模板并入 `.yuan/docs/` 规格书，docs/ 改为会话文件夹结构。
-
-**教训:** 框架自身的文档和给用户复制的模板必须分开放。
+- [PIT-001：GitHub 中国环境推送 443 超时](./knowledge/pitfalls/PIT-001-github-ssh.md)
+- [PIT-002：gh-cli 国内下载极慢](./knowledge/pitfalls/PIT-002-gh-cli-mirror.md)
+- [PIT-003：Docs 模板与实际文档混淆](./knowledge/pitfalls/PIT-003-docs-template-separation.md)

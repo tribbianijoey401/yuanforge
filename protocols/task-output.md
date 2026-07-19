@@ -26,7 +26,7 @@ git commit -m "feat(task-NNN): <标题>"
 
 ### 3. 踩坑记录
 
-如有，追加到 `docs/PITFALLS.md`：
+如有，在当前 Workspace 创建或更新 `BUG-NNN.md`；会复用的经验在会话关闭时蒸馏到 `docs/knowledge/pitfalls/`：
 
 ```markdown
 ### PIT-NNN: FastAPI middleware 顺序问题

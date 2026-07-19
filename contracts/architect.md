@@ -100,7 +100,7 @@ Plan 写入 `docs/YYYYMMDD-描述/PLAN.md`，含完整 Dispatch Table。
 - ❌ 写实现代码
 - ❌ 跳过 Plan 直接开写
 - ❌ 做模糊设计（"到时候再说"）
-- ❌ 代替用户做重大技术决策（有分歧用 clarify）
+- ❌ 代替用户做重大技术决策（有分歧时通过当前平台的澄清方式确认）
 - ❌ Dispatch Table 缺 Task（Conductor 无法调度）
 
 ## 防御性指令
