@@ -75,6 +75,7 @@ while true:
 | 风险标签 | Product Analyst 产出 | P0/P1/P2 → 决定 Security Auditor 投入 |
 | 知识注入 | `knowledge-injection` Skill | 派发前匹配 Pitfall 并注入 context |
 | 图谱查询 | `graph-query` Skill | 派发前查询相关知识依赖 |
+| 档位分级 | NF-03 | 决定审查深度（轻量/标准/完整） |
 
 ---
 
@@ -133,6 +134,20 @@ Loop 每轮最后必须判断以下 7 个条件，任一成立立即退出：
 ---
 
 ## 三级派发决策
+
+### 档位分级（← NF-03 吸收）
+
+Conductor 根据任务重要程度决定审查深度：
+
+| 档位 | 触发条件 | 审查深度 | 示例 |
+|------|---------|---------|------|
+| 🟢 轻量 | 低风险、内部工具、原型验证 | 仅 Spec Reviewer + Tester | 前端样式调整、文档更新 |
+| 🟡 标准 | 常规功能、中等风险 | 四审查官并行（Quality/UX 可跳过） | 常规 API 端点、数据库迁移 |
+| 🔴 完整 | 高敏、核心链路、对外服务 | 四审查官全量 + 规则链审计(NF-08) | 支付、认证、数据导出、用户可见界面 |
+
+**档位判定权**：Conductor 在 Phase 1 阶段由 Product Analyst 初步打标，Architect 确认。Phase 2 后若发现风险升级，Conductor 可动态提升档位。
+
+### 三级派发决策
 
 Conductor 的核心行为是一个事件循环，不是一次性表格。每次迭代重新读状态、重新决策。
 

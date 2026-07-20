@@ -32,7 +32,24 @@ version: 2.0.0
 1. **Agent 首次加载 = 完整继任** — 读完 Memory 后能无缝继续开发
 2. **上下文压缩友好** — 每份文档都紧凑可扫描，不依赖大段文本
 3. **进度驱动** — PROGRESS.md 是王，任何 Agent 先读它
-4. **坑即知识** — Workspace 的 BUG 记录经蒸馏进入 `docs/knowledge/pitfalls/`，成为学习回环的输入
+4. **坑即知识** — PITFALLS.md 把踩坑经验结构化，是学习回环的输入
+5. **记忆边界控制（← NF-16 吸收）** — 人工维护记忆可写 / 生成记忆只读。Agent 首次加载 = 完整继任 — 读完 Memory 后能无缝继续开发
+
+---
+
+## 记忆边界控制（← NF-16 吸收）
+
+| 记忆类型 | 可写方 | 验证 | 示例 |
+|---------|--------|------|------|
+| 人工维护记忆 | Agent 直接写 | 无 | PROGRESS.md, ARCHITECTURE.md |
+| 生成记忆 | 只读（由 Conductor 蒸馏） | Promotion Pipeline | knowledge/features/FEAT-NNN.md |
+| 快照记忆 | 只读（不可修改，只能追加） | verified_commit | knowledge/features/ 快照 |
+| 偏好记忆 | 平台 memory 工具 | 不在此体系 | 语言偏好、回复风格 |
+
+**铁律**：
+- 生成记忆（knowledge/）只能由 Promotion Pipeline 写入，Agent 不得直接修改
+- 快照记忆一旦写入不可修改，只能追加新快照或标记 deprecated
+- 偏好记忆不归本体系管理，交给平台自己的 memory/配置工具
 
 ---
 

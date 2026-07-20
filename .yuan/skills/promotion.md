@@ -259,7 +259,23 @@ Conductor 定期检查 reject.log，处理需要人工判断的拒绝项。
 
 ---
 
-## 九、与现有规格书的关系
+## 九、NF-09 变更路由（← 吸收）
+
+Promotion Pipeline 合并知识时，必须考虑变更对知识面的影响：
+
+| 变更类型 | 影响知识面 | 处理 |
+|---------|-----------|------|
+| 新增 feature | features/ + ARCHITECTURE.md | 直接 distill |
+| API 变更 | features/ + API docs + INDEX.md | 同步更新所有引用 |
+| 数据模型变更 | features/ + ARCHITECTURE.md + migration docs | 标记旧 schema deprecated |
+| 依赖变更 | setup docs + knowledge/features/ | 更新 depends 链 |
+| 规则/合约变更 | rules/ + contracts/ | 同步验证引用 |
+| 配置变更 | SETUP.md + knowledge/features/ | 记录变更前后对比 |
+| 测试策略变更 | knowledge/pitfalls/ + testing docs | 更新测试覆盖率 |
+| 文档格式变更 | 所有 docs 的格式一致性 | 全量扫描 |
+| 生命周期变更 | knowledge/ 状态机 | 检查状态合法性 |
+
+## 十、与现有规格书的关系
 
 | 规格书 | 关联 |
 |--------|------|
@@ -268,3 +284,4 @@ Conductor 定期检查 reject.log，处理需要人工判断的拒绝项。
 | PROPOSAL.md | Proposal 生命周期和格式 |
 | SESSION.md | Workspace Close 触发 Promotion Pipeline |
 | EVENTS.md | Pipeline 产出 KNOWLEDGE_UPDATED 事件 |
+| verification-policy.md | 晋升前必须完成六维验证（NF-02）+ 证据层级（NF-10） |

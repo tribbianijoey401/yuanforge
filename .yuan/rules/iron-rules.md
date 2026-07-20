@@ -101,9 +101,19 @@
 
 <SECTION-END:2>
 
-## 铁律 Ⅲ — 三档审查
+## 铁律 Ⅲ — 三档审查（← NF-03 档位分级吸收）
 
 **每个 Task 完成后，必须经过 4 审查官并行审查：🔴Blocker / 🟡Hard Gate / 🟢Advisory↗。**
+
+### 档位分级
+
+| 档位 | 触发条件 | 审查深度 | 示例 |
+|------|---------|---------|------|
+| 🟢 轻量 | 低风险、内部工具、原型验证 | 仅 Spec Reviewer + Tester | 前端样式调整、文档更新 |
+| 🟡 标准 | 常规功能、中等风险 | 四审查官并行（Quality/UX 可跳过） | 常规 API 端点、数据库迁移 |
+| 🔴 完整 | 高敏、核心链路、对外服务 | 四审查官全量 + 规则链审计 | 支付、认证、数据导出 |
+
+**档位判定权**：Phase 1 由 Product Analyst 初步打标，Architect 确认。Phase 2 后若发现风险升级，Conductor 可动态提升档位。
 
 - **四个审查官同时启动**：Spec Reviewer (🔴) + Security Auditor (🔴) + Quality Auditor (🟢) + UX Reviewer (🟢)
 - Spec Reviewer：对照验收标准 + API 契约，不通过 → Blocker
@@ -333,6 +343,43 @@ L0 项目循环: backlog → Feature → archive → backlog
 **Conductor 不转述。Conductor 只导航。** Agent 顺着指针自己去读原文，不依赖摘要。
 
 <SECTION-END:10>
+
+## 铁律 Ⅺ — 清场前 Gate（← NF-14 吸收）
+
+**清场会销毁复盘和用户复核证据，必须按 9 步顺序执行，不可跳过。**
+
+1. 只读预览待归档/待删除对象
+2. 检查 dirty 文件和 patch equivalence
+3. 向用户完整汇报结果并保留现场
+4. 等待用户在看完汇报后明确确认可以清场
+5. 记录用户确认凭证
+6. 执行授权的清理
+7. 重新运行 workspace audit
+8. 补充汇报清场结果
+9. 检查没有误删仍含唯一改动的 lane
+
+**铁律**：用户最初任务中的"收尾并清理""做完删掉"等预授权**不替代第 4 步**；确认必须发生在完整汇报之后。
+
+<SECTION-END:11>
+
+## 铁律 Ⅻ — 事实面独立验证（← NF-02 吸收）
+
+**知识治理必须覆盖 6 个事实面，每面独立标记状态。**
+
+六面：代码 / 运行态 / 文档 / 规则 / 记忆 / 工作区。
+状态：verified-current / changed-and-verified / pending / out-of-scope / not-applicable。
+
+**铁律**：不要把 git status 干净、PR 已合并或测试通过单独当成「全部同步」。
+
+<SECTION-END:12>
+
+## 铁律 ⅩⅢ — 发布状态机（← NF-12 吸收）
+
+**发布状态必须区分：draft → PR → merged → deployed → live verified → knowledge closed → cleaned。**
+
+跳过的状态必须有项目规则允许的原因。失败停在哪一格，就按那一格汇报。
+
+<SECTION-END:13>
 
 ## 违规处理
 

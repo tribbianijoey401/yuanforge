@@ -59,6 +59,9 @@
 | Ⅷ | 质量门禁 | Phase 2 审查 | 全部审查官 |
 | Ⅸ | 自主调度 | Conductor 每次循环 | Conductor |
 | Ⅹ | 循环收敛 | 审查/修复/Debug | Spec Reviewer, Tester, Dev |
+| Ⅺ | 清场前 Gate | 销毁前必须汇报+用户确认 | Conductor, Doc Engineer |
+| Ⅻ | 事实面独立验证 | 六面独立标记，不靠 git status 代替 | Conductor, Doc Engineer |
+| ⅩⅢ | 发布状态机 | merged ≠ deployed ≠ live verified | Conductor, Doc Engineer |
 
 > **速查表只负责索引，不替代详细规则。** 具体执行时必须等待 Conductor 注入对应铁律的详细内容（见 `.yuan/rules/iron-rules.md` 分段锚点）。
 
@@ -249,7 +252,7 @@
 | .yuan/specs/ | 5 份核心协议 | 按需 |
 | .yuan/docs/ | 文档格式规格书（TASK_BOARD、SESSION 等） | 操作文档时 |
 
-### 十条铁律速查
+### 十三条铁律速查
 
 | # | 铁律 | 一句话 |
 |---|------|--------|
@@ -263,10 +266,15 @@
 | Ⅷ | 质量门禁 | G1→G2(四审查并行)→G3→G4 |
 | Ⅸ | 自主调度 | Conductor 按调度循环自主派发 |
 | Ⅹ | 循环收敛 | 每个循环必须有闸门，不得"直到正确为止" |
+| Ⅺ | 清场前 Gate | 销毁前必须汇报+用户确认 |
+| Ⅻ | 事实面独立验证 | 六面独立标记，不靠 git status 代替 |
+| ⅩⅢ | 发布状态机 | merged ≠ deployed ≠ live verified |
 
 ---
 
 ## 根本原则（最高优先级）
+
+> **优先级链：用户规则 > 项目规则 > Yuan 框架 > Skill（包括 neat-freak）。**
 
 | 原则 | 一句话 |
 |------|--------|

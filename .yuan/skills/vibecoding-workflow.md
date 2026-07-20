@@ -287,19 +287,49 @@ BLOCKER → 🔄返工 → Dev 修复
 
 ## Phase 6: 知识蒸馏（详细）
 
+### 6.0 知识治理（← NF-07 完整路径前置增强）
+
+**Phase 6 蒸馏前必须先完成知识治理。** 加载 `neat-freak` skill 执行：
+
+```
+Phase 5 测试通过
+  │
+  ▼
+┌──────────────────────────────────────────────┐
+│ Phase 6.0: 知识治理（neat-freak 完整路径）   │
+│                                              │
+│ 1. 事实面六维验证（NF-02）                   │
+│    - 代码/运行态/文档/规则/记忆/工作区        │
+│    - 每面标 verified-current/pending/N/A     │
+│ 2. 规则链审计（NF-08 governance.md）         │
+│    - 必备文件/同源/矛盾/死引用/安全红线       │
+│ 3. 变更影响路由（NF-09 sync-matrix.md）      │
+│    - 9 种代码变化→知识面对照表               │
+│ 4. 先减后加地修改（NF §4）                   │
+│    - 删过期/合并重复/压缩过载                │
+│ 5. 记忆边界控制（NF-16 + 本项目 memory.md）  │
+│    - 人工维护记忆可写 / 生成记忆只读          │
+│ 6. 发布状态验证（NF-12 状态机）              │
+│    - 区分 merged/deployed/live verified      │
+│ 7. 标准化汇报（NF-20 模板）                  │
+│    - 影响 → 改动/新建 → 待确认 → 遗留        │
+└────────────────────┬─────────────────────────┘
+```
+
 ### 6.1 Doc Engineer
 
 增量：合入主干时异步更新 API/数据/配置/依赖文档
 阶段：Milestone 结束 → 概览图+索引+一致性检查
 
-### 6.2 Conductor 蒸馏
+### 6.2 Conductor 蒸馏（← NF-09 变更路由吸收）
 
-1. FEATURE.md → knowledge/features/FEAT-NNN.md
-2. ADR → knowledge/decisions/ADR-NNN.md
-3. BUG → 会重复 → knowledge/pitfalls/，一次性 → 留在 archive
-4. 未完成 → workspace/backlog.md
-5. Archive Workspace
-6. 运行 build-graph.py
+1. **CHANGE ROUTE（NF-09）**：根据 6.0 路由结果，识别受影响知识面
+2. FEATURE.md → knowledge/features/FEAT-NNN.md
+3. ADR → knowledge/decisions/ADR-NNN.md
+4. BUG → 会重复 → knowledge/pitfalls/，一次性 → 留在 archive
+5. 未完成 → workspace/backlog.md
+6. Archive Workspace（含 NF-14 清场前 Gate）
+7. 运行 build-graph.py
 
 ### 6.3 回环学习
 
