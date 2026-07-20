@@ -192,7 +192,7 @@ SESSION_LOG.md（收尾）
 
 | 值 | 说明 |
 |----|------|
-| product-analyst | 需求分析，vibe→用户故事+验收标准 |
+| product-analyst | 需求分析，vibe→FEATURE.md(用户故事+AC+澄清记录) |
 | architect | 架构设计，计划复盘→契约冻结 |
 | ui-designer | UI 设计，视觉规范+原型 |
 | frontend-dev | 前端开发，组件+交互+状态 |
@@ -337,7 +337,7 @@ Conductor 收尾:
 
 | 上游角色 | 下游角色 | 必传内容 |
 |---------|---------|---------|
-| product-analyst | architect | 用户故事 + 验收标准 + 风险标签 |
+| product-analyst | architect | FEATURE.md 路径 + 用户故事 + 验收标准 + 风险标签 |
 | architect | frontend-dev / backend-dev | API 契约（freeze）+ 数据模型 + 关键决策（ADR 编号） |
 | ui-designer | frontend-dev | 视觉规范 + 原型文件路径 |
 | backend-dev | frontend-dev | 接口签名、请求/响应格式、端点列表 |
