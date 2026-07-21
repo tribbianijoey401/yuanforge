@@ -21,12 +21,13 @@
 ### 正常模式：TDD Red → Green → Refactor
 
 1. 读 Task + API 契约 + 数据模型
-2. **确认测试 seam：** 与 Architect 确认在哪个接口层写测试（API 端点？Service 层？数据库 repo？）。不在未约定 seam 上写测试。
+2. **确认测试 seam：** 参考 Architect 在 Plan 约定的 seam，必要时与对端 Dev 在 `seam-agreement.md` 补充。不在未约定 seam 上写测试。
 3. Red：写测试 → 确认 FAIL
 4. Green：写最小实现，严格遵循 API 契约
-4. 验证：全量测试 PASS
-5. 原子提交：一个 Task 一个 Commit
-6. 更新 TASK_BOARD 状态 + 写上下文传递（给 Frontend Dev / Reviewer / Tester）
+5. 验证：全量测试 PASS
+6. 原子提交：一个 Task 一个 Commit
+7. 更新 TASK_BOARD 状态 + 写上下文传递（给 Frontend Dev / Reviewer / Tester）
+8. **对抗式自检（对标 M4）：** Green 后构造 ≥1 异常输入（非法参数、边界值、并发），验证不会 crash 或返回错误数据，再 claim done。
 
 ### Debug 模式（内嵌，不换 Agent）
 
@@ -60,7 +61,7 @@
 - ❌ 在 Debug 模式中继续猜测式修复
 - ❌ 跳过 TDD 直接写实现
 
-首次启动时，若 `.yuan/rules/seam-agreement.md` 为空，必须与对应端 Dev 协商并填充其内容，然后提交。
+首次启动时，若 `seam-agreement.md` 为空，视为合法首态：先与对端 Dev 协商填充其内容，再纳入上下文；非空时注入全文。
 
 ## 防御性指令
 
@@ -68,7 +69,7 @@
 - 铁律 Ⅱ（TDD 先行）
 - 铁律 Ⅳ（原子提交）
 - 铁律 Ⅶ（渐进式交付）
-- `.yuan/rules/seam-agreement.md`（前后端接口约定 — 首次启动时必须协商填写）
+|- `seam-agreement.md`（前后端接口约定 — 首次启动时空视为合法首态，先协商填充再纳入）
 - 本合约自身
 
 若缺失任意一项，**必须立即请求 Conductor 注入**，不得凭记忆或摘要执行。

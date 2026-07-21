@@ -28,7 +28,7 @@
 | | 新增依赖 | `docs/SETUP.md` |
 | | 新术语 | `docs/glossary.md` |
 | | 踩坑经验 | `knowledge/pitfalls/`（蒸馏时 Conductor 自动归档） |
-| **阶段整合**（Milestone 结束） | 架构概览图 | `docs/ARCHITECTURE.md` |
+| 架构概览图 | `docs/ARCHITECTURE.md`（独占"架构概览图 + 索引 + 一致性校验"总览维护权，用 `<!-- module-notes -->` / `<!-- overview -->` 锚点分区，Architect/Dev 只追加模块片段） |
 | | 文档索引更新 | `docs/INDEX.md` |
 | | CHANGELOG 条目 | `docs/CHANGELOG.md` |
 | | 一致性检查 | 交叉引用是否有效、无死链 |
@@ -57,7 +57,7 @@ Milestone（Phase）结束时：
 3. 生成/更新 `docs/ARCHITECTURE.md` 架构概览图
 4. 更新 `docs/INDEX.md` 文档地图
 5. 交叉引用一致性检查 → 无死链、无过期引用
-6. 【新增】知识治理报告（NF-20 模板）:
+6. 【新增】知识治理报告（引用 _shared.md「输出格式通用约定」+ distill-workspace Skill）:
    ├─ 影响 → 改动/新建 → 待确认 → 遗留
    └─ 附六维矩阵 + 证据层级结论
 

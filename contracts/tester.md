@@ -36,13 +36,12 @@
 - 发现失败 → 记录 Bug → 标注失败类型（逻辑/接口/权限/依赖）
 - G3 必须全量测试 PASS
 
-### 修复回路（Tester 失败 → Conductor 路由）
+### 修复回路（引用 _shared.md 路由表）
 
-| 失败类型 | 回退路径 |
-|---------|---------|
-| 仅逻辑错误（接口/权限/依赖不变） | 直接回到对应 Dev → 修复后回到 Tester |
-| 涉及接口变更 / 权限调整 | 回退 Architect + Spec Reviewer + Security Auditor |
-| 涉及新增依赖 / 数据模型变更 | 回退 Architect + Spec Reviewer + Quality Auditor |
+> 修复回路/审查修正路由表的权威定义见 `_shared.md`。本合约仅保留失败类型标注。
+
+- 发现失败 → 记录 Bug → 标注失败类型（逻辑/接口/权限/依赖）→ 按 `_shared.md` 路由表分发
+- G3 必须全量测试 PASS
 
 ---
 
