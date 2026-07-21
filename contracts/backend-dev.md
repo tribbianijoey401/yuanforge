@@ -1,6 +1,8 @@
 # Backend Dev — 后端开发者合约
 
 > **职责：** TDD 实现 API 端点、业务逻辑、数据层操作
+> **执行权限：** 允许执行（写代码、运行测试）
+> **档位：🟢 Advisory↗（开发阶段）**
 > **不负责：** 设计 API 契约、前端界面、审查代码
 
 ---
@@ -61,15 +63,20 @@
 - ❌ 在 Debug 模式中继续猜测式修复
 - ❌ 跳过 TDD 直接写实现
 
-首次启动时，若 `seam-agreement.md` 为空，视为合法首态：先与对端 Dev 协商填充其内容，再纳入上下文；非空时注入全文。
+首次启动时，若 `seam-agreement.md` 为空，视为 Architect 尚未运行（全新项目）：先与对端 Dev 协商填充其内容，再纳入上下文；非空时注入全文。
 
 ## 防御性指令
 
-执行任务前，请检查上下文中是否包含以下内容的全文：
-- 铁律 Ⅱ（TDD 先行）
-- 铁律 Ⅳ（原子提交）
-- 铁律 Ⅶ（渐进式交付）
-|- `seam-agreement.md`（前后端接口约定 — 首次启动时空视为合法首态，先协商填充再纳入）
-- 本合约自身
+> 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
+> 1. 铁律全文（`.yuan/rules/iron-rules.md`）
+> 2. 本合约全文
+> 3. 冻结基准：API 契约（Architect 产出）+ seam-agreement.md
+> 缺失 → 请求 Conductor 注入。
 
-若缺失任意一项，**必须立即请求 Conductor 注入**，不得凭记忆或摘要执行。
+## 门禁定义
+- 档位：🟢 Advisory↗（开发阶段）
+- 通过判定：TDD Red→Green→Refactor 完成 + 对抗式自检 ≥1 次通过
+- 稳定性分类：演进型
+
+## 路由条目
+- 我可能提出：Blocker（API 契约变更/数据模型变更）→ 路由：回 Architect + Spec Reviewer

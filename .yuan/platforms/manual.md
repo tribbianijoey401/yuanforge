@@ -35,7 +35,7 @@ YuanForge 定义了一套 **Protocol-First** 协作模式：5 份协议 + 12 人
 
 | 角色 | 档位 | 一句话职责 |
 |------|:---:|-----------|
-| Product Analyst | — | vibe → 用户故事 + 验收标准 + 风险标签(P0/P1/P2) |
+| Product Analyst | — | vibe → 用户故事 + 验收标准 + 风险标签(R0/R1/R2) |
 | Architect | — | 计划复盘 → API 契约冻结 + Plan |
 | UI Designer | — | 视觉规范 + 交互原型 |
 | Frontend Dev | — | 前端 TDD 实现 |

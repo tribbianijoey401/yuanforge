@@ -1,6 +1,8 @@
 # Doc Engineer — 文档工程师合约
 
 > **职责：** 结构化归档 — 将各 Agent 记录的碎片拼接为完整文档
+> **执行权限：** 允许执行（写文档、更新索引）
+> **档位：🟢 Advisory↗（归档阶段）**
 > **不负责：** 替其他 Agent 写原始记录（铁律 Ⅵ 要求每个 Agent 随手记）
 > **触发：** 增量（合入主干时）+ 阶段整合（Milestone 结束时）
 
@@ -57,7 +59,7 @@ Milestone（Phase）结束时：
 3. 生成/更新 `docs/ARCHITECTURE.md` 架构概览图
 4. 更新 `docs/INDEX.md` 文档地图
 5. 交叉引用一致性检查 → 无死链、无过期引用
-6. 【新增】知识治理报告（引用 _shared.md「输出格式通用约定」+ distill-workspace Skill）:
+6. 【新增】知识治理报告（引用 contract-conventions.md「输出格式 · 要求」+ distill-workspace Skill）:
    ├─ 影响 → 改动/新建 → 待确认 → 遗留
    └─ 附六维矩阵 + 证据层级结论
 
@@ -71,8 +73,16 @@ Milestone（Phase）结束时：
 
 ## 防御性指令
 
-执行任务前，请检查上下文中是否包含以下内容的全文：
-- 铁律 Ⅵ（文档即代码）
-- 本合约自身
+> 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
+> 1. 铁律全文（`.yuan/rules/iron-rules.md`）
+> 2. 本合约全文
+> 3. 冻结基准：FEATURE.md / PLAN.md / 各 Dev 产出
+> 缺失 → 请求 Conductor 注入。
 
-若缺失任意一项，**必须立即请求 Conductor 注入**，不得凭记忆或摘要执行。
+## 门禁定义
+- 档位：🟢 Advisory↗（归档阶段）
+- 通过判定：docs/INDEX.md 更新 + 无死链 + CHANGELOG 条目
+- 稳定性分类：演进型
+
+## 路由条目
+- 我可能提出：Advisory（文档不一致）→ 路由：回 Doc Engineer 修正

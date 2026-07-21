@@ -29,7 +29,7 @@ version: 2.0.0
 ```
 1. Dispatch(product-analyst)
    输入: 用户 vibe / 一句话需求
-   产出: 用户故事 + 验收标准 + 风险标签(P0/P1/P2)
+   产出: 用户故事 + 验收标准 + 风险标签(R0/R1/R2)
    → 用户确认
 
 2. Dispatch(architect)

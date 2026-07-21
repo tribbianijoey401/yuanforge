@@ -152,7 +152,7 @@ Action Sequence:
 产出:
   - 用户故事
   - 验收标准（可验证的 checkpoints）
-  - 风险标签（P0=高敏 / P1=标准 / P2=低敏）
+  - 风险标签（R0=高敏 / R1=标准 / R2=低敏）
 
 规则:
   - Product Analyst 必须主动追问模糊点
@@ -228,9 +228,9 @@ Action Sequence:
   - Conductor 不得合并、重排序、跨轴比较
 
 Security Auditor 分级:
-  - P0（高敏）→ 全量审计
-  - P1（标准）→ 关键路径审计
-  - P2（低敏）→ 跳过
+  - R0（高敏）→ 全量审计
+  - R1（标准）→ 关键路径审计
+  - R2（低敏）→ 跳过
 
 Advisory 升级规则:
   - 同模块 🟠 警告 ≥ 3 次 → 强制升级 🔴 Blocker

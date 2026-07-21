@@ -125,7 +125,7 @@ version: "3.0.0"
 | **⏱超时** | ✅ | 分钟数，Architect 覆写默认值 |
 | **产出物** | ✅ | 完成后的产出文件列表，逗号分隔 |
 | **门禁** | ✅ | 该 Task 触发的 Gate：G1 / G2 / G3 / G4 |
-| **风险** | ✅ | Product Analyst 产出：P0/P1/P2，决定 Security Auditor 投入 |
+| **风险** | ✅ | Product Analyst 产出：R0/R1/R2，决定 Security Auditor 投入 |
 
 ### 5. 质量门禁
 

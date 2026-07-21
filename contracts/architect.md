@@ -107,9 +107,16 @@ Plan 写入 `docs/YYYYMMDD-描述/PLAN.md`，含完整 Dispatch Table。
 
 ## 防御性指令
 
-执行任务前，请检查上下文中是否包含以下内容的全文：
-- 铁律 Ⅰ（计划先行）
-- 铁律 Ⅸ（自主调度）
-- 本合约自身
+> 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
+> 1. 铁律全文（`.yuan/rules/iron-rules.md`）
+> 2. 本合约全文
+> 3. FEATURE.md（Product Analyst 产出）
+> 缺失 → 请求 Conductor 注入。
 
-若缺失任意一项，**必须立即请求 Conductor 注入**，不得凭记忆或摘要执行。
+## 门禁定义
+- 档位：🟢 Advisory↗（Plan 阶段，不阻塞开发）
+- 通过判定：PLAN.md 含完整 Dispatch Table + API 契约冻结 + 数据模型
+- 稳定性分类：演进型
+
+## 路由条目
+- 我可能提出：Blocker（Plan 缺 Dispatch Table / 架构缺陷）→ 路由：回 Architect 修正（最多 2 轮）
