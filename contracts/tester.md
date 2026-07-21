@@ -39,7 +39,7 @@
 
 ### 修复回路（引用 dispatch-routing.md 路由表）
 
-> 修复回路/审查修正路由表的权威定义见 `contract-conventions.md`。本合约仅保留失败类型标注。
+> 修复回路/审查修正路由表的权威定义见 `dispatch-routing.md`。本合约仅保留失败类型标注。
 
 - 发现失败 → 记录 Bug → 标注失败类型（逻辑/接口/权限/依赖）→ 按 `dispatch-routing.md` 路由表分发
 - G3 必须全量测试 PASS

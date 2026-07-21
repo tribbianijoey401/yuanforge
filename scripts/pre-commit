@@ -166,13 +166,7 @@ for f in proposal_files:
 # Define required anchors per file
 REQUIRED_ANCHORS = {
     '.yuan/rules/iron-rules.md': [f'<SECTION-END:{i}>' for i in range(1, 11)],
-    'contracts/conductor.md': [
-        '<SECTION-END:conductor-schedule>',
-        '<SECTION-END:conductor-tier>',
-        '<SECTION-END:conductor-forbidden>',
-        '<SECTION-END:conductor-exit>',
-        '<SECTION-END:conductor-session-log>',
-    ],
+    'contracts/conductor.md': [],  # SECTION-END anchors removed (converted to comments), no longer checked
     '.yuan/docs/TASK_BOARD.md': [
         '<SECTION-END:tb-statuses>',
         '<SECTION-END:tb-snapshot>',
@@ -228,6 +222,36 @@ for filepath, required_anchors in REQUIRED_ANCHORS.items():
         sys.exit(1)
     else:
         print(f"  ✓ {filepath}: all {len(required_anchors)} anchors present")
+
+
+# ── Scorecard audit (event-driven, after contract creation/modification) ──
+
+# Check if any contract file was staged
+contract_files = [f for f in staged_files if f.startswith('contracts/') and f.endswith('.md')]
+if contract_files:
+    import re
+    issues = []
+    for cf in contract_files:
+        cp = REPO_ROOT / cf
+        ct = cp.read_text()
+        # P-F: has ## 门禁定义
+        if '## 门禁定义' not in ct:
+            issues.append(f"  {cf}: missing ## 门禁定义")
+        # M6: defensive directive references contract-conventions.md
+        if '## 防御性指令' in ct and 'contract-conventions.md' not in ct:
+            issues.append(f"  {cf}: ## 防御性指令 does not reference contract-conventions.md")
+        # P-C: review roles must have 对抗式审查
+        if 'Reviewer' in cf or cf in ('tester.md', 'quality-auditor.md'):
+            if '## 对抗式审查' not in ct:
+                issues.append(f"  {cf}: missing ## 对抗式审查")
+    
+    if issues:
+        print("⚠️  Scorecard audit findings:")
+        for iss in issues:
+            print(iss)
+        print("  (Non-blocking: <2.5 avg = tech debt tracked in TASK_BOARD)")
+    else:
+        print("  ✓ Scorecard audit: all modified contracts pass structural checks")
 
 # ── All good ───────────────────────────────────────────────────────
 

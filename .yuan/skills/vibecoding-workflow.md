@@ -311,7 +311,7 @@ Phase 5 测试通过
 │    - 人工维护记忆可写 / 生成记忆只读          │
 │ 6. 发布状态验证（NF-12 状态机）              │
 │    - 区分 merged/deployed/live verified      │
-│ 7. 标准化汇报（NF-20 模板）                  │
+│ 7. 标准化汇报（引用 contract-conventions.md「输出格式 · 要求」+ distill-workspace Skill）                  │
 │    - 影响 → 改动/新建 → 待确认 → 遗留        │
 └────────────────────┬─────────────────────────┘
 ```
