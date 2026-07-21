@@ -1,3 +1,11 @@
+---
+name: iron-rules
+description: >
+  十条铁律 + Loop Engineering 四条原则 + 根本原则
+spec_type: rule
+version: "3.0.0"
+---
+
 # YuanForge 铁律
 
 > **铁律不可违反。** Agent 启动时加载本文，所有行为受此约束。

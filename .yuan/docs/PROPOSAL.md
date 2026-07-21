@@ -1,3 +1,11 @@
+---
+name: PROPOSAL
+description: >
+  文档格式规格书：提案事务格式
+spec_type: document-format
+version: "3.0.0"
+---
+
 # PROPOSAL — 提案事务规格书
 
 > 管辖 `docs/proposals/`。Proposal 是 Knowledge 层的写事务——保证原子性和并发安全。

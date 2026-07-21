@@ -1,3 +1,11 @@
+---
+name: ARCHITECTURE
+description: >
+  文档格式规格书：系统架构文档格式
+spec_type: document-format
+version: "3.0.0"
+---
+
 # ARCHITECTURE — 架构文档规格书
 
 > 管辖 docs/ARCHITECTURE.md。系统的设计蓝图。

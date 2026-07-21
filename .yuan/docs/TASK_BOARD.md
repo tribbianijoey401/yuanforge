@@ -1,3 +1,11 @@
+---
+name: TASK_BOARD
+description: >
+  文档格式规格书：多 Agent 任务板
+spec_type: document-format
+version: "3.0.0"
+---
+
 # TASK_BOARD — 多 Agent 共享任务文档规格书
 
 > 管辖每个会话文件夹中的 TASK_BOARD.md。所有 Agent 通过它进行任务沟通和状态同步。
@@ -62,7 +70,7 @@ SESSION_LOG.md（收尾）
 <SECTION-END:tb-statuses>
 ## 任务状态
 
-| ID | 优 | 任务 | 角色 | 依赖 | ⏱超时(分) | 状态 | 产出 | 原因指针 |
+| ID | 优先级 | 任务 | 角色 | 依赖 | ⏱超时(分) | 状态 | 产出 | 原因指针 |
 |----|----|------|------|------|-----------|------|------|---------|
 | T01 | P2 | [任务名] | [product-analyst/architect/ui-designer/frontend-dev/backend-dev/spec-reviewer/security-auditor/quality-auditor/ux-reviewer/tester/doc-engineer] | [-] | [默认见下表] | [状态] | [文件路径] | [→段名#锚点 或 —] |
 

@@ -1,3 +1,11 @@
+---
+name: plan-format
+description: >
+  Plan 工程化格式规范（含 Dispatch Table）
+spec_type: rule
+version: "3.0.0"
+---
+
 # Plan 工程化格式规范
 
 > Plan 不是给人类看的笔记，而是 Agent 军团的**作战指令书**。

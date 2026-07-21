@@ -194,7 +194,7 @@
 8. 读上游产出物文件（按需）
 ```
 
-> Tier 3（角色切换）模式下尤其关键 — Agent 是空上下文进入，必须从文件重建状态。
+> Tier 3（角色切换）模式下尤其关键 — Agent 是空上下文进入，必须从文件重建状态。使用 `role-switch` Skill 执行。
 >
 > **知识注入**：Conductor 派发 Task 时会加载 `knowledge-injection` Skill，自动匹配相关 Pitfall 并注入 context。Agent 看到的摘要已经是最相关的，原文可按需深读。
 

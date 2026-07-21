@@ -1,5 +1,7 @@
 # Action Protocol — 动作协议
 
+> **依赖**: runtime-protocol → state-protocol
+
 > **协议定位**：定义 YuanForge 系统中所有平台必须支持的统一动作。
 > **本协议只定义「动作的语义」。**
 >

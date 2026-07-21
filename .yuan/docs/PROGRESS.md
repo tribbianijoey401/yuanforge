@@ -1,3 +1,11 @@
+---
+name: PROGRESS
+description: >
+  文档格式规格书：进度中枢格式
+spec_type: document-format
+version: "3.0.0"
+---
+
 # PROGRESS — 进度中枢规格书
 
 > 管辖 docs/PROGRESS.md。项目最重要的文件，回答「到哪了？下一步做什么？」

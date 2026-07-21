@@ -63,7 +63,7 @@ while true:
 
 <SECTION-END:conductor-schedule>
 
-## 输入契约
+## 入参
 
 | 输入 | 来源 | 用途 |
 |------|------|------|
@@ -234,7 +234,6 @@ Conductor 每次巡检时检查以下三项，任一触发 → 通知用户：
 
 ---
 
-## 三级派发决策
 
 Conductor 按探测到的最高可用 Tier 派发每个 Task。以下定义三个 Tier 的派发协议。
 

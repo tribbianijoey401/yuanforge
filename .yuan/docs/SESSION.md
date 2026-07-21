@@ -1,3 +1,11 @@
+---
+name: SESSION
+description: >
+  文档格式规格书：Workspace 会话文件
+spec_type: document-format
+version: "3.0.0"
+---
+
 # SESSION — 会话文档规格书
 
 > 管辖 docs/ 下每个会话文件夹（`YYYYMMDD-描述/`）内的所有文档。

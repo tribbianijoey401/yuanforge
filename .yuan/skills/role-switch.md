@@ -1,3 +1,9 @@
+---
+name: role-switch
+description: Tier 3 兜底派发协议 — 当平台无 subagent 也无后台进程时，同一 Agent 内切换 persona 执行任务
+version: "3.0.0"
+---
+
 # Role-Switch Protocol — Tier 3 角色切换
 
 > **这是兜底方案，不是设计目标。** 仅当 Tier 1（subagent）和 Tier 2（后台进程）都不可用时使用。

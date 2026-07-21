@@ -1,3 +1,11 @@
+---
+name: GLOBAL
+description: >
+  文档格式规格书：全局文档与 knowledge/ 格式
+spec_type: document-format
+version: "3.0.0"
+---
+
 # GLOBAL — 全局文档规格书
 
 > 管辖 docs/ 下的全局文档：INDEX.md / SETUP.md / CONVENTIONS.md / glossary.md / knowledge/

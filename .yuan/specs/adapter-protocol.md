@@ -1,5 +1,7 @@
 # Adapter Protocol — 平台适配协议
 
+> **依赖**: runtime-protocol → action-protocol
+
 > **协议定位**：定义每个 Agent 平台如何实现 YuanForge 的 Action。
 > **这是 5 份协议中唯一需要在具体平台上「实现」的协议。**
 >

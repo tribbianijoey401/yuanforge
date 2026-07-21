@@ -1,5 +1,7 @@
 # State Protocol — 状态协议
 
+> **依赖**: runtime-protocol → object-protocol
+
 > **协议定位**：定义对象的状态如何变化。
 > **本协议只定义「什么状态能变成什么状态」。**
 >

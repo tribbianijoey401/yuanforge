@@ -1,3 +1,11 @@
+---
+name: docs-framework
+description: >
+  文档框架规则：docs/ 目录组织与命名规范
+spec_type: rule
+version: "3.0.0"
+---
+
 # docs/ 说明书体系规范
 
 > **YuanForge 项目说明书 v3** — 以会话文件夹组织的结构化知识库。

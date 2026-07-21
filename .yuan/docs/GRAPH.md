@@ -1,3 +1,11 @@
+---
+name: GRAPH
+description: >
+  文档格式规格书：知识图谱格式
+spec_type: document-format
+version: "3.0.0"
+---
+
 # GRAPH — 知识图谱规格书
 
 > 管辖 `docs/graph/index.json`。Graph 是 Build Artifact，从 Knowledge frontmatter 自动构建。

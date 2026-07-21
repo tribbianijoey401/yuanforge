@@ -1,5 +1,13 @@
 ---
 name: seam-agreement
+description: >
+  Seam 预约定：代码合并边界规范
+spec_type: rule
+version: "3.0.0"
+---
+
+---
+name: seam-agreement
 description: 前后端接口契约约定 — 前后端 Dev 共享的唯一真相源。首次使用时由前后端 Dev 协商填写。
 version: 1.0.0
 ---

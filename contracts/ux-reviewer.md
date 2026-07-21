@@ -7,6 +7,19 @@
 
 ---
 
+## 入参
+
+- 上游产出物文件路径
+- 审查目标（Task ID / Session ID）
+- 对应的铁律条款
+
+## 产出
+
+- 审查报告（Markdown）
+- 判定：Pass / Blocker / Advisory
+
+---
+
 ## 审计范围
 
 | 类别 | 检查项 |

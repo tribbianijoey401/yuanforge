@@ -1,3 +1,11 @@
+---
+name: FEATURE
+description: >
+  文档格式规格书：会话特性文件
+spec_type: document-format
+version: "3.0.0"
+---
+
 # FEATURE — 需求规格书
 
 > 管辖每个会话文件夹中的 `FEATURE.md`。Product Analyst 产出，Architect 读取。

@@ -33,7 +33,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parent
 SOURCE_ROOT = SCRIPT_DIR.parent
 
-FRAMEWORK_VERSION = "2.7.0"
+FRAMEWORK_VERSION = "3.0.0"
 
 # ── 框架子目录（粒度化，区分框架数据 vs 项目数据）──
 # 框架数据 — 从源完全同步（增/改/删）

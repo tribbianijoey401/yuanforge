@@ -1,5 +1,7 @@
 # Runtime Protocol — 运行时层协议
 
+> **依赖**: workflow-protocol
+
 > **协议定位**：定义 YuanForge 的运行时层——如何让系统持续稳定推进。
 > **Runtime 是框架的发动机。** 包含 Task、Loop、Checkpoint、Event 四个核心对象。
 >

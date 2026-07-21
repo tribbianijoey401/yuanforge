@@ -1,3 +1,11 @@
+---
+name: EVENTS
+description: >
+  文档格式规格书：事件存储格式
+spec_type: document-format
+version: "3.0.0"
+---
+
 # EVENTS — 事件存储规格书
 
 > 管辖 `docs/events/`。事件是不可变的事实记录，JSONL 格式，Append Only。
