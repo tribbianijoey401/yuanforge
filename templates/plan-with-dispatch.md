@@ -74,9 +74,9 @@ Conductor 请按以下方案调度 Agent：
 |---------|----|------|------|---------|-------|--------|------|------|
 | task-001 | P0 | 需求澄清 | product-analyst | - | 30 | `docs/[会话]/` | G1 | — |
 | task-002 | P0 | 架构设计 | architect | task-001 | 120 | `docs/[会话]/PLAN.md` | G1 | — |
-| task-003 | P1 | 数据模型 | backend-dev | task-002 | 30 | `src/models/x.py, tests/` | G2 | [P0/P1] |
-| task-004 | P1 | API 实现 | backend-dev | task-003 | 30 | `src/api/x.py, tests/` | G2 | [P0/P1] |
-| task-005 | P1 | 前端实现 | frontend-dev | task-002 | 30 | `src/ui/X.tsx, tests/` | G2 | [P0/P1] |
+| task-003 | P1 | 数据模型 | backend-dev | task-002 | 30 | `src/models/x.py, tests/` | G2 | [R0/R1] |
+| task-004 | P1 | API 实现 | backend-dev | task-003 | 30 | `src/api/x.py, tests/` | G2 | [R0/R1] |
+| task-005 | P1 | 前端实现 | frontend-dev | task-002 | 30 | `src/ui/X.tsx, tests/` | G2 | [R0/R1] |
 | task-006 | P1 | 集成测试 | tester | task-004,task-005 | 20 | `tests/integration/` | G3 | — |
 | task-007 | P2 | 文档归档 | doc-engineer | task-006 | 10 | `docs/CHANGELOG.md` | G4 | — |
 

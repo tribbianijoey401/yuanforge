@@ -70,9 +70,9 @@ SESSION_LOG.md（收尾）
 <SECTION-END:tb-statuses>
 ## 任务状态
 
-| ID | 优先级 | 任务 | 角色 | 依赖 | ⏱超时(分) | 状态 | 产出 | 原因指针 |
-|----|----|------|------|------|-----------|------|------|---------|
-| T01 | P2 | [任务名] | [product-analyst/architect/ui-designer/frontend-dev/backend-dev/spec-reviewer/security-auditor/quality-auditor/ux-reviewer/tester/doc-engineer] | [-] | [默认见下表] | [状态] | [文件路径] | [→段名#锚点 或 —] |
+| ID | 优先级 | 风险 | 任务 | 角色 | 依赖 | ⏱超时(分) | 状态 | 产出 | 原因指针 |
+|----|----|----|------|------|------|-----------|------|------|---------|
+| T01 | P2 | R2 | [任务名] | [product-analyst/architect/ui-designer/frontend-dev/backend-dev/spec-reviewer/security-auditor/quality-auditor/ux-reviewer/tester/doc-engineer] | [-] | [默认见下表] | [状态] | [文件路径] | [→段名#锚点 或 —] |
 
 > **原因指针：** Agent 启动时顺着指针读取 docs/ 中的原始证据，自行理解"为什么在这个状态、该做什么"。Conductor 只导航，不转述。取值规则见 State Protocol「十一、原因指针」。
 
@@ -99,9 +99,13 @@ SESSION_LOG.md（收尾）
 <SECTION-END:tb-context>
 ## 上下文传递
 
-| 从 | 到 | 摘要 | 传递内容 |
-|----|-----|------|---------|
-| [T-ID] | [T-ID 列表] | [1-2句精华] | [下游需要知道的关键信息] |
+> 格式要求：每行必须包含以下字段，Agent 可通过 grep 精确匹配。
+
+| 时间戳 | 从 | 到 | 摘要 | 传递内容 |
+|--------|-----|------|------|---------|
+| [HH:MM] | [T-ID] | [T-ID 列表] | [1-2句精华] | `[file_path]` + 关键信息（接口签名/文件路径/待办事项） |
+
+> **传递内容规范**：必须包含至少一个文件路径引用（如 `` `src/api/auth.py` ``），方便下游 Agent 精确定位上游产出物。
 
 <SECTION-END:tb-82>
 
@@ -206,7 +210,7 @@ SESSION_LOG.md（收尾）
 | frontend-dev | 前端开发，组件+交互+状态 |
 | backend-dev | 后端开发，API+逻辑+数据层 |
 | spec-reviewer | 规范审计，Blocker 级 |
-| security-auditor | 安全审计，P0/P1/P2 分级 |
+| security-auditor | 安全审计，R0/R1/R2 分级 |
 | quality-auditor | 质量审计，DB+性能合并，Advisory |
 | ux-reviewer | 体验审计，还原度+无障碍，Advisory |
 | tester | 测试，Hard Gate |
@@ -289,7 +293,7 @@ Conductor 巡检（持续）:
   ▼
 质量层 4 审查官并行:
   ├── Spec Reviewer: 🔴 Blocker，对照验收标准+API契约
-  ├── Security Auditor: 🔴 Blocker，按 P0/P1/P2 分级
+  ├── Security Auditor: 🔴 Blocker，按 R0/R1/R2 分级
   ├── Quality Auditor: 🟢 Advisory，DB+性能，🟠 ≥3→升级
   └── UX Reviewer: 🟢 Advisory，还原度，有界面时触发
       任意 Blocker → 通知其他审查官暂停 → 解决后断点恢复
@@ -461,7 +465,7 @@ Conductor 定期巡检 TASK_BOARD，检查所有 `🔨进行中` 的任务：
 | frontend-dev | 30 | 一个 Task 不应超过半小时 |
 | backend-dev | 30 | 一个 Task 不应超过半小时 |
 | spec-reviewer | 15 | 对照验收标准审查 |
-| security-auditor | 30 | P0 全量审计需时间 |
+| security-auditor | 30 | R0 全量审计需时间 |
 | quality-auditor | 20 | DB+性能检查 |
 | ux-reviewer | 15 | 对比原型审查 |
 | tester | 20 | 测试执行 + 分析 |

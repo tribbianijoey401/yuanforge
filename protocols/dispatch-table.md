@@ -19,7 +19,7 @@ task:
   timeout_minutes: 30
   output: ["src/auth/refresh.py", "tests/auth/test_refresh.py"]
   gate: "G2"
-  risk: "P1"
+   risk: "R1"
   acceptance_criteria:
     - "refresh token 必须轮转"
     - "旧 token 必须在刷新后失效"
@@ -40,7 +40,7 @@ task:
 | `timeout_minutes` | int | ✅ | 超时分钟数 |
 | `output` | array | ✅ | 预期产出文件路径 |
 | `gate` | enum | ✅ | G1/G2/G3/G4 |
-| `risk` | enum | — | P0/P1/P2（Product Analyst 产出） |
+| `risk` | enum | — | R0/R1/R2（Product Analyst 产出） |
 | `acceptance_criteria` | array | — | 验收标准 |
 | `context.required_knowledge` | array | — | 派发时注入的 Knowledge ID |
 | `context.input_from` | array | — | 上游 Task ID（上下文来源） |
