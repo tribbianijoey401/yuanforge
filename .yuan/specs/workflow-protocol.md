@@ -58,7 +58,7 @@ Phase 5: Promote（知识蒸馏）
 
 ## 二、Gate 命名对照表
 
-> **质量门禁（方法层）** 由本协议定义，编号 **QG1–QG4**（四级），代表阶段间的质量状态。
+> **质量门禁（方法层）** 由本协议定义，编号 **G1–G4**（四级），代表阶段间的质量状态。
 > **Human Gate（控制流）** 由本协议 `§十.2` 定义，编号 **HG1–HG4**，代表用户参与的关键决策点。
 > 两者语义正交，运行时不可混淆。
 
@@ -66,15 +66,15 @@ Phase 5: Promote（知识蒸馏）
 |------|------|--------|------|----------|
 | **HG1** | Human Gate | Phase 1 结束 | 需求确认（用户故事 + 验收标准） | workflow-protocol.md §十.2 |
 | **HG2** | Human Gate | Phase 2 结束 | 计划确认（Plan + API 契约） | workflow-protocol.md §十.2 |
-| **QG1** | 质量门禁 | Phase 2 结束 | Plan 确认 + API 契约 freeze + Dispatch Table 完整 | 本协议 |
-| **QG1.5** | 质量门禁 | Phase 2.5 结束 | API 契约 + 数据模型 + 架构设计审查通过 | 本协议 |
-| **QG2** | 质量门禁 | Phase 3 结束 | 四个审查官并行审查完成，所有 🔴 Blocker 已解决 | 本协议 |
+| **G1** | 质量门禁 | Phase 2 结束 | Plan 确认 + API 契约 freeze + Dispatch Table 完整 | 本协议 |
+| **G1.5** | 质量门禁 | Phase 2.5 结束 | API 契约 + 数据模型 + 架构设计审查通过 | 本协议 |
+| **G2** | 质量门禁 | Phase 3 结束 | 四个审查官并行审查完成，所有 🔴 Blocker 已解决 | 本协议 |
 | **HG3** | Human Gate | 高危操作时 | 用户显式授权（删库/部署/清空） | workflow-protocol.md §十.2 |
-| **QG3** | 质量门禁 | Phase 4 结束 | 全量测试 PASS + 所有 Blocker 已解决 + Security 通过 | 本协议 |
+| **G3** | 质量门禁 | Phase 4 结束 | 全量测试 PASS + 所有 Blocker 已解决 + Security 通过 | 本协议 |
 | **HG4** | Human Gate | 所有 Task 终态 | 目标完成（用户决定是否继续） | workflow-protocol.md §十.2 |
-| **QG4** | 质量门禁 | Phase 5 结束 | 蒸馏提取 + Workspace 归档 + Graph 重建 | 本协议 |
+| **G4** | 质量门禁 | Phase 5 结束 | 蒸馏提取 + Workspace 归档 + Graph 重建 | 本协议 |
 
-> **四级质量门禁说明：** 质量门禁为四级（QG1 → QG1.5 → QG2 → QG3 → QG4），对应五个阶段关口。其中 QG1.5 为 Design Gate（架构审查），QG2 为 Task Gate（四审查官并行），三者缺一不可。详见 `.yuan/rules/iron-rules.md` 铁律 Ⅷ。
+> **四级质量门禁说明：** 质量门禁为四级（G1 → G1.5 → G2 → G3 → G4），对应五个阶段关口。其中 G1.5 为 Design Gate（架构审查），G2 为 Task Gate（四审查官并行），三者缺一不可。详见 `.yuan/rules/iron-rules.md` 铁律 Ⅷ。
 
 ---
 
@@ -194,7 +194,7 @@ Action Sequence:
   4. [有界面时] Dispatch(ui-designer) — 与 Architect 并行
      产出: 视觉规范 + 交互原型
 
-Gate QG1:
+Gate G1:
   - 用户确认 Plan ✓
   - API 契约已 freeze
   - Dispatch Table 完整（每个 Task 有 role/depends/output）
@@ -210,7 +210,7 @@ Gate QG1:
 
 ```
 输入: API 契约 + Plan
-触发: Phase 2 Gate QG1 通过后
+触发: Phase 2 Gate G1 通过后
 
 Action Sequence:
   1. Conductor 初始化 TASK_BOARD（从 Dispatch Table）
@@ -263,7 +263,7 @@ Action Sequence:
   1. Dispatch(tester)
   2. [🟡 Hard Gate] 全量测试必须 PASS
 
-Gate QG3:
+Gate G3:
   - 全量测试 PASS ✓
   - 所有 🔴 Blocker 已解决 ✓
   - Security 已通过 ✓
@@ -280,7 +280,7 @@ Gate QG3:
 
 ```
 输入: 所有 Task 终态 + 测试全绿
-触发: Phase 4 Gate QG3 通过后
+触发: Phase 4 Gate G3 通过后
 
 Action Sequence:
   1. Promote(workspace_id)
@@ -292,7 +292,7 @@ Action Sequence:
      - Workspace 目录 → archive/
   3. 重建 Graph（python scripts/build-graph.py）
 
-Gate QG4:
+Gate G4:
   - 所有可蒸馏内容已提取 ✓
   - Workspace 已归档 ✓
   - Graph 已重建 ✓
@@ -556,7 +556,7 @@ Conductor 持续巡检:
 ```
 Gate = {
   kind: "quality" | "human",    // 闸门类型
-  id: string,                    // 编号（G1/QG1/HG1 等）
+  id: string,                    // 编号（G1/G1/HG1 等）
   trigger: string,               // 触发条件
   pass_condition: string,        // 通过条件
   fail_action: string,           // 失败动作

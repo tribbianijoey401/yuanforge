@@ -19,7 +19,7 @@ Runtime 层回答的问题：
   为什么以后还能继续？（Checkpoint 恢复）
 
 Runtime 层不回答的问题：
-  为什么做？（Goal Protocol — 意图层）
+  为什么做？（Object Protocol §五 — Goal 定义/意图层）
   怎么做？（Workflow Protocol — 方法层）
   在什么平台上跑？（Adapter Protocol — 执行层）
 ```
@@ -159,8 +159,7 @@ ACTIVE → VERIFIED_FALSE → DISTILLED → ARCHIVED
 
 | 协议 | 依赖方式 |
 |------|---------|
-| Goal Protocol | Runtime 层服务于 Goal 层定义的意图 |
-| Object Protocol | Runtime 操作的对象（Task/Event/Checkpoint）由 Object Protocol 定义 |
+| Object Protocol | Runtime 操作的对象（Task/Event/Checkpoint）及 Goal 定义由 Object Protocol 定义 |
 | State Protocol | Runtime 的状态转换由 State Protocol 定义 |
 | Action Protocol | Runtime 的 DISPATCH/WAIT/DIGEST 使用 Action Protocol 定义的 8 个标准动作 |
 | Workflow Protocol | Runtime 的 Loop 由 Workflow 的 Phase 驱动 |

@@ -24,7 +24,7 @@ version: "3.0.0"
 | Ⅴ | 上下文隔离 | 每个 Task 全新 Subagent |
 | Ⅵ | 文档即代码 | 决策落文档 |
 | Ⅶ | 渐进式交付 | 每步可运行 |
-| Ⅷ | 质量门禁 | QG1→QG1.5→QG2(四审查并行)→QG3→QG4 |
+| Ⅷ | 质量门禁 | G1→G1.5→G2(四审查并行)→G3→G4 |
 | Ⅸ | 自主调度 | Conductor 按调度循环自主派发 |
 | Ⅹ | 循环收敛 | 每个循环必须有闸门，不得"直到正确为止" |
 
@@ -185,18 +185,18 @@ version: "3.0.0"
 **四个 Gates 依次通过，不跳闸、不倒灌。**
 
 ```
-Phase 1 ── QG1 ──→ Phase 2 ── QG1.5 ──→ Phase 2.5 ── QG2 ──→ Phase 3 ── QG3 ──→ Phase 4 ── QG4 ──→ 交付
+Phase 1 ── G1 ──→ Phase 2 ── G1.5 ──→ Phase 2.5 ── G2 ──→ Phase 3 ── G3 ──→ Phase 4 ── G4 ──→ 交付
 ```
 
 | || Gate | 检查内容 | 通过标准 | 不通过动作 ||
 |------|---------|---------|-----------||
-| **QG1** Plan Gate | Plan 完整 + 用户确认设计理解书 | Architect 反向输出设计理解书 → 用户确认 | 返回 Architect 修正 ||
-| **QG1.5** Design Gate 🆕 | API 契约 + 数据模型 + 架构设计审查 | Design Reviewer 输出审查报告，🔴 Blocker 全部解决 | 打回 Architect 修正（最多 2 轮），2 轮不通过 → 通知用户人工决策 ||
-| **QG2** Task Gate | 四个审查官并行审查 | 🔴 Blocker 全部解决 + 🟡 Tester 全绿 | 打回对应 Dev 修复→重审 ||
-| **QG3** Integration Gate | 全量测试 PASS、集成环境可运行 | `pytest tests/ -q` 全绿 | 定位→修复→重跑 ||
-| **QG4** Release Gate | 文档齐全、Doc Engineer 归档完成 | 所有检查项 ✅ | 修复缺失项 ||
+| **G1** Plan Gate | Plan 完整 + 用户确认设计理解书 | Architect 反向输出设计理解书 → 用户确认 | 返回 Architect 修正 ||
+| **G1.5** Design Gate 🆕 | API 契约 + 数据模型 + 架构设计审查 | Design Reviewer 输出审查报告，🔴 Blocker 全部解决 | 打回 Architect 修正（最多 2 轮），2 轮不通过 → 通知用户人工决策 ||
+| **G2** Task Gate | 四个审查官并行审查 | 🔴 Blocker 全部解决 + 🟡 Tester 全绿 | 打回对应 Dev 修复→重审 ||
+| **G3** Integration Gate | 全量测试 PASS、集成环境可运行 | `pytest tests/ -q` 全绿 | 定位→修复→重跑 ||
+| **G4** Release Gate | 文档齐全、Doc Engineer 归档完成 | 所有检查项 ✅ | 修复缺失项 ||
 
-### QG2 审查三档 + 并行规则
+### G2 审查三档 + 并行规则
 
 ```
                     ┌── Spec Reviewer ──→ 🔴 Blocker (必须解决)
@@ -272,7 +272,7 @@ Conductor 依据 Product Analyst 的风险标签决定：
    - **禁止在 Tier 1/2 可用时降级到 Tier 3**
 5. **循环收敛** — 每个重复执行的操作有闸门限制（见铁律 Ⅹ）
 6. **自动流转** — Task 完成后，Conductor 检查是否有新的 ready Task，有则立即派发
-7. **Gates 不跳** — 所有 Task 完成后，Conductor 触发 QG3 集成测试 → QG4 归档
+7. **Gates 不跳** — 所有 Task 完成后，Conductor 触发 G3 集成测试 → G4 归档
 
 ### Conductor 禁止事项
 
