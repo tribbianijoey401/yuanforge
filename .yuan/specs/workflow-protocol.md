@@ -1,7 +1,5 @@
 # Workflow Protocol — 工作流协议
 
-> **依赖**: goal-protocol
-
 > **协议定位**：定义 YuanForge 的软件开发流程——项目从用户需求到交付的完整阶段。
 > **本协议只定义「下一步应该做什么」。**
 >
@@ -37,11 +35,11 @@ Discover → Plan → Build → Verify → Promote
 ```
 Phase 1: Discover（需求澄清）
   │  Product Analyst 多轮追问 → 用户故事 + 验收标准 + 风险标签
-  │  [G1: 需求确认 Human Gate]
+  │  [HG1: 需求确认 Human Gate]
   ▼
 Phase 2: Plan（方案设计）
   │  Architect 设计理解书 → 用户确认 → API 契约冻结 + Plan
-  │  [G2: 计划确认 Human Gate]
+  │  [HG2: 计划确认 Human Gate]
   ▼
 Phase 3: Build（开发实现）
   │  Conductor 驱动 Loop 完成所有 Task
@@ -53,8 +51,30 @@ Phase 4: Verify（质量验证）
   ▼
 Phase 5: Promote（知识蒸馏）
   │  Workspace Close → Promote → Archive → 输出 Loop Metrics
-  │  [G4: 目标完成 Human Gate]
+  │  [HG4: 目标完成 Human Gate]
 ```
+
+---
+
+## 二、Gate 命名对照表
+
+> **质量门禁（方法层）** 由本协议定义，编号 **QG1–QG4**（四级），代表阶段间的质量状态。
+> **Human Gate（控制流）** 由本协议 `§十.2` 定义，编号 **HG1–HG4**，代表用户参与的关键决策点。
+> 两者语义正交，运行时不可混淆。
+
+| 编号 | 类型 | 触发点 | 含义 | 所属协议 |
+|------|------|--------|------|----------|
+| **HG1** | Human Gate | Phase 1 结束 | 需求确认（用户故事 + 验收标准） | workflow-protocol.md §十.2 |
+| **HG2** | Human Gate | Phase 2 结束 | 计划确认（Plan + API 契约） | workflow-protocol.md §十.2 |
+| **QG1** | 质量门禁 | Phase 2 结束 | Plan 确认 + API 契约 freeze + Dispatch Table 完整 | 本协议 |
+| **QG1.5** | 质量门禁 | Phase 2.5 结束 | API 契约 + 数据模型 + 架构设计审查通过 | 本协议 |
+| **QG2** | 质量门禁 | Phase 3 结束 | 四个审查官并行审查完成，所有 🔴 Blocker 已解决 | 本协议 |
+| **HG3** | Human Gate | 高危操作时 | 用户显式授权（删库/部署/清空） | workflow-protocol.md §十.2 |
+| **QG3** | 质量门禁 | Phase 4 结束 | 全量测试 PASS + 所有 Blocker 已解决 + Security 通过 | 本协议 |
+| **HG4** | Human Gate | 所有 Task 终态 | 目标完成（用户决定是否继续） | workflow-protocol.md §十.2 |
+| **QG4** | 质量门禁 | Phase 5 结束 | 蒸馏提取 + Workspace 归档 + Graph 重建 | 本协议 |
+
+> **四级质量门禁说明：** 质量门禁为四级（QG1 → QG1.5 → QG2 → QG3 → QG4），对应五个阶段关口。其中 QG1.5 为 Design Gate（架构审查），QG2 为 Task Gate（四审查官并行），三者缺一不可。详见 `.yuan/rules/iron-rules.md` 铁律 Ⅷ。
 
 ---
 
@@ -174,7 +194,7 @@ Action Sequence:
   4. [有界面时] Dispatch(ui-designer) — 与 Architect 并行
      产出: 视觉规范 + 交互原型
 
-Gate G1:
+Gate QG1:
   - 用户确认 Plan ✓
   - API 契约已 freeze
   - Dispatch Table 完整（每个 Task 有 role/depends/output）
@@ -190,7 +210,7 @@ Gate G1:
 
 ```
 输入: API 契约 + Plan
-触发: Phase 2 Gate G1 通过后
+触发: Phase 2 Gate QG1 通过后
 
 Action Sequence:
   1. Conductor 初始化 TASK_BOARD（从 Dispatch Table）
@@ -243,7 +263,7 @@ Action Sequence:
   1. Dispatch(tester)
   2. [🟡 Hard Gate] 全量测试必须 PASS
 
-Gate G3:
+Gate QG3:
   - 全量测试 PASS ✓
   - 所有 🔴 Blocker 已解决 ✓
   - Security 已通过 ✓
@@ -260,7 +280,7 @@ Gate G3:
 
 ```
 输入: 所有 Task 终态 + 测试全绿
-触发: Phase 5 Gate G3 通过后
+触发: Phase 4 Gate QG3 通过后
 
 Action Sequence:
   1. Promote(workspace_id)
@@ -272,7 +292,7 @@ Action Sequence:
      - Workspace 目录 → archive/
   3. 重建 Graph（python scripts/build-graph.py）
 
-Gate G4:
+Gate QG4:
   - 所有可蒸馏内容已提取 ✓
   - Workspace 已归档 ✓
   - Graph 已重建 ✓
@@ -523,3 +543,51 @@ Conductor 持续巡检:
 | State Protocol | Workflow 通过 Action 触发状态转换 |
 | Action Protocol | Workflow 产生 Action → Adapter 执行 |
 | Adapter Protocol | Workflow 不直接执行——通过 Adapter |
+
+---
+
+## 十、Gate 模型
+
+> **Gate 是控制流原语，统一定义所有闸门。**
+> 质量闸（G 轴）和 Human Gate（HG 轴）使用同一 Gate 原语，仅 `kind` 不同。
+
+### 10.1 Gate 原语
+
+```
+Gate = {
+  kind: "quality" | "human",    // 闸门类型
+  id: string,                    // 编号（G1/QG1/HG1 等）
+  trigger: string,               // 触发条件
+  pass_condition: string,        // 通过条件
+  fail_action: string,           // 失败动作
+  owner: string,                 // 负责方（Conductor/Tester/User/Architect）
+}
+```
+
+**铁律**：
+- 所有闸门必须使用 Gate 原语定义，禁止在代码或合约中 hardcode 闸门逻辑
+- `kind="quality"` 的闸门由 Conductor 自动评估，不暂停
+- `kind="human"` 的闸门必须暂停 Loop，等待用户授权
+
+### 10.2 Human Gate（HG1–HG4）
+
+> **只有"会改变用户世界"的操作才需要人类显式确认。**
+
+| 级别 | 触发点 | 说明 |
+|------|--------|------|
+| **HG1 需求确认** | Product Analyst 完成需求文档后 | 用户确认用户故事 + 验收标准 |
+| **HG2 计划确认** | Architect 完成设计并通过审查后 | 用户确认 Plan + API 契约 |
+| **HG3 高危操作** | 删除数据库/部署生产/清空文件等 | 用户显式授权 |
+| **HG4 目标完成** | Goal 达成，所有 Task 终态 | 用户决定下一步 |
+
+**Human Gate 执行流程**：
+```
+1. Conductor 检测触发 Human Gate 的条件
+2. 写 Checkpoint（冻结当前状态）
+3. 暂停 Loop，通知用户："遇到人工确认点：[HG级别]，[原因]。请回复 '确认' 或 '修改'"
+4. 等待用户自然语言授权
+5. 用户回复后，Conductor 解析意图 → 继续或修改
+6. 启动新的 Loop（不是恢复旧 Loop）
+```
+
+**铁律**：Conductor 遇到 Human Gate 必须暂停，不得自行决定继续。

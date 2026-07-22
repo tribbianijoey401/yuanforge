@@ -231,7 +231,76 @@ Runtime 对象回答了「项目正在做什么」。它们存放在 `docs/YYYYM
 
 ---
 
-## 五、Event 对象
+## 五、Goal 定义（逻辑分组）
+
+> **Goal 不是 Runtime 对象**，是 Task 的 `goal` 字段的逻辑分组。
+> **协议最小化**：所有 Goal 信息从 TASK_BOARD 推导，不单独存储 Goal 状态。
+> **铁律**：Goal 不参与调度、派发或状态机维护。Goal 的状态由其包含 Task 的状态纯函数推导。
+
+### 5.1 Goal YAML 结构
+
+Goal 由 Architect 在 Plan 中声明，写入每个 Task 的 `goal` 字段：
+
+```yaml
+goal:
+  id: "auth-module"
+  summary: "实现用户认证与权限管理"
+  verification:
+    - "所有 API 测试通过"
+    - "E2E 测试覆盖核心流程"
+    - "安全审查无 Blocker"
+  constraints:
+    - "Go + Gin, React + TS"
+    - "bcrypt 哈希, JWT 2h 过期"
+    - "遵循 iron-rules"
+  stop_conditions:
+    - "Human Gate 触发"
+    - "连续 3 次返工"
+  parent: null          # 父 Goal ID，实现 Goal Stack
+  priority: 1
+```
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:---:|------|
+| `id` | string | ✅ | Goal 唯一标识 |
+| `summary` | string | ✅ | 一句话描述 Goal 意图 |
+| `verification` | array | ✅ | 成功标准（可验证的检查点） |
+| `constraints` | array | ✅ | 技术约束（语言/框架/安全要求） |
+| `stop_conditions` | array | — | 停止条件（触发 Human Gate 的场景） |
+| `parent` | string | — | 父 Goal ID（实现 Goal Stack 嵌套） |
+| `priority` | int | — | 优先级（数字越小越优先） |
+
+### 5.2 Goal Stack（嵌套 Goal）
+
+```
+Goal (parent=null, priority=1)
+  ├─ Goal G1.1 (parent=G1, priority=2)
+  │    └─ Task T01..T05
+  └─ Goal G1.2 (parent=G1, priority=3)
+       └─ Task T06..T10
+```
+
+- 子 Goal 完成 → 父 Goal 自动推进
+- 父 Goal 取消 → 所有子 Goal 级联取消
+- Conductor 按 `priority` 升序选择下一个 Goal 推进
+
+### 5.3 Goal 状态推导
+
+> Goal 是 Task 的逻辑分组，不是独立对象。Goal 状态从 Task 状态实时推导，不单独存储。
+
+| 规则 | 推导方式 |
+|------|---------|
+| Goal DONE | 该 Goal 下所有 Task 均为终态 |
+| Goal ACTIVE | 至少一个 Task 处于非终态且非阻塞 |
+| Goal BLOCKED | 至少一个 Task 为 ❌阻塞 且无阻塞解除条件 |
+| Goal READY | 至少一个 Task 为 🟢就绪 |
+| Goal Cluster | `group by Task.goal_cluster` 导出 |
+
+**铁律**：禁止在任何代码或文件中维护 `Goal.state` 字段。Goal 状态必须每次从 Task 状态实时推导。
+
+---
+
+## 六、Event 对象
 
 Event 回答了「发生了什么」。**不可变、Append Only。**
 
@@ -258,7 +327,7 @@ Event 回答了「发生了什么」。**不可变、Append Only。**
 
 ---
 
-## 六、对象间关系
+## 七、对象间关系
 
 ```
 Workspace ──contains──→ Task[]
@@ -279,23 +348,7 @@ Proposal ──produces──→ Event (KNOWLEDGE_UPDATED)
 Workspace ──measured_by──→ Workspace Metrics (computed at Close)
 ```
 
-### Goal 推导规则（Loop Engineering）
-
-> **Goal 不是 Runtime 对象，是 Task 的逻辑分组。**
-
-| 规则 | 推导方式 |
-|------|---------|
-| Goal 列表 | `group by Task.goal` 从 TASK_BOARD 导出 |
-| Goal DONE | 该 Goal 下所有 Task 均为终态 |
-| Goal ACTIVE | 至少一个 Task 处于非终态且非阻塞 |
-| Goal BLOCKED | 至少一个 Task 为 ❌阻塞 且无阻塞解除条件 |
-| Goal Cluster | `group by Task.goal_cluster` 导出 |
-
-**铁律**：禁止在代码中维护 `Goal.state` 字段。Goal 状态必须每次从 Task 状态实时推导。
-
----
-
-## 七、扩展规则
+## 八、扩展规则
 
 **新增对象类型**：
 1. 在本文档追加类型定义

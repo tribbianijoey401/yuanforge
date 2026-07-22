@@ -28,5 +28,5 @@
 > 本文件只定义列 schema；各 agent 合约在「路由条目」段声明自己提出的类型与去向，须与 `dispatch-routing.md` 一致。
 
 ## 升级 / 阻塞 / Human Gate 的最终裁决（与 Runtime 协议衔接）
-- 各 agent 合约中关于「何时升级 / 何时阻塞 / 何时需 Human 确认」的描述，**只是报告口径**；最终由 Conductor 依据 `.yuan/specs/runtime-protocol.md`（连续返工升级闸门）与 `.yuan/specs/goal-protocol.md`（四级 Human Gate：G1 需求 / G2 计划 / G3 高危 / …）统一执行。
+- 各 agent 合约中关于「何时升级 / 何时阻塞 / 何时需 Human 确认」的描述，**只是报告口径**；最终由 Conductor 依据 `.yuan/specs/runtime-protocol.md`（连续返工升级闸门）与 `.yuan/specs/workflow-protocol.md` §十.2（四级 Human Gate：HG1–HG4）统一执行。
 - Agent 只负责**报告异常**（附依据 + 复现），**不自行触发 Loop 控制或 Human Gate**。

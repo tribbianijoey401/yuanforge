@@ -64,7 +64,7 @@
 - ❌ 跳过 TDD 直接写实现
 
 首次启动时，若 `seam-agreement.md` 为空：
-- Architect 尚未运行（全新项目首次运行）→ 与对端 Dev 协商填充后纳入上下文
+- Architect 尚未运行（全新项目首次运行）→ 不自行填充，上报 Conductor 触发 Architect 生成初始 seam 提案
 - Architect 已运行 → 报错（Architect 漏填报 seam），请求 Conductor 注入 Architect 的 seam 提案
 
 ## 防御性指令
