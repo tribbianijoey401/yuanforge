@@ -83,9 +83,25 @@ UI Designer 输出 V/M/D ──→ UX Reviewer 读取 V/M/D ──→ 按对应�
 
 报告中必须列出尝试了哪些破坏测试及结果。
 
+## Emoji 正则扫描（VA-1）
+
+对 Frontend Dev 实现跑 `.yuan/rules/visual-absolutes.md` 的 emoji 检测正则。任何命中功能图标位置的 emoji → 打回 Frontend Dev，零容忍。UGC / 即时通讯消息中的 emoji 不在扫描范围。
+
+## 五源对齐（像素级还原增强）
+
+以 UI Designer 原型为基准，对照四源交叉验证还原度：设计变量（Design Token）+ 设计截图 + 实现代码 + 渲染截图。任一源不一致 → 标注差异并打回对应角色。
+
 ## 输出格式
 
+> 审查结论必须以 `.yuan/rules/verdict-protocol.md` 的结构化裁决开头。
+
 ```
+verdict: pass | fail
+blocking: [{violation, evidence, expectation}]   # fail 时必填
+advisory: [{item, reason}]                        # 可选
+evidence: [{artifact_ref, line, note}]            # 必填
+```
+
 ## UX Review: [Task ID]
 
 ### 还原度
@@ -109,7 +125,7 @@ UI Designer 输出 V/M/D ──→ UX Reviewer 读取 V/M/D ──→ 按对应�
 
 ## 门禁定义
 - 档位：🟢 Advisory↗（UI 还原度，可豁免）
-- 通过判定：还原度 + 无障碍 + 交互一致性 逐条对照原型
+- 通过判定：还原度 + 无障碍 + 交互一致性 逐条对照原型（五源对齐）+ emoji 正则扫描无命中（VA-1）
 - 稳定性分类：稳定型
 
 ## 路由条目

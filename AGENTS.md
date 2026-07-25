@@ -191,7 +191,9 @@
 6. 读自己的角色合约 contracts/<角色>.md                             ✅ 必读
 7. 读 knowledge/pitfalls/（避坑）                                   ✅ 必读
    → 注意：Conductor 已注入 Pitfall 摘要到 context 中，这里是可选读原文
-8. 读上游产出物文件（按需）
+8. 读 .yuan/rules/visual-absolutes.md（UI 任务必读）
+9. 读 .yuan/rules/verdict-protocol.md（审查官必读）
+10. 读上游产出物文件（按需）
 ```
 
 > Tier 3（角色切换）模式下尤其关键 — Agent 是空上下文进入，必须从文件重建状态。使用 `role-switch` Skill 执行。
@@ -249,6 +251,8 @@
 |------|------|:---:|
 | .yuan/rules/iron-rules.md | 十条铁律 — 含三档阻塞策略 | ✅ 每次必读 |
 | .yuan/rules/plan-format.md | Plan 工程化格式（含 Dispatch Table） | 产出 Plan 时 |
+| .yuan/rules/visual-absolutes.md | P0 视觉绝对禁令（emoji/渐变/占位/硬编码色/弹跳缓动） | UI 任务必读 |
+| .yuan/rules/verdict-protocol.md | 结构化裁决协议（verdict/blocking/advisory/evidence） | 审查官必读 |
 | .yuan/specs/ | 5 份核心协议 | 按需 |
 | .yuan/docs/ | 文档格式规格书（TASK_BOARD、SESSION 等） | 操作文档时 |
 

@@ -78,11 +78,29 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 
 ---
 
+## 视觉绝对禁令（P0）
+
+> 参考 `.yuan/rules/visual-absolutes.md`。任何违反以下任一条的原型，在门禁必须打回，零容忍。
+> UI Designer 原型产出后，必须对本节跑一遍 emoji 正则扫描（VA-1）。
+
+- **VA-1 禁止 emoji 作功能图标**：功能图标必须用统一描边、可矢量缩放、语义明确的 SVG 图标方案（由 Architect 在 Plan 的 Spec 段锁定一套，全项目不混用）。尺寸：行内 16px / 按钮内 20px / 独立图标 24px。
+- **VA-2 禁止紫粉渐变主视觉**：禁止 `linear-gradient(135deg, #7C3AED→#A855F7→#EC4899)` 及 Indigo→Pink 任意渐变组合（Indigo/Slate Blue 纯色允许）。
+- **VA-3 禁止 AI 模板味占位文案**：禁止 "Lorem ipsum" / "Welcome to Our App" / "Sign up today" 等空洞占位，文案由 Product Analyst 的 FEATURE.md 驱动。
+- **VA-4 禁止硬编码颜色**：除 `#fff` `#000` 外，所有颜色通过 Design Token 引用（Architect Plan 的 Spec 段锁定 Token 体系）。
+- **VA-5 禁止弹跳/弹性缓动**：禁止 `cubic-bezier(0.68, -0.55, 0.265, 1.55)` 等弹跳缓动，动效深度匹配 MOTION 旋钮值。
+
+---
+
 ## 禁止事项
 
 - ❌ 跳过原型直接让 Frontend Dev "自由发挥"
 - ❌ 产出与 API 契约不一致的界面
 - ❌ 在设计规范中写实现代码
+- ❌ 用 emoji 字符当功能图标（VA-1，改用锁定图标库）
+- ❌ 紫粉渐变主视觉（VA-2）
+- ❌ AI 模板味占位文案（VA-3）
+- ❌ 硬编码颜色值（VA-4，除 #fff/#000）
+- ❌ 弹跳/弹性缓动（VA-5）
 
 ---
 
@@ -96,7 +114,7 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 
 ## 门禁定义
 - 档位：🟢 Advisory↗（设计阶段）
-- 通过判定：视觉规范含 V/M/D 旋钮 + 完整原型可浏览器预览
+- 通过判定：视觉规范含 V/M/D 旋钮 + 完整原型可浏览器预览 + emoji 正则扫描无命中（VA-1）
 - 稳定性分类：演进型
 
 ## 路由条目
