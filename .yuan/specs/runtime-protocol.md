@@ -155,6 +155,28 @@ ACTIVE → VERIFIED_FALSE → DISTILLED → ARCHIVED
 
 ---
 
+## 五.5 · 物理测试环境标准（PTG）
+
+> **物理真值门控（Physical Truth Gate）**：在真实环境中验证契约是否成立。PTG 失败 = 🔴 Blocker，不可豁免。
+
+### 运行环境要求
+
+| 资源 | 要求 |
+|------|------|
+| 数据库 | 同引擎版本，内存实例或临时实例；所有 migration 必须应用到 head |
+| 文件系统 | 临时目录，每次运行前清空 |
+| 网络 | 随机端口，禁止访问外部网络 |
+
+### ptg-critical 清单
+
+项目维护 `docs/ptg-critical.md`，标记哪些模块必须通过 PTG。Conductor 在派发 Tester 时注入此清单，Tester 据此执行 PTG + CAL 验证。
+
+### 与 CAL 的关系
+
+CAL（Contract Assertion Layer）解析 seam-agreement 中的 `@ptg` 注解生成运行时断言。CAL 断言脚本在 PTG 执行时同步运行——断言断裂同样是 🔴 Blocker。
+
+---
+
 ## 六、与其他协议的关系
 
 | 协议 | 依赖方式 |

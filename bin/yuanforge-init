@@ -97,6 +97,8 @@ DOCS_SKELETON_FILES = {
     "glossary.md":        "# 术语表\n",
     "workspace/backlog.md": "# 待办事项\n\n> 蒸馏时 Workspace 未完成任务自动追加到此文件\n",
     "workspace/roadmap.md": "# 路线图\n",
+    "ptg-critical.md": "# PTG Critical Modules\n\n> 标记必须通过物理测试门控（PTG）的模块。\n> Tester 在 G3 审查时读取此清单，确保这些模块在真实环境中通过集成测试。\n>\n> 格式: 每行一个模块/路径，可加注释。空文件 = 无 PTG-critical 模块。\n",
+    "anti-patterns.md": "{{ anti-patterns_template }}",
     "policies/write-policy.md":         "# Knowledge 写入规则\n\n> 框架模板 — 见 yuanforge 母体的 policies/\n",
     "policies/merge-policy.md":         "# Proposal 合并规则\n",
     "policies/archive-policy.md":       "# Workspace 归档规则\n",
@@ -326,7 +328,15 @@ def create_docs_skeleton(target: Path, mode: str, dry_run: bool = False) -> dict
             results[relpath] = "created" if not filepath.exists() else "skipped"
         else:
             filepath.parent.mkdir(parents=True, exist_ok=True)
-            filepath.write_text(content, encoding="utf-8")
+            # 处理模板替换：{{ anti-patterns_template }} → 从 templates/ 读取
+            file_content = content
+            if "{{ anti-patterns_template }}" in content:
+                template_path = SOURCE_ROOT / "templates" / "anti-patterns.md"
+                if template_path.exists():
+                    file_content = template_path.read_text(encoding="utf-8")
+                else:
+                    file_content = "# 反模式清单（空白）\n"
+            filepath.write_text(file_content, encoding="utf-8")
             results[relpath] = "created"
 
     return results

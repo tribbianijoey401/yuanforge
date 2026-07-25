@@ -39,6 +39,19 @@
 4. 追踪同模块警告累积 → 达 3 次通知 Conductor 升级为 🔴 Blocker
 5. Conductor 处理 Advisory 列表：采纳 → 创建 backlog 任务；豁免 → 记录理由
 
+### Advisory 自动升级规则（新增）
+
+当 Quality Auditor 产生 🟢 Advisory 时，若命中以下任一条件，自动升级为 🔴 Blocker：
+
+| 命中条件 | 说明 |
+|---------|------|
+| 涉及 `docs/ptg-critical.md` 中标记的模块 | PTG-critical 模块的任何 Advisory 不可豁免 |
+| 涉及 schema / migration / 数据库结构变更 | 表缺列、字段类型漂移等直接 Blocker |
+| 涉及 PTG 运行时环境一致性 | 本地与生产环境版本差异 |
+| 涉及 CAL 断言缺失或断裂 | seam-agreement 中 @ptg 注解对应的断言未覆盖 |
+
+升级无需人工判断，直接在 task-board 中标注并阻止合并。
+
 ## 对抗式审查
 
 **不要只检查代码写得好不好 — 要主动构造极端数据场景，试图把系统压垮。**

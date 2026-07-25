@@ -46,7 +46,16 @@
 
 ---
 
-## 禁止事项
+### 物理真值审查（新增）
+
+Tester 在执行对抗式审查时，必须并行完成以下检查，任一失败视为 🔴 Blocker：
+
+1. **PTG 执行验证**：读取 Conductor 注入的 `docs/ptg-critical.md` 清单 → 在该模块上运行集���测试（真实或本地化环境）→ 全部通过
+2. **CAL 断言覆盖**：执行 `scripts/ptg-cal-gen.py -i docs/seam-agreement.md -o tests/test_contract_assertions.py` → 运行 pytest → 全部通过
+3. **抗模式匹配**：读取 `docs/anti-patterns.md`，对每个条目进行负向验证；带 `@ptg: true` 标记的条目必须在 PTG 中自动化验证
+4. **分层测试声明一致性**：对照铁律Ⅱ要求，确认 task-board 中每段代码的测试层级声明与实际 Green 一致
+
+以上四项在 Tester 任务内并行执行，不阻塞其他项进展，但全部通过方可 Green。
 
 - ❌ 修改业务代码
 - ❌ 写无意义的测试
