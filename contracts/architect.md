@@ -108,6 +108,8 @@ Plan 写入 `docs/YYYYMMDD-描述/PLAN.md`，含完整 Dispatch Table。
 - **e2e 验证步骤**：一条可执行的端到端验证脚本（覆盖成功流 + 关键错误流）
 - **OPEN-DECISIONS 登记**：悬而未决项写入 `docs/decisions/OPEN-DECISIONS.md`，只追加 + 就地关闭，闭环追踪。三类固定 slug：`waiting-on-external-condition` / `design-decision-to-evaluate` / `existing-design-boundary`
 
+> 详细规范见 `references/01-standards/spec-as-contract.md`（Spec 12 章契约模板）；OPEN-DECISIONS 登记格式与 slug 定义见 `references/01-standards/open-decisions-register.md`。
+
 ## 禁止事项
 
 - ❌ 跳过计划复盘直接设计

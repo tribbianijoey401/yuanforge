@@ -194,6 +194,9 @@
 8. 读 .yuan/rules/visual-absolutes.md（UI 任务必读）
 9. 读 .yuan/rules/verdict-protocol.md（审查官必读）
 10. 读上游产出物文件（按需）
+11. 读 references/ 分层知识库（按角色职责选读对应子目录）
+    → 子目录：01-standards（工程纪律/spec即契约/代码组织/测试纪律/防生成式失败/自改进记忆）· architecture（MVP栈/多租户SaaS/RAG知识库/AI Agent模式）· design-systems（Token/配色/行业设计系统/落地页模式）· industries（AI原生/SaaS/电商/企业/内容平台）· platforms（微信小程序/鸿蒙）· cost-models（开发成本模型）
+    → 角色映射：Architect→01-standards+architecture；Frontend/Backend Dev→01-standards（generated-code-failure-modes / code-organization）；UI Designer→design-systems；Product Analyst→industries；DevOps→platforms；Conductor/Doc Engineer→cost-models
 ```
 
 > Tier 3（角色切换）模式下尤其关键 — Agent 是空上下文进入，必须从文件重建状态。使用 `role-switch` Skill 执行。
@@ -253,6 +256,7 @@
 | .yuan/rules/plan-format.md | Plan 工程化格式（含 Dispatch Table） | 产出 Plan 时 |
 | .yuan/rules/visual-absolutes.md | P0 视觉绝对禁令（emoji/渐变/占位/硬编码色/弹跳缓动） | UI 任务必读 |
 | .yuan/rules/verdict-protocol.md | 结构化裁决协议（verdict/blocking/advisory/evidence） | 审查官必读 |
+| references/ | MVP 团队分层知识库（工程纪律/架构/设计系统/行业/平台/成本）— 各角色按职责选读 | 按角色按需 |
 | .yuan/specs/ | 5 份核心协议 | 按需 |
 | .yuan/docs/ | 文档格式规格书（TASK_BOARD、SESSION 等） | 操作文档时 |
 

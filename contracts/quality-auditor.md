@@ -108,7 +108,7 @@
 
 ## 代码组织门禁
 
-对照 `.yuan/rules/code-organization.md`（如尚未建立，按下列最低标准）审查：
+对照 `references/01-standards/code-organization.md` 审查（下列最低标准作为兜底）：
 
 - 目录分层清晰，依赖方向只向下（routes → controllers → services → repositories）
 - 单文件 ≤ 300 行；超长文件必须拆分
