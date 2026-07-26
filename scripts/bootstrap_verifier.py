@@ -240,14 +240,19 @@ def main() -> int:
         sys.stderr.reconfigure(encoding="utf-8")
     args = parse_args()
     manifest_path = args.manifest.resolve()
+    suite_root = manifest_path.parent.resolve()
     receipt_path = args.receipt.resolve()
     receipt = receipt_base(manifest_path)
     exit_code = 2
-    receipt_path_safe = not paths_overlap(receipt_path, manifest_path)
+    receipt_path_safe = not (
+        receipt_path == suite_root
+        or suite_root in receipt_path.parents
+        or paths_overlap(receipt_path, manifest_path)
+    )
     try:
         if not receipt_path_safe:
             receipt["reason_codes"].append("RECEIPT_PATH_CONFLICT")
-            receipt["error"] = "receipt path overlaps the manifest"
+            receipt["error"] = "receipt path overlaps the untrusted suite root"
         elif not SHA256_PATTERN.fullmatch(args.manifest_sha256):
             raise ManifestError("manifest-sha256 is not lowercase SHA-256")
         else:
@@ -263,7 +268,7 @@ def main() -> int:
                 else:
                     if not isinstance(manifest, dict):
                         raise ManifestError("manifest root must be an object")
-                    root = manifest_path.parent.resolve()
+                    root = suite_root
                     protected = collect_protected_inputs(
                         manifest,
                         root,
