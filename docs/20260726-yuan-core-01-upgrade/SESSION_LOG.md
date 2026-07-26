@@ -17,7 +17,7 @@
 | task-005 | ✅ 完成 | M2 inert Core candidate 经两轮独立返工后通过 M3 | M3-B01–B06 全部关闭；未弱化 held-out 或旧 trust root | `.yuan/core/0.1/`, `evidence/m3/independent-review.md` | `3df9250` |
 | task-006 | ✅ 完成 | M3 旧信任根接受 r2 candidate | 30/30 held-out、27/27 author、31/31 M1、75-check bootstrap 全部 PASS | `tests/core_01/`, `evidence/m3/` | 本提交 |
 | task-007 | ✅ 完成 | M4 Shadow conversion 与回退演练 | 单向只读 legacy→shadow；Core 重建、writer guard 与无损 rollback 全绿 | `scripts/yuan-shadow-migrate.py`, `evidence/m4/` | 本提交 |
-| task-008 | 🟢 就绪 | M5 Canary Work | M4 author gate 已通过，等待独立 Tester | 见 `PLAN.md` | — |
+| task-008 | ❌ 阻塞 | M5 Canary Work 成功路径 COMPLETE，但恢复对抗 Gate 失败 | M5-B01：BLOCKED rebuild 丢失 UNKNOWN reconciliation target，返回 task-005-r3 | `evidence/m5/` | 本提交 |
 | task-009–task-013 | ⏳ 等待 | M6 Adapter conformance 至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
 
 ## 现场保护
@@ -68,6 +68,15 @@
 - `.yuan-shadow-m4-drill` 回退前后 legacy snapshot SHA-256 均为
   `0f4098281c0338df3cd5297cc69fa57810491020f69b8ff336e1a5bde20abc4c`；
   shadow 已丢弃，结构化回执见 `evidence/m4/rollback-receipt.json`。
+- task-008 M5 真实 Canary：reference Port 以 CAS 写入固定 artifact，并
+  通过 Python audit sandbox command 执行预绑定独立 validator；3/3
+  assertions PASS，Core reducer 仅依据 Work/Attempt/Evidence 产生
+  `COMPLETE`。authority pointer 与 4 个 legacy runtime state 文件在
+  Canary 执行前后 SHA-256 相等，派生 Run Memory 删除后可字节等价重建。
+- M5 独立对抗检查 10 项中 9 PASS / 1 FAIL：stale Evidence 与 UNKNOWN
+  均不能 COMPLETE，但合法 UNKNOWN Attempt 在 `BLOCKED` rebuild 中从
+  `pending_side_effects` 消失，违反 Core Protocol §9 并使 reconciliation
+  无法定位。建立 M5-B01，task-008 Hard Gate 阻塞并返回 task-005-r3。
 
 ## 决策
 
@@ -96,4 +105,6 @@
 - `evidence/m1/`
 - `tests/core_01/`
 - `evidence/m3/`
+- `evidence/m5/`
+- `tests/core_canary/`
 - `docs/events/20260726/events.jsonl`

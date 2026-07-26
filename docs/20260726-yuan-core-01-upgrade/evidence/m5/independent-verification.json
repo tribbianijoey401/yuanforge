@@ -1,0 +1,65 @@
+{
+  "schema_version": "yuan.m5-independent-verification/v1",
+  "status": "FAIL",
+  "assertions": 10,
+  "checks": [
+    {
+      "id": "M5-SUCCESS-CORE-REDUCER-COMPLETE",
+      "status": "PASS",
+      "observation": "persisted success history rebuilds byte-equivalent to COMPLETE"
+    },
+    {
+      "id": "M5-TYPED-AC-PREBOUND-INDEPENDENT",
+      "status": "PASS",
+      "observation": "typed AC uses the pre-bound independent validator with positive assertions"
+    },
+    {
+      "id": "M5-SCOPE-AUTH-BUDGET",
+      "status": "PASS",
+      "observation": "scope, deny-by-default grant, and immutable budget are mechanically enforced"
+    },
+    {
+      "id": "M5-REFERENCE-PORT-RECEIPTS",
+      "status": "PASS",
+      "observation": "file-write and sandboxed command have structured reference Port receipts"
+    },
+    {
+      "id": "M5-LEGACY-AUTHORITY-UNCHANGED",
+      "status": "PASS",
+      "observation": "canary execution did not write the authority pointer or legacy runtime state"
+    },
+    {
+      "id": "M5-STALE-EVIDENCE-FAILS-CLOSED",
+      "status": "PASS",
+      "observation": "stale Evidence cannot reduce to COMPLETE"
+    },
+    {
+      "id": "M5-UNKNOWN-BLOCKS-COMPLETE",
+      "status": "PASS",
+      "observation": "UNKNOWN side effects fail closed"
+    },
+    {
+      "id": "M5-UNKNOWN-REMAINS-RECONCILABLE",
+      "status": "FAIL",
+      "observation": "Run Memory must retain the UNKNOWN Attempt so an independent reconciliation can target it"
+    },
+    {
+      "id": "M5-DERIVED-RUN-MEMORY-DISCARD-REBUILD",
+      "status": "PASS",
+      "observation": "the disposable Run Memory projection can be deleted and rebuilt from immutable history"
+    },
+    {
+      "id": "M5-M4-WRITER-GUARD-CROSS-LANE",
+      "status": "PASS",
+      "observation": "M4 shadow writer is mechanically denied access to the legacy evidence lane"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "M5-B01",
+      "route": "task-005",
+      "summary": "BLOCKED rebuild discards the UNKNOWN pending side effect, preventing targeted reconciliation.",
+      "evidence": "negative/unknown-run-memory.json"
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 > 会话: 20260726-yuan-core-01-upgrade
 > 创建: 2026-07-26 18:30 +08:00
-> 最后更新: 2026-07-26 23:58 +08:00
+> 最后更新: 2026-07-27 00:17 +08:00
 
 ## 当前状态快照
 
@@ -10,7 +10,7 @@
 |----|-----|
 | **已验证实现 HEAD** | `3df925011ac6d99f62b728ab4b6624d24cf2c6d0` |
 | **原始 Git 脏文件** | 8 tracked modified + 2 untracked；已由 `evidence/m0a/` 保护 |
-| **活跃 Agent** | task-007 已完成；task-008 与 task-010 可由 Conductor 继续派发 |
+| **活跃 Agent** | task-008 M5 Hard Gate 阻塞；须派发 task-005-r3 修复 M5-B01 |
 | **当前 authority** | 旧 YuanForge 文档运行态；新 Core 尚未接管 |
 | **最后 Conductor 巡检** | 2026-07-26 18:34 +08:00 |
 
@@ -25,7 +25,7 @@
 | task-005 | P0 | R0 | M2 实现 inert Core candidate | backend-dev | task-004 | ✅ 完成 | `.yuan/core/0.1/`, `evidence/m2/` | `evidence/m3/independent-review.md` |
 | task-006 | P0 | R0 | M3 旧信任根验证新候选 | tester | task-005 | ✅ 完成 | `tests/core_01/`, `evidence/m3/` | `evidence/m3/final.json` |
 | task-007 | P0 | R0 | M4 Shadow conversion 与回退演练 | backend-dev | task-006 | ✅ 完成 | converter, rollback receipt | `evidence/m4/author-evidence.md` |
-| task-008 | P1 | R1 | M5 Canary Work | tester | task-007 | 🟢 就绪 | canary Evidence | `evidence/m4/author-evidence.md` |
+| task-008 | P1 | R1 | M5 Canary Work | tester | task-007 | ❌ 阻塞 | canary Evidence + held-out Gate | `evidence/m5/M5-TEST-REPORT.md#blocker-m5-b01` |
 | task-009 | P1 | R1 | M6 Adapter conformance | tester | task-008 | ⏳ 等待 | adapter reports | `DESIGN.md#7-最小平台-port` |
 | task-010 | P0 | R0 | M7 Extensions 与条款 provenance | doc-engineer | task-006 | ⏳ 等待 | extensions, provenance manifest | `DESIGN.md#9-authority-与迁移不变量` |
 | task-011 | P0 | R0 | M8 原子 authority switch | backend-dev | task-009,task-010 | ⏳ 等待 | writer guard, authority receipt | `PLAN.md#里程碑-gate` |
@@ -49,6 +49,7 @@
 | 23:35 | task-005-r2 | task-006-r2 | replay 已在 COMPLETE 前强制验证受保护变更 trust proof；BLOCKED 投影按 Evidence→Attempt→Work 保留真实 scope | 27/27 author、50/50 self-check、29/29 原样 held-out、31/31 M1 PASS；新 manifest SHA-256 `c3d41ac1a056523ad5af4a430e09185f7ab1e732507097ba7546be7f512d72e3` |
 | 23:39 | task-006-r2 | task-007 | 旧 Genesis trust root 已接受修正候选；独立 held-out 与固定种子变体全部通过 | 30/30 held-out、27/27 author、31/31 M1、75-check bootstrap（7/7 cases）PASS；M3_APPROVED |
 | 23:58 | task-007 | task-008,task-010 | 单向 shadow converter、writer guard、确定性 replay 与无损 rollback 已完成 | 3 Workspace / 9 sources / 28 records；Core rebuild 3/3 PASS；19 项歧义全部 structured unresolved/BLOCKED；legacy rollback hash 相等 |
+| 00:17 | task-008 | task-005-r3 | 真实 Canary 成功路径 reducer=`COMPLETE`，但 UNKNOWN 失败分支丢失 reconciliation target | 10 项独立检查 9 PASS / 1 FAIL；M5-B01 见 `evidence/m5/M5-TEST-REPORT.md` |
 
 ## 故障记录
 
@@ -58,19 +59,20 @@
 | 22:07 | task-003-r1 | held-out Blocker | M1-B04：manifest hash 校验失败时未收集 candidate 拓扑，FAIL receipt 仍可覆盖 suite input |
 | 22:53 | task-006 | held-out Blocker | M3-B01–B05：Evidence 绑定/新鲜度、Attempt journal、Run Memory rebuild、自修改旧根、授权过期与 command scope 未闭合 |
 | 23:23 | task-006-r1 | held-out Blocker | M3-B06：self_modification_authorized 未接入 replay；`_blocked` 将 artifact scope 硬编码为 `.` |
+| 00:17 | task-008 | held-out Blocker | M5-B01：`BLOCKED` rebuild 将合法 UNKNOWN Attempt 从 `pending_side_effects` 丢失，后续 reconciliation 无法定位 |
 
 ## 返工记录
 
 | 任务 | 次数 | 原因 | 审查人 |
 |------|------|------|--------|
 | task-003 | 2 | r1 修复三项初始 Blocker；r2 将 receipt 隔离前移到 manifest 信任之前，封闭 hash-tamper + receipt-collision 组合攻击 | Tester |
-| task-005 | 2 | r1 封闭 B01–B05；r2 强制 replay trust proof 并修复 BLOCKED scope 投影；Tester 独立复测通过 | Tester |
+| task-005 | 3 | r1 封闭 B01–B05；r2 强制 replay trust proof/修复 BLOCKED scope；r3 须修复 UNKNOWN pending projection | Tester |
 
 ## 阻塞
 
 | 时间 | 任务 | 类型 | 原因 |
 |------|------|------|------|
-| — | — | — | 暂无 |
+| 2026-07-27 00:17 | task-008 | M5-B01 | UNKNOWN 已阻塞完成但从 Run Memory `pending_side_effects` 消失；须 task-005-r3 修复并原样复测 |
 
 ## 审查结果
 
@@ -83,6 +85,7 @@
 | 2026-07-26 22:53 | task-005 / task-006 | Tester held-out | FAIL → task-005 r1 | 旧 bootstrap 64 checks 明确拒绝 candidate；held-out 16 PASS / 12 FAIL；M3-B01–B05 |
 | 2026-07-26 23:23 | task-005-r1 / task-006-r1 | Tester held-out | FAIL → task-005 r2 | 原 28 项全 PASS；新增组合检查 FAIL；旧 bootstrap 72 checks 仅 Core case REJECT；M3-B06 |
 | 2026-07-26 23:39 | task-005-r2 / task-006-r2 | Tester held-out | PASS | 30/30 held-out、27/27 author、31/31 M1；旧 bootstrap 75 checks、7/7 cases 接受 Core；M3-B01–B06 全部关闭 |
+| 2026-07-27 00:17 | task-008 | Tester Canary held-out | FAIL → task-005-r3 | 成功路径 COMPLETE；10 项独立检查 9 PASS / 1 FAIL；M5-B01 丢失 UNKNOWN reconciliation target |
 
 ## Conductor 调度状态
 
@@ -101,6 +104,7 @@
 | 23:35 | task-005-r2 完成 → task-006-r2 复测 | tester | M3-B06 author 与原样 held-out 均绿；冻结 M3 runner 须独立重绑定新 manifest |
 | 23:39 | task-006-r2 完成 → promote task-007 | backend-dev | M3 Gate PASS；M4 Shadow conversion 与无损回退演练可派发 |
 | 23:58 | task-007 完成 → promote task-008 | tester | M4 author gate PASS；M5 Canary 可派发，M7 仍可并行 |
+| 00:17 | task-008 阻塞 → return task-005-r3 | backend-dev | 保留合法 UNKNOWN pending side effect，且不得弱化 M5/M3/M1 Gate |
 
 ## 派发日志
 
@@ -119,3 +123,4 @@
 | 23:35 | task-005-r2 | Tier 1 | backend-dev | ✅ B06 修复完成；author 27/27、自检 50/50、原样 held-out 29/29、M1 31/31 |
 | 23:39 | task-006-r2 | Tier 1 | tester | ✅ M3_APPROVED：30/30 独立 held-out、旧根 75 checks / 7 cases 全部通过 |
 | 23:58 | task-007 | Tier 1 | backend-dev | ✅ 9/9 TDD、3/3 Core rebuild、单写 guard 与 rollback drill PASS；旧语义歧义未猜测完成 |
+| 00:17 | task-008 | Tier 1 | tester | ❌ 真实 Canary 成功路径 COMPLETE；UNKNOWN 恢复分支暴露 M5-B01，Hard Gate 阻塞 |
