@@ -1,0 +1,2 @@
+# M0a is a byte-preserving recovery package. Do not normalize or render it as source diff.
+evidence/m0a/** -text -diff

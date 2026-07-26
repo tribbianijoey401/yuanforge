@@ -1,13 +1,13 @@
 # YuanForge 开发进度
 
-> 最后更新: 2026-07-20
+> 最后更新: 2026-07-26
 
 ## 当前状态
 
 | 项 | 值 |
 |----|-----|
-| **当前 Phase** | 完成（DocsOS v1；框架逻辑审计已通过） |
-| **当前会话** | —（无活跃 Workspace） |
+| **当前 Phase** | Yuan Core 0.1 升级 — M0 Genesis baseline |
+| **当前会话** | [`20260726-yuan-core-01-upgrade`](./20260726-yuan-core-01-upgrade/) |
 | **模式** | 严格模式 |
 
 ## 活跃 Bug
@@ -24,8 +24,9 @@
 
 ## 下一步
 
-1. 用真实项目验证 DocsOS 与 Loop Engineering 工作流
-2. 收集 Agent 使用反馈并迭代规则
+1. 完成 M1 bootstrap verifier，并证明其拒绝 empty、零断言和 known-bad fixtures
+2. 通过冻结 verifier 验证 inert Core candidate
+3. 按 M0a–M9 迁移、切换 authority 并完成自修改 dogfood
 
 > **待办任务** → [`workspace/backlog.md`](./workspace/backlog.md)
 
