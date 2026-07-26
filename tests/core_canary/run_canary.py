@@ -129,6 +129,7 @@ def _harness_binding() -> dict[str, str]:
         "document_validation.py",
         "port_types.py",
         "reference_port.py",
+        "replay_pending.py",
         "replay_trust.py",
         "runtime_replay.py",
         "schema_runtime.py",

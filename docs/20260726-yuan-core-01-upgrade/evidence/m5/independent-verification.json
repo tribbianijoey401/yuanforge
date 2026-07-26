@@ -1,7 +1,7 @@
 {
   "schema_version": "yuan.m5-independent-verification/v1",
-  "status": "FAIL",
-  "assertions": 10,
+  "status": "PASS",
+  "assertions": 13,
   "checks": [
     {
       "id": "M5-SUCCESS-CORE-REDUCER-COMPLETE",
@@ -40,8 +40,23 @@
     },
     {
       "id": "M5-UNKNOWN-REMAINS-RECONCILABLE",
-      "status": "FAIL",
+      "status": "PASS",
       "observation": "Run Memory must retain the UNKNOWN Attempt so an independent reconciliation can target it"
+    },
+    {
+      "id": "M5-COMMITTED-NOT-PENDING",
+      "status": "PASS",
+      "observation": "a normal COMMITTED side effect must not be projected as pending"
+    },
+    {
+      "id": "M5-PURE-READ-NOT-PENDING",
+      "status": "PASS",
+      "observation": "a valid non-mutating file read cannot manufacture pending work"
+    },
+    {
+      "id": "M5-MISSING-ATTEMPT-BLOCKS-WITHOUT-FORGED-POINTER",
+      "status": "PASS",
+      "observation": "missing Attempt history blocks replay without inventing a reconciliation pointer"
     },
     {
       "id": "M5-DERIVED-RUN-MEMORY-DISCARD-REBUILD",
@@ -54,12 +69,5 @@
       "observation": "M4 shadow writer is mechanically denied access to the legacy evidence lane"
     }
   ],
-  "blockers": [
-    {
-      "id": "M5-B01",
-      "route": "task-005",
-      "summary": "BLOCKED rebuild discards the UNKNOWN pending side effect, preventing targeted reconciliation.",
-      "evidence": "negative/unknown-run-memory.json"
-    }
-  ]
+  "blockers": []
 }

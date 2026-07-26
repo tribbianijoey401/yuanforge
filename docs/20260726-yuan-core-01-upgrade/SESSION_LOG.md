@@ -17,7 +17,7 @@
 | task-005 | ✅ 完成 | M2 inert Core candidate 经两轮独立返工后通过 M3 | M3-B01–B06 全部关闭；未弱化 held-out 或旧 trust root | `.yuan/core/0.1/`, `evidence/m3/independent-review.md` | `3df9250` |
 | task-006 | ✅ 完成 | M3 旧信任根接受 r2 candidate | 30/30 held-out、27/27 author、31/31 M1、75-check bootstrap 全部 PASS | `tests/core_01/`, `evidence/m3/` | 本提交 |
 | task-007 | ✅ 完成 | M4 Shadow conversion 与回退演练 | 单向只读 legacy→shadow；Core 重建、writer guard 与无损 rollback 全绿 | `scripts/yuan-shadow-migrate.py`, `evidence/m4/` | 本提交 |
-| task-008 | ❌ 阻塞 | M5 Canary Work 成功路径 COMPLETE，但恢复对抗 Gate 失败 | M5-B01：BLOCKED rebuild 丢失 UNKNOWN reconciliation target，返回 task-005-r3 | `evidence/m5/` | 本提交 |
+| task-008 | ✅ 完成 | M5 Canary Work 经 r3 修复后通过独立复测 | 原 10 项 + 3 项普通数据变体全绿；旧 Genesis root 接受新 candidate | `evidence/m5/` | 本提交 |
 | task-009–task-013 | ⏳ 等待 | M6 Adapter conformance 至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
 
 ## 现场保护
@@ -77,6 +77,14 @@
   均不能 COMPLETE，但合法 UNKNOWN Attempt 在 `BLOCKED` rebuild 中从
   `pending_side_effects` 消失，违反 Core Protocol §9 并使 reconciliation
   无法定位。建立 M5-B01，task-008 Hard Gate 阻塞并返回 task-005-r3。
+- task-008-r1 对 `b8e518e` 做完整性 diff，确认 task-005-r3 未修改
+  `tests/core_canary/` 或首轮 M5 Evidence；原样复跑 10/10 PASS。
+- 新增三组普通数据变体：COMMITTED 与纯 read 均不进入 pending；缺失
+  Attempt 的 Evidence 必须 BLOCKED 且不伪造 pointer。最终 M5 13/13
+  PASS、0 skip、0 xfail，M5-B01 关闭。
+- 新 candidate manifest `d3e0f536...ea4fc` 经旧 Genesis root
+  77 checks / 7 cases 接受；M1 31/31、Core 30/30、M3 1/1、M4 10/10
+  与 M0a 原 dirty 10/10 hash 全部通过。task-009 可派发。
 
 ## 决策
 

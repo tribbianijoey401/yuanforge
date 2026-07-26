@@ -1,0 +1,40 @@
+{
+  "schema_version": "yuan.m5-final-verification/v1",
+  "status": "PASS",
+  "candidate_manifest_sha256": "d3e0f536428c7315f96b6546b4f728055c162cff16e80d00d3b5d5db378ea4fc",
+  "canary": {
+    "result": "COMPLETE",
+    "artifact_sha256": "c30e40fbf27d6ca297746483e1cad0dd04d7ef726c3565ff7f8fef98b5e3dc9c",
+    "work_contract_sha256": "f69c17d64ba5abdd41a5d5c37be7e0a32f2011ce425790260f0b1e5def1cf697",
+    "receipt_sha256": "6f21b581800734878c8c043795194f2fa3b2e4afd4180a8128f72a4561f056c7",
+    "validator_assertions": 3,
+    "validator_failures": 0
+  },
+  "independent_gate": {
+    "receipt_sha256": "742d60a6c850438fe49d328a795512400d8885168afc5bd774cd6e1325efbd1e",
+    "assertions": 13,
+    "failures": 0,
+    "skips": 0,
+    "blockers": []
+  },
+  "old_root": {
+    "manifest_sha256": "3d205794305095bb91496d301e8f42c753d9a9716edc4d042695adc3b44835cf",
+    "receipt_sha256": "059434e8e1c2c8f655e8f7817f47f0ec3f445e6660249ccbc9b1546c44bdc5ca",
+    "status": "PASS",
+    "checks_executed": 77,
+    "cases": 7
+  },
+  "regressions": [
+    {"id": "M1-bootstrap", "passed": 31, "failed": 0},
+    {"id": "Core-author", "passed": 30, "failed": 0},
+    {"id": "M3-independent-held-out", "passed": 1, "failed": 0},
+    {"id": "M4-shadow-migration", "passed": 10, "failed": 0},
+    {"id": "M0a-original-dirty-hashes", "passed": 10, "failed": 0}
+  ],
+  "integrity": {
+    "task_005_r3_changed_canary_or_held_out": false,
+    "test_or_threshold_weakening": false,
+    "skip_or_xfail_added": false
+  },
+  "resolved_blockers": ["M5-B01"]
+}

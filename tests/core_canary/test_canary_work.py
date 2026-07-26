@@ -29,7 +29,7 @@ class CanaryWorkTests(unittest.TestCase):
         failures = [item for item in result["checks"] if item["status"] != "PASS"]
         self.assertEqual([], failures, failures)
         self.assertEqual("PASS", result["status"])
-        self.assertGreaterEqual(result["assertions"], 10)
+        self.assertGreaterEqual(result["assertions"], 13)
 
 
 if __name__ == "__main__":

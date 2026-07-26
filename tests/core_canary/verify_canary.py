@@ -178,6 +178,50 @@ def verify(run_root: pathlib.Path, *, persist: bool) -> dict[str, Any]:
         "Run Memory must retain the UNKNOWN Attempt so an independent reconciliation can target it",
     )
 
+    _record(
+        checks,
+        "M5-COMMITTED-NOT-PENDING",
+        lambda: attempt["side_effect_state"] == "COMMITTED"
+        and rebuilt["pending_side_effects"] == [],
+        "a normal COMMITTED side effect must not be projected as pending",
+    )
+
+    read_attempt = copy.deepcopy(attempt)
+    read_attempt["attempt_id"] = "ATT-m5-canary-read"
+    read_attempt["action"] = {
+        "type": "file-read",
+        "mutating": False,
+        "side_effect_class": "none",
+        "scope": work["acceptance_criteria"][0]["artifact_scope"],
+        "authorization_grant_id": None,
+        "high_impact": False,
+        "self_modification": None,
+    }
+    read_attempt["journal"] = []
+    read_attempt["side_effect_state"] = "NOT_APPLICABLE"
+    read_attempt["tool_receipt"] = None
+    read_attempt["postcondition"] = None
+    read_attempt["evidence_ids"] = []
+    read_attempt["outcome"] = "SUCCEEDED"
+    read_memory = _rebuild(work, [read_attempt], [], artifact_sha256)
+    _record(
+        checks,
+        "M5-PURE-READ-NOT-PENDING",
+        lambda: not CONFORMANCE.validate_document("attempt", read_attempt).errors
+        and read_memory["pending_side_effects"] == [],
+        "a valid non-mutating file read cannot manufacture pending work",
+    )
+
+    missing_attempt_memory = _rebuild(work, [], [evidence], artifact_sha256)
+    _record(
+        checks,
+        "M5-MISSING-ATTEMPT-BLOCKS-WITHOUT-FORGED-POINTER",
+        lambda: missing_attempt_memory["last_result"] == "BLOCKED"
+        and "MISSING_ATTEMPT_HISTORY" in missing_attempt_memory["rebuild"]["errors"]
+        and missing_attempt_memory["pending_side_effects"] == [],
+        "missing Attempt history blocks replay without inventing a reconciliation pointer",
+    )
+
     with tempfile.TemporaryDirectory(prefix="yuan-m5-rebuild-") as temporary:
         disposable = pathlib.Path(temporary) / "run-memory.json"
         disposable.write_text(
@@ -221,22 +265,19 @@ def verify(run_root: pathlib.Path, *, persist: bool) -> dict[str, Any]:
     if persist:
         negative = run_root / "negative"
         negative.mkdir(parents=True, exist_ok=True)
-        RUNNER._atomic_json(
-            negative / "stale-evidence.json", stale, expected_sha256=None
-        )
-        RUNNER._atomic_json(
-            negative / "stale-run-memory.json",
-            stale_memory,
-            expected_sha256=None,
-        )
-        RUNNER._atomic_json(
-            negative / "unknown-attempt.json", unknown, expected_sha256=None
-        )
-        RUNNER._atomic_json(
-            negative / "unknown-run-memory.json",
-            unknown_memory,
-            expected_sha256=None,
-        )
+        persisted = {
+            "stale-evidence.json": stale,
+            "stale-run-memory.json": stale_memory,
+            "unknown-attempt.json": unknown,
+            "unknown-run-memory.json": unknown_memory,
+            "read-attempt.json": read_attempt,
+            "read-run-memory.json": read_memory,
+            "missing-attempt-run-memory.json": missing_attempt_memory,
+        }
+        for filename, value in persisted.items():
+            path = negative / filename
+            expected = RUNNER._sha256_file(path) if path.is_file() else None
+            RUNNER._atomic_json(path, value, expected_sha256=expected)
 
     status = "PASS" if checks and all(item["status"] == "PASS" for item in checks) else "FAIL"
     return {
@@ -244,18 +285,14 @@ def verify(run_root: pathlib.Path, *, persist: bool) -> dict[str, Any]:
         "status": status,
         "assertions": len(checks),
         "checks": checks,
-        "blockers": (
-            []
-            if status == "PASS"
-            else [
-                {
-                    "id": "M5-B01",
-                    "route": "task-005",
-                    "summary": "BLOCKED rebuild discards the UNKNOWN pending side effect, preventing targeted reconciliation.",
-                    "evidence": "negative/unknown-run-memory.json",
-                }
-            ]
-        ),
+        "blockers": [] if status == "PASS" else [
+            {
+                "id": "M5-B01",
+                "route": "task-005",
+                "summary": "BLOCKED rebuild does not preserve exactly the valid pending pointers required for reconciliation.",
+                "evidence": "negative/unknown-run-memory.json",
+            }
+        ],
     }
 
 
