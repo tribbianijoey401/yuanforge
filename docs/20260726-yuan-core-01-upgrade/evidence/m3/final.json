@@ -1,0 +1,61 @@
+{
+  "schema_version": "yuan.test-evidence/v1",
+  "task_id": "task-006",
+  "subject_commit": "5cbf1d699e423595e71c94f5c35a4f7215eb36ea",
+  "created_at": "2026-07-26T22:53:19.2768034+08:00",
+  "tester_role": "independent-tester",
+  "status": "FAIL_M3_BLOCKED",
+  "commands": [
+    {
+      "command": "python -B -m unittest discover -s tests/bootstrap_verifier -p 'test_*.py' -v",
+      "tests_run": 31,
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "python -B tests/core_01/held_out_validator.py .yuan/core/0.1",
+      "checks_run": 28,
+      "passed": 16,
+      "failed": 12,
+      "skipped": 0,
+      "receipt": "held-out-result.json"
+    },
+    {
+      "command": "python -B tests/core_01/run_m3_bootstrap.py",
+      "status": "FAIL_EXPECTED_FOR_REJECTED_CANDIDATE",
+      "checks_executed": 64,
+      "genesis_cases_matched": 6,
+      "core_candidate_observed": "REJECT",
+      "reason": "CHECK_FAILED",
+      "receipt": "bootstrap-receipt.json"
+    }
+  ],
+  "hashes": {
+    "scripts/bootstrap-core-verifier.py": "94a36a178ee8242e850ee9f23b7cafc63906eac8aac2e723ca64225751cdfb40",
+    "scripts/bootstrap_verifier.py": "9ec6ba19fb7a4c2d4e6d654be0bcda3190c38fcd0842ddf8ce17b3996a984119",
+    "scripts/bootstrap_verifier_support.py": "d4435acdc60458893c39e7722a801df1418dd634d8330469ecf3c34b8ac5749b",
+    ".yuan/core/0.1/candidate-manifest.json": "852016c9f710f6b53e89ec76104cff8ba10a2964a803d916427031314b216176",
+    "tests/core_01/held_out_validator.py": "77ff50e3dcf4d1254836356f7fd30c3c94ff9bf4da93b7437b46c9288e6d4350",
+    "tests/core_01/run_m3_bootstrap.py": "60c2ff7d20870a9480d0abe497e4b5b7b573c19c9b31decdc56bdf8048e24a1b",
+    "bootstrap-manifest.json": "679c0d49949dc4848bf5170581a3c358d717f3d0f010f28d2aac1b26d24921f5",
+    "bootstrap-receipt.json": "0795e1d3bb365a9410ff39f5266be55ea64230f4906588da0e0e413eb930cc61",
+    "held-out-result.json": "28ed25e59ac9205f375396d287e5b9a717ddd954acb2ee383be2f2ef243a3159"
+  },
+  "blocking_groups": [
+    "M3-B01_EVIDENCE_BINDING_FRESHNESS_DIGEST",
+    "M3-B02_ATTEMPT_JOURNAL_FAIL_OPEN",
+    "M3-B03_RUN_MEMORY_REBUILD_MISSING",
+    "M3-B04_SELF_MOD_TRUST_ENFORCER_MISSING",
+    "M3-B05_AUTH_AND_COMMAND_SCOPE_BYPASS"
+  ],
+  "anti_gaming": {
+    "candidate_implementation_modified": false,
+    "candidate_author_tests_used_as_gate": false,
+    "old_bootstrap_verifier_modified": false,
+    "held_out_was_author_invisible": true,
+    "assertions_weakened": false,
+    "skip_or_xfail_added": false
+  },
+  "gate": "M3_FAIL_RETURN_TASK_005"
+}

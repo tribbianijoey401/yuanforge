@@ -1,0 +1,280 @@
+{
+  "schema_version": "yuan.bootstrap-suite/v1",
+  "suite_id": "m3-old-root-verifies-yuan-core-01",
+  "cases": [
+    {
+      "id": "valid",
+      "expected": "ACCEPT",
+      "negative_class": null,
+      "candidate": "candidates/valid",
+      "required_files": [
+        {
+          "path": "protocol.md",
+          "sha256": "00360adb21b83baacdadc427bef10c683e891de77afa1a0acc904f50b5c4f82c"
+        }
+      ],
+      "validator": {
+        "command": [
+          "{python}",
+          "validators/pass_validator.py",
+          "{candidate}"
+        ],
+        "timeout_seconds": 5,
+        "trusted_files": [
+          {
+            "path": "validators/pass_validator.py",
+            "sha256": "50329c65f97895223fc5237f5ffaf1f4932051fcc2aead65df17a83cf1c61de6"
+          }
+        ]
+      },
+      "expected_reason_codes": []
+    },
+    {
+      "id": "empty",
+      "expected": "REJECT",
+      "negative_class": "empty_candidate",
+      "candidate": "candidates/empty",
+      "required_files": [],
+      "validator": {
+        "command": [
+          "{python}",
+          "validators/pass_validator.py",
+          "{candidate}"
+        ],
+        "timeout_seconds": 5,
+        "trusted_files": [
+          {
+            "path": "validators/pass_validator.py",
+            "sha256": "50329c65f97895223fc5237f5ffaf1f4932051fcc2aead65df17a83cf1c61de6"
+          }
+        ]
+      },
+      "expected_reason_codes": [
+        "EMPTY_CANDIDATE"
+      ]
+    },
+    {
+      "id": "known-bad",
+      "expected": "REJECT",
+      "negative_class": "known_bad",
+      "candidate": "candidates/known-bad",
+      "required_files": [
+        {
+          "path": "protocol.md",
+          "sha256": "0a04671ee4eaef564821511ddb43f1769ae0d88cdf1024f069bb4996be6200f0"
+        }
+      ],
+      "validator": {
+        "command": [
+          "{python}",
+          "validators/known_bad_validator.py",
+          "{candidate}"
+        ],
+        "timeout_seconds": 5,
+        "trusted_files": [
+          {
+            "path": "validators/known_bad_validator.py",
+            "sha256": "9d1b2ed462a35f4ba62563217c0aa727e4b1fbd8bc40bcacef0ae71e0157635e"
+          }
+        ]
+      },
+      "expected_reason_codes": [
+        "CHECK_FAILED"
+      ]
+    },
+    {
+      "id": "zero-assertions",
+      "expected": "REJECT",
+      "negative_class": "zero_assertions",
+      "candidate": "candidates/zero-assertions",
+      "required_files": [
+        {
+          "path": "protocol.md",
+          "sha256": "806a374489e96700a3362492357416ac55209764052c8135e2dfd819c494421a"
+        }
+      ],
+      "validator": {
+        "command": [
+          "{python}",
+          "validators/zero_validator.py",
+          "{candidate}"
+        ],
+        "timeout_seconds": 5,
+        "trusted_files": [
+          {
+            "path": "validators/zero_validator.py",
+            "sha256": "eadfce4bc0b3b58919f4716bb78791b8e53c052a57eec5bc282183802b063c3c"
+          }
+        ]
+      },
+      "expected_reason_codes": [
+        "ZERO_ASSERTIONS"
+      ]
+    },
+    {
+      "id": "validator-error",
+      "expected": "REJECT",
+      "negative_class": "validator_error",
+      "candidate": "candidates/validator-error",
+      "required_files": [
+        {
+          "path": "protocol.md",
+          "sha256": "9b3df79763917c2d2353f35ce8d517ed009bf05c249f331367dd7a16cc61a9b0"
+        }
+      ],
+      "validator": {
+        "command": [
+          "{python}",
+          "validators/error_validator.py",
+          "{candidate}"
+        ],
+        "timeout_seconds": 5,
+        "trusted_files": [
+          {
+            "path": "validators/error_validator.py",
+            "sha256": "5f0164c876160d789b428cc38a818f3567aa2ff0a781eb58a21c578168a59ba2"
+          }
+        ]
+      },
+      "expected_reason_codes": [
+        "VALIDATOR_ERROR"
+      ]
+    },
+    {
+      "id": "parse-error",
+      "expected": "REJECT",
+      "negative_class": "parse_error",
+      "candidate": "candidates/parse-error",
+      "required_files": [
+        {
+          "path": "protocol.md",
+          "sha256": "dd522bb917150758f4d2cdfcc8258260e2285de003fe48404df421b7ca3e3b4f"
+        }
+      ],
+      "validator": {
+        "command": [
+          "{python}",
+          "validators/parse_error_validator.py",
+          "{candidate}"
+        ],
+        "timeout_seconds": 5,
+        "trusted_files": [
+          {
+            "path": "validators/parse_error_validator.py",
+            "sha256": "cceb43d4806bed3383d704e230c39785f89173c79dee62ca564cc36aa5e80d5d"
+          }
+        ]
+      },
+      "expected_reason_codes": [
+        "RESULT_PARSE_ERROR"
+      ]
+    },
+    {
+      "id": "yuan-core-01-candidate",
+      "candidate": "candidates/core-01",
+      "required_files": [
+        {
+          "path": "attempt.schema.yaml",
+          "sha256": "a3c84729fc56846dc349baf29439f5d9ecdd17765b353090e84adee6f9ccd407"
+        },
+        {
+          "path": "conformance.py",
+          "sha256": "dc73e7f795c9efd69e04acd05dcf7b308843020b94445384c1e5f5e866a9a8de"
+        },
+        {
+          "path": "evidence.schema.yaml",
+          "sha256": "35d079089f136c487148c6b0d5c4d8396747e6bff976b0a96d57c4f24b60836e"
+        },
+        {
+          "path": "fixtures/invalid/attempt-invalid-journal.json",
+          "sha256": "eab89722076b29335ebfc1f94bffff970b2f40a5aaf72400b934a706fb94da69"
+        },
+        {
+          "path": "fixtures/invalid/evidence-zero-assertions.json",
+          "sha256": "ce7e652c0e63201c3a7d755d11659427b5310787255863df763569274172ca18"
+        },
+        {
+          "path": "fixtures/invalid/run-memory-unknown-complete.json",
+          "sha256": "d43ffc2e18119d591da2b57e1a3ed39bf17a50d73bb952f33e3655a77a76cc7c"
+        },
+        {
+          "path": "fixtures/invalid/work-contract-duplicate-ac.json",
+          "sha256": "768e92abb9349cfd119109a1ca83587c1698486a50d1c3ad1f5353fb56ed1e8f"
+        },
+        {
+          "path": "fixtures/valid/attempt.json",
+          "sha256": "c04a30a63da7b3d6cabe2eea5e5eb3b2cd29b71aab5c8d2086d14956144b5297"
+        },
+        {
+          "path": "fixtures/valid/evidence.json",
+          "sha256": "07841751a433aebfbd5c36776ebc3a8c09a53b2f1e5608992ec25808db009969"
+        },
+        {
+          "path": "fixtures/valid/run-memory.json",
+          "sha256": "65cad683c7fd54696bbe0939bfc35503b0eb117037f9cbad445e04cb0a1cd34d"
+        },
+        {
+          "path": "fixtures/valid/work-contract.json",
+          "sha256": "4e18a0d030364420057e8fde4b9d705926158f89bca4558ae00689a6f27e6965"
+        },
+        {
+          "path": "port_types.py",
+          "sha256": "1506da4ce18c71f0d2f3109ed3938eb0719b5d49986fc2259c45a2eac3fec37c"
+        },
+        {
+          "path": "protocol.md",
+          "sha256": "715ea87e41d83f4c271b342cacaec96c1a09ee1033b84e6af48f30fce914346d"
+        },
+        {
+          "path": "reference_port.py",
+          "sha256": "e43822ef0ed2afa946f787a7c24f160f59fa972ac2015d41118fd47a522bbe31"
+        },
+        {
+          "path": "run-memory.schema.yaml",
+          "sha256": "fbd33b5f9a099207cdf1015cbbb00917d74af4f4d47e2b389c8a83e0ec3f7f29"
+        },
+        {
+          "path": "schema_runtime.py",
+          "sha256": "b419619e68d952a5fa0b25366de607d8c1c378becb5a79bc88eebbefefaf568e"
+        },
+        {
+          "path": "tests/_load.py",
+          "sha256": "a3daec2c5b24f688415904ccb1c94ce5fdb9afbf5adb8117c1433c366d09741d"
+        },
+        {
+          "path": "tests/test_conformance.py",
+          "sha256": "bfb2b59f1e9c4c6e40d951ce627de81d350b71c1ab1ca960b98a45dc74ce06b6"
+        },
+        {
+          "path": "tests/test_reference_port.py",
+          "sha256": "a0811c0dc54bfcc5850631d981f019fc4383d98946ad69dd216de64f7d860fe9"
+        },
+        {
+          "path": "work-contract.schema.yaml",
+          "sha256": "42c2b795d7f841787ba033f5a10cbb95cc3baf47d722a9dbde6217ed236ddd5e"
+        },
+        {
+          "path": "candidate-manifest.json",
+          "sha256": "852016c9f710f6b53e89ec76104cff8ba10a2964a803d916427031314b216176"
+        }
+      ],
+      "validator": {
+        "command": [
+          "{python}",
+          "validators/m3_held_out_validator.py",
+          "{candidate}"
+        ],
+        "trusted_files": [
+          {
+            "path": "validators/m3_held_out_validator.py",
+            "sha256": "77ff50e3dcf4d1254836356f7fd30c3c94ff9bf4da93b7437b46c9288e6d4350"
+          }
+        ],
+        "timeout_seconds": 20
+      },
+      "expected": "ACCEPT",
+      "negative_class": null,
+      "expected_reason_codes": []
+    }
+  ]
+}

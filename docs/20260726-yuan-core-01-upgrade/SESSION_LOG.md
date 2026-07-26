@@ -14,8 +14,9 @@
 | task-002 | ✅ 完成 | 冻结 clean-room Yuan Core 0.1 Genesis baseline | 五原语、六结果、八项 mandatory semantics | `FEATURE.md`, `DESIGN.md`, `PLAN.md`, 状态文档 | 本提交 |
 | task-003 | ✅ 完成 | 独立、失败关闭的 bootstrap verifier | CLI + 冻结 manifest SHA-256 + 结构化 receipt；visible fixtures 不替代 Tester held-out | `scripts/bootstrap-core-verifier.py`, `scripts/bootstrap_verifier*.py`, `tests/bootstrap_verifier/` | 本提交 |
 | task-004 | ✅ 完成 | M1 独立 held-out、组合攻击与反作弊验证 | 两轮返工关闭 M1-B01–B04；31/31 tests 和冻结 receipt PASS | `tests/bootstrap_verifier/test_bootstrap_core_verifier_held_out.py`, `evidence/m1/` | 本提交 |
-| task-005 | ✅ 完成 | M2 inert Core candidate | 五原语协议/Schema、reference Port、17 项 author tests 与 41-check 自检；不替代 M3 | `.yuan/core/0.1/`, `evidence/m2/` | 本提交 |
-| task-006–task-013 | ⏳ 等待 | M3 独立验证至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
+| task-005 | 🔄 返工 | M2 inert Core candidate 未通过独立 M3 | M3-B01–B05 返回 Backend Dev；不得弱化 held-out | `.yuan/core/0.1/`, `evidence/m3/independent-review.md` | 待修复 |
+| task-006 | ❌ 阻塞 | M3 旧信任根验证拒绝 candidate | M1 regression 31/31 PASS；M3 held-out 16/28 PASS，旧根 64-check FAIL | `tests/core_01/`, `evidence/m3/` | 本提交 |
+| task-007–task-013 | ⏳ 等待 | M4 Shadow conversion 至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
 
 ## 现场保护
 
@@ -49,6 +50,9 @@
 - task-004 未预告组合攻击发现 manifest 未可信时 FAIL receipt 仍可覆盖 candidate；r2 将 receipt 隔离前移到 manifest 信任之前。
 - r2 最终独立验证：31/31 PASS、0 skip、0 xfail；额外覆盖 junction 逃逸、suite-root 边界、原子写失败、Windows UTF-8 和 reason pollution。
 - 冻结 author-visible manifest 产生 14-check PASS receipt；用户原始 10 个 dirty/untracked 文件哈希仍与 M0a 一致。
+- task-006 M3 使用未告知 held-out 攻击 Evidence、Attempt、Run Memory、reducer、授权/预算、Reference Port 与自修改：28 checks 中 16 PASS、12 FAIL。
+- 冻结 M1 verifier regression 仍为 31/31 PASS；外层 M3 suite 内容寻址绑定 candidate 与独立 validator，64 checks 后仅 Core case 因 `CHECK_FAILED` 被拒绝。
+- 建立 M3-B01–B05 并将 task-005 返回 Backend Dev；task-006 保持 Hard Gate 阻塞，修复后原样复测。
 
 ## 决策
 
@@ -75,4 +79,6 @@
 - `tests/bootstrap_verifier/`
 - `tests/bootstrap_verifier/test_bootstrap_core_verifier_held_out.py`
 - `evidence/m1/`
+- `tests/core_01/`
+- `evidence/m3/`
 - `docs/events/20260726/events.jsonl`

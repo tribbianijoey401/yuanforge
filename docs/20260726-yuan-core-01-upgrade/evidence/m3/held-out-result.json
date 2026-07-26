@@ -1,0 +1,263 @@
+{
+  "schema_version": "yuan.validator-result/v1",
+  "status": "FAIL",
+  "assertions": 28,
+  "checks": [
+    {
+      "id": "five-primitives-and-six-results",
+      "status": "PASS"
+    },
+    {
+      "id": "typed-ac-baseline-completes",
+      "status": "PASS"
+    },
+    {
+      "id": "evidence-must-bind-current-work-revision",
+      "status": "FAIL"
+    },
+    {
+      "id": "evidence-must-bind-work-harness-revision",
+      "status": "FAIL"
+    },
+    {
+      "id": "evidence-must-bind-current-environment-fingerprint",
+      "status": "FAIL"
+    },
+    {
+      "id": "expired-evidence-fails-closed",
+      "status": "FAIL"
+    },
+    {
+      "id": "evidence-immutable-digest-is-verified",
+      "status": "FAIL"
+    },
+    {
+      "id": "zero-assertions-rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "stale-artifact-rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "self-attestation-rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "attempt-baseline-valid",
+      "status": "PASS"
+    },
+    {
+      "id": "committed-side-effect-requires-bound-receipt",
+      "status": "FAIL"
+    },
+    {
+      "id": "unknown-side-effect-cannot-succeed",
+      "status": "FAIL"
+    },
+    {
+      "id": "mutating-action-type-cannot-claim-non-mutating",
+      "status": "FAIL"
+    },
+    {
+      "id": "run-memory-has-deterministic-rebuild",
+      "status": "FAIL"
+    },
+    {
+      "id": "self-modification-has-old-root-enforcer",
+      "status": "FAIL"
+    },
+    {
+      "id": "six-result-priority-is-mutually-exclusive",
+      "status": "PASS"
+    },
+    {
+      "id": "scope-auth-budget-baseline-authorized",
+      "status": "PASS"
+    },
+    {
+      "id": "scope-path-escape-blocked",
+      "status": "PASS"
+    },
+    {
+      "id": "expired-grant-waits-for-authorization",
+      "status": "FAIL"
+    },
+    {
+      "id": "over-budget-action-exits",
+      "status": "PASS"
+    },
+    {
+      "id": "same-strategy-without-new-evidence-rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "file-path-escape-rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "file-write-cas-and-hash",
+      "status": "PASS"
+    },
+    {
+      "id": "file-write-stale-cas-rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "command-timeout-has-bounded-receipt",
+      "status": "PASS"
+    },
+    {
+      "id": "command-output-is-utf8-bounded-with-full-digest",
+      "status": "PASS"
+    },
+    {
+      "id": "command-arguments-cannot-escape-work-scope",
+      "status": "FAIL"
+    }
+  ],
+  "observations": [
+    {
+      "id": "five-primitives-and-six-results",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "typed-ac-baseline-completes",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "evidence-must-bind-current-work-revision",
+      "status": "FAIL",
+      "observation": "expected invariant was violated"
+    },
+    {
+      "id": "evidence-must-bind-work-harness-revision",
+      "status": "FAIL",
+      "observation": "expected invariant was violated"
+    },
+    {
+      "id": "evidence-must-bind-current-environment-fingerprint",
+      "status": "FAIL",
+      "observation": "expected invariant was violated"
+    },
+    {
+      "id": "expired-evidence-fails-closed",
+      "status": "FAIL",
+      "observation": "expected invariant was violated"
+    },
+    {
+      "id": "evidence-immutable-digest-is-verified",
+      "status": "FAIL",
+      "observation": "expected invariant was violated"
+    },
+    {
+      "id": "zero-assertions-rejected",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "stale-artifact-rejected",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "self-attestation-rejected",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "attempt-baseline-valid",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "committed-side-effect-requires-bound-receipt",
+      "status": "FAIL",
+      "observation": "expected invariant was violated"
+    },
+    {
+      "id": "unknown-side-effect-cannot-succeed",
+      "status": "FAIL",
+      "observation": "expected invariant was violated"
+    },
+    {
+      "id": "mutating-action-type-cannot-claim-non-mutating",
+      "status": "FAIL",
+      "observation": "expected invariant was violated"
+    },
+    {
+      "id": "run-memory-has-deterministic-rebuild",
+      "status": "FAIL",
+      "observation": "expected invariant was violated"
+    },
+    {
+      "id": "self-modification-has-old-root-enforcer",
+      "status": "FAIL",
+      "observation": "expected invariant was violated"
+    },
+    {
+      "id": "six-result-priority-is-mutually-exclusive",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "scope-auth-budget-baseline-authorized",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "scope-path-escape-blocked",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "expired-grant-waits-for-authorization",
+      "status": "FAIL",
+      "observation": "expected invariant was violated"
+    },
+    {
+      "id": "over-budget-action-exits",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "same-strategy-without-new-evidence-rejected",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "file-path-escape-rejected",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "file-write-cas-and-hash",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "file-write-stale-cas-rejected",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "command-timeout-has-bounded-receipt",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "command-output-is-utf8-bounded-with-full-digest",
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "command-arguments-cannot-escape-work-scope",
+      "status": "FAIL",
+      "observation": "expected invariant was violated"
+    }
+  ],
+  "producer": "task-006-independent-held-out",
+  "created_at": "2026-07-26T14:51:52.930047+00:00"
+}
