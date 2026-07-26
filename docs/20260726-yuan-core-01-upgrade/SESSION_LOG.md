@@ -153,6 +153,17 @@
   software-delivery/work-authoring，并把 workflow-protocol.md 的 335 行复合
   内容作为一个条款处理。完整证据见 `evidence/m7-review/R1-QUALITY-AUDIT.md`；
   task-010 返回 r2，task-011/M8 保持阻塞。
+- task-010-r2 独立复审在 clean clone 以 reviewed registry
+  `4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4`
+  重现 2,207 source clauses / 2,227 semantic records / 0 unmapped；
+  11/11 作者负例和独立构造的 registry pin、category flip、valid wrong
+  target、cross-family、manifest drift、compound deletion 均 fail-closed。
+- 全量 claim 审计确认 2,227 个 source claims 与 claim pairs 均唯一且绑定
+  精确源身份/范围；483 个 Core/Extension target claims 绑定精确 anchor，
+  1,736 个 retained targets 绑定字节同一内容，8 个 fixtures 绑定精确 case，
+  heuristic/default/rationale 字段为零。七个实际错分和 21 段复合 clause
+  已复核通过；M7-B01–B06 关闭。机器可读 approval Evidence 已锁定上述 hash，
+  task-011 晋升就绪，M8 authority receipt 必须携带并预检同一 hash。
 
 ## 决策
 
