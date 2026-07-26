@@ -1,0 +1,11 @@
+## 九、与其他协议的关系
+
+| 协议 | 本协议如何使用 |
+|------|--------------|
+| Object Protocol | Workflow 中每个 Phase 产生/操作的对象 |
+| State Protocol | Workflow 通过 Action 触发状态转换 |
+| Action Protocol | Workflow 产生 Action → Adapter 执行 |
+| Adapter Protocol | Workflow 不直接执行——通过 Adapter |
+
+---
+

@@ -10,7 +10,7 @@
 |----|-----|
 | **已验证实现 HEAD** | `c506b919e7a8af8dd1b0c8f3a230b16573cba7cc` |
 | **原始 Git 脏文件** | 8 tracked modified + 2 untracked；已由 `evidence/m0a/` 保护 |
-| **活跃 Agent** | task-010-r1 独立复审 FAIL，task-010-r2 待返工；task-011 被 M7-B06 阻塞 |
+| **活跃 Agent** | task-010-r2 作者修复 PASS，等待独立复审；task-011 仍被 M7 Gate 阻塞 |
 | **当前 authority** | 旧 YuanForge 文档运行态；新 Core 尚未接管 |
 | **最后 Conductor 巡检** | 2026-07-27 02:26 +08:00 |
 
@@ -27,7 +27,7 @@
 | task-007 | P0 | R0 | M4 Shadow conversion 与回退演练 | backend-dev | task-006 | ✅ 完成 | converter, rollback receipt | `evidence/m4/author-evidence.md` |
 | task-008 | P1 | R1 | M5 Canary Work | tester | task-007 | ✅ 完成 | canary Evidence + 13-check held-out Gate | `evidence/m5/final-verification.json` |
 | task-009 | P1 | R1 | M6 Adapter conformance | tester | task-008 | ✅ 完成 | 8-check adapter Gate + old-root receipt | `evidence/m6/final-verification.json` |
-| task-010 | P0 | R0 | M7 Extensions 与条款 provenance | doc-engineer | task-006 | 🔴 Blocked → r2 | extensions, provenance manifest | `evidence/m7-review/R1-QUALITY-AUDIT.md` |
+| task-010 | P0 | R0 | M7 Extensions 与条款 provenance | doc-engineer | task-006 | 🟡 r2 作者完成，待独立复审 | semantic registry, provenance manifest | `evidence/m7/M7-R2-REPORT.md` |
 | task-011 | P0 | R0 | M8 原子 authority switch | backend-dev | task-009,task-010 | ⏳ 等待 | writer guard, authority receipt | `evidence/m7-review/R1-QUALITY-AUDIT.md` |
 | task-012 | P0 | R0 | M9 自修改 dogfood | tester | task-011 | ⏳ 等待 | self-host Evidence | `FEATURE.md#clean-room-验收标准` |
 | task-013 | P0 | R0 | M9 汇报、二次授权与 tombstone | doc-engineer | task-012 | ⏳ 等待 | 清场报告、授权回执、恢复窗口 | `PLAN.md#里程碑-gate` |
@@ -59,6 +59,7 @@
 | 01:33 | task-010 Quality Audit | task-010-r1,task-011 | 作者机械 verify 通过但独立 provenance 语义审查 FAIL；M8 不得消费 M7 | M7-B01–B05：默认 catch-all、117 个错误行区间、唯一事实丢失、scope 可缩减、commit 不可独立复现；见 `evidence/m7-review/QUALITY-AUDIT.md` |
 | 02:08 | task-010-r1 | task-010 independent re-review | 显式、冻结、可复现、fail-closed provenance 作者修复完成 | 294 tracked + 2 OOB inventory；177 files / 2,207 clauses / 0 unmapped；独立 verifier、6/6 negatives、clean checkout、全回归与 M0a 10/10 PASS；M8 仍等待独立复审 |
 | 02:26 | task-010-r1 Quality Audit | task-010-r2,task-011 | B01–B05 已关闭，但 clause→semantic target 信任边界仍可被作者任意改写；M8 继续阻塞 | M7-B06：类别翻转与有效目标置换均被 verifier 接受，且存在真实批量错分；见 `evidence/m7-review/R1-QUALITY-AUDIT.md` |
+| 03:12 | task-010-r2 | task-010 independent re-review | 语义 registry、family registry、reviewed hash 与复合 clause 原子绑定完成；M8 仍等待独立复审 | 2,207 source clauses / 2,227 semantic records / 0 unmapped；11/11 negatives、全回归、old-root 80/7、M0a 10/10 PASS |
 
 ## 故障记录
 
@@ -111,6 +112,7 @@
 | 2026-07-27 01:33 | task-010 / 8513dae | Quality Auditor independent | FAIL → task-010-r1 | Extensions 边界 PASS；provenance 信任 FAIL。450 个默认 catch-all、117 个错误行区间、零 legacy→Core 映射、唯一 AP/脚本内容未保留、scope/dirty reproducibility 未闭合 |
 | 2026-07-27 02:08 | task-010-r1 | Doc Engineer author verification | PASS → independent re-review | M7-B01–B05 作者侧关闭：显式 2,207-entry disposition、冻结 294+2 inventory、独立 verifier、8 AP、PTG 函数级 obsolete、10 dirty snapshots；clean checkout 与 6/6 negatives PASS |
 | 2026-07-27 02:26 | task-010-r1 / ff69740 | Quality Auditor independent | FAIL → task-010-r2 | B01–B05 关闭且 2,207/2,207 字节、范围、retained blob 独立复核通过；M7-B06：类别翻转和有效目标置换均被接受，真实 clause 存在跨域错分与 335 行复合条款 |
+| 2026-07-27 03:12 | task-010-r2 | Doc Engineer author verification | PASS → independent re-review | 2,227 条记录绑定 disposition、family、exact target、具体 claims 与 relation；7 个审计关键映射和 21 段复合 clause 独立断言；11/11 negatives PASS |
 
 ## Conductor 调度状态
 
@@ -139,6 +141,7 @@
 | 01:33 | task-010 独立审查阻塞 → return task-010-r1 | doc-engineer | 关闭 M7-B01–B05 后原样重跑独立 Quality Audit；task-011 退回等待 |
 | 02:08 | task-010-r1 作者修复完成 → independent re-review | quality-auditor | 必须独立复核显式映射、冻结 scope、语义切分、目标保留、dirty 可复现与 6 个负例；复审前不得解锁 task-011 |
 | 02:26 | task-010-r1 独立复审阻塞 → return task-010-r2 | doc-engineer | 保留 B01–B05 修复；增加不可由作者任意改写的 disposition↔target-family/条款语义约束，修正实际错分并新增两类 held-out 负例 |
+| 03:12 | task-010-r2 作者修复完成 → independent re-review | quality-auditor | 必须从 reviewed registry hash、family/path、7 个高风险绑定和 21 段复合 clause 独立对抗；复审前不得解锁 task-011 |
 
 ## 派发日志
 
@@ -167,3 +170,4 @@
 | 01:33 | task-010 independent review | Tier 1 | quality-auditor | ❌ 机械 verify PASS 但语义 provenance FAIL；M7-B01–B05，返回 task-010-r1，M8 阻塞 |
 | 02:08 | task-010-r1 | Tier 1 | doc-engineer | ✅ 作者修复及 clean reproduce 完成；等待 quality-auditor 独立复审，M8 继续阻塞 |
 | 02:26 | task-010-r1 independent review | Tier 1 | quality-auditor | ❌ B01–B05 关闭；M7-B06 证明语义类别/目标可任意置换并存在真实错分，返回 task-010-r2，M8 继续阻塞 |
+| 03:12 | task-010-r2 | Tier 1 | doc-engineer | ✅ semantic registry 2,227 条、11/11 negatives、全回归与 clean reproduce 完成；等待独立 Quality Audit |

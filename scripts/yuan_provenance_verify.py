@@ -46,6 +46,66 @@ NORMATIVE_DOCS = {
     "docs/MVP专家团对标与YuanForge优化.md",
 }
 
+EXTENSION_PATHS = {
+    "testing": ".yuan/extensions/testing.md",
+    "docsos": ".yuan/extensions/docsos.md",
+    "knowledge": ".yuan/extensions/knowledge.md",
+    "ui": ".yuan/extensions/ui.md",
+    "software-delivery": ".yuan/extensions/software-delivery.md",
+    "platform-adapters": ".yuan/extensions/platform-adapters.md",
+}
+DISPOSITION_FAMILIES = {
+    "core": {"core"},
+    "extension": set(EXTENSION_PATHS),
+    "knowledge": {"knowledge"},
+    "fixture": {"fixture"},
+    "obsolete-with-proof": {"obsolete"},
+}
+RELATIONS = {
+    "core": {"preserved", "refined", "superseded"},
+    "extension": {"preserved", "refined", "superseded"},
+    "knowledge": {"preserved", "superseded"},
+    "fixture": {"fixture"},
+    "obsolete-with-proof": {"obsolete"},
+}
+REQUIRED_SEMANTIC_BINDINGS = {
+    (".yuan/rules/iron-rules.md", 90): (
+        "extension", "testing", ".yuan/extensions/testing.md", "md:verifier-recipe:1",
+    ),
+    (".yuan/rules/iron-rules.md", 160): (
+        "extension", "docsos", ".yuan/extensions/docsos.md", "md:document-verification:1",
+    ),
+    (".yuan/rules/iron-rules.md", 374): (
+        "extension", "testing", ".yuan/extensions/testing.md", "md:actor-checker-separation:1",
+    ),
+    (".yuan/specs/object-protocol.md", 36): (
+        "extension", "knowledge", ".yuan/extensions/knowledge.md", "md:record-shape:1",
+    ),
+    (".yuan/specs/object-protocol.md", 61): (
+        "extension", "knowledge", ".yuan/extensions/knowledge.md", "md:promotion-advice:1",
+    ),
+    ("contracts/frontend-dev.md", 24): (
+        "extension", "testing", ".yuan/extensions/testing.md", "md:verifier-recipe:1",
+    ),
+    ("contracts/quality-auditor.md", 57): (
+        "extension", "software-delivery", ".yuan/extensions/software-delivery.md", "md:review-recipe:1",
+    ),
+}
+COMPOUND_EXPECTED = {
+    259: "testing", 279: "knowledge", 303: "software-delivery",
+    305: "software-delivery", 315: "software-delivery",
+    342: "software-delivery", 373: "testing", 383: "software-delivery",
+    406: "software-delivery", 422: "software-delivery",
+    434: "software-delivery", 444: "knowledge",
+    456: "software-delivery", 478: "docsos",
+    490: "software-delivery", 504: "docsos",
+    529: "software-delivery", 538: "software-delivery",
+    549: "software-delivery", 554: "software-delivery",
+    572: "software-delivery",
+}
+COMPOUND_PATH = ".yuan/specs/workflow-protocol.md"
+COMPOUND_ANCHOR = "md:phase-4b-tester-测试验证:1"
+
 
 class ProvenanceFailure(RuntimeError):
     pass
@@ -263,13 +323,59 @@ def validate_fixture_target(repo: Path, target: dict[str, str]) -> None:
         raise ProvenanceFailure(f"fixture case hash mismatch: {case_id}")
 
 
-def verify(repo: Path, prov: Path) -> dict[str, Any]:
+def verify(
+    repo: Path,
+    prov: Path,
+    expected_registry_sha256: str | None = None,
+) -> dict[str, Any]:
     inventory_raw = (prov / "inventory.lock.json").read_bytes()
-    map_raw = (prov / "disposition-map.json").read_bytes()
+    registry_raw = (prov / "semantic-registry.json").read_bytes()
+    manifest_raw = (prov / "clause-manifest.json").read_bytes()
+    family_raw = (prov / "target-family-registry.json").read_bytes()
     inventory = json.loads(inventory_raw)
-    explicit = json.loads(map_raw)
+    registry = json.loads(registry_raw)
+    family_registry = json.loads(family_raw)
+    registry_sha256 = hash_bytes(registry_raw)
+    pinned = (prov / "semantic-registry.sha256").read_text(encoding="utf-8").strip()
+    if pinned != registry_sha256:
+        raise ProvenanceFailure("semantic registry hash pin mismatch")
+    if expected_registry_sha256 is not None and registry_sha256 != expected_registry_sha256:
+        raise ProvenanceFailure("semantic registry hash differs from reviewed value")
+    if manifest_raw != registry_raw:
+        raise ProvenanceFailure("registry/manifest byte drift")
+    if registry["target_family_registry_sha256"] != hash_bytes(family_raw):
+        raise ProvenanceFailure("target family registry hash mismatch")
     if inventory["source_revision"] != FROZEN_SOURCE_REVISION:
         raise ProvenanceFailure("inventory source revision is not frozen")
+    if registry["source_revision"] != FROZEN_SOURCE_REVISION:
+        raise ProvenanceFailure("semantic registry source revision is not frozen")
+    if registry["inventory_lock_sha256"] != hash_bytes(inventory_raw):
+        raise ProvenanceFailure("semantic registry inventory binding mismatch")
+
+    allowed_targets: dict[str, set[tuple[str, str, str, str]]] = {}
+    seen_targets: set[tuple[str, str, str, str]] = set()
+    for family, descriptor in family_registry["families"].items():
+        targets: set[tuple[str, str, str, str]] = set()
+        for target in descriptor.get("targets", []):
+            token = (target["kind"], target["path"], target["anchor"], target["sha256"])
+            if token in seen_targets:
+                raise ProvenanceFailure(f"duplicate target registry entry: {token}")
+            seen_targets.add(token)
+            targets.add(token)
+            path = repo / target["path"]
+            if not path.is_file():
+                raise ProvenanceFailure(f"target missing: {target['path']}")
+            clauses = independent_split(path.read_bytes(), target["path"])
+            matches = [part for part in clauses if part["anchor"] == target["anchor"]]
+            if len(matches) != 1 or matches[0]["clause_sha256"] != target["sha256"]:
+                raise ProvenanceFailure(
+                    f"target anchor/hash mismatch: {target['path']}#{target['anchor']}"
+                )
+            if family == "core" and not target["path"].startswith(".yuan/core/0.1/"):
+                raise ProvenanceFailure("core family target escapes Core 0.1")
+            if family in EXTENSION_PATHS and target["path"] != EXTENSION_PATHS[family]:
+                raise ProvenanceFailure(f"target family/path mismatch: {family}")
+        allowed_targets[family] = targets
 
     tree = frozen_tree(repo)
     entries = inventory["entries"]
@@ -327,9 +433,14 @@ def verify(repo: Path, prov: Path) -> dict[str, Any]:
         if not snapshot.is_file() or hash_bytes(snapshot.read_bytes()) != expected_hash:
             raise ProvenanceFailure(f"dirty snapshot missing/hash mismatch: {path}")
 
-    mappings = explicit["mappings"]
-    if explicit["mapping_count"] != len(mappings):
-        raise ProvenanceFailure("explicit mapping count mismatch")
+    records = registry["records"]
+    if registry["semantic_record_count"] != len(records):
+        raise ProvenanceFailure("semantic record count mismatch")
+    if len({record["record_key"] for record in records}) != len(records):
+        raise ProvenanceFailure("duplicate semantic record key")
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for record in records:
+        grouped.setdefault(record["source_mapping_key"], []).append(record)
     expected_keys: set[str] = set()
     expected_files: list[dict[str, Any]] = []
     expected_clauses: list[dict[str, Any]] = []
@@ -359,37 +470,94 @@ def verify(repo: Path, prov: Path) -> dict[str, Any]:
                 raise ProvenanceFailure(f"invalid inclusive range: {entry['path']}#{part['anchor']}")
             key = key_for(entry["path"], part["anchor"], part["clause_sha256"])
             expected_keys.add(key)
-            mapping = mappings.get(key)
-            if mapping is None:
+            clause_records = grouped.get(key)
+            if not clause_records:
                 raise ProvenanceFailure(f"UNMAPPED clause: {entry['path']}#{part['anchor']}")
-            if any(token in mapping for token in ("mapping_rule", "default", "keyword")):
-                raise ProvenanceFailure(f"heuristic disposition metadata forbidden: {key}")
-            if (
-                mapping["source"] != entry["path"]
-                or mapping["anchor"] != part["anchor"]
-                or mapping["clause_sha256"] != part["clause_sha256"]
-            ):
-                raise ProvenanceFailure(f"explicit mapping identity mismatch: {key}")
+            is_compound = len(clause_records) > 1 or "parent_source_anchor" in clause_records[0]
+            if is_compound:
+                if entry["path"] != COMPOUND_PATH or part["anchor"] != COMPOUND_ANCHOR:
+                    raise ProvenanceFailure("unexpected compound clause")
+                starts = {record["line_start"]: record["target_family"] for record in clause_records}
+                if starts != COMPOUND_EXPECTED:
+                    raise ProvenanceFailure("compound clause family coverage mismatch")
+                ordered = sorted(clause_records, key=lambda record: record["byte_start"])
+                if (
+                    ordered[0]["byte_start"] != part["byte_start"]
+                    or ordered[-1]["byte_end"] != part["byte_end"]
+                    or any(left["byte_end"] != right["byte_start"] for left, right in zip(ordered, ordered[1:]))
+                ):
+                    raise ProvenanceFailure("compound clause byte coverage mismatch")
+                parent_destinations = {
+                    json.dumps(record.get("parent_destination"), sort_keys=True)
+                    for record in clause_records
+                }
+                if len(parent_destinations) != 1:
+                    raise ProvenanceFailure("compound clause parent destination mismatch")
+                parent_destination = clause_records[0]["parent_destination"]
+                parent_blob = repo / parent_destination["path"]
+                parent_bytes = data[part["byte_start"]:part["byte_end"]]
+                if (
+                    parent_destination["sha256"] != part["clause_sha256"]
+                    or not parent_blob.is_file()
+                    or parent_blob.read_bytes() != parent_bytes
+                ):
+                    raise ProvenanceFailure("compound clause retained parent mismatch")
+                retained_names.add(parent_blob.name)
+            else:
+                record = clause_records[0]
+                for field, value in (
+                    ("source", entry["path"]), ("anchor", part["anchor"]),
+                    ("clause_sha256", part["clause_sha256"]),
+                    ("byte_start", part["byte_start"]), ("byte_end", part["byte_end"]),
+                    ("line_start", part["line_start"]), ("line_end", part["line_end"]),
+                ):
+                    if record[field] != value:
+                        raise ProvenanceFailure(f"semantic source identity mismatch: {key}")
+
+            for record in clause_records:
+                if any(token in record for token in ("mapping_rule", "default", "keyword", "review_rationale")):
+                    raise ProvenanceFailure(f"heuristic semantic metadata forbidden: {record['record_key']}")
+                disposition = record["disposition"]
+                family = record["target_family"]
+                if family not in DISPOSITION_FAMILIES.get(disposition, set()):
+                    raise ProvenanceFailure("disposition/target family mismatch")
+                if record["relation"] not in RELATIONS[disposition]:
+                    raise ProvenanceFailure("invalid semantic relation")
+                if not record.get("source_claim", "").strip() or not record.get("target_claim", "").strip():
+                    raise ProvenanceFailure("source_claim/target_claim missing")
+                record_bytes = data[record["byte_start"]:record["byte_end"]]
+                if hash_bytes(record_bytes) != record["clause_sha256"]:
+                    raise ProvenanceFailure(f"semantic record byte hash mismatch: {record['record_key']}")
+                destination = record["destination"]
+                blob = repo / destination["path"]
+                if (
+                    destination["kind"] != "content-addressed-retained-clause"
+                    or destination["sha256"] != record["clause_sha256"]
+                    or not blob.is_file()
+                    or blob.read_bytes() != record_bytes
+                ):
+                    raise ProvenanceFailure(f"retained destination mismatch: {record['record_key']}")
+                retained_names.add(blob.name)
+                target = record["target"]
+                token = (target["kind"], target["path"], target["anchor"], target["sha256"])
+                if target["kind"] in {"semantic-anchor", "core-registry-anchor"}:
+                    if token not in allowed_targets.get(family, set()):
+                        raise ProvenanceFailure("target family/path mismatch")
+                elif target["kind"] == "retained-clause":
+                    if family in {"core", "fixture"} or target["path"] != destination["path"] or target["sha256"] != destination["sha256"]:
+                        raise ProvenanceFailure("target family/path mismatch")
+                elif target["kind"] == "fixture-case":
+                    if family != "fixture":
+                        raise ProvenanceFailure("target family/path mismatch")
+                    validate_fixture_target(repo, {
+                        "path": target["path"], "anchor": target["anchor"],
+                        "clause_sha256": target["sha256"],
+                    })
+                else:
+                    raise ProvenanceFailure(f"unknown semantic target kind: {target['kind']}")
+
+            mapping = clause_records[0]
             disposition = mapping["disposition"]
-            if disposition not in {"core", "extension", "knowledge", "fixture", "obsolete-with-proof"}:
-                raise ProvenanceFailure(f"invalid/UNMAPPED disposition: {key}")
-            destination = mapping["destination"]
-            if destination["kind"] != "content-addressed-retained-clause":
-                raise ProvenanceFailure(f"destination is not exact retained clause: {key}")
-            blob = repo / destination["path"]
-            clause_bytes = data[part["byte_start"]:part["byte_end"]]
-            if (
-                destination["sha256"] != part["clause_sha256"]
-                or not blob.is_file()
-                or blob.read_bytes() != clause_bytes
-                or hash_bytes(blob.read_bytes()) != destination["sha256"]
-            ):
-                raise ProvenanceFailure(f"retained destination mismatch: {key}")
-            retained_names.add(blob.name)
-            if "semantic_target" in mapping:
-                validate_markdown_target(repo, mapping["semantic_target"])
-            if "fixture_target" in mapping:
-                validate_fixture_target(repo, mapping["fixture_target"])
             if disposition == "obsolete-with-proof":
                 proof = mapping.get("obsolete") or {}
                 if proof.get("source_sha256") != part["clause_sha256"] or not proof.get("reason"):
@@ -413,22 +581,12 @@ def verify(repo: Path, prov: Path) -> dict[str, Any]:
                 elif disposition == "obsolete-with-proof":
                     raise ProvenanceFailure("only the false-green PTG gate may be obsolete")
 
-            actual = {
-                "mapping_key": key, "source": entry["path"],
-                "source_sha256": entry["source_sha256"], **part,
-            }
-            for field in (
-                "disposition", "destination", "review_rationale",
-                "semantic_target", "fixture_target", "obsolete",
-            ):
-                if field in mapping:
-                    actual[field] = mapping[field]
-            expected_clauses.append(actual)
+            expected_clauses.append({"mapping_key": key, "source": entry["path"], **part})
 
-    if set(mappings) != expected_keys:
-        raise ProvenanceFailure("disposition map has stale/extra clauses")
-    if legacy_core == 0:
-        raise ProvenanceFailure("no reviewed legacy clause maps to Core")
+    if set(grouped) != expected_keys:
+        raise ProvenanceFailure("semantic registry has stale/extra clauses")
+    if legacy_core != 12:
+        raise ProvenanceFailure("reviewed legacy-to-Core count is not 12")
     if len(ptg_obsolete) != 1:
         raise ProvenanceFailure("PTG runner obsolete function count is not exactly one")
     fixture_payload = json.loads((repo / ".yuan/extensions/fixtures/legacy-anti-patterns.json").read_text(encoding="utf-8"))
@@ -439,6 +597,21 @@ def verify(repo: Path, prov: Path) -> dict[str, Any]:
     retained_actual = {path.name for path in (prov / "retained").glob("*.blob")}
     if retained_actual != retained_names:
         raise ProvenanceFailure("retained clause pack has missing or unreferenced blobs")
+
+    bindings = {(record["source"], record["line_start"]): record for record in records}
+    for identity, expected in REQUIRED_SEMANTIC_BINDINGS.items():
+        record = bindings.get(identity)
+        if record is None:
+            raise ProvenanceFailure(f"required semantic binding missing: {identity}")
+        actual = (
+            record["disposition"], record["target_family"],
+            record["target"]["path"], record["target"]["anchor"],
+        )
+        if actual != expected:
+            raise ProvenanceFailure(f"required semantic binding mismatch: {identity}")
+    claim_pairs = {(record["source_claim"], record["target_claim"]) for record in records}
+    if len(claim_pairs) != len(records):
+        raise ProvenanceFailure("source_claim/target_claim pair is not record-specific")
 
     scope_expected = {
         "schema_version": "yuan.provenance-scope/v2",
@@ -459,27 +632,22 @@ def verify(repo: Path, prov: Path) -> dict[str, Any]:
     scope_actual = json.loads((prov / "scope-manifest.json").read_text(encoding="utf-8"))
     if scope_actual != scope_expected:
         raise ProvenanceFailure("scope manifest is stale or independently inconsistent")
-    manifest_actual = json.loads((prov / "clause-manifest.json").read_text(encoding="utf-8"))
-    expected_manifest = {
-        "schema_version": "yuan.clause-provenance/v2",
-        "scope_sha256": hash_bytes(json_bytes(scope_expected)),
-        "disposition_map_sha256": hash_bytes(map_raw),
-        "allowed_dispositions": ["core", "extension", "knowledge", "fixture", "obsolete-with-proof"],
-        "mapped_clause_count": len(expected_clauses),
-        "unmapped_clause_count": 0,
-        "clauses": expected_clauses,
-    }
-    if manifest_actual != expected_manifest:
-        raise ProvenanceFailure("clause manifest is stale, altered, or range-invalid")
+    if registry["scope_sha256"] != hash_bytes(json_bytes(scope_expected)):
+        raise ProvenanceFailure("semantic registry scope binding mismatch")
+    if registry["source_clause_count"] != len(expected_clauses):
+        raise ProvenanceFailure("semantic registry source clause count mismatch")
 
     return {
         "status": "PASS",
         "tracked_inventory": len(tree),
         "out_of_band": len(out_of_band),
         "included_sources": len(expected_files),
-        "clauses": len(expected_clauses),
-        "mapped": len(expected_clauses),
+        "source_clauses": len(expected_clauses),
+        "semantic_records": len(records),
+        "mapped": len(records),
         "unmapped": 0,
+        "registry_sha256": registry_sha256,
+        "families": dict(sorted(Counter(record["target_family"] for record in records).items())),
         "legacy_to_core": legacy_core,
         "anti_patterns": len(ap_ids),
         "ptg_obsolete_functions": len(ptg_obsolete),

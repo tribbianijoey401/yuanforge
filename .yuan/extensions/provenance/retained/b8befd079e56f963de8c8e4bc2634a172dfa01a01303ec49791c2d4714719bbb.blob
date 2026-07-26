@@ -1,0 +1,10 @@
+### L2-1 · TDD 循环
+
+```
+scope: L2（内嵌在 Dev 中）
+trigger: Dev 收到 Task（Dispatch）
+body: Red（写测试 → FAIL）→ Green（写实现 → PASS）→ Blue（重构 → STILL PASS）
+gate: Red→Green→Blue 线性推进，不会反向。Blue 阶段 max 3 次重构失败 → 跳过重构，mark 技术债
+carry: 不需要——Dev 是同一 Agent 同一会话
+```
+

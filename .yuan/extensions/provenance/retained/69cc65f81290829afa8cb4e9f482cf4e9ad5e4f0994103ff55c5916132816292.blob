@@ -1,0 +1,12 @@
+### L3-1 · Debug 循环
+
+```
+scope: L3（内嵌在 L2-3 中）
+trigger: Dev ≥2 次修复失败，猜测代替逻辑
+body: 详见 debug-feedback-loop Skill
+  Phase 0: 构建反馈循环（10 种方式）
+  Phase 1: 隔离 → 二分定位 → 假设记录 → 并行通知 Architect → 修复 → verify
+gate: max_iterations: 5; on_exceed: 标记 known issue → 跳过此 Task
+carry: 「假设记录 + 诊断结论」→ TASK_BOARD 原因指针
+```
+

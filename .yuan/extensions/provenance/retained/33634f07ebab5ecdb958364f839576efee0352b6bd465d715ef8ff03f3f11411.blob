@@ -1,0 +1,16 @@
+### L2-3 · 修复回路
+
+```
+scope: L2
+trigger: Tester 返回 ❌
+body:
+  Tester 诊断失败类型 → 写入 TASK_BOARD 原因指针
+  Conductor 读失败类型，路由：
+    → 逻辑缺陷 → Dispatch 原 Dev（回 L2-1 TDD）
+    → 接口/权限缺陷 → 通知 Architect + Spec Reviewer + Security Auditor
+    → 依赖问题 → 通知 Architect + Spec Reviewer + Quality Auditor
+  → 问题修复 → 重新进入 L2-2 审查 → 审查通过 → 重新进入测试
+gate: max_iterations: 3; on_exceed: escalate_to_user
+carry: Tester 写入「失败类型 + 具体症状」→ Conductor 路由决策落盘
+```
+

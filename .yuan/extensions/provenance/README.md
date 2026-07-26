@@ -20,10 +20,20 @@ content-addressed files in `sources/`; their independent bindings are in
 [`dirty-source-receipt.json`](dirty-source-receipt.json). Original dirty paths
 remain untouched and unstaged.
 
-[`disposition-map.json`](disposition-map.json) is an explicit reviewed map keyed
-by source path, semantic anchor, and clause SHA-256. The generator contains no
-keyword, substring, default, or catch-all disposition. A new or changed clause
-therefore becomes `UNMAPPED` and fails generation.
+[`semantic-registry.json`](semantic-registry.json) is the reviewed source of
+truth. Each record binds an exact source path, source anchor, byte hash,
+disposition, target family, exact target, source claim, target claim, and
+semantic relation. Its reviewed hash is pinned in
+[`semantic-registry.sha256`](semantic-registry.sha256), while
+[`target-family-registry.json`](target-family-registry.json) constrains which
+exact anchors belong to Core and each Extension family. The generated clause
+manifest is byte-identical to the registry.
+
+The generator contains no keyword, substring, default, catch-all disposition,
+or semantic routing logic. A new or changed source tuple therefore becomes
+`UNMAPPED` and fails generation. The independent verifier additionally freezes
+the seven audit-critical bindings and the 21 atomic subclauses of the malformed
+legacy workflow fence.
 
 ## Clause boundaries
 
@@ -43,14 +53,16 @@ rules, examples, tables, exceptions, and legacy implementation details.
 
 ```text
 python -B scripts/yuan-provenance.py generate
-python -B scripts/verify-yuan-provenance.py
+python -B scripts/verify-yuan-provenance.py \
+  --semantic-registry-sha256 4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4
 python -B -m unittest discover -s tests/provenance -p "test_*.py" -v
 ```
 
 The independent verifier does not import the author generator. It independently
 recomputes the frozen Git inventory, M0 source receipt, clause ranges/hashes,
 explicit mapping coverage, retained destinations, target anchors/hashes,
-anti-pattern fixtures, and obsolete proof.
+disposition/family compatibility, record-specific claim pairs, audit-critical
+semantic bindings, anti-pattern fixtures, and obsolete proof.
 
 Held-out negatives reject:
 
@@ -60,6 +72,11 @@ Held-out negatives reject:
 - an invalid inclusive range;
 - a missing destination/target;
 - a dirty source that cannot be reproduced.
+- a category-only disposition flip;
+- a reviewed-hash change to a valid but unrelated target;
+- a cross-family target;
+- registry/manifest drift;
+- a missing atomic subclause in the compound workflow clause.
 
 ## Exclusions
 

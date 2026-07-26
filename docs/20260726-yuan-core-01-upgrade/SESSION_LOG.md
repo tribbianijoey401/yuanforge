@@ -19,7 +19,7 @@
 | task-007 | ✅ 完成 | M4 Shadow conversion 与回退演练 | 单向只读 legacy→shadow；Core 重建、writer guard 与无损 rollback 全绿 | `scripts/yuan-shadow-migrate.py`, `evidence/m4/` | 本提交 |
 | task-008 | ✅ 完成 | M5 Canary Work 经 r3 修复后通过独立复测 | 原 10 项 + 3 项普通数据变体全绿；旧 Genesis root 接受新 candidate | `evidence/m5/` | 本提交 |
 | task-009 | ✅ 完成 | M6 Adapter conformance | manual executable mapping + Hermes honest unsupported；旧根与独立变体通过 | `evidence/m6/` | 本提交 |
-| task-010 | 🟡 r1 作者完成，待独立复审 | M7 Extensions 与条款 provenance | 显式 disposition、冻结 inventory、独立 verifier、内容寻址保留与 dirty snapshots 已关闭作者侧 B01–B05；M8 仍阻塞 | `.yuan/extensions/`, `scripts/yuan_provenance_verify.py`, `tests/provenance/`, `evidence/m7/` | r1 提交 |
+| task-010 | 🟡 r2 作者完成，待独立复审 | M7 Extensions 与条款 provenance | reviewed semantic registry + family registry + exact claims/relations 关闭作者侧 M7-B06；11/11 negatives 与全回归 PASS；M8 仍阻塞 | `.yuan/extensions/provenance/`, `scripts/yuan_provenance_verify.py`, `tests/provenance/`, `evidence/m7/M7-R2-REPORT.md` | r2 待提交 |
 | task-011–task-013 | ⏳ 等待 | M8 authority switch 至 M9 清场 | M8 依赖已满足；继续 verifier-first 推进 | 见 `PLAN.md` | — |
 
 ## 现场保护

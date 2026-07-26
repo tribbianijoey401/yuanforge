@@ -21,9 +21,14 @@ def main() -> int:
         type=Path,
         default=ROOT / ".yuan/extensions/provenance",
     )
+    parser.add_argument("--semantic-registry-sha256")
     args = parser.parse_args()
     try:
-        result = verify(args.repo.resolve(), args.provenance_dir.resolve())
+        result = verify(
+            args.repo.resolve(),
+            args.provenance_dir.resolve(),
+            expected_registry_sha256=args.semantic_registry_sha256,
+        )
     except (OSError, KeyError, ValueError, UnicodeError, json.JSONDecodeError, ProvenanceFailure) as exc:
         print(f"FAIL {exc}", file=sys.stderr)
         return 1

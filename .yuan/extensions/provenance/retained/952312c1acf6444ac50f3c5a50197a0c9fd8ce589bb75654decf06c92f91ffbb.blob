@@ -1,0 +1,10 @@
+### L3-2 · Grilling 循环
+
+```
+scope: L3（内嵌在 Product Analyst / Architect 中）
+trigger: 需求存在模糊点
+body: 详见 grilling Skill。一次一问 → 等反馈 → 探索边界
+gate: max_iterations: ∞（用户驱动，"可以了" = 退出）
+carry: 不需要——与用户对话，同一 Agent
+```
+

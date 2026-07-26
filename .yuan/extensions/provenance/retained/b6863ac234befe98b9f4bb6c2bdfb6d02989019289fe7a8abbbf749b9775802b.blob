@@ -1,0 +1,12 @@
+### 跨会话恢复
+
+新 Conductor 启动时：
+1. 读 PROGRESS.md → 找到当前 Workspace
+2. 读 TASK_BOARD → 扫描全部状态
+3. 读 Event Log（最近 20 条）→ 了解刚才发生了什么
+4. 回退 🔨进行中 → 🟢就绪（上一个 Conductor 可能崩溃）
+5. 检查 Git working tree → 脏则 stash
+6. 进入调度循环 step 1
+
+---
+

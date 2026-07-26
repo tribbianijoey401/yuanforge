@@ -1,0 +1,1985 @@
+{
+  "families": {
+    "core": {
+      "allowed_dispositions": [
+        "core"
+      ],
+      "retained_clause_allowed": false,
+      "semantic_path_prefix": ".yuan/core/0.1/",
+      "targets": [
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/attempt.schema.yaml",
+          "sha256": "98bff43675cabf103b6507c6241e658ce64578e475c17847a328b22b95e19c2b"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/authorization_semantics.py",
+          "sha256": "474068c3f09d5b82f0f700c02bbc69680d7c804f4832943e971424f129632583"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/authorization_semantics.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/authorization_semantics.py",
+          "sha256": "e6b279f7d762dd4e79956651f1dcaec3f33d7e0a2cf996833587844f22ea41d9"
+        },
+        {
+          "anchor": "py:import:datetime:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/authorization_semantics.py",
+          "sha256": "2ed0247cc05b861fea3391ee7651aec4bb57304b71be6e96d2b74d171c551f55"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/authorization_semantics.py",
+          "sha256": "5da144fd706331fe3cce39bf7af7929606eeb3b91c2df91874bba29bb2254b5f"
+        },
+        {
+          "anchor": "py:import:document_validation:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/authorization_semantics.py",
+          "sha256": "1fe64d479ac80583364846146c1b3fe1adb9435557e4032083415ca83a91dcc4"
+        },
+        {
+          "anchor": "py:import:trust_semantics:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/authorization_semantics.py",
+          "sha256": "cf7539c1b3eed3992a5c67ff3f6974b2263b070800cbfa119e70cbd7bbe958af"
+        },
+        {
+          "anchor": "py:function:_scope_contains:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/authorization_semantics.py",
+          "sha256": "10237fbd2c053e2e40017ad7d20a65eb04dd0a47c8e10d9238d22277479cee17"
+        },
+        {
+          "anchor": "py:function:authorization_status:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/authorization_semantics.py",
+          "sha256": "338e44fefa8d5f5f8c970c3916fda4dfb14a04e4ae77f5abb37cb2df186d433a"
+        },
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/candidate-manifest.json",
+          "sha256": "20ac1cbb7f2377d5cecadf3347a40d81e14e8469c6c914701f585a49903d9768"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/command_sandbox.py",
+          "sha256": "e175574eb31c9542b1bd1a11de905a03038e352e45d07fbe568e2164b77f7bb0"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/command_sandbox.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/command_sandbox.py",
+          "sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/command_sandbox.py",
+          "sha256": "e6b279f7d762dd4e79956651f1dcaec3f33d7e0a2cf996833587844f22ea41d9"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/command_sandbox.py",
+          "sha256": "6d6d536ea0f71c1b09d6c37b85d67fd3465d0db9e256ba83cf4dbdbf9498be41"
+        },
+        {
+          "anchor": "py:assignment:line-10:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/command_sandbox.py",
+          "sha256": "ce09e46ddbd013b1a47cb3b328dfcd22ed7612cf328be15708bc885970749993"
+        },
+        {
+          "anchor": "py:assignment:line-11:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/command_sandbox.py",
+          "sha256": "81515272deea9c4954fc7ac15d0c2a6c1798763bc6ddd8c7618444741c6b32bf"
+        },
+        {
+          "anchor": "py:function:_inside:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/command_sandbox.py",
+          "sha256": "43905d2a97d0135580392d54ddec5bb8036664fbbc51601fe514ec479b9a1634"
+        },
+        {
+          "anchor": "py:function:prepare_command:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/command_sandbox.py",
+          "sha256": "c63cd72d885dcac93ebe0fe0517177b5d0cff3b82bb53f71d5e5bae79f62614b"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/completion_semantics.py",
+          "sha256": "9f3d68ce9cd1b25c041d49725b8f64587589761b2de3cdeca972d0f11d5c4828"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/completion_semantics.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:datetime:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/completion_semantics.py",
+          "sha256": "2ed0247cc05b861fea3391ee7651aec4bb57304b71be6e96d2b74d171c551f55"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/completion_semantics.py",
+          "sha256": "5da144fd706331fe3cce39bf7af7929606eeb3b91c2df91874bba29bb2254b5f"
+        },
+        {
+          "anchor": "py:import:document_validation:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/completion_semantics.py",
+          "sha256": "3e8adddf8bc60c30e206a8b7a2db872ec4a83bc9c67286218cabc82c328d37ec"
+        },
+        {
+          "anchor": "py:import:trust_semantics:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/completion_semantics.py",
+          "sha256": "662c011c92982cd3bc978339620113671b60063b710eb80996991917249658b1"
+        },
+        {
+          "anchor": "py:function:_valid_evidence_for_ac:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/completion_semantics.py",
+          "sha256": "facd26ff444bf33248c107d40157b5108484f34c1dbb001ce45d822c43048c30"
+        },
+        {
+          "anchor": "py:function:completion_satisfied:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/completion_semantics.py",
+          "sha256": "256a67fd1fa363119a26f608ab76b1d23d3e40769c014799bac5809f6e08f398"
+        },
+        {
+          "anchor": "python-ast:preamble",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "d682cbdb4c8b07518bf486c58990fc391783aa20a916bfb27ad211eb1d5c3642"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "c3cab17abcdaae86e024d755d4c5cdbb0ab50bc2fbf3f4fd88b8d04d8edfdc1c"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "b53e5a5286172fb0a4772843ba3ed62331687bcb9939ec9c49e9066d4ee4272d"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "3b3ea3cdc7068a9e97cfcddbcd9d8e0c54fe4d068347b80b158fdd8b14676e3b"
+        },
+        {
+          "anchor": "py:import:names:3",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "261a9112a2918e2aba03e19a2f221a027ab4b6f9e946a6c39814f54e18e07dfc"
+        },
+        {
+          "anchor": "py:import:names:4",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "e6b279f7d762dd4e79956651f1dcaec3f33d7e0a2cf996833587844f22ea41d9"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "5da144fd706331fe3cce39bf7af7929606eeb3b91c2df91874bba29bb2254b5f"
+        },
+        {
+          "anchor": "py:import:authorization_semantics:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "968848d6a54711dfea0eb9aaa475a00b17e6f81aa167d87139306e4e57089b0c"
+        },
+        {
+          "anchor": "py:import:completion_semantics:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "6744320ff65f862d3a362ebed2c57f452eea6297851572b943f1cb425c05c252"
+        },
+        {
+          "anchor": "py:import:document_validation:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "6587da5f1febeabbc874034bda74252aeeae0c16ae00a53f6bdb959b89904ad4"
+        },
+        {
+          "anchor": "py:import:trust_semantics:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "3347fb56dbb6e2a1dcb99a76d5002c8d39c4903c46d974a0918bfbe677483330"
+        },
+        {
+          "anchor": "py:assignment:line-26:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "4866435428d6b34565c174efc0460d76e52a40eec16f4ce7a69dd5557767420c"
+        },
+        {
+          "anchor": "py:assignment:line-27:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "e39c7239211c30a7f76bc86cff845cff0756ef6f41e5c3c34f01145ed74ef002"
+        },
+        {
+          "anchor": "py:function:reduce_tick:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "8f9d777d815e1cb5e8eb467a2c21db7ba30864481a4161038d5fd39e23a7054d"
+        },
+        {
+          "anchor": "py:function:repeated_without_new_evidence:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "162049639161dbe8544e67bca317c6bc7b6a5be1ac45db2d663da2fb06a56a8d"
+        },
+        {
+          "anchor": "py:function:rebuild_run_memory:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "3deb0960f22ac53b433afec9fad8fd7701ed78fa7f36420261c67ebca301ccc2"
+        },
+        {
+          "anchor": "py:function:_sha256:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "f42428ad68e235c77dde72d4c3ebe19a1fcc299cae57e260a0e77886bddbb1df"
+        },
+        {
+          "anchor": "py:function:run_candidate:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "617f54cb27717df15e9ccd6370b787dc80f42bc6c618d36f1ccdc7c133145d5c"
+        },
+        {
+          "anchor": "py:function:main:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "c9fa1788b3f0d495cab37003f9417236c227f16df94d1f771526926b88c91e2b"
+        },
+        {
+          "anchor": "py:if:line-188:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/conformance.py",
+          "sha256": "34336821e270180f917411b77fe541ae43e60a9670634b7c9655bc9a07ce6531"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "bc2df6751f4453bba94417ed3c751f49f573de0ea4d7f1812fec393f98a16dc6"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "261a9112a2918e2aba03e19a2f221a027ab4b6f9e946a6c39814f54e18e07dfc"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "e6b279f7d762dd4e79956651f1dcaec3f33d7e0a2cf996833587844f22ea41d9"
+        },
+        {
+          "anchor": "py:import:dataclasses:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "07ac27eea41ef7e0d14eeb4cc65ebf0beaa2041ad913826ebdf97d56d6febd5f"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "5da144fd706331fe3cce39bf7af7929606eeb3b91c2df91874bba29bb2254b5f"
+        },
+        {
+          "anchor": "py:import:schema_runtime:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "545b67ee7e37107210763e46eba0e7ead7fa8b9b5490084c38b2d5b2e7e3b40e"
+        },
+        {
+          "anchor": "py:import:trust_semantics:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "8a2c67083cefbeb575ee510784e5593effcf698ab68ec38b3d0a31cde2b04434"
+        },
+        {
+          "anchor": "py:assignment:line-14:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "4866435428d6b34565c174efc0460d76e52a40eec16f4ce7a69dd5557767420c"
+        },
+        {
+          "anchor": "py:assignment:line-15:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "e4e95c6b1c82119966ebad3c44a599c4684524ed3da30868cd7f2abc055dbc15"
+        },
+        {
+          "anchor": "py:assignment:line-16:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "3d9d1e44e8431c9c4896c0a8ac44b1b3dca901c30f6275013224ee1d66a1eb14"
+        },
+        {
+          "anchor": "py:class:ValidationResult:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "9a50247cb9863ca87bdf9d810ad7de9a18995b10bf20123cbc80b964bdf80251"
+        },
+        {
+          "anchor": "py:function:_schema_path:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "8f1a9b39d8af84eb0d17ee0e459b3bc9c0912ac38fefbf16dc4d80ba7764df1e"
+        },
+        {
+          "anchor": "py:function:_work_errors:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "ab0a653f05a0e43360f6f7c1ac94cd561e78e59630876ad2adb9ba6b157e23e1"
+        },
+        {
+          "anchor": "py:function:_attempt_errors:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "4bddf20acbf7ad7cbd30ce3f64a42f9c1a18ec79cef8be16fb97bb79ad8ce103"
+        },
+        {
+          "anchor": "py:function:_evidence_errors:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "21aea11c6694d69df39585c9db97bfe91374d64ef8b1a2b2bcd3279dffe2f7d6"
+        },
+        {
+          "anchor": "py:function:_semantic_errors:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "1810e1bc4a3c3bc3f99a1d18d3f0c7606eaafe8473a1661848412c34cc2424af"
+        },
+        {
+          "anchor": "py:function:validate_document:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "52bddda589bedd105c44361456919319352cef1a4e68251d06732d52b3fedd73"
+        },
+        {
+          "anchor": "py:function:work_revision_valid:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/document_validation.py",
+          "sha256": "27d7ec9e523b4b47ea78f890bf0cec94d6000d5bf2eb0ae9a69d06fe133236ec"
+        },
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/evidence.schema.yaml",
+          "sha256": "9211e878074c31e27d8e34003de5f92072192c503e2d3d07c3eb68a796088f1b"
+        },
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/fixtures/invalid/attempt-invalid-journal.json",
+          "sha256": "8867bcf06374f64a7956c631f2f5c35a191bb779dcbd9a82bd371bfa7411a270"
+        },
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/fixtures/invalid/evidence-zero-assertions.json",
+          "sha256": "efe17107e4a038a7cb3c44c26bb8b60a3558cb41e12ab88e7cd116a3d18e4d58"
+        },
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/fixtures/invalid/run-memory-unknown-complete.json",
+          "sha256": "cf20071e8631e160fe65a3c65420f797532171838342629ddda3501fc7c6fae0"
+        },
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/fixtures/invalid/work-contract-duplicate-ac.json",
+          "sha256": "349c99a3f7b796fb0ee30254ab59794781f616b8e4097822cacffcb7b31da443"
+        },
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/fixtures/valid/attempt.json",
+          "sha256": "66e5e372384bcca1e8ab4498c356f7179522ea8a10e313b2b794811a38edfc3b"
+        },
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/fixtures/valid/evidence.json",
+          "sha256": "b8bcb58bfdb3cba38c5eb86880991bfa618d78c8e16c5f8dd53f9aef53a60a18"
+        },
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/fixtures/valid/run-memory.json",
+          "sha256": "ff7eb8e470ffeebd4a98458b3327c39360361116a7cbf25cbf9f90f8426797da"
+        },
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/fixtures/valid/work-contract.json",
+          "sha256": "2600bfbb735028c5970f03f955a930ca707cf6d86fbfe311e8d516d0448254cb"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "565a55cd0b6faa605068413685f4c66f2600e0dd0025b2c303825e97e39479fe"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "3b3ea3cdc7068a9e97cfcddbcd9d8e0c54fe4d068347b80b158fdd8b14676e3b"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7"
+        },
+        {
+          "anchor": "py:import:names:3",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "e6b279f7d762dd4e79956651f1dcaec3f33d7e0a2cf996833587844f22ea41d9"
+        },
+        {
+          "anchor": "py:import:names:4",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "ab270e34de38d99f0364043ca1808983f498a9e3943133071931657340b5bc95"
+        },
+        {
+          "anchor": "py:import:datetime:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "3df68ba6162584056f27ffe01097a4661a76b9fca4131bbe0346c44b51cb973f"
+        },
+        {
+          "anchor": "py:import:port_types:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "6d6d99bdf58f8ffaee22aac08f88eaa3bd257db38e4982a42de01bb0b009591d"
+        },
+        {
+          "anchor": "py:function:configured_limits:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "dcf43d48a5180d9cce21e0d52e9344d07c3060e2026522109b9e6ca2797a99e1"
+        },
+        {
+          "anchor": "py:function:bounded_limits:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "50bae7a5d9566a5e7ece51e7046061deb7c7b6dc1ba8621422d40c461a45695b"
+        },
+        {
+          "anchor": "py:function:_is_link_or_junction:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "cbbead32a0f18712b63cbac7818fec05ed5ac60981307aac4ce9751ad89ab478"
+        },
+        {
+          "anchor": "py:function:_utc_now:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "9a8d7055b4975db21fbbd60d89f886a56ce1ed783d11c77e89cc47ceb067af37"
+        },
+        {
+          "anchor": "py:function:enumerate_bounded:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_enumeration.py",
+          "sha256": "1d724ea8e6e3f66cfca89c09de6ed344e6ec6c33b41a70491d15c9c14c9d1486"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_proposal.py",
+          "sha256": "8677ece8e7193c2abbd3e5cc0a2456aaf105fb06223822ee2af23b90d58a8eca"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_proposal.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_proposal.py",
+          "sha256": "3b3ea3cdc7068a9e97cfcddbcd9d8e0c54fe4d068347b80b158fdd8b14676e3b"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_proposal.py",
+          "sha256": "261a9112a2918e2aba03e19a2f221a027ab4b6f9e946a6c39814f54e18e07dfc"
+        },
+        {
+          "anchor": "py:import:names:3",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_proposal.py",
+          "sha256": "ab270e34de38d99f0364043ca1808983f498a9e3943133071931657340b5bc95"
+        },
+        {
+          "anchor": "py:import:datetime:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_proposal.py",
+          "sha256": "bd3698cb9f306b035e45c51278a2dfff864360ff5b22ba137ee373b0821704bb"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_proposal.py",
+          "sha256": "5da144fd706331fe3cce39bf7af7929606eeb3b91c2df91874bba29bb2254b5f"
+        },
+        {
+          "anchor": "py:import:port_types:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_proposal.py",
+          "sha256": "fea7d9571f3c33254791c07e78a06e3c48e93eebae340e5b630640d8ef491a64"
+        },
+        {
+          "anchor": "py:function:_canonical_bytes:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_proposal.py",
+          "sha256": "89c6029dd0ea59b29a04a708239404c887890fff171e890d6d77813a0267a1e7"
+        },
+        {
+          "anchor": "py:function:build_proposal_receipt:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_proposal.py",
+          "sha256": "58a1aebeb653599e4f3ac51af1b3882ceef3746c42f7bf50bd825a946f8665a5"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "972880ce6e5be228e7f2eba2c9fcaf8e49701ec89d7d25e8e91d78675d209b4d"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "bfda8797d05a788b5b5be2670078d63cf5dd942f479679d2646be1d66d632ef4"
+        },
+        {
+          "anchor": "py:import:dataclasses:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "07ac27eea41ef7e0d14eeb4cc65ebf0beaa2041ad913826ebdf97d56d6febd5f"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "1d1ca20efb9250424d906196c51a4c7cbbf8da9ee624f84c3f8c39a29494d1f9"
+        },
+        {
+          "anchor": "py:class:PortError:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "424f57911aaf9726b18a49be7656fd04c02fbb833158280098b654207122ea89"
+        },
+        {
+          "anchor": "py:class:ScopeViolation:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "9ab942b77404dadf4002501618a54f3048c5fdc5c34f4cc66306637a9ffc0001"
+        },
+        {
+          "anchor": "py:class:CASMismatch:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "f34383705e7a7c26b890ee01dac1df172da190c0b28cdfbff4d8405de1856044"
+        },
+        {
+          "anchor": "py:class:CommandRejected:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "38cee85550194f695387a211c2fe99103ad57f2c26279f214d121c8f6a1eb3fe"
+        },
+        {
+          "anchor": "py:class:UnsupportedCapability:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "86e148a8dd1f0b10c3ea75e47ac6e0b3ded2c46a1dee3b986b91f7dea71617ec"
+        },
+        {
+          "anchor": "py:class:EnumerationLimitExceeded:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "ead49f45353a4cce23974dfb49171b86561d036037b8f127ef5b4615119cdb47"
+        },
+        {
+          "anchor": "py:class:ProposalProvider:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "62cfef6c6c6df2dba23b7814b214dfbebfea56feeb7f6a2ecd2eb2ac96686a3d"
+        },
+        {
+          "anchor": "py:class:CancellationToken:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "f4543f344b0102d3cf9db3e9f5d17e3beb4b6bc5e29ebb577af869e55c713288"
+        },
+        {
+          "anchor": "py:class:FileReadReceipt:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "06977c46e2425b09e4b0b7c0ddee85fffd674b217bca6b8e49f9e5cffe2f88f2"
+        },
+        {
+          "anchor": "py:class:FileWriteReceipt:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "58b0941ff209579c8287da1d581dee665a23c9eb4cf638376034949be04dc63a"
+        },
+        {
+          "anchor": "py:class:EnumeratedFile:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "c12b11bfa7675a11b2c38599034701b16d33a8a6d9d6cc7f3323185bb3d0af33"
+        },
+        {
+          "anchor": "py:class:FileEnumerationReceipt:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "947fb33bd8ba215ff016a132a701d6a95072e61ad0ad63f6c6302e2bf41a13aa"
+        },
+        {
+          "anchor": "py:class:CommandReceipt:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/port_types.py",
+          "sha256": "648ec306606f59843577ed53bc8c184583bf1bf985ea50c8eb5b13b871640796"
+        },
+        {
+          "anchor": "md:yuan-core-protocol-0-1:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "930b329704aba78ea8800ab2ef48cf45d7011f8622e11dede41be0229d228c93"
+        },
+        {
+          "anchor": "md:1-boundary:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "50f3cd1490b42dc657d9c7e4be5a35e394fec4588e76f194b444ab46cbea2f3c"
+        },
+        {
+          "anchor": "md:2-immutable-bindings:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "b3d2a407e26e8ece3318c60f6a81062cde79c0e4a575bf347a54263094f4d5a9"
+        },
+        {
+          "anchor": "md:3-tick:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "4844a3602adccfe849249194b25fcb7fb73d5653db793dfbbde793a4d6519e8d"
+        },
+        {
+          "anchor": "md:4-side-effect-journal:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "646dcb375db720da47a1f46e860f787607391840a4e6101b7a9b1521d32c82ee"
+        },
+        {
+          "anchor": "md:5-evidence-validity:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "4a8bf718a2ddc742c8fcd1565e52d9fe95a933fea0563b94d95843d3de8b8d36"
+        },
+        {
+          "anchor": "md:6-completion-predicate:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "65e0713f258b89df45be3f4970b2fa1ce1105d0038169150cbfbf147200e974b"
+        },
+        {
+          "anchor": "md:7-exactly-six-results-and-frozen-priority:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "1dc874779f3462815beb7c6fe5cd41443475e5684f7911fbc2575b88a276adb6"
+        },
+        {
+          "anchor": "md:8-scope-authorization-and-budget:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "58e9c576d1ecf5386ccea27e4ea9e588a62581591ac9121220cbb873a65636c0"
+        },
+        {
+          "anchor": "md:9-run-memory-rebuild:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "37bea1f0c0098a656967c15d357270cbe5d3c8c661a7630a98e130b060e003d2"
+        },
+        {
+          "anchor": "md:10-minimal-port:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "145cacc351d1ee18d1b14248abbbd4cfd47b4b2e2083ed4ae985a6bc9b6e75fa"
+        },
+        {
+          "anchor": "md:11-self-modification:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "d3041db0c26efa83d5ae46227573d0853a4f2df2f0523c45992b388d6b2c1a9a"
+        },
+        {
+          "anchor": "md:12-inert-candidate-rule:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/protocol.md",
+          "sha256": "9d35e28ea96b49745f2ccc5109647515cd303f731dd94c6669337d1e9d3d4dfc"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "258aacd9921f7139fb5a624ae1dca5b57a23656bb0dd3c91269f85bf2d5b923e"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "3b3ea3cdc7068a9e97cfcddbcd9d8e0c54fe4d068347b80b158fdd8b14676e3b"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7"
+        },
+        {
+          "anchor": "py:import:names:3",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "e6b279f7d762dd4e79956651f1dcaec3f33d7e0a2cf996833587844f22ea41d9"
+        },
+        {
+          "anchor": "py:import:names:4",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "17ea74bb79ba96edc39a8382a97f22993b80cc4088b3e2717a98917c60c1dd5a"
+        },
+        {
+          "anchor": "py:import:names:5",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "0578139baa8835231355e06f7fc51643ad48d2c6333bd0777e80b84a93b8aad7"
+        },
+        {
+          "anchor": "py:import:names:6",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "bfda8797d05a788b5b5be2670078d63cf5dd942f479679d2646be1d66d632ef4"
+        },
+        {
+          "anchor": "py:import:names:7",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "7b2ddb8a2e64c6166feedaf30ee50ac62165fe149fdd8b0d7b777ebee21ca34d"
+        },
+        {
+          "anchor": "py:import:names:8",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "ab270e34de38d99f0364043ca1808983f498a9e3943133071931657340b5bc95"
+        },
+        {
+          "anchor": "py:import:datetime:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "bd3698cb9f306b035e45c51278a2dfff864360ff5b22ba137ee373b0821704bb"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "4ec0adfb621f06c80cbfe140f43b55e6943e73f2f2b48ddb86badf4c960b7eaa"
+        },
+        {
+          "anchor": "py:import:command_sandbox:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "7bc9ef19143fe01c6153afaf37d05441e28a7de267c58f694863c53b3ca5c12d"
+        },
+        {
+          "anchor": "py:import:port_enumeration:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "bf2ba38683320ee3c53ff9c0f52eba6c9dd09cbc2829adb674d221f44f230de9"
+        },
+        {
+          "anchor": "py:import:port_proposal:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "531a60886a6d2f9aa7899660141a3443ac596116fd879d35e2eedef3f1cc984c"
+        },
+        {
+          "anchor": "py:import:port_types:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "ddc2168597466596538cd5578ea275baf70b50502b9fcdff7bdfb9f5b616784a"
+        },
+        {
+          "anchor": "py:function:_utc_now:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "9a8d7055b4975db21fbbd60d89f886a56ce1ed783d11c77e89cc47ceb067af37"
+        },
+        {
+          "anchor": "py:function:_digest:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "915e3a773bb806399a629185e6f4c7cffd650619ffc343f95b21af4cf0ed0401"
+        },
+        {
+          "anchor": "py:function:_is_link_or_junction:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "cbbead32a0f18712b63cbac7818fec05ed5ac60981307aac4ce9751ad89ab478"
+        },
+        {
+          "anchor": "py:class:ReferencePort:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/reference_port.py",
+          "sha256": "5e879644494faa41303a7899b42d43ed3ce40b5b94064e56bb72908091d75984"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_pending.py",
+          "sha256": "0ebd0838a6eef3159eb7b1d570b54a54f3f751bbafbfef1d323e1e215023b295"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_pending.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_pending.py",
+          "sha256": "ee21558cd4bfba9023822be716f2bfbadaf732ecd3ffbc2b666b2526914aba32"
+        },
+        {
+          "anchor": "py:import:trust_semantics:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_pending.py",
+          "sha256": "fca3d3af77ec4c502d1c28dc9b9ebcf19e0d3c5126301b7872c03732915feb35"
+        },
+        {
+          "anchor": "py:assignment:line-10:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_pending.py",
+          "sha256": "400fa0419c94a1adfd29b78d8044bcc507fe63250411d575ffb20d22eeb2e0b2"
+        },
+        {
+          "anchor": "py:assignment:line-11:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_pending.py",
+          "sha256": "191be3e8e5fb96392740c46b3a67ae2a23edfb58f8635720433bb2ffa71e9c1c"
+        },
+        {
+          "anchor": "py:function:rebuild_pending_side_effects:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_pending.py",
+          "sha256": "c60c6f906c3be29830e1bc9060b2f69e4c21db646afa488187d8fbf225813554"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_trust.py",
+          "sha256": "1531825aead7d44e6f90720710f1763bbd835df59f086fc97fc7c792b7db6452"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_trust.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_trust.py",
+          "sha256": "5da144fd706331fe3cce39bf7af7929606eeb3b91c2df91874bba29bb2254b5f"
+        },
+        {
+          "anchor": "py:import:trust_semantics:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_trust.py",
+          "sha256": "f079b5226c579b608a3077d5c682241fc9b0c96906ce82b32db61796b815f139"
+        },
+        {
+          "anchor": "py:function:artifact_scope:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_trust.py",
+          "sha256": "26f2326aa0724559df4b3600c4f8491aeee2c581e8a8bfb532999a52e348a1de"
+        },
+        {
+          "anchor": "py:function:protected_target_kind:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_trust.py",
+          "sha256": "d7b66e109d04f8249ff980ad9a5d252af68110b472c095bd9949c327c48147f5"
+        },
+        {
+          "anchor": "py:function:replay_self_modification_authorized:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/replay_trust.py",
+          "sha256": "f1c67038b767c7872414733ed9f8963937528f17ec89d18571cb49f28aa4010f"
+        },
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/run-memory.schema.yaml",
+          "sha256": "50fa5993ba210e34f7fa4a1b334654f264fedfa87882160e926c80ff045a9c6d"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/runtime_replay.py",
+          "sha256": "943bc60ba2943dd9a9f624df44b6a0076d565ac4ace3456736608b6b74ca8033"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/runtime_replay.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/runtime_replay.py",
+          "sha256": "ee21558cd4bfba9023822be716f2bfbadaf732ecd3ffbc2b666b2526914aba32"
+        },
+        {
+          "anchor": "py:import:replay_pending:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/runtime_replay.py",
+          "sha256": "9c57525734767a6c62d9d882c3b4af3f18d61426c265bab1b81797d73c31e608"
+        },
+        {
+          "anchor": "py:import:replay_trust:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/runtime_replay.py",
+          "sha256": "12c3be428d324a82c196182bc95e2cea6e4d74edef7ce5a050ffe7bc723d4c7d"
+        },
+        {
+          "anchor": "py:import:trust_semantics:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/runtime_replay.py",
+          "sha256": "dc2b18d74daae6519bb7bd9b8c6835476250089c158b2d6018389a2a83746a37"
+        },
+        {
+          "anchor": "py:function:_collection_digest:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/runtime_replay.py",
+          "sha256": "c0dddfeb378b76aa559190a7a9a4dade66e63bab1eac1d93ff4099e3fe75a379"
+        },
+        {
+          "anchor": "py:function:_blocked:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/runtime_replay.py",
+          "sha256": "5245fb22684dc390f6318da6f715e273a0c8a809acea2f2e6cb9f5787d91a27f"
+        },
+        {
+          "anchor": "py:function:rebuild:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/runtime_replay.py",
+          "sha256": "d029e171a38eaf417554e9a04f2469f11ee404be10575c9b2b78237d9916adab"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/schema_runtime.py",
+          "sha256": "8d406442a5fa48353969924f161bfa67b890fd5aa921a3096b13161966ca3c85"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/schema_runtime.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/schema_runtime.py",
+          "sha256": "261a9112a2918e2aba03e19a2f221a027ab4b6f9e946a6c39814f54e18e07dfc"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/schema_runtime.py",
+          "sha256": "a830333312c4c9c2233bb02762bd498203b1c3bf0527614735693b4b79f6d167"
+        },
+        {
+          "anchor": "py:import:datetime:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/schema_runtime.py",
+          "sha256": "2ed0247cc05b861fea3391ee7651aec4bb57304b71be6e96d2b74d171c551f55"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/schema_runtime.py",
+          "sha256": "9d37a33d073ab8da29dc74ce6a89131818a52a5c165d16f31d991997f0e66cf7"
+        },
+        {
+          "anchor": "py:function:_resolve_ref:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/schema_runtime.py",
+          "sha256": "0b111c856f0785b838a0b253407682aff1b37f159c22bc00c1ed1bdae2b5f1bd"
+        },
+        {
+          "anchor": "py:function:_matches_type:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/schema_runtime.py",
+          "sha256": "11f296d8f96119c29d076f56264c3398e05f4d2a7c583d4450da116f99b28062"
+        },
+        {
+          "anchor": "py:function:validate_schema:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/schema_runtime.py",
+          "sha256": "6a3f4339369eec870050cb0690ba3eb255ad4639cbb36469a3455b211e18a1a1"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/_load.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/_load.py",
+          "sha256": "786ac52e942c0dd6126225bf477e4536f68ec6c7ddb2aac0f289a96b5b1c90fc"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/_load.py",
+          "sha256": "e6b279f7d762dd4e79956651f1dcaec3f33d7e0a2cf996833587844f22ea41d9"
+        },
+        {
+          "anchor": "py:import:names:3",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/_load.py",
+          "sha256": "c517577851c489e45abae2591256c40404a05c6d19cd4d5ae7fd22b0084cec6c"
+        },
+        {
+          "anchor": "py:import:types:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/_load.py",
+          "sha256": "5f865afd445d46d8a55f2574bcc59b0573069b597ad0ee0a43e4b6ff678341f6"
+        },
+        {
+          "anchor": "py:assignment:line-9:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/_load.py",
+          "sha256": "e1aafe6882727488be7c0a498256bc08acf3e96d7fdb2c4bd72cb7eeb8f08447"
+        },
+        {
+          "anchor": "py:if:line-10:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/_load.py",
+          "sha256": "69058ff1c132ecb0260c2b9069dc339f213b2765dbfa6e597ddf788098971ef2"
+        },
+        {
+          "anchor": "py:function:load_core_module:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/_load.py",
+          "sha256": "592ae8ea965c0f4dd5537ae8e254103c4e7245fa56b9621e1ef54825ef7ccd67"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "3b3ea3cdc7068a9e97cfcddbcd9d8e0c54fe4d068347b80b158fdd8b14676e3b"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "261a9112a2918e2aba03e19a2f221a027ab4b6f9e946a6c39814f54e18e07dfc"
+        },
+        {
+          "anchor": "py:import:names:3",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7"
+        },
+        {
+          "anchor": "py:import:names:4",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "c517577851c489e45abae2591256c40404a05c6d19cd4d5ae7fd22b0084cec6c"
+        },
+        {
+          "anchor": "py:import:names:5",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "0578139baa8835231355e06f7fc51643ad48d2c6333bd0777e80b84a93b8aad7"
+        },
+        {
+          "anchor": "py:import:names:6",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "e1d92481cfd5db7ec574fbd3ddef3734c629ec779e84eaa6ad92c125936320c7"
+        },
+        {
+          "anchor": "py:import:pathlib:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "3cb9ffccba5146b2dd177a30c3057a4395ebd5c745d0789d2ed95d0cf4afe271"
+        },
+        {
+          "anchor": "py:import:unittest:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "a7cbeaf3130b23705222434c8022a3cfce6122c2f2a4c5da836df0d207df420a"
+        },
+        {
+          "anchor": "py:import:_load:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "01da74ef4eebaf07301e19dfbcac8040dbaefe525b4e3449e5edb71ac28a39c4"
+        },
+        {
+          "anchor": "py:import:port_types:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "fd60f98322678f90b058084f9cd9ce49afecdaba7ad3ca812ee1d82b972db72b"
+        },
+        {
+          "anchor": "py:assignment:line-16:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "af4dee1ad8de2b0d0d4874a0d20a7ffdee52e418f3b0afb30128573ec6401871"
+        },
+        {
+          "anchor": "py:assignment:line-17:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "eb4e14ee25c345b25919ec0667fd1a677788e698df7891359148445793c51387"
+        },
+        {
+          "anchor": "py:class:_ProposalProvider:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "5f48c9fd17061548e941f25349ba3729ae1cf58b3a3cc331ea0d40e189bea09a"
+        },
+        {
+          "anchor": "py:class:_MalformedProvider:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "fd567ccde2220f007ee9b307d628c63c7681dafe4ada875a704f30530e286ceb"
+        },
+        {
+          "anchor": "py:class:AdapterPortTests:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "8c2e012c45032567b15eb8bb1e2b02e99f58c4efb4812d7591c7821731635a89"
+        },
+        {
+          "anchor": "py:if:line-208:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+          "sha256": "b08279bbab104c1743a90005a61f5306c3fd31f52da7f6dcaf26f919d9cfeab7"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_conformance.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_conformance.py",
+          "sha256": "01185d20d26568a358ea5c862ad992fbed2b4c0a68684d42477f0920b7be3e7f"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_conformance.py",
+          "sha256": "261a9112a2918e2aba03e19a2f221a027ab4b6f9e946a6c39814f54e18e07dfc"
+        },
+        {
+          "anchor": "py:import:names:3",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_conformance.py",
+          "sha256": "e6b279f7d762dd4e79956651f1dcaec3f33d7e0a2cf996833587844f22ea41d9"
+        },
+        {
+          "anchor": "py:import:names:4",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_conformance.py",
+          "sha256": "5e4b67ab4f5add63d434dc0505a5f020215d3a696739bda1463a98413332a73f"
+        },
+        {
+          "anchor": "py:import:_load:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_conformance.py",
+          "sha256": "01644f64939d05ec005c03445872588d5f251dbb6068217748a5fbf82412ed90"
+        },
+        {
+          "anchor": "py:assignment:line-11:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_conformance.py",
+          "sha256": "e74b4497e8a306d567bf6b509dd7545f5437631a9c0030ec39bd6105dcc4e480"
+        },
+        {
+          "anchor": "py:class:SchemaContractTests:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_conformance.py",
+          "sha256": "5235aec09e68e1bbfc6e7e6ca48f8f248413bbe553a637b65ce4e70dee88dbb5"
+        },
+        {
+          "anchor": "py:class:ReducerTests:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_conformance.py",
+          "sha256": "45c31cf9b263cd0ccbd6e633e8e68d615a6021b64285af4ab141f2fee0cd0af6"
+        },
+        {
+          "anchor": "py:if:line-240:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_conformance.py",
+          "sha256": "b08279bbab104c1743a90005a61f5306c3fd31f52da7f6dcaf26f919d9cfeab7"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_reference_port.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_reference_port.py",
+          "sha256": "e6b279f7d762dd4e79956651f1dcaec3f33d7e0a2cf996833587844f22ea41d9"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_reference_port.py",
+          "sha256": "c517577851c489e45abae2591256c40404a05c6d19cd4d5ae7fd22b0084cec6c"
+        },
+        {
+          "anchor": "py:import:names:3",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_reference_port.py",
+          "sha256": "0578139baa8835231355e06f7fc51643ad48d2c6333bd0777e80b84a93b8aad7"
+        },
+        {
+          "anchor": "py:import:names:4",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_reference_port.py",
+          "sha256": "bfda8797d05a788b5b5be2670078d63cf5dd942f479679d2646be1d66d632ef4"
+        },
+        {
+          "anchor": "py:import:names:5",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_reference_port.py",
+          "sha256": "7b2ddb8a2e64c6166feedaf30ee50ac62165fe149fdd8b0d7b777ebee21ca34d"
+        },
+        {
+          "anchor": "py:import:names:6",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_reference_port.py",
+          "sha256": "5e4b67ab4f5add63d434dc0505a5f020215d3a696739bda1463a98413332a73f"
+        },
+        {
+          "anchor": "py:import:_load:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_reference_port.py",
+          "sha256": "97d517ebde0f379fcb8ae5dc9cae96a3e983936f3a72838c658664540b82d680"
+        },
+        {
+          "anchor": "py:assignment:line-13:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_reference_port.py",
+          "sha256": "8ef8ee1386960b722b16daa34ad810d5ef6291d75148c8dc3454172931add1cb"
+        },
+        {
+          "anchor": "py:class:ReferencePortTests:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_reference_port.py",
+          "sha256": "419d14879bff313b3397c99a249579df1d85969daf1ff08b662ae51f04457d0d"
+        },
+        {
+          "anchor": "py:if:line-121:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_reference_port.py",
+          "sha256": "b08279bbab104c1743a90005a61f5306c3fd31f52da7f6dcaf26f919d9cfeab7"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+          "sha256": "01185d20d26568a358ea5c862ad992fbed2b4c0a68684d42477f0920b7be3e7f"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+          "sha256": "261a9112a2918e2aba03e19a2f221a027ab4b6f9e946a6c39814f54e18e07dfc"
+        },
+        {
+          "anchor": "py:import:names:3",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+          "sha256": "e1d92481cfd5db7ec574fbd3ddef3734c629ec779e84eaa6ad92c125936320c7"
+        },
+        {
+          "anchor": "py:import:datetime:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+          "sha256": "3df68ba6162584056f27ffe01097a4661a76b9fca4131bbe0346c44b51cb973f"
+        },
+        {
+          "anchor": "py:import:_load:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+          "sha256": "01644f64939d05ec005c03445872588d5f251dbb6068217748a5fbf82412ed90"
+        },
+        {
+          "anchor": "py:assignment:line-11:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+          "sha256": "e74b4497e8a306d567bf6b509dd7545f5437631a9c0030ec39bd6105dcc4e480"
+        },
+        {
+          "anchor": "py:function:fixture:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+          "sha256": "e0eb222f96d539c34da29d5a13f939572bc7e51fe0b03e6aa805fcbc657272fa"
+        },
+        {
+          "anchor": "py:function:rebuild:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+          "sha256": "78d0ae6eca7e600b2c0ff39da3edd0308fc6f7c3c7797cdacbb509607d74f0e2"
+        },
+        {
+          "anchor": "py:function:unknown_attempt:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+          "sha256": "abe56ff3a0aeaea20a493bea41434137efdd3a7c99240f0f0468a0507c31e738"
+        },
+        {
+          "anchor": "py:class:ReplayPendingTests:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+          "sha256": "25853de6404c48ee9943f661afe2c37cf87457f3521684926c9dcb6b59d298b0"
+        },
+        {
+          "anchor": "py:if:line-131:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+          "sha256": "b08279bbab104c1743a90005a61f5306c3fd31f52da7f6dcaf26f919d9cfeab7"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+          "sha256": "01185d20d26568a358ea5c862ad992fbed2b4c0a68684d42477f0920b7be3e7f"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+          "sha256": "261a9112a2918e2aba03e19a2f221a027ab4b6f9e946a6c39814f54e18e07dfc"
+        },
+        {
+          "anchor": "py:import:names:3",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+          "sha256": "e1d92481cfd5db7ec574fbd3ddef3734c629ec779e84eaa6ad92c125936320c7"
+        },
+        {
+          "anchor": "py:import:datetime:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+          "sha256": "3df68ba6162584056f27ffe01097a4661a76b9fca4131bbe0346c44b51cb973f"
+        },
+        {
+          "anchor": "py:import:_load:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+          "sha256": "01644f64939d05ec005c03445872588d5f251dbb6068217748a5fbf82412ed90"
+        },
+        {
+          "anchor": "py:assignment:line-11:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+          "sha256": "e74b4497e8a306d567bf6b509dd7545f5437631a9c0030ec39bd6105dcc4e480"
+        },
+        {
+          "anchor": "py:function:fixture:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+          "sha256": "e0eb222f96d539c34da29d5a13f939572bc7e51fe0b03e6aa805fcbc657272fa"
+        },
+        {
+          "anchor": "py:function:committed_core_write:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+          "sha256": "8ff62cce342b5ac7e6784bb624d979e4ebab44f6bbb0cba1c441d794a92eb109"
+        },
+        {
+          "anchor": "py:class:ReplayTrustTests:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+          "sha256": "905cf360aedffbc4c653c20ef7dc80db77cc06dc9e878760e554f030530a2ae6"
+        },
+        {
+          "anchor": "py:if:line-163:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+          "sha256": "b08279bbab104c1743a90005a61f5306c3fd31f52da7f6dcaf26f919d9cfeab7"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "01185d20d26568a358ea5c862ad992fbed2b4c0a68684d42477f0920b7be3e7f"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "261a9112a2918e2aba03e19a2f221a027ab4b6f9e946a6c39814f54e18e07dfc"
+        },
+        {
+          "anchor": "py:import:names:3",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "e6b279f7d762dd4e79956651f1dcaec3f33d7e0a2cf996833587844f22ea41d9"
+        },
+        {
+          "anchor": "py:import:names:4",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "c517577851c489e45abae2591256c40404a05c6d19cd4d5ae7fd22b0084cec6c"
+        },
+        {
+          "anchor": "py:import:names:5",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "0578139baa8835231355e06f7fc51643ad48d2c6333bd0777e80b84a93b8aad7"
+        },
+        {
+          "anchor": "py:import:names:6",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "e1d92481cfd5db7ec574fbd3ddef3734c629ec779e84eaa6ad92c125936320c7"
+        },
+        {
+          "anchor": "py:import:datetime:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "3df68ba6162584056f27ffe01097a4661a76b9fca4131bbe0346c44b51cb973f"
+        },
+        {
+          "anchor": "py:import:_load:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "01644f64939d05ec005c03445872588d5f251dbb6068217748a5fbf82412ed90"
+        },
+        {
+          "anchor": "py:assignment:line-14:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "53c351e8fcb346b461813862b136a8524ea75bea943d3bc58526b2faa327b792"
+        },
+        {
+          "anchor": "py:assignment:line-15:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "af4dee1ad8de2b0d0d4874a0d20a7ffdee52e418f3b0afb30128573ec6401871"
+        },
+        {
+          "anchor": "py:assignment:line-16:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "4db52554e40f2d4cc7c7c89691365f0e90b5a6b7c7570c1437c765cd285debcb"
+        },
+        {
+          "anchor": "py:function:fixture:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "d5a641a1a09134e4b0615ee58b12ed17f5fbc63c4fed0d741f944978ba5fa619"
+        },
+        {
+          "anchor": "py:class:EvidenceTrustTests:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "2c53ac6639b5cf1d7f8822a1c2506edf16d805d7e833c04bfae28fc7545bb011"
+        },
+        {
+          "anchor": "py:class:AttemptJournalTests:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "de063e03a96c2cf53ad33d98158b1ad649b97aadea51bb783b193d69a49b9b81"
+        },
+        {
+          "anchor": "py:class:RebuildAndSelfModificationTests:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "ba343d3d37224b7389da49422f5d031991d15666308a570cf602321ed139a239"
+        },
+        {
+          "anchor": "py:class:AuthorizationAndSandboxTests:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "51296bb7854e7927d77fd5030d6601586cc259c6e5d9a5cf1647b98b1f3743a9"
+        },
+        {
+          "anchor": "py:if:line-268:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+          "sha256": "b08279bbab104c1743a90005a61f5306c3fd31f52da7f6dcaf26f919d9cfeab7"
+        },
+        {
+          "anchor": "py:module-docstring:docstring:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "a8579eb2c12601bc32b8367fcfc2fd4d61533a4de6482c68e59ef01a0f8c71bc"
+        },
+        {
+          "anchor": "py:import:__future__:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "3c78788ea0fb8b468bf16f215d385ccca713e31b0d6625da9c1c4e1f920e5b92"
+        },
+        {
+          "anchor": "py:import:names:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "01185d20d26568a358ea5c862ad992fbed2b4c0a68684d42477f0920b7be3e7f"
+        },
+        {
+          "anchor": "py:import:names:2",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "3b3ea3cdc7068a9e97cfcddbcd9d8e0c54fe4d068347b80b158fdd8b14676e3b"
+        },
+        {
+          "anchor": "py:import:names:3",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "261a9112a2918e2aba03e19a2f221a027ab4b6f9e946a6c39814f54e18e07dfc"
+        },
+        {
+          "anchor": "py:import:datetime:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "bd3698cb9f306b035e45c51278a2dfff864360ff5b22ba137ee373b0821704bb"
+        },
+        {
+          "anchor": "py:import:typing:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "82b06e0ee1424a0f8c5020fc997f4d2c1b6ee1af386226335a257642af32b496"
+        },
+        {
+          "anchor": "py:assignment:line-12:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "3710caa674d692f19f7af93ac7a84bf6eb4c02de72452b17ddb5d59404a5275f"
+        },
+        {
+          "anchor": "py:function:canonical_digest:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "14011c8ce909495b3e408f63688c0903739cf8a053e6a1021b5fe78b340413c8"
+        },
+        {
+          "anchor": "py:function:parse_trusted_time:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "af578a1916d4f9ca8598d816dbb44c2dc82c0bdae2e2782b4a986224e5f4bba5"
+        },
+        {
+          "anchor": "py:function:trusted_now:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "92382c57b4f3b110c32210d3b921d8aba7b6eeed0083e610ea166e42672ed52e"
+        },
+        {
+          "anchor": "py:function:immutable_binding_matches:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "06082d31e2fc61e8e640d6b7296ac1e670b8051f97e06f5f39e8dd3850497bd9"
+        },
+        {
+          "anchor": "py:function:self_modification_authorized:1",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/trust_semantics.py",
+          "sha256": "4c03f97e233992604c61e4f95f4b5e40e9763700a70419417d68947e05a85e3b"
+        },
+        {
+          "anchor": "whole:file",
+          "kind": "core-registry-anchor",
+          "path": ".yuan/core/0.1/work-contract.schema.yaml",
+          "sha256": "a2c3344331e7083ea4bdced30e221d27c5d52f7cd9f0e03f5205765144aff660"
+        }
+      ]
+    },
+    "docsos": {
+      "allowed_dispositions": [
+        "extension"
+      ],
+      "retained_clause_allowed": true,
+      "semantic_path": ".yuan/extensions/docsos.md",
+      "targets": [
+        {
+          "anchor": "md:docsos-extension:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/docsos.md",
+          "sha256": "a6673eb7cba3e2d75b41eb0331705364f11921712613ebf84f67bbc84189c83a"
+        },
+        {
+          "anchor": "md:contract:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/docsos.md",
+          "sha256": "19ebd17b52407425f7b042b2dbbc78c081235cb007da00ed27223e3e43c9f33d"
+        },
+        {
+          "anchor": "md:state-externalization:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/docsos.md",
+          "sha256": "68a66fff398ad0e118eba6997a18e88dd443fbdd4d7a303349485880e95a0582"
+        },
+        {
+          "anchor": "md:template-and-runtime-separation:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/docsos.md",
+          "sha256": "57a14495552617f9eb2ffa1d76b10aa7e53be793f2540f9219e23a73f099adcf"
+        },
+        {
+          "anchor": "md:document-verification:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/docsos.md",
+          "sha256": "152c418fb29a9047166628e24e0c9dbd6ea876fa12d293e17698783baf7c774b"
+        },
+        {
+          "anchor": "md:preservation-during-migration:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/docsos.md",
+          "sha256": "4c78a695faff87be964701aed8b05acf90fb37b1bcb4f08370550a408d4832de"
+        }
+      ]
+    },
+    "fixture": {
+      "allowed_dispositions": [
+        "fixture"
+      ],
+      "retained_clause_allowed": false,
+      "semantic_path": ".yuan/extensions/fixtures/legacy-anti-patterns.json",
+      "targets": []
+    },
+    "knowledge": {
+      "allowed_dispositions": [
+        "extension"
+      ],
+      "retained_clause_allowed": true,
+      "semantic_path": ".yuan/extensions/knowledge.md",
+      "targets": [
+        {
+          "anchor": "md:knowledge-extension:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/knowledge.md",
+          "sha256": "ca9e02de136c6f7aeefd0f330fb3b9b4fe66a9b5d1b56cffe3cb9139b98b0adf"
+        },
+        {
+          "anchor": "md:contract:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/knowledge.md",
+          "sha256": "5dfc0593f80a383b417252d725f39337eb54dcda23bbff69dd172081455a8387"
+        },
+        {
+          "anchor": "md:record-shape:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/knowledge.md",
+          "sha256": "76913c4e23fb8a9e20e03dd42b983bba564cdd7ddafc428fab2986b9ea0c6870"
+        },
+        {
+          "anchor": "md:promotion-advice:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/knowledge.md",
+          "sha256": "1bdc2ff79e14e9ce05bb68b1c75e7d5089eadaecdb49c4082ca2a98d501a1fa1"
+        },
+        {
+          "anchor": "md:conflicts-and-invalidation:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/knowledge.md",
+          "sha256": "d550d3971073521946da56da274b6241b9f657feaa293df7a290336a628e7a20"
+        }
+      ]
+    },
+    "obsolete": {
+      "allowed_dispositions": [
+        "obsolete-with-proof"
+      ],
+      "retained_clause_allowed": true,
+      "targets": []
+    },
+    "platform-adapters": {
+      "allowed_dispositions": [
+        "extension"
+      ],
+      "retained_clause_allowed": true,
+      "semantic_path": ".yuan/extensions/platform-adapters.md",
+      "targets": [
+        {
+          "anchor": "md:platform-adapters-extension:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/platform-adapters.md",
+          "sha256": "18bf08ad917d261c73a4552dfdd4c81add198f60feefa14856b2d914238d3fea"
+        },
+        {
+          "anchor": "md:contract:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/platform-adapters.md",
+          "sha256": "5872491b5f66bf444d9effd1fb1585fd54e7eda47c9dcf876fc100b1c6b7940f"
+        },
+        {
+          "anchor": "md:capability-mapping:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/platform-adapters.md",
+          "sha256": "b5685ac1a857a2fb08b5b37bf6af8a09daf7934da2e6d0d998f984e5ed280c66"
+        },
+        {
+          "anchor": "md:conformance-evidence:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/platform-adapters.md",
+          "sha256": "a116ac55c49b676d75ed375372c9a5c9f499b974bc1e411c4e4c273eef77bd88"
+        },
+        {
+          "anchor": "md:version-authority:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/platform-adapters.md",
+          "sha256": "61d2c52a1f761316f11f1a182f472abcdce8ac4803a2ab8df8b6529f36fffa41"
+        }
+      ]
+    },
+    "software-delivery": {
+      "allowed_dispositions": [
+        "extension"
+      ],
+      "retained_clause_allowed": true,
+      "semantic_path": ".yuan/extensions/software-delivery.md",
+      "targets": [
+        {
+          "anchor": "md:software-delivery-extension:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/software-delivery.md",
+          "sha256": "fca3bd6a254e4503c1ea62ff50b3ef374d8fce130172265a5abd034a58258470"
+        },
+        {
+          "anchor": "md:contract:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/software-delivery.md",
+          "sha256": "824d2c7913d3418536d04fa4cd84f4513ea4ba08adb33d01276389df61628f8a"
+        },
+        {
+          "anchor": "md:work-authoring-advice:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/software-delivery.md",
+          "sha256": "4fb434d6f90c345b19f30052353d3bc033e1bee42d39fba799006f3c7047b58c"
+        },
+        {
+          "anchor": "md:bounded-convergence:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/software-delivery.md",
+          "sha256": "c3eb8f9c70faa3791ba96fd9742b03b5007046ba49f884a55730a16e8f1f6582"
+        },
+        {
+          "anchor": "md:independent-delivery-claims:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/software-delivery.md",
+          "sha256": "f20c61c476221524e814d0c2f8ec0c9f8feb299305f53863fce7170e4d4eba15"
+        },
+        {
+          "anchor": "md:review-recipe:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/software-delivery.md",
+          "sha256": "52aaac899a814f49b2278b53ade0ce966d281a6d27b9128f6086a9e4bbfccc9f"
+        }
+      ]
+    },
+    "testing": {
+      "allowed_dispositions": [
+        "extension"
+      ],
+      "retained_clause_allowed": true,
+      "semantic_path": ".yuan/extensions/testing.md",
+      "targets": [
+        {
+          "anchor": "md:testing-extension:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/testing.md",
+          "sha256": "32fc0ebf44c1387f56a9b599c767d95ce26460cb6bc403e652d6f6e2d7cf0f60"
+        },
+        {
+          "anchor": "md:contract:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/testing.md",
+          "sha256": "ed289faaab06aa32afe988ac49b02ecf084bdc0bee9485888d26acbe7222e040"
+        },
+        {
+          "anchor": "md:verifier-recipe:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/testing.md",
+          "sha256": "60fad430047e9923b6426e0e005dbe78c1d99cd5414aefef6c01b85ad0ee0c48"
+        },
+        {
+          "anchor": "md:actor-checker-separation:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/testing.md",
+          "sha256": "26dff07a091c4dca9a1da75dde86e27c13c9f9a82c314d1b71c47f18f858096d"
+        },
+        {
+          "anchor": "md:integrity-and-anti-gaming:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/testing.md",
+          "sha256": "98fe3b239454e927ff394c3dfb73f36a7a7c9f389817e25465770bd7ad3b2faa"
+        },
+        {
+          "anchor": "md:selected-regression-fixtures:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/testing.md",
+          "sha256": "273b19ae50ba78fdf9a02916dad8aaf502deade683cdcceb5aa48409b0d11319"
+        }
+      ]
+    },
+    "ui": {
+      "allowed_dispositions": [
+        "extension"
+      ],
+      "retained_clause_allowed": true,
+      "semantic_path": ".yuan/extensions/ui.md",
+      "targets": [
+        {
+          "anchor": "md:ui-extension:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/ui.md",
+          "sha256": "270dac041a0124aea6dd8b5f906be0c50f1aebe1f5720326b5937ea12b2f91eb"
+        },
+        {
+          "anchor": "md:contract:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/ui.md",
+          "sha256": "3718d061a2fd216ad8e5ebf21fcfdace3a581a48a0c41d2f250a47666bf582c2"
+        },
+        {
+          "anchor": "md:work-authoring-advice:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/ui.md",
+          "sha256": "6d2456675b38ee019a367694b8920e04722381291cc60da7254b1d8473d460b6"
+        },
+        {
+          "anchor": "md:verifier-recipes:1",
+          "kind": "semantic-anchor",
+          "path": ".yuan/extensions/ui.md",
+          "sha256": "160e4741c6e1a4367e06f233b4b29a8b281818e8fa237b629abb3860b7b66e1a"
+        }
+      ]
+    }
+  },
+  "schema_version": "yuan.provenance-target-family-registry/v1"
+}
