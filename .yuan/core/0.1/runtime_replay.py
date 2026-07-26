@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from replay_pending import rebuild_pending_side_effects
 from replay_trust import (
     artifact_scope,
     replay_self_modification_authorized,
@@ -26,6 +27,7 @@ def _blocked(
     attempt_ids: list[str],
     evidence_ids: list[str],
     errors: list[str],
+    pending_side_effects: list[dict[str, str]],
 ) -> dict[str, Any]:
     return {
         "schema_version": "yuan.run-memory/v1",
@@ -44,7 +46,7 @@ def _blocked(
         ),
         "ac_evidence": {},
         "active_hypotheses": [],
-        "pending_side_effects": [],
+        "pending_side_effects": pending_side_effects,
         "attempted_strategies": [],
         "legal_next_steps": [],
         "last_result": "BLOCKED",
@@ -79,7 +81,11 @@ def rebuild(
     attempts_digest = _collection_digest(attempts)
     evidence_digest = _collection_digest(evidence_items)
     errors: list[str] = []
-    if validate_document("work-contract", work).errors or not work_revision_valid(work):
+    work_is_valid = (
+        not validate_document("work-contract", work).errors
+        and work_revision_valid(work)
+    )
+    if not work_is_valid:
         errors.append("INVALID_WORK")
     if expected_attempts_digest not in {None, attempts_digest}:
         errors.append("ATTEMPTS_DIGEST_MISMATCH")
@@ -126,30 +132,13 @@ def rebuild(
             errors.append("EVIDENCE_SOURCE_MISMATCH")
         if not immutable_binding_matches(evidence.get("work_binding"), work.get("revision")):
             errors.append("EVIDENCE_WORK_MISMATCH")
-    if errors:
-        return _blocked(
-            work,
-            current_artifact_scope,
-            current_artifact_sha256,
-            environment_id,
-            environment_fingerprint,
-            attempts_digest,
-            evidence_digest,
-            attempt_ids,
-            evidence_ids,
-            errors,
-        )
-    remaining = dict(work["budget"])
-    for attempt in attempts:
-        for field in remaining:
-            remaining[field] -= attempt["budget_charge"][field]
-    if any(value < 0 for value in remaining.values()):
-        errors.append("BUDGET_HISTORY_INVALID")
-    pending = [
-        {"attempt_id": item["attempt_id"], "state": item["side_effect_state"]}
-        for item in attempts
-        if item["side_effect_state"] not in {"COMMITTED", "NOT_APPLICABLE"}
-    ]
+    pending = rebuild_pending_side_effects(
+        work,
+        attempts,
+        validate_document=validate_document,
+        work_is_valid=work_is_valid,
+        attempts_digest_trusted=expected_attempts_digest in {None, attempts_digest},
+    )
     if any(item["state"] == "UNKNOWN" for item in pending):
         errors.append("UNKNOWN_SIDE_EFFECT")
     if errors:
@@ -164,6 +153,27 @@ def rebuild(
             attempt_ids,
             evidence_ids,
             errors,
+            pending,
+        )
+    remaining = dict(work["budget"])
+    for attempt in attempts:
+        for field in remaining:
+            remaining[field] -= attempt["budget_charge"][field]
+    if any(value < 0 for value in remaining.values()):
+        errors.append("BUDGET_HISTORY_INVALID")
+    if errors:
+        return _blocked(
+            work,
+            current_artifact_scope,
+            current_artifact_sha256,
+            environment_id,
+            environment_fingerprint,
+            attempts_digest,
+            evidence_digest,
+            attempt_ids,
+            evidence_ids,
+            errors,
+            pending,
         )
     ac_evidence: dict[str, list[str]] = {}
     safety: dict[str, bool] = {}

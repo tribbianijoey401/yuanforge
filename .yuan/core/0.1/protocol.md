@@ -185,6 +185,14 @@ pointers and digests for:
 - non-terminal/UNKNOWN side effects;
 - Attempt and Evidence source ids plus their aggregate digests.
 
+Each pending side effect is a minimal atomic pointer `{attempt_id, state}`.
+Replay includes it only when the immutable target Attempt has a valid identity,
+binding, mutating action, target scope, and journal phase. Action, target,
+idempotency material, and reconciliation probes remain in that Attempt as the
+single source of truth. A collection-digest mismatch preserves a resolvable
+Attempt pointer but degrades its projected phase to `UNKNOWN`; invalid,
+ambiguous, committed, or pure-read Attempts cannot manufacture pending work.
+
 If missing, corrupt, stale, or inconsistent, discard it and deterministically
 replay the immutable Work, ordered Attempts, and Evidence. Missing history,
 digest mismatch, invalid transitions, or ambiguous ordering is `BLOCKED`; it
