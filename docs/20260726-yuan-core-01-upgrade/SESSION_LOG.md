@@ -13,7 +13,8 @@
 | task-001 | ✅ 完成 | 在任何仓库写入前保护原始 dirty 与 untracked 内容 | 使用仓库外唯一 snapshot，后镜像为 Evidence | `evidence/m0a/` | 本提交 |
 | task-002 | ✅ 完成 | 冻结 clean-room Yuan Core 0.1 Genesis baseline | 五原语、六结果、八项 mandatory semantics | `FEATURE.md`, `DESIGN.md`, `PLAN.md`, 状态文档 | 本提交 |
 | task-003 | ✅ 完成 | 独立、失败关闭的 bootstrap verifier | CLI + 冻结 manifest SHA-256 + 结构化 receipt；visible fixtures 不替代 Tester held-out | `scripts/bootstrap-core-verifier.py`, `scripts/bootstrap_verifier*.py`, `tests/bootstrap_verifier/` | 本提交 |
-| task-004–task-013 | ⏳ 等待 | M1 独立负向验证及 M2–M9 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
+| task-004 | ✅ 完成 | M1 独立 held-out、组合攻击与反作弊验证 | 两轮返工关闭 M1-B01–B04；31/31 tests 和冻结 receipt PASS | `tests/bootstrap_verifier/test_bootstrap_core_verifier_held_out.py`, `evidence/m1/` | 本提交 |
+| task-005–task-013 | ⏳ 等待 | M2 inert Core 至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
 
 ## 现场保护
 
@@ -43,6 +44,10 @@
 - task-003 TDD Red：实现文件不存在时 5 项 CLI 测试全部失败。
 - task-003 Green：9 项 CLI/异常测试全绿，`py_compile` 通过；author-visible manifest SHA-256 为 `66f20b3a04050135468209e6ead66f3df258f2faff8dbeb8f76a50c635ad8e55`。
 - Bootstrap verifier 对 empty、known-bad、零断言、validator crash、不可解析输出均形成显式 REJECT，并对 manifest/candidate/validator 文件做哈希绑定。
+- task-004 首轮 held-out 发现未绑定 validator command、receipt 覆盖输入和重复 check ID 三项 Blocker；r1 修复。
+- task-004 未预告组合攻击发现 manifest 未可信时 FAIL receipt 仍可覆盖 candidate；r2 将 receipt 隔离前移到 manifest 信任之前。
+- r2 最终独立验证：31/31 PASS、0 skip、0 xfail；额外覆盖 junction 逃逸、suite-root 边界、原子写失败、Windows UTF-8 和 reason pollution。
+- 冻结 author-visible manifest 产生 14-check PASS receipt；用户原始 10 个 dirty/untracked 文件哈希仍与 M0a 一致。
 
 ## 决策
 
@@ -67,4 +72,6 @@
 - `scripts/bootstrap_verifier.py`
 - `scripts/bootstrap_verifier_support.py`
 - `tests/bootstrap_verifier/`
+- `tests/bootstrap_verifier/test_bootstrap_core_verifier_held_out.py`
+- `evidence/m1/`
 - `docs/events/20260726/events.jsonl`

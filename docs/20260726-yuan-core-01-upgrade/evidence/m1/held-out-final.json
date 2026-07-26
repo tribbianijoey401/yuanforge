@@ -1,0 +1,78 @@
+{
+  "schema_version": "yuan.test-evidence/v1",
+  "task_id": "task-004",
+  "subject_commit": "f46c4e465ded813b1d21e6fa5b9d61196c7f0e54",
+  "created_at": "2026-07-26T22:14:28.4257575+08:00",
+  "tester_role": "independent-tester",
+  "status": "PASS",
+  "commands": [
+    {
+      "command": "python -m unittest discover -s tests/bootstrap_verifier -p 'test_*.py' -v",
+      "tests_run": 31,
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0,
+      "xfail": 0,
+      "duration_seconds": 19.108
+    },
+    {
+      "command": "python -m py_compile scripts/bootstrap-core-verifier.py scripts/bootstrap_verifier.py scripts/bootstrap_verifier_support.py",
+      "status": "PASS"
+    },
+    {
+      "command": "bootstrap-core-verifier.py against frozen author-visible manifest",
+      "status": "PASS",
+      "checks_executed": 14,
+      "receipt": "docs/20260726-yuan-core-01-upgrade/evidence/m1/receipt.json",
+      "receipt_sha256": "13a592ca3455d6d4f2a937fc117c9aa15bca694ec011ad2dd2367f0b0557028f"
+    }
+  ],
+  "hashes": {
+    "scripts/bootstrap-core-verifier.py": "94a36a178ee8242e850ee9f23b7cafc63906eac8aac2e723ca64225751cdfb40",
+    "scripts/bootstrap_verifier.py": "9ec6ba19fb7a4c2d4e6d654be0bcda3190c38fcd0842ddf8ce17b3996a984119",
+    "scripts/bootstrap_verifier_support.py": "d4435acdc60458893c39e7722a801df1418dd634d8330469ecf3c34b8ac5749b",
+    "tests/bootstrap_verifier/test_bootstrap_core_verifier_held_out.py": "b2d7feb3ac9a2178d6096c162fe3df288ace8aeae9680ef44c8be1b94d47916c",
+    "tests/bootstrap_verifier/fixtures/author-visible/manifest.json": "66f20b3a04050135468209e6ead66f3df258f2faff8dbeb8f76a50c635ad8e55"
+  },
+  "coverage": {
+    "empty_candidate": "PASS",
+    "zero_assertions": "PASS",
+    "known_bad": "PASS",
+    "validator_crash": "PASS",
+    "validator_timeout": "PASS",
+    "parse_error": "PASS",
+    "manifest_tamper": "PASS",
+    "candidate_tamper": "PASS",
+    "validator_tamper": "PASS",
+    "candidate_path_traversal": "PASS",
+    "validator_command_path_traversal": "PASS",
+    "junction_escape": "PASS",
+    "missing_negative_class": "PASS",
+    "expected_reason_pollution": "PASS",
+    "receipt_input_overlap": "PASS",
+    "receipt_untrusted_manifest_combination": "PASS",
+    "receipt_atomic_parent_failure": "PASS",
+    "receipt_prefix_boundary": "PASS",
+    "duplicate_check_ids": "PASS",
+    "windows_utf8": "PASS",
+    "receipt_required_fields": "PASS",
+    "zero_tests": "REJECTED_BY_NONZERO_TEST_COUNT"
+  },
+  "anti_gaming": {
+    "implementation_and_held_out_diff_separate": true,
+    "held_out_modified_by_implementer": false,
+    "assertions_weakened": false,
+    "skip_or_xfail_added": false,
+    "exceptions_swallowed": false,
+    "threshold_or_baseline_lowered": false,
+    "original_user_dirty_hash_compare": "PASS",
+    "original_user_dirty_files_checked": 10
+  },
+  "closed_blockers": [
+    "M1-B01",
+    "M1-B02",
+    "M1-B03",
+    "M1-B04"
+  ],
+  "gate": "M1_PASS"
+}
