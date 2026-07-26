@@ -143,6 +143,16 @@
   输出 hash 完全一致。独立 verifier、6/6 对抗负例、M1–M6/旧 Genesis
   与 M0a 10/10 全绿。此为作者证据，不解除 task-011，仍须 Quality
   Auditor 独立复审。
+- task-010-r1 独立复审在 clean checkout 重现 177 files / 2,207 clauses /
+  0 unmapped，6/6 作者负例通过，另以不导入项目代码的检查器逐条复算
+  2,207 个 source/clause/blob hash、字节覆盖与行区间，全部通过；因此
+  M7-B01–B05 关闭。
+- 新增对抗变体发现 M7-B06：将真实 Extension 条款的 disposition 翻转为
+  Core，或将其目标换成另一条有效 UI anchor，重新生成后 verifier 均接受。
+  实际映射还把 TDD、DocsOS、Knowledge、独立事实验证及审查协议批量投向
+  software-delivery/work-authoring，并把 workflow-protocol.md 的 335 行复合
+  内容作为一个条款处理。完整证据见 `evidence/m7-review/R1-QUALITY-AUDIT.md`；
+  task-010 返回 r2，task-011/M8 保持阻塞。
 
 ## 决策
 
