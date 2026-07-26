@@ -115,6 +115,25 @@
   35/35、M3 30/30、M4 10/10、M5 1/1（内部 13 checks）、M6 8/8、
   旧 Genesis 80 checks / 7 cases、M0a dirty 10/10 全绿。task-011 的
   M6/M7 依赖全部满足。
+- task-010 独立 Quality Audit 复跑机械 verify，确认作者 lane 的
+  177 files / 1,701 clauses / hash/link 检查可重复，但对抗审查判定 M7
+  FAIL：450 条 disposition 来自默认 software-delivery catch-all，
+  映射器只读 path+heading、不读 clause body；`build-graph.py` 甚至因
+  `build` 含 `ui` 子串被错分 UI。
+- 独立范围/坐标审计发现 56 个 `@preamble` 的
+  `line_start > line_end`，另有 61 个 newline-terminated 全文件记录的
+  `line_end` 超出实际 EOF；当前 verifier 对这 117 个错误仍报告 PASS。
+- PIT-004 零丢失不成立：1,046 条 legacy clause 只指向六份短 Extension
+  且无目标 anchor；`docs/anti-patterns.md` 多个唯一 AP 条目未进入十项
+  catalog；312 行 PTG runner 被整文件 obsolete，replacement 又不是
+  应用 PTG/CAL 执行器。
+- scope policy 与生成器同一信任 lane；内存删除 `docs/knowledge`
+  include root 后 discovery 仍成功并静默少 9 个源。manifest 还依赖
+  commit 中不存在的用户 dirty/untracked 源字节，clean checkout 不能
+  重现 177/1,701。
+- 建立 M7-B01–B05，task-010 返回 Doc Engineer r1；task-011 撤回就绪并
+  等待独立复审。完整 verdict 见
+  `evidence/m7-review/QUALITY-AUDIT.md`。
 
 ## 决策
 
