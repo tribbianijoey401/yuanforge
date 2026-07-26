@@ -24,7 +24,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 CORE = ROOT / ".yuan" / "core" / "0.1"
 M1_SUITE = ROOT / "tests" / "bootstrap_verifier" / "fixtures" / "author-visible"
 M1_MANIFEST_SHA256 = "66f20b3a04050135468209e6ead66f3df258f2faff8dbeb8f76a50c635ad8e55"
-CORE_MANIFEST_SHA256 = "852016c9f710f6b53e89ec76104cff8ba10a2964a803d916427031314b216176"
+CORE_MANIFEST_SHA256 = "659e2da5cc3732d96fb15c6a470a0ca974cc8161c6e31e165c8032cdbbdbd942"
 FROZEN_M1_FILES = {
     "scripts/bootstrap-core-verifier.py": "94a36a178ee8242e850ee9f23b7cafc63906eac8aac2e723ca64225751cdfb40",
     "scripts/bootstrap_verifier.py": "9ec6ba19fb7a4c2d4e6d654be0bcda3190c38fcd0842ddf8ce17b3996a984119",

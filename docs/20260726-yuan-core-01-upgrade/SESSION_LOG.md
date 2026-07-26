@@ -14,8 +14,8 @@
 | task-002 | ✅ 完成 | 冻结 clean-room Yuan Core 0.1 Genesis baseline | 五原语、六结果、八项 mandatory semantics | `FEATURE.md`, `DESIGN.md`, `PLAN.md`, 状态文档 | 本提交 |
 | task-003 | ✅ 完成 | 独立、失败关闭的 bootstrap verifier | CLI + 冻结 manifest SHA-256 + 结构化 receipt；visible fixtures 不替代 Tester held-out | `scripts/bootstrap-core-verifier.py`, `scripts/bootstrap_verifier*.py`, `tests/bootstrap_verifier/` | 本提交 |
 | task-004 | ✅ 完成 | M1 独立 held-out、组合攻击与反作弊验证 | 两轮返工关闭 M1-B01–B04；31/31 tests 和冻结 receipt PASS | `tests/bootstrap_verifier/test_bootstrap_core_verifier_held_out.py`, `evidence/m1/` | 本提交 |
-| task-005 | 🔄 返工 | M2 inert Core candidate 未通过独立 M3 | M3-B01–B05 返回 Backend Dev；不得弱化 held-out | `.yuan/core/0.1/`, `evidence/m3/independent-review.md` | 待修复 |
-| task-006 | ❌ 阻塞 | M3 旧信任根验证拒绝 candidate | M1 regression 31/31 PASS；M3 held-out 16/28 PASS，旧根 64-check FAIL | `tests/core_01/`, `evidence/m3/` | 本提交 |
+| task-005 | 🔄 返工 r2 | M2 inert Core candidate 未通过独立 M3 r1 | B01–B05 已关闭；M3-B06 返回 Backend Dev，不得弱化 held-out | `.yuan/core/0.1/`, `evidence/m3/independent-review.md` | 待修复 |
+| task-006 | ❌ 阻塞 | M3 旧信任根继续拒绝 r1 candidate | M1 regression 31/31 PASS；M3 held-out 28/29 PASS，旧根 72-check FAIL | `tests/core_01/`, `evidence/m3/` | 本提交 |
 | task-007–task-013 | ⏳ 等待 | M4 Shadow conversion 至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
 
 ## 现场保护
@@ -53,6 +53,9 @@
 - task-006 M3 使用未告知 held-out 攻击 Evidence、Attempt、Run Memory、reducer、授权/预算、Reference Port 与自修改：28 checks 中 16 PASS、12 FAIL。
 - 冻结 M1 verifier regression 仍为 31/31 PASS；外层 M3 suite 内容寻址绑定 candidate 与独立 validator，64 checks 后仅 Core case 因 `CHECK_FAILED` 被拒绝。
 - 建立 M3-B01–B05 并将 task-005 返回 Backend Dev；task-006 保持 Hard Gate 阻塞，修复后原样复测。
+- task-005 r1 未触碰独立 held-out/M1 verifier；原 28 项 held-out、25 项 author 与 31 项 M1 全部 PASS，证明 B01–B05 已关闭。
+- Tester 将外层 manifest 重绑定到 `659e2da5...bdbd942`，并新增不访问网络/外部系统、不产生真实副作用的 rebuild+self-mod revision+artifact scope 组合一致性检查。
+- 新检查发现 M3-B06：replay 未强制 self-mod trust proof，且 BLOCKED Run Memory 把 artifact scope 退化为 `.`；旧根 72 checks 仅拒绝 Core case。
 
 ## 决策
 

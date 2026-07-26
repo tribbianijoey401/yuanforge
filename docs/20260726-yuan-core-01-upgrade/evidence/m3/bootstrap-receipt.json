@@ -1,15 +1,15 @@
 {
   "schema_version": "yuan.bootstrap-receipt/v1",
   "verifier_revision": "yuan.bootstrap-verifier/1",
-  "created_at": "2026-07-26T14:51:53.426928+00:00",
-  "manifest_path": "C:\\Users\\guangchuan\\AppData\\Local\\Temp\\yuan-m3-bootstrap-ruazwm_2\\manifest.json",
-  "manifest_sha256": "679c0d49949dc4848bf5170581a3c358d717f3d0f010f28d2aac1b26d24921f5",
+  "created_at": "2026-07-26T15:23:17.851427+00:00",
+  "manifest_path": "C:\\Users\\guangchuan\\AppData\\Local\\Temp\\yuan-m3-bootstrap-8avxr42c\\manifest.json",
+  "manifest_sha256": "a7b5d48cb8e16954eed1a180ba58cfcbf2911bb3db271660e6d8ac66015697fe",
   "suite_id": "m3-old-root-verifies-yuan-core-01",
   "status": "FAIL",
   "reason_codes": [
     "SUITE_EXPECTATION_MISMATCH"
   ],
-  "checks_executed": 64,
+  "checks_executed": 72,
   "cases": [
     {
       "id": "valid",
@@ -90,7 +90,7 @@
       "validator": {
         "exit_code": 1,
         "assertions": 0,
-        "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\guangchuan\\AppData\\Local\\Temp\\yuan-m3-bootstrap-ruazwm_2\\validators\\error_validator.py\", line 1, in <module>\n    raise RuntimeError(\"author-visible validator failure\")\nRuntimeError: author-visible validator failure\n"
+        "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\guangchuan\\AppData\\Local\\Temp\\yuan-m3-bootstrap-8avxr42c\\validators\\error_validator.py\", line 1, in <module>\n    raise RuntimeError(\"author-visible validator failure\")\nRuntimeError: author-visible validator failure\n"
       }
     },
     {
@@ -119,11 +119,11 @@
       "reason_codes": [
         "CHECK_FAILED"
       ],
-      "candidate_sha256": "2597c80d20477b2a387a0d1892d04dcb270bbc85249443d4f97f45348aeec0e3",
-      "checks_executed": 50,
+      "candidate_sha256": "bdbf05223285a67c4dc810bd4fefe73c27e15bc6c64bf99088fdd81dc5d2648a",
+      "checks_executed": 58,
       "validator": {
         "exit_code": 0,
-        "assertions": 28,
+        "assertions": 29,
         "stderr": ""
       }
     }

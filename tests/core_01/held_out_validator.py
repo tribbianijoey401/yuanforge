@@ -257,6 +257,120 @@ def _semantic_checks(candidate: pathlib.Path) -> list[dict[str, str]]:
         lambda: callable(getattr(conformance, "self_modification_authorized", None)),
     )
 
+    def rebuild_self_modification_and_scope_are_consistent() -> bool:
+        self_work = copy.deepcopy(work)
+        self_work["acceptance_criteria"][0]["verifier_binding"].update(
+            {
+                "id": "candidate-self-verifier",
+                "revision": "candidate",
+                "sha256": "e" * 64,
+                "trust_root_id": "candidate-new-root",
+            }
+        )
+        self_work["revision"]["sha256"] = conformance.canonical_digest(
+            self_work, omitted_paths=(("revision", "sha256"),)
+        )
+        self_attempt = copy.deepcopy(baseline_attempt)
+        self_attempt["work_binding"] = copy.deepcopy(self_work["revision"])
+        receipt = {
+            "schema_version": "yuan.tool-receipt/v1",
+            "kind": "file-write",
+            "operation_id": "OP-self-mod-without-old-root",
+            "status": "REPLACED",
+            "path": ".yuan/core/0.1",
+            "before_sha256": "1" * 64,
+            "after_sha256": "2" * 64,
+        }
+        receipt_digest = conformance.canonical_digest(receipt)
+        self_attempt["action"].update(
+            {
+                "type": "file-write",
+                "mutating": True,
+                "side_effect_class": "filesystem",
+                "authorization_grant_id": "GRANT-core-candidate",
+            }
+        )
+        self_attempt["journal"] = [
+            {
+                "ordinal": ordinal,
+                "state": state,
+                "recorded_at": f"2026-07-26T14:4{ordinal}:00+00:00",
+                "receipt_sha256": (
+                    receipt_digest if state in {"OBSERVED", "COMMITTED"} else None
+                ),
+            }
+            for ordinal, state in enumerate(
+                ("PREPARED", "EXECUTING", "OBSERVED", "COMMITTED"), start=1
+            )
+        ]
+        self_attempt["side_effect_state"] = "COMMITTED"
+        self_attempt["tool_receipt"] = receipt
+        self_attempt["postcondition"] = {
+            "scope": ".yuan/core/0.1",
+            "observed_sha256": "2" * 64,
+            "satisfied": True,
+        }
+        self_attempt["outcome"] = "SUCCEEDED"
+        self_evidence = copy.deepcopy(evidence)
+        self_evidence["work_binding"] = copy.deepcopy(self_work["revision"])
+        self_evidence["verifier_binding"].update(
+            {
+                "id": "candidate-self-verifier",
+                "revision": "candidate",
+                "sha256": "e" * 64,
+                "trust_root_id": "candidate-new-root",
+            }
+        )
+        self_evidence["independence"].update(
+            {
+                "method": "held-out",
+                "author_identity": "candidate-author",
+                "verifier_identity": "candidate-alias",
+                "independent": True,
+            }
+        )
+        self_evidence["immutable_digest"] = conformance.canonical_digest(
+            self_evidence, omitted_paths=(("immutable_digest",),)
+        )
+        sys.path.insert(0, str(candidate))
+        try:
+            rebuilt = conformance.rebuild_run_memory(
+                self_work,
+                [self_attempt],
+                [self_evidence],
+                current_artifact_sha256=self_evidence["artifact_binding"]["sha256"],
+                environment_id=self_evidence["environment_binding"]["id"],
+                environment_fingerprint=self_evidence["environment_binding"][
+                    "fingerprint"
+                ],
+                trusted_now=datetime(2026, 7, 26, 15, 0, tzinfo=timezone.utc),
+            )
+        finally:
+            sys.path.pop(0)
+        blocked_baseline = conformance.rebuild_run_memory(
+            work,
+            [baseline_attempt],
+            [evidence],
+            current_artifact_sha256=evidence["artifact_binding"]["sha256"],
+            environment_id=evidence["environment_binding"]["id"],
+            environment_fingerprint=evidence["environment_binding"]["fingerprint"],
+            trusted_now=datetime(2026, 7, 26, 15, 0, tzinfo=timezone.utc),
+            expected_attempts_digest="0" * 64,
+        )
+        return (
+            rebuilt["last_result"] == "BLOCKED"
+            and rebuilt["work_binding"] == self_work["revision"]
+            and blocked_baseline["last_result"] == "BLOCKED"
+            and blocked_baseline["artifact_binding"]["scope"]
+            == evidence["artifact_binding"]["scope"]
+        )
+
+    _check(
+        checks,
+        "rebuild-selfmod-revision-and-port-scope-consistent",
+        rebuild_self_modification_and_scope_are_consistent,
+    )
+
     base_signals = {
         "state_consistent": True,
         "side_effect_states": [],
