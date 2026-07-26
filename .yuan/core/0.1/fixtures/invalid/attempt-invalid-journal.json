@@ -8,7 +8,7 @@
   "strategy_fingerprint": "1111111111111111111111111111111111111111111111111111111111111111",
   "relevant_inputs": [{"scope": "state", "sha256": "2222222222222222222222222222222222222222222222222222222222222222"}],
   "hypothesis": {"claim": "Write is safe.", "falsification": "CAS fails."},
-  "action": {"type": "file-write", "mutating": true, "side_effect_class": "filesystem", "scope": "state", "authorization_grant_id": "grant", "high_impact": false},
+  "action": {"type": "file-write", "mutating": true, "side_effect_class": "filesystem", "scope": "state", "authorization_grant_id": "grant", "high_impact": false, "self_modification": null},
   "budget_charge": {"ticks": 1, "tool_calls": 1, "strategies": 1, "command_seconds": 0},
   "journal": [
     {"ordinal": 1, "state": "EXECUTING", "recorded_at": "2026-07-26T14:30:00+00:00", "receipt_sha256": null},

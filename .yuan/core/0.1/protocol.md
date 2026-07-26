@@ -232,6 +232,18 @@ bound to the candidate; or an unexpired human grant naming candidate revision,
 candidate hash, risk, human identity, and grant identity. Future-dated,
 expired, mismatched, zero-assertion, and self-rooted proofs are rejected.
 
+Every mutating Attempt whose scope resolves to Protocol, Core, Harness,
+validator, or authority data carries a structured `self_modification`
+change/proof record. Replay invokes the mechanical authorizer before it may
+reduce to `COMPLETE`; a missing, candidate-self, unbound, or invalid proof
+reduces to `BLOCKED`. Previous-root proofs additionally bind to the Work's
+pre-bound required verifier, independent-root proofs bind to independent
+Evidence, and human grants bind to a declared Work grant.
+
+Every replay projection, including early `BLOCKED` projections, derives its
+artifact scope from current Evidence, Attempt, or Work data. It never replaces
+the active Reference Port scope with a synthetic repository-wide scope.
+
 ## 12. Inert-candidate rule
 
 Files in this directory define a candidate only. They must not modify the

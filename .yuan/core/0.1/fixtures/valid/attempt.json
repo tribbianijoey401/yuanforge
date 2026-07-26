@@ -34,7 +34,8 @@
     "side_effect_class": "none",
     "scope": ".yuan/core/0.1",
     "authorization_grant_id": null,
-    "high_impact": false
+    "high_impact": false,
+    "self_modification": null
   },
   "budget_charge": {
     "ticks": 1,

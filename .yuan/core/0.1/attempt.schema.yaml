@@ -29,14 +29,32 @@
     },
     "action": {
       "type": "object", "additionalProperties": false,
-      "required": ["type", "mutating", "side_effect_class", "scope", "authorization_grant_id", "high_impact"],
+      "required": ["type", "mutating", "side_effect_class", "scope", "authorization_grant_id", "high_impact", "self_modification"],
       "properties": {
         "type": {"enum": ["file-read", "file-write", "command", "llm-propose", "verify", "reconcile"]},
         "mutating": {"type": "boolean"},
         "side_effect_class": {"type": "string", "minLength": 1},
         "scope": {"type": "string", "minLength": 1},
         "authorization_grant_id": {"type": ["string", "null"]},
-        "high_impact": {"type": "boolean"}
+        "high_impact": {"type": "boolean"},
+        "self_modification": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["change", "proofs"],
+          "properties": {
+            "change": {
+              "type": "object", "additionalProperties": false,
+              "required": ["target_kind", "candidate_binding", "previous_binding", "risk"],
+              "properties": {
+                "target_kind": {"enum": ["protocol", "core", "harness", "validator", "authority"]},
+                "candidate_binding": {"$ref": "#/$defs/binding"},
+                "previous_binding": {"$ref": "#/$defs/binding"},
+                "risk": {"type": "string", "minLength": 1}
+              }
+            },
+            "proofs": {"type": "array", "minItems": 1, "items": {"type": "object"}}
+          }
+        }
       }
     },
     "budget_charge": {

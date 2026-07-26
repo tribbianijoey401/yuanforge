@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from replay_trust import (
+    artifact_scope,
+    replay_self_modification_authorized,
+)
 from trust_semantics import canonical_digest, immutable_binding_matches
 
 
@@ -13,6 +17,7 @@ def _collection_digest(items: list[dict[str, Any]]) -> str:
 
 def _blocked(
     work: dict[str, Any],
+    artifact_scope: str,
     artifact_sha256: str,
     environment_id: str,
     environment_fingerprint: str,
@@ -28,7 +33,7 @@ def _blocked(
         "projection_sequence": len(attempt_ids) + len(evidence_ids),
         "work_binding": work.get("revision", {}),
         "protocol_binding": work.get("protocol_binding", {}),
-        "artifact_binding": {"scope": ".", "sha256": artifact_sha256},
+        "artifact_binding": {"scope": artifact_scope, "sha256": artifact_sha256},
         "environment_binding": {
             "id": environment_id,
             "fingerprint": environment_fingerprint,
@@ -70,6 +75,7 @@ def rebuild(
 ) -> dict[str, Any]:
     attempt_ids = [item.get("attempt_id", "") for item in attempts]
     evidence_ids = [item.get("evidence_id", "") for item in evidence_items]
+    current_artifact_scope = artifact_scope(work, attempts, evidence_items)
     attempts_digest = _collection_digest(attempts)
     evidence_digest = _collection_digest(evidence_items)
     errors: list[str] = []
@@ -106,6 +112,10 @@ def rebuild(
             errors.append("ATTEMPT_HARNESS_MISMATCH")
         if any(item not in evidence_by_id for item in attempt.get("evidence_ids", [])):
             errors.append("MISSING_EVIDENCE_HISTORY")
+        if not replay_self_modification_authorized(
+            work, attempt, evidence_items, trusted_now
+        ):
+            errors.append("SELF_MODIFICATION_UNAUTHORIZED")
     for evidence in evidence_items:
         if validate_document("evidence", evidence).errors:
             errors.append("INVALID_EVIDENCE")
@@ -119,6 +129,7 @@ def rebuild(
     if errors:
         return _blocked(
             work,
+            current_artifact_scope,
             current_artifact_sha256,
             environment_id,
             environment_fingerprint,
@@ -144,6 +155,7 @@ def rebuild(
     if errors:
         return _blocked(
             work,
+            current_artifact_scope,
             current_artifact_sha256,
             environment_id,
             environment_fingerprint,
@@ -189,7 +201,7 @@ def rebuild(
         "work_binding": work["revision"],
         "protocol_binding": work["protocol_binding"],
         "artifact_binding": {
-            "scope": evidence_items[-1]["artifact_binding"]["scope"],
+            "scope": current_artifact_scope,
             "sha256": current_artifact_sha256,
         },
         "environment_binding": {
