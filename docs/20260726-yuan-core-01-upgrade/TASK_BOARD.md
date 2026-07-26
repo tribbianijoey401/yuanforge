@@ -2,7 +2,7 @@
 
 > 会话: 20260726-yuan-core-01-upgrade
 > 创建: 2026-07-26 18:30 +08:00
-> 最后更新: 2026-07-26 22:53 +08:00
+> 最后更新: 2026-07-26 23:14 +08:00
 
 ## 当前状态快照
 
@@ -10,7 +10,7 @@
 |----|-----|
 | **已验证实现 HEAD** | `f46c4e465ded813b1d21e6fa5b9d61196c7f0e54` |
 | **原始 Git 脏文件** | 8 tracked modified + 2 untracked；已由 `evidence/m0a/` 保护 |
-| **活跃 Agent** | task-006 独立 M3 已阻塞；task-005 等待 Backend Dev 返工 |
+| **活跃 Agent** | task-005 r1 已完成；task-006 等待 Tester 独立重绑定与复测 |
 | **当前 authority** | 旧 YuanForge 文档运行态；新 Core 尚未接管 |
 | **最后 Conductor 巡检** | 2026-07-26 18:34 +08:00 |
 
@@ -22,8 +22,8 @@
 | task-002 | P0 | R0 | M0b 冻结 Genesis baseline | doc-engineer | task-001 | ✅ 完成 | `FEATURE.md`, `DESIGN.md`, `PLAN.md` | `DESIGN.md#8-trust-root-与验证层` |
 | task-003 | P0 | R0 | M1 实现 bootstrap verifier | backend-dev | task-002 | ✅ 完成 | `scripts/bootstrap-core-verifier.py`, `scripts/bootstrap_verifier*.py`, `tests/bootstrap_verifier/` | `evidence/m1/held-out-final.json` |
 | task-004 | P0 | R0 | M1 负向 fixtures 与反作弊验证 | tester | task-003 | ✅ 完成 | held-out tests, `evidence/m1/receipt.json` | `evidence/m1/held-out-final.json` |
-| task-005 | P0 | R0 | M2 实现 inert Core candidate | backend-dev | task-004 | 🔄 返工 | `.yuan/core/0.1/`, `evidence/m2/` | `evidence/m3/independent-review.md` |
-| task-006 | P0 | R0 | M3 旧信任根验证新候选 | tester | task-005 | ❌ 阻塞 | `tests/core_01/`, `evidence/m3/` | `evidence/m3/final.json` |
+| task-005 | P0 | R0 | M2 实现 inert Core candidate | backend-dev | task-004 | ✅ 完成 | `.yuan/core/0.1/`, `evidence/m2/` | `evidence/m3/independent-review.md` |
+| task-006 | P0 | R0 | M3 旧信任根验证新候选 | tester | task-005 | 🟢 待复测 | `tests/core_01/`, `evidence/m3/` | `evidence/m3/final.json` |
 | task-007 | P0 | R0 | M4 Shadow conversion 与回退演练 | backend-dev | task-006 | ⏳ 等待 | converter, rollback receipt | `DESIGN.md#9-authority-与迁移不变量` |
 | task-008 | P1 | R1 | M5 Canary Work | tester | task-007 | ⏳ 等待 | canary Evidence | `PLAN.md#里程碑-gate` |
 | task-009 | P1 | R1 | M6 Adapter conformance | tester | task-008 | ⏳ 等待 | adapter reports | `DESIGN.md#7-最小平台-port` |
@@ -44,6 +44,7 @@
 | 22:15 | task-004 | task-005 | M1 独立 Hard Gate 通过；31/31 tests、14-check frozen receipt、py_compile 和 dirty hash 复核均 PASS | `evidence/m1/held-out-final.json`, `evidence/m1/receipt.json` |
 | 22:37 | task-005 | task-006 | inert Core candidate 已按 TDD 完成；17/17 author tests、41-check candidate conformance、31/31 M1 regression 与 10 个原 dirty hash 复核均 PASS；author 自检不构成 M3 证明 | `.yuan/core/0.1/candidate-manifest.json`, `evidence/m2/author-final.json` |
 | 22:53 | task-006 | task-005-r1 | 冻结 M1 verifier 仍为 31/31 PASS，但 28-check 独立 held-out 有 12 FAIL，旧根 64-check suite 拒绝 Core candidate | M3-B01–B05；详见 `evidence/m3/independent-review.md` |
+| 23:14 | task-005-r1 | task-006 | M3-B01–B05 已按 author TDD 封闭；25/25 author、48-check candidate self-check、28/28 原样 held-out、31/31 M1 回归均 PASS | 新 manifest SHA-256 `659e2da5cc3732d96fb15c6a470a0ca974cc8161c6e31e165c8032cdbbdbd942`；冻结 M3 runner 须由 Tester 独立重绑定后出具新证据 |
 
 ## 故障记录
 
@@ -58,7 +59,7 @@
 | 任务 | 次数 | 原因 | 审查人 |
 |------|------|------|--------|
 | task-003 | 2 | r1 修复三项初始 Blocker；r2 将 receipt 隔离前移到 manifest 信任之前，封闭 hash-tamper + receipt-collision 组合攻击 | Tester |
-| task-005 | 1 | M3 28-check held-out 中 12 FAIL；冻结旧根明确 REJECT candidate | Tester |
+| task-005 | 1 | M3 28-check held-out 中 12 FAIL；r1 已封闭 B01–B05，等待 Tester 独立重绑定与复测 | Tester |
 
 ## 阻塞
 
@@ -88,6 +89,7 @@
 | 22:15 | task-004 完成 → promote task-005 | backend-dev | M1 Gate PASS，M2 inert Core candidate 可派发 |
 | 22:37 | task-005 完成 → promote task-006 | tester | M2 author evidence PASS；须由旧 Genesis trust root + 新 held-out 独立验证 |
 | 22:53 | task-006 阻塞 → return task-005-r1 | backend-dev | 修复 M3-B01–B05 后原样重跑独立 held-out，不得弱化测试 |
+| 23:14 | task-005-r1 完成 → task-006 复测 | tester | author 回归全绿；冻结 M3 runner 的候选 manifest 哈希须由 Tester 独立重绑定 |
 
 ## 派发日志
 
@@ -101,3 +103,4 @@
 | 22:10 | task-004 | Tier 1 | tester | ✅ 独立 31 项负向/反作弊/边界验证通过，M1 receipt 已冻结 |
 | 22:37 | task-005 | Tier 1 | backend-dev | ✅ 五原语 Schema/Protocol、reference Port、author fixtures/tests/conformance 完成；M3 独立 Gate 待执行 |
 | 22:53 | task-006 | Tier 1 | tester | ❌ M3 Hard Gate：冻结旧根 REJECT；held-out 12 项失败，task-005 返工 |
+| 23:14 | task-005-r1 | Tier 1 | backend-dev | ✅ B01–B05 修复完成；author 25/25、自检 48/48、原样 held-out 28/28、M1 31/31 |

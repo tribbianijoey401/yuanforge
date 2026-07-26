@@ -75,6 +75,8 @@ class CommandReceipt:
     kind: str
     operation_id: str
     status: str
+    profile: str
+    sandboxed: bool
     argv: tuple[str, ...]
     cwd: str
     started_at: str

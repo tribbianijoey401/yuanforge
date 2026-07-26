@@ -9,8 +9,8 @@
   "authorization": {"default": "deny", "grants": []},
   "budget": {"ticks": 1, "tool_calls": 1, "strategies": 1, "command_seconds": 1},
   "acceptance_criteria": [
-    {"id": "AC-DUP", "type": "structure", "required": true, "predicate": "first", "artifact_scope": ".yuan/core/0.1", "verifier_binding": {"id": "v", "revision": "1", "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "trust_root_id": "old", "environment_ids": ["test"], "minimum_assertions": 1}},
-    {"id": "AC-DUP", "type": "structure", "required": true, "predicate": "second", "artifact_scope": ".yuan/core/0.1", "verifier_binding": {"id": "v", "revision": "1", "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "trust_root_id": "old", "environment_ids": ["test"], "minimum_assertions": 1}}
+    {"id": "AC-DUP", "type": "structure", "required": true, "predicate": "first", "artifact_scope": ".yuan/core/0.1", "verifier_binding": {"id": "v", "revision": "1", "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "trust_root_id": "old", "environment_ids": ["test"], "environment_fingerprints": {"test": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}, "minimum_assertions": 1}},
+    {"id": "AC-DUP", "type": "structure", "required": true, "predicate": "second", "artifact_scope": ".yuan/core/0.1", "verifier_binding": {"id": "v", "revision": "1", "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "trust_root_id": "old", "environment_ids": ["test"], "environment_fingerprints": {"test": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}, "minimum_assertions": 1}}
   ],
   "safety_invariants": [{"id": "SAFE-01", "predicate": "Remain inert."}]
 }

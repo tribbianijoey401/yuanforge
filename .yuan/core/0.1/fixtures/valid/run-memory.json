@@ -5,7 +5,7 @@
   "work_binding": {
     "id": "WORK-core-author-fixture",
     "revision": "1",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "sha256": "1dcdab79925246025bd4cc62b98fefe807a937d95b43aac9c84788b828233d6f"
   },
   "protocol_binding": {
     "id": "yuan-core-protocol",
@@ -56,6 +56,7 @@
     "attempt_ids": ["ATT-author-001"],
     "evidence_ids": ["EVD-author-001"],
     "attempts_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "errors": []
   }
 }

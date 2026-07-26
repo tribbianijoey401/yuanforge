@@ -4,7 +4,7 @@
   "revision": {
     "id": "WORK-core-author-fixture",
     "revision": "1",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "sha256": "1dcdab79925246025bd4cc62b98fefe807a937d95b43aac9c84788b828233d6f"
   },
   "protocol_binding": {
     "id": "yuan-core-protocol",
@@ -35,7 +35,8 @@
         "side_effect_classes": ["none", "filesystem", "command"],
         "scopes": [".yuan/core/0.1"],
         "high_impact": false,
-        "expires_at": null
+        "expires_at": null,
+        "max_uses": null
       }
     ]
   },
@@ -58,6 +59,9 @@
         "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
         "trust_root_id": "genesis-m1",
         "environment_ids": ["windows-python312"],
+        "environment_fingerprints": {
+          "windows-python312": "4444444444444444444444444444444444444444444444444444444444444444"
+        },
         "minimum_assertions": 1
       }
     }

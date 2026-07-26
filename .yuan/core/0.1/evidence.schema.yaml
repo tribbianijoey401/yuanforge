@@ -5,7 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version", "evidence_id", "work_binding", "ac_id", "kind",
+    "schema_version", "evidence_id", "sequence", "work_binding", "ac_id", "kind",
     "created_at", "source_attempt_id", "status", "assertions", "checks",
     "artifact_binding", "environment_binding", "verifier_binding",
     "harness_binding", "logs", "freshness", "independence", "immutable_digest"
@@ -13,6 +13,7 @@
   "properties": {
     "schema_version": {"const": "yuan.evidence/v1"},
     "evidence_id": {"type": "string", "pattern": "^EVD-[A-Za-z0-9._-]+$"},
+    "sequence": {"type": "integer", "minimum": 1},
     "work_binding": {"$ref": "#/$defs/binding"},
     "ac_id": {"type": "string", "pattern": "^AC-[A-Za-z0-9._-]+$"},
     "kind": {"enum": ["logic", "integration", "contract", "structure", "review", "human-judgment", "tool-receipt"]},

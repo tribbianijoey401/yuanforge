@@ -1,6 +1,7 @@
 {
   "schema_version": "yuan.evidence/v1",
   "evidence_id": "EVD-invalid-zero",
+  "sequence": 1,
   "work_binding": {"id": "work", "revision": "1", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
   "ac_id": "AC-ZERO",
   "kind": "structure",

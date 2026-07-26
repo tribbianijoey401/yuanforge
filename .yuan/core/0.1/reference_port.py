@@ -13,6 +13,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Sequence
 
+from command_sandbox import PYTHON_PROFILE, prepare_command
 from port_types import (
     CASMismatch,
     CancellationToken,
@@ -52,6 +53,7 @@ class ReferencePort:
         max_command_seconds: float,
         max_output_bytes: int,
         proposal_provider: ProposalProvider | None = None,
+        command_profiles: dict[str, str] | None = None,
     ) -> None:
         self.root = pathlib.Path(root).resolve(strict=True)
         if not self.root.is_dir() or _is_link_or_junction(self.root):
@@ -62,6 +64,14 @@ class ReferencePort:
             os.path.normcase(str(pathlib.Path(item).resolve(strict=True)))
             for item in allowed_executables
         }
+        explicit_profiles = command_profiles or {}
+        self.command_profiles = {
+            os.path.normcase(str(pathlib.Path(path).resolve(strict=True))): profile
+            for path, profile in explicit_profiles.items()
+        }
+        for executable in self.allowed_executables:
+            if pathlib.Path(executable).name.lower().startswith("python"):
+                self.command_profiles.setdefault(executable, PYTHON_PROFILE)
         self.max_command_seconds = float(max_command_seconds)
         self.max_output_bytes = int(max_output_bytes)
         self.proposal_provider = proposal_provider
@@ -208,13 +218,20 @@ class ReferencePort:
             raise CommandRejected("executable does not exist") from error
         if os.path.normcase(str(executable)) not in self.allowed_executables:
             raise CommandRejected("executable is not explicitly bound")
+        profile = self.command_profiles.get(os.path.normcase(str(executable)))
+        if profile is None:
+            raise CommandRejected("executable has no bound invocation profile")
+        try:
+            effective_argv = prepare_command(executable, argv, self.root, profile)
+        except ValueError as error:
+            raise CommandRejected(str(error)) from error
         command_cwd = self._resolve(cwd, allow_missing=False)
         if not command_cwd.is_dir():
             raise CommandRejected("command cwd is not a directory")
         started_at = _utc_now()
         started = time.monotonic()
         process = subprocess.Popen(
-            list(argv),
+            effective_argv,
             cwd=command_cwd,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
@@ -254,6 +271,8 @@ class ReferencePort:
             kind="command",
             operation_id=str(uuid.uuid4()),
             status=status,
+            profile=profile,
+            sandboxed=True,
             argv=tuple(argv),
             cwd=command_cwd.relative_to(self.root).as_posix() or ".",
             started_at=started_at,

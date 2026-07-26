@@ -45,14 +45,15 @@
           "type": "array",
           "items": {
             "type": "object", "additionalProperties": false,
-            "required": ["id", "action_types", "side_effect_classes", "scopes", "high_impact"],
+            "required": ["id", "action_types", "side_effect_classes", "scopes", "high_impact", "max_uses"],
             "properties": {
               "id": {"type": "string", "minLength": 1},
               "action_types": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
               "side_effect_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
               "scopes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/relativePath"}},
               "high_impact": {"type": "boolean"},
-              "expires_at": {"type": ["string", "null"], "format": "date-time"}
+              "expires_at": {"type": ["string", "null"], "format": "date-time"},
+              "max_uses": {"type": ["integer", "null"], "minimum": 1}
             }
           }
         }
@@ -84,10 +85,14 @@
               {"$ref": "#/$defs/immutableBinding"},
               {
                 "type": "object",
-                "required": ["trust_root_id", "environment_ids", "minimum_assertions"],
+                "required": ["trust_root_id", "environment_ids", "environment_fingerprints", "minimum_assertions"],
                 "properties": {
                   "trust_root_id": {"type": "string", "minLength": 1},
                   "environment_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+                  "environment_fingerprints": {
+                    "type": "object",
+                    "additionalProperties": {"$ref": "#/$defs/sha256"}
+                  },
                   "minimum_assertions": {"type": "integer", "minimum": 1}
                 }
               }

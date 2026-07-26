@@ -90,12 +90,13 @@
     "last_result": {"enum": ["CONTINUE", "CORRECT", "COMPLETE", "BLOCKED", "WAIT_AUTH", "BUDGET_EXIT"]},
     "rebuild": {
       "type": "object", "additionalProperties": false,
-      "required": ["attempt_ids", "evidence_ids", "attempts_digest", "evidence_digest"],
+      "required": ["attempt_ids", "evidence_ids", "attempts_digest", "evidence_digest", "errors"],
       "properties": {
         "attempt_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
         "evidence_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
         "attempts_digest": {"$ref": "#/$defs/sha256"},
-        "evidence_digest": {"$ref": "#/$defs/sha256"}
+        "evidence_digest": {"$ref": "#/$defs/sha256"},
+        "errors": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
       }
     }
   },

@@ -38,6 +38,12 @@ revision pre-binds every required typed AC to:
 The LLM cannot replace a verifier after observing a result. A revision/hash
 mismatch is invalid input, never an implicit upgrade.
 
+JSON-compatible records use one canonical digest: deep-copy the record, omit
+the named self-digest path, then encode UTF-8 JSON with sorted keys, no
+insignificant whitespace, no ASCII escaping, and no NaN before SHA-256. Work
+omits `revision.sha256`; Evidence omits `immutable_digest`. Ordered
+Attempt/Evidence collection digests omit nothing.
+
 ## 3. Tick
 
 One Tick performs this finite sequence:
@@ -84,6 +90,11 @@ PREPARED → EXECUTING → OBSERVED → COMMITTED
 an independent reconciliation Attempt may establish what happened. The LLM
 must not call side-effecting tools outside the Harness/Port route.
 
+For `OBSERVED` and `COMMITTED`, each journal entry binds the canonical receipt
+digest. The postcondition binds action scope and observed artifact hash; file
+writes also bind receipt path and after-hash. `UNKNOWN` can only have outcome
+`UNKNOWN`, and mutating action kinds cannot claim `mutating: false`.
+
 ## 5. Evidence validity
 
 Evidence is append-only and valid only when all applicable checks hold:
@@ -100,6 +111,10 @@ Evidence is append-only and valid only when all applicable checks hold:
 8. stdout, stderr, and receipt digests are present;
 9. independence is explicit and valid for the AC;
 10. freshness window, when declared, has not expired.
+
+Freshness uses a timezone-aware Harness clock. Work revision and Harness
+binding must equal the Evidence bindings; an environment id is insufficient
+without its Work-bound fingerprint.
 
 Verifier crash, timeout, cancellation, zero assertions, missing or unparsable
 logs, stale artifact, wrong scope/environment, unbound verifier, duplicate
@@ -175,6 +190,11 @@ replay the immutable Work, ordered Attempts, and Evidence. Missing history,
 digest mismatch, invalid transitions, or ambiguous ordering is `BLOCKED`; it
 must never reconstruct `COMPLETE`.
 
+Attempt and Evidence sequences are contiguous from one. Rebuild verifies Work,
+Protocol, Harness, source references, canonical collection digests, budget
+charges, journal transitions, safety checks, and Evidence before deriving the
+projection. Its error list is deterministic and sorted.
+
 ## 10. Minimal Port
 
 The platform boundary exposes only:
@@ -188,6 +208,12 @@ An unavailable capability is `UNSUPPORTED`, not a semantic fallback. Tool
 receipts include operation id, status, timing, scope/argv, exit state, output
 digests, truncation flags, and before/after hashes where applicable.
 
+Trusting an executable is insufficient: every command binds an invocation
+profile. The reference Python profile accepts only isolated `-c`, rejects
+absolute arguments outside the Port root, and installs an audit sandbox that
+denies filesystem writes, subprocesses, sockets, ctypes, and OS mutation.
+Unprofiled executables are rejected.
+
 ## 11. Self-modification
 
 A candidate must not establish its own trust. Core, Harness, schema, validator,
@@ -199,6 +225,12 @@ or authority changes require acceptance by at least one of:
 
 Candidate conformance and author tests are development evidence only. Validator
 failure, empty validation, or missing independent root blocks authority switch.
+
+The mechanical authorizer accepts exactly one of: a positive previous-root
+proof bound to previous and candidate revisions; an independent-root proof
+bound to the candidate; or an unexpired human grant naming candidate revision,
+candidate hash, risk, human identity, and grant identity. Future-dated,
+expired, mismatched, zero-assertion, and self-rooted proofs are rejected.
 
 ## 12. Inert-candidate rule
 

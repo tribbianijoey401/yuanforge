@@ -13,5 +13,5 @@
   "attempted_strategies": [],
   "legal_next_steps": [],
   "last_result": "COMPLETE",
-  "rebuild": {"attempt_ids": ["ATT-unknown"], "evidence_ids": ["EVD-one"], "attempts_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "evidence_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
+  "rebuild": {"attempt_ids": ["ATT-unknown"], "evidence_ids": ["EVD-one"], "attempts_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "evidence_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "errors": []}
 }

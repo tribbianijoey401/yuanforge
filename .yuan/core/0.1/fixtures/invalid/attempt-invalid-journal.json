@@ -16,6 +16,7 @@
   ],
   "side_effect_state": "COMMITTED",
   "tool_receipt": {"schema_version": "yuan.tool-receipt/v1", "kind": "file-write", "operation_id": "OP-invalid", "status": "REPLACED"},
+  "postcondition": null,
   "evidence_ids": [],
   "outcome": "SUCCEEDED"
 }

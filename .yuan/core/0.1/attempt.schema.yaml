@@ -8,7 +8,7 @@
     "schema_version", "attempt_id", "work_binding", "protocol_binding",
     "harness_binding", "sequence", "strategy_fingerprint", "relevant_inputs",
     "hypothesis", "action", "budget_charge", "journal", "side_effect_state",
-    "tool_receipt", "evidence_ids", "outcome"
+    "tool_receipt", "postcondition", "evidence_ids", "outcome"
   ],
   "properties": {
     "schema_version": {"const": "yuan.attempt/v1"},
@@ -71,11 +71,22 @@
         "kind": {"enum": ["file-read", "file-write", "command", "llm-propose"]},
         "operation_id": {"type": "string", "minLength": 1},
         "status": {"type": "string", "minLength": 1},
+        "profile": {"type": "string", "minLength": 1},
+        "sandboxed": {"type": "boolean"},
         "before_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
         "after_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
         "stdout_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
         "stderr_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
         "exit_code": {"type": ["integer", "null"]}
+      }
+    },
+    "postcondition": {
+      "type": ["object", "null"],
+      "required": ["scope", "observed_sha256", "satisfied"],
+      "properties": {
+        "scope": {"type": "string", "minLength": 1},
+        "observed_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "satisfied": {"type": "boolean"}
       }
     },
     "evidence_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},

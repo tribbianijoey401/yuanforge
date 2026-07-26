@@ -1,22 +1,28 @@
 {
   "schema_version": "yuan.evidence/v1",
   "evidence_id": "EVD-author-001",
+  "sequence": 1,
   "work_binding": {
     "id": "WORK-core-author-fixture",
     "revision": "1",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "sha256": "1dcdab79925246025bd4cc62b98fefe807a937d95b43aac9c84788b828233d6f"
   },
   "ac_id": "AC-STRUCTURE",
   "kind": "structure",
   "created_at": "2026-07-26T14:30:00+00:00",
   "source_attempt_id": "ATT-author-001",
   "status": "PASS",
-  "assertions": 1,
+  "assertions": 2,
   "checks": [
     {
       "id": "schemas-parse",
       "status": "PASS",
       "observation": "Four schemas parsed with the Python standard library."
+    },
+    {
+      "id": "SAFE-01",
+      "status": "PASS",
+      "observation": "The candidate remains inert and has not changed runtime authority."
     }
   ],
   "artifact_binding": {
@@ -53,5 +59,5 @@
     "verifier_identity": "bootstrap-verifier-task-004",
     "independent": true
   },
-  "immutable_digest": "8888888888888888888888888888888888888888888888888888888888888888"
+  "immutable_digest": "c0520ea5b8bc31d7970b80097865a0b2e38915a20145b85af1b2427775f37bc0"
 }

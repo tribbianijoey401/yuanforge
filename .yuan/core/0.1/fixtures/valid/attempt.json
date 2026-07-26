@@ -4,7 +4,7 @@
   "work_binding": {
     "id": "WORK-core-author-fixture",
     "revision": "1",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "sha256": "1dcdab79925246025bd4cc62b98fefe807a937d95b43aac9c84788b828233d6f"
   },
   "protocol_binding": {
     "id": "yuan-core-protocol",
@@ -52,6 +52,7 @@
     "exit_code": 0,
     "receipt_sha256": "3333333333333333333333333333333333333333333333333333333333333333"
   },
+  "postcondition": null,
   "evidence_ids": ["EVD-author-001"],
   "outcome": "SUCCEEDED"
 }
