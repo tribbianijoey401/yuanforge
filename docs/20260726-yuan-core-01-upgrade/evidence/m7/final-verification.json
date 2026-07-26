@@ -1,0 +1,123 @@
+{
+  "schema_version": "yuan.m7-final-verification/v1",
+  "task_id": "task-010",
+  "source_head": "c506b919e7a8af8dd1b0c8f3a230b16573cba7cc",
+  "created_at": "2026-07-26T17:18:40Z",
+  "role": "doc-engineer",
+  "status": "PASS",
+  "gate": "M7_AUTHOR_G4_PASS",
+  "core_modified": false,
+  "legacy_normative_source_modified": false,
+  "legacy_source_deleted": false,
+  "runtime_authority_changed": false,
+  "extensions": [
+    "software-delivery",
+    "testing",
+    "docsos",
+    "knowledge",
+    "ui",
+    "platform-adapters"
+  ],
+  "extension_boundary": {
+    "inputs": "public Core Protocol and record schemas only",
+    "outputs": ["work-authoring-advice", "evidence"],
+    "forbidden": [
+      "new-core-primitive",
+      "new-tick-result",
+      "completion-redefinition",
+      "runtime-authority-write",
+      "core-prerequisite"
+    ]
+  },
+  "provenance": {
+    "source_files": 177,
+    "source_bytes": 1435630,
+    "source_clauses": 1701,
+    "mapped_clauses": 1701,
+    "unmapped_clauses": 0,
+    "coverage_percent": 100.0,
+    "dispositions": {
+      "core": 47,
+      "extension": 1046,
+      "knowledge": 588,
+      "fixture": 19,
+      "obsolete-with-proof": 1
+    },
+    "required_families_present": true,
+    "obsolete_proofs_valid": true,
+    "local_links_valid": true,
+    "source_and_clause_hashes_valid": true
+  },
+  "commands": [
+    {
+      "command": "python -B scripts/yuan-provenance.py verify",
+      "status": "PASS",
+      "assertions": 1701,
+      "failures": 0
+    },
+    {
+      "command": "python -B -m unittest discover -s tests/bootstrap_verifier -p 'test_*.py' -q",
+      "status": "PASS",
+      "tests": 31,
+      "failures": 0
+    },
+    {
+      "command": "python -B -m unittest discover -s .yuan/core/0.1/tests -p 'test_*.py' -q",
+      "status": "PASS",
+      "tests": 35,
+      "failures": 0
+    },
+    {
+      "command": "python -B tests/core_01/held_out_validator.py .yuan/core/0.1",
+      "status": "PASS",
+      "checks": 30,
+      "failures": 0
+    },
+    {
+      "command": "python -B -m unittest discover -s tests/shadow_migration -p 'test_*.py' -q",
+      "status": "PASS",
+      "tests": 10,
+      "failures": 0
+    },
+    {
+      "command": "python -B -m unittest discover -s tests/core_canary -p 'test_*.py' -q",
+      "status": "PASS",
+      "tests": 1,
+      "internal_checks": 13,
+      "failures": 0
+    },
+    {
+      "command": "python -B -m unittest discover -s tests/adapter_conformance -p 'test_*.py' -q",
+      "status": "PASS",
+      "tests": 8,
+      "failures": 0
+    },
+    {
+      "command": "python -B tests/adapter_conformance/run_m6_old_root.py --candidate-manifest-sha256 20ac1cbb7f2377d5cecadf3347a40d81e14e8469c6c914701f585a49903d9768",
+      "status": "PASS",
+      "checks": 80,
+      "cases": 7,
+      "failures": 0
+    }
+  ],
+  "m0a_dirty_integrity": {
+    "checked": 10,
+    "passed": 10,
+    "failed": 0
+  },
+  "hashes": {
+    ".yuan/extensions/README.md": "eb3ea98fb593ef70930d93846dbdc511b05bfce7a498696f917066f3f608e136",
+    ".yuan/extensions/software-delivery.md": "da7c86f85583b7aa870b04b668cb2904bd28e9ea5937e1d56c5a3d4b657fbf6d",
+    ".yuan/extensions/testing.md": "4fa105dacf6033d483b69b925a7e05ac61356f2ec70d2bacb49869d189ab9421",
+    ".yuan/extensions/docsos.md": "82411f48ef4aed3ba935674d38e76eb4d5196cf943679d0a65f59f96349fae46",
+    ".yuan/extensions/knowledge.md": "40ba9a52e8790aaa71b0f40b6e1c270dc0c4d07b4d8a4e12ec1fadd051680f2d",
+    ".yuan/extensions/ui.md": "f3543a7bb9d2f8e2b51346fa35ba7e3cade4e440efb46b8a137271b86c5220b5",
+    ".yuan/extensions/platform-adapters.md": "e76f86eb42a944ef417e7a3d8814e9aaf28bf5d9f9bb2c5613c7ad3b70d6bb23",
+    ".yuan/extensions/fixtures/legacy-anti-patterns.json": "e797f4c482bebb5a6fa3ba6de9df1e477fa54797aa1b583bc96e1968fd8c1142",
+    ".yuan/extensions/provenance/scope-policy.json": "71d0b407ee9a335be65f312492ba9dcb6a1ba07ff9a8ab3dfceeb293fbc940c9",
+    ".yuan/extensions/provenance/scope-manifest.json": "0ae97eb51a619494935556484682dd183e9c43a25127763da01ed4d3dd8499cd",
+    ".yuan/extensions/provenance/clause-manifest.json": "4f584fef7f35cf3cfcdf4297ef9c120e3e0c7e9b84399db63cf5a4056d4cd3ec",
+    ".yuan/extensions/provenance/REPORT.md": "bd96520394dc21accf357eead12bede89c5f8b83938b4e40c61a2f314aa2cd69",
+    "scripts/yuan-provenance.py": "d65011f6fa2d90bb0f622a8e77a717afac3a7cc64a63a2a1ad9c7850a9bb89e4"
+  }
+}

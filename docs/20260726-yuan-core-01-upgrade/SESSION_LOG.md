@@ -19,7 +19,8 @@
 | task-007 | ✅ 完成 | M4 Shadow conversion 与回退演练 | 单向只读 legacy→shadow；Core 重建、writer guard 与无损 rollback 全绿 | `scripts/yuan-shadow-migrate.py`, `evidence/m4/` | 本提交 |
 | task-008 | ✅ 完成 | M5 Canary Work 经 r3 修复后通过独立复测 | 原 10 项 + 3 项普通数据变体全绿；旧 Genesis root 接受新 candidate | `evidence/m5/` | 本提交 |
 | task-009 | ✅ 完成 | M6 Adapter conformance | manual executable mapping + Hermes honest unsupported；旧根与独立变体通过 | `evidence/m6/` | 本提交 |
-| task-010–task-013 | ⏳ 等待 | M7 Extensions 至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
+| task-010 | ✅ 完成 | M7 Extensions 与条款 provenance | 六 Extensions 只消费 Core 公共契约、只产 authoring advice/Evidence；旧源全保留 | `.yuan/extensions/`, `evidence/m7/` | 本提交 |
+| task-011–task-013 | ⏳ 等待 | M8 authority switch 至 M9 清场 | M8 依赖已满足；继续 verifier-first 推进 | 见 `PLAN.md` | — |
 
 ## 现场保护
 
@@ -98,6 +99,22 @@
   `20ac1cbb...d9768` 后 80 checks / 7 cases PASS；M1 31/31、Core 35/35、
   M3 30/30、M4 10/10、M5 1/1（内部 13-check）及 M0a dirty 10/10
   全绿。M6-B01–B04 关闭，task-009 完成。
+- task-010 M7：建立 software-delivery、testing、DocsOS、Knowledge、UI、
+  platform-adapters 六个可选 Extension；每个只消费 Core 公共契约，只能
+  形成 Work authoring advice 或 Evidence，不重定义五原语、六结果、
+  `COMPLETE` 或 runtime authority。
+- provenance scope 覆盖 177 个规范源、1,435,630 bytes，并按 Markdown
+  heading/无 heading 全文件 hash 机械切分为 1,701 条 clause；1,701 条
+  全部唯一映射到 Core / Extension / Knowledge / Fixture /
+  Obsolete-with-proof，unmapped=0、coverage=100.00%。
+- 抽取状态外置、Protocol over Platform、bounded convergence、
+  actor/checker、held-out、integrity diff、真实环境契约验证、PIT-003/004、
+  merged/deployed/live claim 分离与 VERSION 单源；10 项 legacy failure
+  以 source hash 绑定为负向 fixtures，未用概括替代或删除旧源。
+- M7 Gate：provenance links/hash/obsolete proof PASS；M1 31/31、Core
+  35/35、M3 30/30、M4 10/10、M5 1/1（内部 13 checks）、M6 8/8、
+  旧 Genesis 80 checks / 7 cases、M0a dirty 10/10 全绿。task-011 的
+  M6/M7 依赖全部满足。
 
 ## 决策
 
@@ -131,4 +148,7 @@
 - `tests/adapter_conformance/`
 - `.yuan/adapters/`
 - `evidence/m6/`
+- `.yuan/extensions/`
+- `scripts/yuan-provenance.py`
+- `evidence/m7/`
 - `docs/events/20260726/events.jsonl`
