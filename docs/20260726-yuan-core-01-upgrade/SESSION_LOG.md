@@ -12,7 +12,8 @@
 |------|------|------|------|------|--------|
 | task-001 | ✅ 完成 | 在任何仓库写入前保护原始 dirty 与 untracked 内容 | 使用仓库外唯一 snapshot，后镜像为 Evidence | `evidence/m0a/` | 本提交 |
 | task-002 | ✅ 完成 | 冻结 clean-room Yuan Core 0.1 Genesis baseline | 五原语、六结果、八项 mandatory semantics | `FEATURE.md`, `DESIGN.md`, `PLAN.md`, 状态文档 | 本提交 |
-| task-003–task-013 | ⏳ 等待 | M1–M9 实施与验证 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
+| task-003 | ✅ 完成 | 独立、失败关闭的 bootstrap verifier | CLI + 冻结 manifest SHA-256 + 结构化 receipt；visible fixtures 不替代 Tester held-out | `scripts/bootstrap-core-verifier.py`, `scripts/bootstrap_verifier*.py`, `tests/bootstrap_verifier/` | 本提交 |
+| task-004–task-013 | ⏳ 等待 | M1 独立负向验证及 M2–M9 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
 
 ## 现场保护
 
@@ -39,6 +40,9 @@
 - Clean-room 需求与架构冻结文档初版。
 - M0a–M9 verifier-first 实施计划和 Dispatch Table。
 - M0b Genesis baseline 冻结，M1 bootstrap verifier 已可派发。
+- task-003 TDD Red：实现文件不存在时 5 项 CLI 测试全部失败。
+- task-003 Green：9 项 CLI/异常测试全绿，`py_compile` 通过；author-visible manifest SHA-256 为 `66f20b3a04050135468209e6ead66f3df258f2faff8dbeb8f76a50c635ad8e55`。
+- Bootstrap verifier 对 empty、known-bad、零断言、validator crash、不可解析输出均形成显式 REJECT，并对 manifest/candidate/validator 文件做哈希绑定。
 
 ## 决策
 
@@ -59,4 +63,8 @@
 - `TASK_BOARD.md`
 - `SESSION_LOG.md`
 - `evidence/m0a/`
+- `scripts/bootstrap-core-verifier.py`
+- `scripts/bootstrap_verifier.py`
+- `scripts/bootstrap_verifier_support.py`
+- `tests/bootstrap_verifier/`
 - `docs/events/20260726/events.jsonl`
