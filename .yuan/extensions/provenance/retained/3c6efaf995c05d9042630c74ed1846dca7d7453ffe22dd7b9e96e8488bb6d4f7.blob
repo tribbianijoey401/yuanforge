@@ -1,0 +1,5 @@
+### 用户授权
+- 手机号：`<button open-type="getPhoneNumber">` + 后端解密
+- 用户信息：已废弃直接获取，需用户手动填写
+- 地理位置：`wx.authorize({scope: 'scope.userLocation'})`
+

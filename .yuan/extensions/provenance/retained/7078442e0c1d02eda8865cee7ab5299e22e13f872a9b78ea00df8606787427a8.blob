@@ -1,0 +1,23 @@
+## 关键文件
+- src/xxx/handler.py
+- tests/xxx/test.py
+```
+
+#### decisions/
+
+**命名**：`ADR-NNN.md`（保留原始 ADR 编号）。
+
+```markdown
+---
+id: ADR-NNN
+object_type: decision
+lifecycle: knowledge
+owner: architect
+status: accepted
+date: YYYY-MM-DD
+summary: "一句话描述此决策"
+depends: []
+supersedes: ADR-xxx  (可选)
+confidence: verified
+---
+

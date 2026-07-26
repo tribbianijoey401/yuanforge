@@ -1,0 +1,5 @@
+if not changed:
+    sys.exit(0)
+
+# ── 2. YAML validation ────────────────────────────────────────────
+

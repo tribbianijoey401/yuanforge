@@ -1,0 +1,66 @@
+class AuthorizationAndSandboxTests(unittest.TestCase):
+    def test_expired_or_spent_grant_waits_for_authorization(self) -> None:
+        work = fixture("work-contract")
+        action = {
+            "type": "file-write",
+            "side_effect_class": "filesystem",
+            "scope": ".yuan/core/0.1/new-file",
+            "authorization_grant_id": "GRANT-core-candidate",
+            "high_impact": False,
+        }
+        charge = {"ticks": 1, "tool_calls": 1, "strategies": 1, "command_seconds": 1}
+        remaining = {"ticks": 2, "tool_calls": 2, "strategies": 2, "command_seconds": 2}
+        work["authorization"]["grants"][0]["expires_at"] = "2000-01-01T00:00:00+00:00"
+        self.assertEqual(
+            "WAIT_AUTH",
+            conformance.authorization_status(
+                work,
+                action,
+                charge,
+                remaining,
+                trusted_now=datetime(2026, 7, 26, tzinfo=timezone.utc),
+            ),
+        )
+        work["authorization"]["grants"][0]["expires_at"] = None
+        work["authorization"]["grants"][0]["max_uses"] = 1
+        self.assertEqual(
+            "WAIT_AUTH",
+            conformance.authorization_status(
+                work, action, charge, remaining, grant_usage={"GRANT-core-candidate": 1}
+            ),
+        )
+
+    def test_python_profile_rejects_absolute_escape_and_sandboxes_hardcoded_write(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = pathlib.Path(temporary) / "root"
+            root.mkdir()
+            outside = root.parent / "outside.txt"
+            port = reference_port.ReferencePort(
+                root,
+                allowed_executables=[sys.executable],
+                max_command_seconds=2,
+                max_output_bytes=4096,
+            )
+            with self.assertRaises(reference_port.CommandRejected):
+                port.run_command(
+                    [
+                        sys.executable,
+                        "-c",
+                        "import pathlib,sys; pathlib.Path(sys.argv[1]).write_text('x')",
+                        str(outside),
+                    ],
+                    timeout_seconds=1,
+                )
+            receipt = port.run_command(
+                [
+                    sys.executable,
+                    "-c",
+                    f"open({str(outside)!r}, 'w').write('x')",
+                ],
+                timeout_seconds=1,
+            )
+            self.assertNotEqual(0, receipt.exit_code)
+            self.assertFalse(outside.exists())
+            self.assertEqual("python-audit-sandbox/v1", receipt.profile)
+
+

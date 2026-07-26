@@ -1,0 +1,77 @@
+{
+  "m0_base_commit": "b8fc38901f928be2fe52d1d9fc9f15679904fe47",
+  "m0_binary_patch_sha256": "ab559d842f0bd629d538b7905a90d83ae72feee38fdc92951c79da53eb58b48f",
+  "schema_version": "yuan.dirty-source-receipt/v1",
+  "sources": [
+    {
+      "bytes": 61,
+      "logical_path": ".gitignore",
+      "sha256": "e3ea7c19edc937c649c0751b0fb38070fad601655cadd9db44cde07f8b8e1059",
+      "snapshot_path": ".yuan/extensions/provenance/sources/e3ea7c19edc937c649c0751b0fb38070fad601655cadd9db44cde07f8b8e1059.blob",
+      "tracked_at_source": true
+    },
+    {
+      "bytes": 4724,
+      "logical_path": ".yuan/rules/test-integrity.md",
+      "sha256": "73924d897e515e2bd201650f2356c35e98237f29af7cc85d502111157729ce4b",
+      "snapshot_path": ".yuan/extensions/provenance/sources/73924d897e515e2bd201650f2356c35e98237f29af7cc85d502111157729ce4b.blob",
+      "tracked_at_source": false
+    },
+    {
+      "bytes": 16234,
+      "logical_path": "AGENTS.md",
+      "sha256": "d282f61862b19ab42fe4933584fa4dd5b893650c38776ba2e9a3c97fb8d45d7a",
+      "snapshot_path": ".yuan/extensions/provenance/sources/d282f61862b19ab42fe4933584fa4dd5b893650c38776ba2e9a3c97fb8d45d7a.blob",
+      "tracked_at_source": true
+    },
+    {
+      "bytes": 6758,
+      "logical_path": "contracts/architect.md",
+      "sha256": "e4efcce9c7cc0fc8770a2f54e8173c632f42ca54c15d259267c59c0b641aacba",
+      "snapshot_path": ".yuan/extensions/provenance/sources/e4efcce9c7cc0fc8770a2f54e8173c632f42ca54c15d259267c59c0b641aacba.blob",
+      "tracked_at_source": true
+    },
+    {
+      "bytes": 4818,
+      "logical_path": "contracts/backend-dev.md",
+      "sha256": "2505b3668124beda352e2174399b16396c9b0b0c4ec2ace9ac1b138a20fb1ef9",
+      "snapshot_path": ".yuan/extensions/provenance/sources/2505b3668124beda352e2174399b16396c9b0b0c4ec2ace9ac1b138a20fb1ef9.blob",
+      "tracked_at_source": true
+    },
+    {
+      "bytes": 3686,
+      "logical_path": "contracts/doc-engineer.md",
+      "sha256": "8fbdde4c6bd6c13f16527ae97b6bb5bb49a49cdf04fafe4da5e662ebcc5d3b47",
+      "snapshot_path": ".yuan/extensions/provenance/sources/8fbdde4c6bd6c13f16527ae97b6bb5bb49a49cdf04fafe4da5e662ebcc5d3b47.blob",
+      "tracked_at_source": true
+    },
+    {
+      "bytes": 5137,
+      "logical_path": "contracts/frontend-dev.md",
+      "sha256": "4f74c507acc57ed7955f5d76e179455e77361cace72783dd80da9be6b2d8bc86",
+      "snapshot_path": ".yuan/extensions/provenance/sources/4f74c507acc57ed7955f5d76e179455e77361cace72783dd80da9be6b2d8bc86.blob",
+      "tracked_at_source": true
+    },
+    {
+      "bytes": 5387,
+      "logical_path": "contracts/quality-auditor.md",
+      "sha256": "2bd8814567b7db8e28f816c98727cc3cfdb9d8e491b0011c0f4a20a5b839d26e",
+      "snapshot_path": ".yuan/extensions/provenance/sources/2bd8814567b7db8e28f816c98727cc3cfdb9d8e491b0011c0f4a20a5b839d26e.blob",
+      "tracked_at_source": true
+    },
+    {
+      "bytes": 4430,
+      "logical_path": "contracts/tester.md",
+      "sha256": "4da6edcfa5a7cbc11fbbb3ab2a5dbec7486ad26a2e041339e704a34b71eb57a2",
+      "snapshot_path": ".yuan/extensions/provenance/sources/4da6edcfa5a7cbc11fbbb3ab2a5dbec7486ad26a2e041339e704a34b71eb57a2.blob",
+      "tracked_at_source": true
+    },
+    {
+      "bytes": 2595,
+      "logical_path": "docs/decisions/OPEN-DECISIONS.md",
+      "sha256": "e77cdb53b29d3a218ad892fd9e9cfb728e349293ab0a1ab880eed6e1b6b3411a",
+      "snapshot_path": ".yuan/extensions/provenance/sources/e77cdb53b29d3a218ad892fd9e9cfb728e349293ab0a1ab880eed6e1b6b3411a.blob",
+      "tracked_at_source": false
+    }
+  ]
+}

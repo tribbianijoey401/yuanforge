@@ -1,0 +1,14 @@
+## 四、Checkpoint（恢复点）
+
+> 在 Gate、Pause、Crash 或推理会话结束时强制生成。只存储恢复必需信息。
+
+```yaml
+checkpoint:
+  goal_id: "auth-module"
+  current_task: "T05"
+  state: "等待用户确认计划"
+  failed_hypotheses:
+    - "JWT 为 Bug 源 → 已排除"
+  next_action: "继续执行 T05"
+```
+

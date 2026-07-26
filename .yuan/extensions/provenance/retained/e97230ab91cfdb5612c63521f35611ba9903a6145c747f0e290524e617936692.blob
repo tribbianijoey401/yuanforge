@@ -1,0 +1,11 @@
+## 测试规范
+
+详见 [`.yuan/rules/iron-rules.md`](../.yuan/rules/iron-rules.md) 铁律 Ⅱ。
+
+| 类型 | 范围 | 命名 |
+|------|------|------|
+| 单元测试 | 单个函数/方法 | `test_<功能>.py` |
+| 集成测试 | 多个模块协作 | `test_integration_<场景>.py` |
+
+---
+

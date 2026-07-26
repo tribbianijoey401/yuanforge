@@ -1,0 +1,12 @@
+"""YuanForge pre-commit hook — 确定性校验。
+
+保证 LLM 永远不会污染 Docs。
+
+校验项:
+  1. YAML syntax — object-model.yaml + 所有 frontmatter
+  2. Enum validation — object_type/status/confidence/lifecycle 合法值
+  3. Frontmatter completeness — 必填字段检查
+  4. Proposal validation — Proposal 必填字段
+  5. Anchor integrity — 分段锚点完整性检查
+"""
+

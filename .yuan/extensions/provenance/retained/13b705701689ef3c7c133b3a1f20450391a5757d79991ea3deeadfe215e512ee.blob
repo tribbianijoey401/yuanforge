@@ -1,0 +1,24 @@
+## 一、MVP 开发专家团怎么做
+
+MVP 专家团由 1 名总监 + 7 名专家组成，走 6 阶段（Phase 0→4 + Spec 即契约），核心靠 **P0 绝对规则 + Harness 门禁 + 五源对齐 + DDAD 文档驱动**。
+
+| 角色 | 核心职责 | 关键产出 / 机制 | 与 YuanForge 映射 |
+|------|----------|----------------|-------------------|
+| 项目总监（Conductor 等价） | 统筹 7 专家，逐 Phase 门禁，决策有迹可循 | Spec 12 章 + 每 Phase P0 扫描 | ≈ Conductor |
+| PM（产品） | 竞品调研 + 3 竞品 2 替代 + 差评挖空白，PRD + RICE | 竞品列表 + 用户画像 + PRD | Product Analyst |
+| 架构师 | 技术选型 3 方案对比 + 版本锚定 + ADR | API 清单 + openapi.yaml + DB 清单 + ADR | Architect |
+| 设计师 | 8 硬红线 / 7 反模式 / 13 自检 + Design Token | Token json+css + 锁定 SVG 图标库 | UI Designer |
+| 前端 | Token 化 + emoji SVG + pro-max 打磨 | 单文件 ≤300 行 + lint/type/test ≤3 轮 + UI 11 项 | Frontend Dev |
+| 后端 | 安全 checklist + JWT/RBAC | RESTful API + 幂等 | Backend Dev |
+| QA | 测试金字塔 单元→集成→E2E | P0 缺陷归零 + RoleVerdict 结构化 | Tester / Spec Reviewer |
+| 运维 | CloudBase/Docker + CI/CD + 回滚 | 部署 + health + 交付包 | Doc Engineer / 部署环节 |
+
+**MVP 专家团 5 个可借鉴机制**
+1. **P0 视觉绝对规则**：emoji 图标禁令 + 紫粉渐变禁令 + AI 模板味文案禁令，零容忍、可机扫。
+2. **自检循环**：lint → type-check → test 机械三连，失败自动修，最多 3 轮。
+3. **RoleVerdict 结构化裁决**：`verdict/pass|fail + blocking[] + advisory[] + evidence[]`，机器可消费。
+4. **Spec 即契约（12 章）**：范围锁定 + 版本锚定 + Design Token + EARS 验收 + 内嵌坑 + e2e 验证。
+5. **OPEN-DECISIONS 登记**：悬而未决项只追加 + 就地关闭，闭环追踪。
+
+---
+

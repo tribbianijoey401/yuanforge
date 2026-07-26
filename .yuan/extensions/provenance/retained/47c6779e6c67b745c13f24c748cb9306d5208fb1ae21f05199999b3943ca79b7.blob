@@ -1,0 +1,20 @@
+## 二、事实面六维矩阵（← NF-02 吸收）
+
+每次知识治理必须覆盖以下 6 面，每面独立标记状态。小项目不必硬凑 6 面：没有部署就没有运行态面，如实标 `not-applicable`，不要编造证据。
+
+| 事实面 | 验证内容 | 可用状态 |
+|--------|---------|---------|
+| 代码 | 现在真正实现了什么？ | `verified-current` / `changed-and-verified` / `pending` / `out-of-scope` / `not-applicable` |
+| 运行态 | 用户实际得到什么？ | 同上 |
+| 文档 | 人和下游看到的是不是现役答案？ | 同上 |
+| 规则 | Agent 收到的约束是否同源、可执行、无死引用？ | 同上 |
+| 记忆 | 快照是否仍准确且允许修改？ | 同上 |
+| 工作区 | 是否仍有未集成或未审计的残留？ | 同上 |
+
+**关键规则**：
+- 不要把 `git status` 干净、PR 已合并或测试通过单独当成「全部同步」
+- 发布状态必须区分 `draft`、`PR`、`merged`、`deployed`、`live verified`、`knowledge closed` 和 `cleaned`
+- 每一条差异必须写清 `source of truth → stale surfaces → intended action → verification`
+
+---
+

@@ -1,0 +1,6 @@
+---
+name: debug-feedback-loop
+description: Debug 前置阶段 — 构建可复现的反馈循环。必须先有能复现 Bug 的 tight loop，才能进入诊断。
+trigger: Dev Agent 进入 Debug 模式后，Conductor 注入本协议作为 Phase 0
+---
+

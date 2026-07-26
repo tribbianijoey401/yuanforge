@@ -1,0 +1,22 @@
+### 4.3 边构建
+
+```
+depends:
+  for each item in depends:
+    Edge(from=node.id, to=item, type=DEPENDS_ON)
+
+parent:
+  Edge(from=frontmatter.parent, to=node.id, type=PARENT_OF)
+
+children:
+  for each child in children:
+    Edge(from=node.id, to=child, type=PARENT_OF)
+
+supersedes:
+  Edge(from=node.id, to=frontmatter.supersedes, type=SUPERSEDES)
+
+Module.features:
+  for each feature in features:
+    Edge(from=node.id, to=feature, type=CONTAINS)
+```
+

@@ -1,0 +1,11 @@
+# Workflow Protocol — 工作流协议
+
+> **协议定位**：定义 YuanForge 的软件开发流程——项目从用户需求到交付的完整阶段。
+> **本协议只定义「下一步应该做什么」。**
+>
+> 不定义怎么派发（那是 Adapter Protocol）、不定义怎么审查（那是 Action Protocol）。
+>
+> **Conductor = Workflow Interpreter** — 读 Workflow → 读 State Machine → 产生 Action → 调用 Adapter。
+
+---
+

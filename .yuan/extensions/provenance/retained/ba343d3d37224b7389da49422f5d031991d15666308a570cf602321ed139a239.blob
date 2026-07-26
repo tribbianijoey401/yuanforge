@@ -1,0 +1,57 @@
+class RebuildAndSelfModificationTests(unittest.TestCase):
+    def test_rebuild_is_deterministic_and_fail_closed(self) -> None:
+        work = fixture("work-contract")
+        attempt = fixture("attempt")
+        evidence = fixture("evidence")
+        kwargs = {
+            "current_artifact_sha256": evidence["artifact_binding"]["sha256"],
+            "environment_id": evidence["environment_binding"]["id"],
+            "environment_fingerprint": evidence["environment_binding"]["fingerprint"],
+            "trusted_now": datetime(2026, 7, 26, 15, 0, tzinfo=timezone.utc),
+        }
+        rebuilt = conformance.rebuild_run_memory(work, [attempt], [evidence], **kwargs)
+        self.assertEqual("COMPLETE", rebuilt["last_result"])
+        repeated = conformance.rebuild_run_memory(work, [attempt], [evidence], **kwargs)
+        self.assertEqual(rebuilt, repeated)
+        out_of_order = copy.deepcopy(attempt)
+        out_of_order["sequence"] = 2
+        self.assertEqual(
+            "BLOCKED",
+            conformance.rebuild_run_memory(work, [out_of_order], [evidence], **kwargs)[
+                "last_result"
+            ],
+        )
+        self.assertEqual(
+            "BLOCKED",
+            conformance.rebuild_run_memory(
+                work,
+                [attempt],
+                [evidence],
+                expected_attempts_digest="0" * 64,
+                **kwargs,
+            )["last_result"],
+        )
+
+    def test_self_modification_requires_one_exact_independent_root(self) -> None:
+        change = {
+            "target_kind": "core",
+            "candidate_binding": {"id": "core", "revision": "2", "sha256": "2" * 64},
+            "previous_binding": {"id": "core", "revision": "1", "sha256": "1" * 64},
+            "risk": "R0",
+        }
+        self.assertFalse(conformance.self_modification_authorized(change, []))
+        previous_proof = {
+            "kind": "previous-root",
+            "root_binding": change["previous_binding"],
+            "candidate_binding": change["candidate_binding"],
+            "status": "PASS",
+            "assertions": 1,
+        }
+        self.assertTrue(
+            conformance.self_modification_authorized(change, [previous_proof])
+        )
+        forged = copy.deepcopy(previous_proof)
+        forged["candidate_binding"]["revision"] = "other"
+        self.assertFalse(conformance.self_modification_authorized(change, [forged]))
+
+

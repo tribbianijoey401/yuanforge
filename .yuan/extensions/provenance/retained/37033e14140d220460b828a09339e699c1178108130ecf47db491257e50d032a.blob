@@ -1,0 +1,12 @@
+### Loop 七步
+
+| 步骤 | 动作 | 说明 |
+|------|------|------|
+| **READ** | 扫描 TASK_BOARD.md | 获取所有 Task 状态 |
+| **SELECT** | 选出 READY Task | 依赖已满足，按优先级排序 |
+| **DISPATCH** | 注入合约+铁律+Goal摘要 | 派发给平台执行 |
+| **WAIT** | 等待 Agent 完成 | 或超时/失败 |
+| **DIGEST** | 比对产出与验收标准 | 通过→DONE，否则→RETURN |
+| **UPDATE** | 更新 TASK_BOARD | 写入 Event Log |
+| **CHECK** | 检查退出条件 | Goal 完成？Human Gate？Token 耗尽？ |
+

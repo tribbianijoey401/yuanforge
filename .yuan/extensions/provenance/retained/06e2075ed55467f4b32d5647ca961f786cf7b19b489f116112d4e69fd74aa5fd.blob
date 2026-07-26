@@ -1,0 +1,19 @@
+### 语义断点分块
+```python
+def semantic_chunk(text, threshold=0.7):
+    # 1. 将文本按段落/标题拆分
+    # 2. 计算相邻段落的语义相似度
+    # 3. 相似度低于阈值处 → 断点
+    # 4. 在断点处切分
+    chunks = []
+    current_chunk = []
+    for paragraph in paragraphs:
+        if current_chunk:
+            similarity = embed_similarity(current_chunk[-1], paragraph)
+            if similarity < threshold:
+                chunks.append(join(current_chunk))
+                current_chunk = []
+        current_chunk.append(paragraph)
+    return chunks
+```
+

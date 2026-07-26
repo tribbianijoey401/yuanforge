@@ -1,0 +1,8 @@
+### AP-MIGRATE-007: 框架版本同步时 VERSION 文件漂移
+
+- **描述**: 多个位置声明框架版本号（`.yuan/VERSION`、SKILL.md frontmatter、init 脚本常量），不同步导致 `--sync` 报告"无需更新"但实际上内核已有变化。
+- **重现条件**: 修改版本时只更新了某一个位置的版本号。
+- **修复方式**: 统一以 `.yuan/VERSION` 为唯一真相源，init 脚本中同步更新。
+- **验证方式**: SKILL.md frontmatter version == `cat .yuan/VERSION` == `FRAMEWORK_VERSION` 变量值。
+- **@ptg**: false
+

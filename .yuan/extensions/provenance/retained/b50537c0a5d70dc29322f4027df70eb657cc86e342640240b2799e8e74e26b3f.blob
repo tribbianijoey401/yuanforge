@@ -1,0 +1,12 @@
+### iOS 精要（HIG 浓缩）
+
+- 安全区内布局，避开 notch / Dynamic Island / home indicator。
+- 系统导航：2–5 个顶级 section 用 tab bar，层级用导航栈，自包含任务用 sheet。
+- 左边缘回滑手势是肌肉记忆，永不 disable 或覆盖。
+- 大标题在顶层屏，滚动时塌缩为内联。
+- 触控目标 44×44 pt 起。
+- Dynamic Type 系统文字样式，不硬编码 point size；SF Pro 承载 UI。
+- 语义系统色（label / secondaryLabel / systemBackground / separator / tint），自动适配深色模式与增强对比度。
+- 平台控件优先（Switch / Segmented / Stepper / 系统选择器 / Action Sheet / Alert / Context Menu / Swipe Action），SF Symbols 图标。
+- 系统转场（push 滑入 / sheet 升起 / dismiss 反转），尊重 Reduce Motion。
+

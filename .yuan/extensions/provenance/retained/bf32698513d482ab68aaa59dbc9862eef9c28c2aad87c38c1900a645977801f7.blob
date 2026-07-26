@@ -1,0 +1,8 @@
+#### harden — 加固
+
+边界情况 / 错误状态 / 防御性设计。
+
+- **执行步骤**：测极端输入（超长 / 超短 / emoji / RTL / 大数 / 千项 / 空数据）→ 测错误场景（网络 / API / 验证 / 权限 / 限流 / 并发）→ 测 i18n（德语 +30% / RTL / CJK / 日期 / 货币 / 复数）→ 系统化加固（文本溢出 / i18n / 错误处理 / 边界 / 输入校验 / a11y 韧性 / 性能韧性）。
+- **检查项**：`text-overflow: ellipsis` / `-webkit-line-clamp` / `overflow-wrap: break-word`；`min-width: 0` 让 flex/grid 子项可缩；逻辑属性 `margin-inline-start` 而非 `margin-left`；`Intl.DateTimeFormat` / `Intl.NumberFormat`；空状态 / 加载 / 大数据集 / 并发 / 权限状态全覆盖；防双提交（loading 时 disable）。
+- **反模式**：假设完美输入；忽略 i18n；通用错误消息（"Error occurred"）；信任客户端校验；固定宽度文本容器；假设英语长度；一个组件出错阻塞整个界面。
+

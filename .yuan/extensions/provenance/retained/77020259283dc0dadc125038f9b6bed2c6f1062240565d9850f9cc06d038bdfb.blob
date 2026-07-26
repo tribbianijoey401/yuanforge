@@ -1,0 +1,21 @@
+## 七、对象间关系
+
+```
+Workspace ──contains──→ Task[]
+                      ├──→ Snapshot[] (per Agent)
+                      └──→ Event[]
+
+Task ──triggers──→ Event (status change)
+Task ──references──→ Knowledge (via dispatch_context)
+Task ──belongs_to──→ Goal (derived: group by Task.goal)
+Task ──clustered_by──→ Goal Cluster (derived: group by Task.goal_cluster)
+
+Workspace ──closes──→ Checkpoint
+Checkpoint ──references──→ Knowledge outputs
+
+Proposal ──modifies──→ Knowledge
+Proposal ──produces──→ Event (KNOWLEDGE_UPDATED)
+
+Workspace ──measured_by──→ Workspace Metrics (computed at Close)
+```
+

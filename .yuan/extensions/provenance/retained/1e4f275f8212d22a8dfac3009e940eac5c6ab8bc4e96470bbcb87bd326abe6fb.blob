@@ -1,0 +1,21 @@
+## 11. Corporate Trust 企业信赖
+
+- **类别**：Sans + Sans
+- **标题字**：Lexend
+- **正文字**：Source Sans 3
+- **情绪关键词**：corporate、trustworthy、accessible、readable、professional
+- **最适用于**：企业、政府、医疗、金融、无障碍优先项目
+- **Google Fonts URL**：
+```
+https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap
+```
+- **CSS @import**：
+```css
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
+```
+- **Tailwind config**：
+```js
+fontFamily: { heading: ['Lexend', 'sans-serif'], body: ['Source Sans 3', 'sans-serif'] }
+```
+- **注意事项**：Lexend 为可读性优化，特别适合阅读障碍友好场景。
+

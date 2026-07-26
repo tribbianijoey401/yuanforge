@@ -1,0 +1,22 @@
+### 按钮变体
+```css
+:root {
+  /* Primary */
+  --btn-primary-bg: var(--color-primary-600);
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: var(--color-primary-700);
+  --btn-primary-active: var(--color-primary-800);
+  /* Secondary */
+  --btn-secondary-bg: var(--color-primary-50);
+  --btn-secondary-text: var(--color-primary-700);
+  --btn-secondary-hover: var(--color-primary-100);
+  /* Ghost */
+  --btn-ghost-bg: transparent;
+  --btn-ghost-text: var(--color-primary-600);
+  --btn-ghost-hover: var(--color-primary-50);
+  /* Danger */
+  --btn-danger-bg: #dc2626;
+  --btn-danger-text: #ffffff;
+}
+```
+

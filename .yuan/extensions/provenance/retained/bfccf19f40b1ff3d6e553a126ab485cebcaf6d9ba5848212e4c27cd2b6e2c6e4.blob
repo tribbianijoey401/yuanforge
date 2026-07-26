@@ -1,0 +1,11 @@
+## 铁律 Ⅻ — 事实面独立验证（← NF-02 吸收）
+
+**知识治理必须覆盖 6 个事实面，每面独立标记状态。**
+
+六面：代码 / 运行态 / 文档 / 规则 / 记忆 / 工作区。
+状态：verified-current / changed-and-verified / pending / out-of-scope / not-applicable。
+
+**铁律**：不要把 git status 干净、PR 已合并或测试通过单独当成「全部同步」。
+
+<SECTION-END:12>
+

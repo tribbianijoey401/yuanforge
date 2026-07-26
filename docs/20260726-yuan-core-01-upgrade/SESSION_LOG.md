@@ -19,7 +19,7 @@
 | task-007 | ✅ 完成 | M4 Shadow conversion 与回退演练 | 单向只读 legacy→shadow；Core 重建、writer guard 与无损 rollback 全绿 | `scripts/yuan-shadow-migrate.py`, `evidence/m4/` | 本提交 |
 | task-008 | ✅ 完成 | M5 Canary Work 经 r3 修复后通过独立复测 | 原 10 项 + 3 项普通数据变体全绿；旧 Genesis root 接受新 candidate | `evidence/m5/` | 本提交 |
 | task-009 | ✅ 完成 | M6 Adapter conformance | manual executable mapping + Hermes honest unsupported；旧根与独立变体通过 | `evidence/m6/` | 本提交 |
-| task-010 | ✅ 完成 | M7 Extensions 与条款 provenance | 六 Extensions 只消费 Core 公共契约、只产 authoring advice/Evidence；旧源全保留 | `.yuan/extensions/`, `evidence/m7/` | 本提交 |
+| task-010 | 🟡 r1 作者完成，待独立复审 | M7 Extensions 与条款 provenance | 显式 disposition、冻结 inventory、独立 verifier、内容寻址保留与 dirty snapshots 已关闭作者侧 B01–B05；M8 仍阻塞 | `.yuan/extensions/`, `scripts/yuan_provenance_verify.py`, `tests/provenance/`, `evidence/m7/` | r1 提交 |
 | task-011–task-013 | ⏳ 等待 | M8 authority switch 至 M9 清场 | M8 依赖已满足；继续 verifier-first 推进 | 见 `PLAN.md` | — |
 
 ## 现场保护
@@ -134,6 +134,15 @@
 - 建立 M7-B01–B05，task-010 返回 Doc Engineer r1；task-011 撤回就绪并
   等待独立复审。完整 verdict 见
   `evidence/m7-review/QUALITY-AUDIT.md`。
+- task-010-r1 以冻结 `inventory.lock.json` 和逐条显式
+  `disposition-map.json` 替换作者可收缩 scope 与 catch-all；未知 tuple
+  保持 `UNMAPPED` 并阻塞。Markdown/Python/shell/structured sources 采用
+  独立可重算的语义切分，2,207 条 clause 全部绑定内容寻址 retained blob。
+- 十个 M0 dirty/untracked 源通过 immutable snapshot + receipt 纳入 clean
+  checkout；从 `c1fd815` 仅应用候选补丁即可重现 177/2,207/0，六个关键
+  输出 hash 完全一致。独立 verifier、6/6 对抗负例、M1–M6/旧 Genesis
+  与 M0a 10/10 全绿。此为作者证据，不解除 task-011，仍须 Quality
+  Auditor 独立复审。
 
 ## 决策
 
@@ -170,4 +179,7 @@
 - `.yuan/extensions/`
 - `scripts/yuan-provenance.py`
 - `evidence/m7/`
+- `scripts/yuan_provenance_verify.py`
+- `scripts/verify-yuan-provenance.py`
+- `tests/provenance/`
 - `docs/events/20260726/events.jsonl`

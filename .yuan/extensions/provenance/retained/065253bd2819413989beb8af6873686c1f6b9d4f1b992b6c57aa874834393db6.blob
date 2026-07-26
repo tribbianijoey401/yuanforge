@@ -1,0 +1,13 @@
+def tree_digest(candidate: pathlib.Path, files: list[pathlib.Path]) -> str | None:
+    if not files:
+        return None
+    digest = hashlib.sha256()
+    for path in files:
+        relative = path.relative_to(candidate).as_posix()
+        digest.update(relative.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(file_sha256(path).encode("ascii"))
+        digest.update(b"\n")
+    return digest.hexdigest()
+
+

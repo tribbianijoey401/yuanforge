@@ -1,0 +1,12 @@
+def rollback(
+    repo_root: pathlib.Path,
+    shadow_root: pathlib.Path,
+    receipt_path: pathlib.Path | None = None,
+) -> dict[str, Any]:
+    return rollback_shadow(
+        pathlib.Path(repo_root),
+        pathlib.Path(shadow_root),
+        pathlib.Path(receipt_path) if receipt_path is not None else None,
+    )
+
+

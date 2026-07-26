@@ -1,0 +1,17 @@
+## 15. 教育 / 在线课程
+
+- **推荐落地页模式**：Feature-Rich + Social Proof
+- **风格优先级**：主 Claymorphism / 备 Vibrant & Block-based
+- **配色氛围**：进度青 #0D9488 + 成就橙 #EA580C
+- **字体情绪**：友好 + 进取（Poppins + Open Sans）
+- **关键效果**：学习路径可视化 + 进度条 + 讲师卡
+- **决策规则**：
+```json
+{
+  "if_k12": "add-parent-testimonials",
+  "if_coding_bootcamp": "add-dark-mode-coding-demo",
+  "if_self_paced": "add-curriculum-modal"
+}
+```
+- **反模式**：纯文字课程介绍、无试听、隐藏讲师背景
+

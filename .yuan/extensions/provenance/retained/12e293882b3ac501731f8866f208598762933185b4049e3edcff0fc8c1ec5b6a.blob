@@ -1,0 +1,9 @@
+NEGATIVE_CONTRACT = {
+    "empty_candidate": "EMPTY_CANDIDATE",
+    "known_bad": "CHECK_FAILED",
+    "zero_assertions": "ZERO_ASSERTIONS",
+    "validator_error": "VALIDATOR_ERROR",
+    "parse_error": "RESULT_PARSE_ERROR",
+}
+
+

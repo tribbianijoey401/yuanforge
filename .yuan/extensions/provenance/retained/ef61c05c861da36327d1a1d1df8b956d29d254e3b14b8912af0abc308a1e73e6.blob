@@ -1,0 +1,9 @@
+### 增量累积模式
+```
+chunk1: tool_calls[0].function.name = "search"
+chunk2: tool_calls[0].function.arguments += '{"qu'
+chunk3: tool_calls[0].function.arguments += 'ery": "'
+chunk4: tool_calls[0].function.arguments += 'ERP权限"}'
+→ 完整调用：search(query="ERP权限")
+```
+

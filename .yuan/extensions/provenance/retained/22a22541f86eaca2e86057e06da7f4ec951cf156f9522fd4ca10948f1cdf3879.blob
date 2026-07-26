@@ -1,0 +1,21 @@
+## 25. Dashboard Data 仪表盘数据
+
+- **类别**：Mono + Sans
+- **标题字**：Fira Code
+- **正文字**：Fira Sans
+- **情绪关键词**：dashboard、data、analytics、technical、precise
+- **最适用于**：仪表盘、分析、数据可视化、管理后台
+- **Google Fonts URL**：
+```
+https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap
+```
+- **CSS @import**：
+```css
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
+```
+- **Tailwind config**：
+```js
+fontFamily: { mono: ['Fira Code', 'monospace'], sans: ['Fira Sans', 'sans-serif'] }
+```
+- **注意事项**：Fira Code 用于数据/代码，Fira Sans 用于 UI 标签，单字族一致性强。
+

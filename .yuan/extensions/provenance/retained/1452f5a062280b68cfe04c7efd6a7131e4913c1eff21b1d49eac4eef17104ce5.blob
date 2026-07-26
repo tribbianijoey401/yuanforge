@@ -1,0 +1,13 @@
+## 15. AI 紫青
+
+- **适用行业**：AI 助手、Chatbot、生成式工具
+- **设计意图**：紫表达智能，青表达对话流动
+
+| Primary | #7C3AED | Background | #FAF5FF | Muted | #ECEEF9 |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #1E1B4B | Muted FG | #64748B |
+| Secondary | #A78BFA | Card | #FFFFFF | Border | #DDD6FE |
+| On Secondary | #0F172A | Card FG | #1E1B4B | Destructive | #DC2626 |
+| Accent | #0891B2 | On Destructive | #FFFFFF | Ring | #7C3AED |
+| On Accent | #FFFFFF | | | | |
+

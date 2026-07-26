@@ -1,0 +1,11 @@
+---<!-- Adapted from UmaDev knowledge base (MIT License). Original: knowledge/agentic-delivery/01-standards/context-engineering-for-delivery.md -->
+
+id: context-engineering-for-delivery
+title: 交付用上下文工程（恰当高度指令 + 即时检索 + 保真压实，商业级必读）
+domain: agentic-delivery
+category: 01-standards
+difficulty: advanced
+tags: [context-engineering, right-altitude, just-in-time-retrieval, compaction, scratchpad-memory, sub-agent-isolation, context-rot, context-poisoning, context-overload, 上下文工程, 恰当高度, 即时检索, 压实, 外置记忆, 子代理隔离, 上下文腐化]
+quality_score: 95
+last_updated: 2026-06-29
+---

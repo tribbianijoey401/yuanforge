@@ -1,0 +1,12 @@
+## Spec 即契约（增强要求）
+
+> 参考 MVP 团 Spec 即契约（12 章）。在 Plan 的 Spec 段，除 API 契约 + 数据模型外，增强下列内容，使契约对下游（Frontend/Backend/QA）机器可消费：
+
+- **Design Token 锁定**：主色 / 字体 / 间距 / 圆角等通过 Token 引用，禁止硬编码色（VA-4）
+- **EARS 验收标准**：`While/When/If/Where + 系统 + 必须/应该 + 行为` 格式，供 QA 直接转测试
+- **内嵌已知坑**：从 `knowledge/pitfalls/` 拉取相关坑写入 Spec，防重蹈覆辙
+- **e2e 验证步骤**：一条可执行的端到端验证脚本（覆盖成功流 + 关键错误流）
+- **OPEN-DECISIONS 登记**：悬而未决项写入 `docs/decisions/OPEN-DECISIONS.md`，只追加 + 就地关闭，闭环追踪。三类固定 slug：`waiting-on-external-condition` / `design-decision-to-evaluate` / `existing-design-boundary`
+
+> 详细规范见 `references/01-standards/spec-as-contract.md`（Spec 12 章契约模板）；OPEN-DECISIONS 登记格式与 slug 定义见 `references/01-standards/open-decisions-register.md`。
+

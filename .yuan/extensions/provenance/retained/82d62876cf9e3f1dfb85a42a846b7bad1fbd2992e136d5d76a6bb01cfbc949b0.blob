@@ -1,0 +1,11 @@
+### RESTful 路由
+
+| 方法 | 路径 | 用途 |
+|------|------|------|
+| GET | `/api/{resource}` | 列表 |
+| GET | `/api/{resource}/{id}` | 详情 |
+| POST | `/api/{resource}` | 创建 |
+| PUT | `/api/{resource}/{id}` | 全量更新 |
+| PATCH | `/api/{resource}/{id}` | 部分更新 |
+| DELETE | `/api/{resource}/{id}` | 删除 |
+

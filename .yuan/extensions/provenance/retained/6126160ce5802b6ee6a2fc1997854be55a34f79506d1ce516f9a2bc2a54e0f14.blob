@@ -1,0 +1,10 @@
+## 六、Snapshot 状态机（4 状态）
+
+```
+executing → checkpoint → executing (恢复)
+executing → completed
+executing → failed
+```
+
+---
+

@@ -1,0 +1,14 @@
+## 8. Pricing Page + CTA 定价页
+
+- **关键词**：pricing、plans、tiers
+- **版块顺序**：
+  1. Hero（pricing headline）
+  2. 价格对比卡（3 档）
+  3. 功能对比表
+  4. FAQ
+  5. Final CTA
+- **主 CTA 放置位置**：每卡 CTA + Navbar sticky CTA
+- **配色策略**：Free 灰 / Starter 蓝 / Pro 绿或金 / Enterprise 深
+- **推荐效果**：月/年切换动画、卡片对比高亮、FAQ accordion
+- **转化优化要点**：预选/高亮 starter；显示年付折扣 20-30%；FAQ 解决顾虑
+

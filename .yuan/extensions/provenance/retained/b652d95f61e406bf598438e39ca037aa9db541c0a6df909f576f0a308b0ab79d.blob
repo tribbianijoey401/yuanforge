@@ -1,0 +1,14 @@
+### 2.6 Block Check（阻塞检查）
+
+```
+Rule: BLOCK_CHECK
+  触发: 每次巡检
+  动作:
+    检查所有 ❌阻塞 Task:
+      if block_type == "外因":
+        if 外部条件满足:
+          Task.status = 🟢就绪
+```
+
+---
+

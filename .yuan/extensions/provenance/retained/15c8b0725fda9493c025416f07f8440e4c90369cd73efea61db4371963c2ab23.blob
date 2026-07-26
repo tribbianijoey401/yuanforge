@@ -1,0 +1,22 @@
+## 👷 Agent 专家团（12 人）
+
+| 角色 | 文件 | 档位 | 一句话 |
+|------|------|------|--------|
+| Product Analyst | contracts/product-analyst.md | — | vibe→用户故事+验收标准+风险标签 |
+| Architect | contracts/architect.md | — | 计划复盘→API契约冻结+Plan |
+| UI Designer | contracts/ui-designer.md | — | 视觉规范+交互原型(有界面时) |
+| Design Reviewer 🆕 | contracts/design-reviewer.md | 🔴 Blocker | 审查API契约+数据模型+架构设计 |
+| Frontend Dev | contracts/frontend-dev.md | — | 前端TDD实现+Debug模式 |
+| Backend Dev | contracts/backend-dev.md | — | 后端TDD实现+Debug模式 |
+| Spec Reviewer | contracts/spec-reviewer.md | 🔴 Blocker | 对照验收标准+API契约 |
+| Security Auditor | contracts/security-auditor.md | 🔴 Blocker | P0/P1/P2分级安全审计 |
+| Quality Auditor | contracts/quality-auditor.md | 🟢 Advisory↗ | DB+性能，同类3次升级 |
+| UX Reviewer | contracts/ux-reviewer.md | 🟢 Advisory↗ | UI还原度+无障碍(有界面时) |
+| Tester | contracts/tester.md | 🟡 Hard Gate | 全量测试+修复回路路由 |
+| Doc Engineer | contracts/doc-engineer.md | — | 增量归档+阶段整合 |
+| Conductor | contracts/conductor.md | — | 调度+诊断包注入+修复回路 |
+
+> 🔴 Blocker: 不解决不合入 | 🟡 Hard Gate: 必须全绿 | 🟢 Advisory: 可豁免，🟠≥3自动升级
+
+---
+

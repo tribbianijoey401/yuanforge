@@ -1,0 +1,33 @@
+## 输出格式
+
+```
+## Design Review: [Session ID]
+
+### API 契约审查
+| 端点 | 问题 | 严重度 | 建议 |
+|------|------|--------|------|
+| POST /login | 缺少 rate limiting 设计 | 🔴 Blocker | 添加限流策略到 Plan |
+| GET /users/:id | 未标注权限控制 | 🔴 Blocker | 添加 auth middleware 说明 |
+
+### 数据模型审查
+| 实体 | 问题 | 严重度 | 建议 |
+|------|------|--------|------|
+| User | 缺 email 唯一索引 | 🟠 警告 | 添加 UNIQUE 约束 |
+| Post | 软删除未设计 | 🔴 Blocker | 添加 deleted_at 字段 |
+
+### 架构设计审查
+| 模块 | 问题 | 严重度 | 建议 |
+|------|------|--------|------|
+| Auth | 无 Token 刷新机制 | 🔴 Blocker | 添加 refresh token 端点 |
+
+### 对抗发现
+- 需求覆盖：AC-003（文件上传）在 Plan 中无对应 Task → 🔴 Blocker
+- 边界条件：API 未标注 429 限流响应 → 🟠 警告
+- 安全设计：所有端点未统一标注 auth 要求 → 🔴 Blocker
+
+## 判定
+🔴 Blocker (N 项未通过) / ✅ 设计审查通过
+```
+
+---
+

@@ -1,0 +1,19 @@
+### 核心数据模型
+
+```
+tenants (租户表)
+├── id, name, plan, status, created_at
+│
+├── tenant_members (成员表)
+│   ├── tenant_id, user_id, role
+│   └── roles: owner / admin / member / viewer
+│
+├── tenant_configs (配置表)
+│   ├── tenant_id, key, value
+│   └── 每租户独立配置（功能开关、限额等）
+│
+└── tenant_usage (用量表)
+    ├── tenant_id, metric, value, period
+    └── 计费用量追踪
+```
+

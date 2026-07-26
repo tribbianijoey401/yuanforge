@@ -1,0 +1,17 @@
+## 21. 食谱 / 烹饪
+
+- **推荐落地页模式**：Hero-Centric + Feature-Rich
+- **风格优先级**：主 Claymorphism / 备 Vibrant & Block-based
+- **配色氛围**：食欲红橙 + 暖米
+- **字体情绪**：诱人 + 清晰（Playfair Display SC + Karla）
+- **关键效果**：步骤图滚动 + 食材清单 sticky + 视频教学
+- **决策规则**：
+```json
+{
+  "if_video_recipe": "add-autoplay-muted-loop",
+  "if_shopping_list": "add-one-click-export",
+  "if_dietary_filter": "add-vegan-gluten-free-toggle"
+}
+```
+- **反模式**：长篇故事前置、无打印版、无份量切换
+

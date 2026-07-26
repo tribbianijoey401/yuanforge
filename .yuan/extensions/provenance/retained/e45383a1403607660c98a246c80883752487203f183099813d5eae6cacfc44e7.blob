@@ -1,0 +1,15 @@
+### 5.2 崩溃恢复辅助
+
+崩溃恢复时，Conductor 可以读取最近的事件来了解「最近发生了什么」：
+
+```
+grep events/$(date +%Y%m%d)/events.jsonl
+  → 最后一个 TASK_STATUS_CHANGED 是什么？
+  → 最后一个 KNOWLEDGE_UPDATED 是什么？
+  → 辅助判断崩溃时的状态
+```
+
+> **注意**：Events 是辅助恢复，不是主恢复源。主恢复源仍然是 TASK_BOARD（唯一真相源）。Events 提供时间线上下文。
+
+---
+

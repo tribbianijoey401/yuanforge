@@ -1,0 +1,14 @@
+### 37. Data-Dense Dashboard 数据密集仪表盘
+- **关键词**：multiple charts、widgets、KPI、table
+- **主色方向**：深色 #0F172A 或浅色 #F8FAFC + 语义色
+- **辅助色**：图表调色板（不超过 8 色）
+- **效果与动效**：data update transition、skeleton、tooltip
+- **最适用于**：BI、金融、分析、运营监控、Sales Intelligence
+- **不适用于**：消费者品牌页
+- **浅色模式**：完美适配
+- **深色模式**：完美适配
+- **性能影响**：⚠ 大数据量需虚拟化
+- **无障碍**：AA（图表需 text alternative）
+- **移动端友好度**：低（信息密度高）
+- **转化导向**：N/A（产品内工具）
+

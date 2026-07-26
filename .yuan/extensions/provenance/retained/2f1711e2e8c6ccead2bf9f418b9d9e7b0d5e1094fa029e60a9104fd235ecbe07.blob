@@ -1,0 +1,69 @@
+### 9 节结构（必含，不可删减）
+
+```markdown
+# {产品名} DESIGN.md
+
+> 生成日期：{日期} | 设计师：颜好看 | 基于：PRD v{版本} + 架构文档 v{版本}
+> 三轴刻度：Variance={1-10} / Motion={1-10} / Density={1-10}
+
+## 1. Visual Theme & Atmosphere（视觉主题与氛围）
+- 视觉主题关键词（3-5 个，如"冷静、精准、数据驱动"）
+- 氛围描述（1-2 句话，如"深色为主，数据高亮，类似 Bloomberg Terminal 的专业感"）
+- 对标品牌（2-3 个，如 Linear / Vercel / Stripe）
+
+## 2. Color Palette & Roles（色彩与角色）
+- A1-identity：--bg / --surface / --fg / --muted / --accent / --border
+- A2-semantic：--success / --warn / --danger / --info
+- B-slot 别名：--fg-2 / --surface-warm / --meta / --accent-hover
+- C-extension：项目专属扩展色（如有）
+- 每屏强调色使用 ≤ 2 处的说明
+- 配色来源：`references/design-systems/color-palettes.md` 第 N 套
+
+## 3. Typography（排版）
+- 标题字体 + 正文字体（Google Fonts @import 语句）
+- 字号阶梯：xs/sm/base/lg/xl/2xl/3xl/4xl/5xl/6xl（含 px + rem）
+- 字重：3 级（400 正文 / 510 次标题 / 590 主标题）
+- 行高：正文 1.5 / 标题 1.2-1.3
+- 字距：ALL CAPS ≥ 0.06em / 标题负字距 -0.02em
+- 配对来源：`references/design-systems/typography-pairings.md` 第 N 套
+
+## 4. Components（组件规范）
+- 按钮（primary/secondary/ghost/destructive × default/hover/active/disabled）
+- 输入框（default/focus/error/disabled）
+- 卡片（default/hover/selected）
+- 导航（顶部/侧边/底部）
+- 模态框 / Toast / Badge / Avatar
+- 图标：统一 SVG 图标库（Spec 锁定一套，尺寸 16/20/24px）
+
+## 5. Layout & Spacing（布局与间距）
+- 间距基准：4px 网格（4/8/12/16/24/32/48/64/96）
+- 圆角阶梯：sm(4) / md(8) / lg(12) / xl(16) / 2xl(24) / full
+- 容器最大宽度：max-w-7xl(1280px) / max-w-4xl(896px) / max-w-2xl(672px)
+- 响应式断点：sm(640) / md(768) / lg(1024) / xl(1280) / 2xl(1536)
+- 网格系统：12 列 / gap 24px
+
+## 6. Depth & Elevation（深度与阴影）
+- 阴影阶梯：sm / md / lg / xl / 2xl（含 box-shadow 值）
+- 层级 z-index：base(0) / dropdown(1000) / sticky(1100) / modal(1200) / toast(1300)
+- 毛玻璃/模糊：仅用于有功能目的的半透明（不作装饰）
+
+## 7. Do's & Don'ts（设计守则）
+- ✅ 应该做的 5-8 条
+- ❌ 不应该做的 5-8 条（含行业反模式）
+- 行业反模式来源：`references/design-systems/industry-design-systems.md` 对应行业
+
+## 8. Responsive & Accessibility（响应式与无障碍）
+- 响应式策略：mobile-first / 断点行为说明
+- 无障碍：对比度 4.5:1 / 键盘导航 / focus 可见 / prefers-reduced-motion
+- 触摸目标：最小 44×44px
+- 5 态覆盖：Loading / Empty / Error / Populated / Edge
+
+## 9. Agent Implementation Guide（实现指南）
+- Tailwind config（完整 JSON，含 colors/fontFamily/spacing/borderRadius/shadow）
+- CSS 变量定义（:root 代码块）
+- 框架特定实现提示（按架构师锁定栈）
+- 已知坑提醒（从项目 .workbuddy/memory/pitfalls.jsonl 拉取）
+```
+
+---
+

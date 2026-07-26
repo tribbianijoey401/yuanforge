@@ -1,0 +1,15 @@
+## 二、Action 总览
+
+| Action | 语义 | 触发者 | 产出 |
+|--------|------|--------|------|
+| **Dispatch** | 派发一个 Task 到 Agent | Conductor | Agent 开始执行 |
+| **Complete** | Agent 完成 Task | Agent | 状态变更 + 产出文件 |
+| **Review** | 审查 Task 产出 | Reviewer | 审查结果 |
+| **Snapshot** | 保存 Agent 当前状态 | Agent / Conductor | Snapshot 对象 |
+| **Checkpoint** | 保存 Workspace 全量状态 | Conductor | Checkpoint 对象 |
+| **Promote** | 将 Workspace 产出晋升到 Knowledge | Conductor | Knowledge 对象更新 |
+| **Archive** | 归档 Workspace | Conductor | Workspace 移入 archive/ |
+| **Recover** | 从崩溃中恢复 | Conductor | 恢复的 Workspace 状态 |
+
+---
+

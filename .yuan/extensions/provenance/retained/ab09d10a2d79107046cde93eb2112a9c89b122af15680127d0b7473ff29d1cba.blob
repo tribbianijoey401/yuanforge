@@ -1,0 +1,10 @@
+## 8. 门禁命令
+
+```bash
+# 找出超过 300 行的源文件（不合格即退回）
+find src -name '*.ts' -o -name '*.js' -o -name '*.py' | xargs wc -l | sort -rn | awk '$1>300 && $2!="total" {print "OVER LIMIT:", $0}'
+# 入口文件行数检查
+wc -l src/app.ts app/main.py 2>/dev/null
+```
+
+发现任何文件超 300 行或入口含业务逻辑 → **退回开发重做**，不算通过 Phase 3。

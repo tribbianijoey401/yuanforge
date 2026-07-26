@@ -1,0 +1,17 @@
+def safe_shadow_root(repo_root: pathlib.Path, shadow_root: pathlib.Path) -> pathlib.Path:
+    repo = repo_root.resolve()
+    shadow = shadow_root.resolve()
+    try:
+        relative = shadow.relative_to(repo)
+    except ValueError as error:
+        raise MigrationError("shadow root must be inside repository") from error
+    if relative == pathlib.Path(".") or relative.parts[0].lower() in {
+        "docs",
+        ".git",
+        ".yuan",
+    }:
+        raise MigrationError("shadow root overlaps repository authority or framework")
+    _ensure_no_symlink_path(shadow, repo)
+    return shadow
+
+

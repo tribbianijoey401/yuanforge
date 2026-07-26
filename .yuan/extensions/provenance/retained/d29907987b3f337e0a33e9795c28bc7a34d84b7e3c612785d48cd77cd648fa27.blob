@@ -1,0 +1,21 @@
+## 17. Legal Professional 法律权威
+
+- **类别**：Serif + Sans
+- **标题字**：EB Garamond
+- **正文字**：Lato
+- **情绪关键词**：legal、professional、traditional、trustworthy、formal
+- **最适用于**：律所、法律、合同、正式文档、政府
+- **Google Fonts URL**：
+```
+https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap
+```
+- **CSS @import**：
+```css
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
+```
+- **Tailwind config**：
+```js
+fontFamily: { serif: ['EB Garamond', 'serif'], sans: ['Lato', 'sans-serif'] }
+```
+- **注意事项**：EB Garamond 古典感强，搭配 Lato 不显陈旧。
+

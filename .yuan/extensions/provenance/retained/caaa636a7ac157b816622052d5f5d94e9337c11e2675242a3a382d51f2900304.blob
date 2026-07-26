@@ -1,0 +1,18 @@
+## 与 Task Spec 的关系
+
+Plan 中的 Task 是一个**索引**。每个 Task 的详细执行 spec 放在会话文件夹中：
+
+```
+docs/YYYYMMDD-描述/
+├── PLAN.md                              ← Plan（含 Dispatch Table）
+├── TASK_BOARD.md                        ← 运行时任务板
+├── SESSION_LOG.md
+├── FEATURE.md
+├── ADR-NNN.md
+└── BUG-NNN.md
+```
+
+**Plan 轻，Task 重。** Plan 让 Conductor 快速理解全貌，Task 文件让 Dev 获取完整上下文。
+
+---
+

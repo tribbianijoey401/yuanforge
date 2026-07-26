@@ -1,0 +1,16 @@
+def _timestamp_for_workspace(workspace_id: str) -> str:
+    match = re.match(r"(\d{4})(\d{2})(\d{2})", workspace_id)
+    if not match:
+        return "1970-01-01T00:00:00+00:00"
+    try:
+        value = datetime(
+            int(match.group(1)),
+            int(match.group(2)),
+            int(match.group(3)),
+            tzinfo=timezone.utc,
+        )
+    except ValueError:
+        return "1970-01-01T00:00:00+00:00"
+    return value.isoformat()
+
+

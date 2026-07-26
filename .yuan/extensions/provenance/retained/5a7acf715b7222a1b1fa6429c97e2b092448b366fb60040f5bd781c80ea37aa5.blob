@@ -1,0 +1,12 @@
+## 与 PLAN.md 的关系
+
+```
+FEATURE.md（需求，Product Analyst 产出）
+  │  Architect 读取 → 计划复盘（设计理解书 → 用户确认）
+  ▼
+PLAN.md（设计，Architect 产出，冻结）
+```
+
+FEATURE.md 是 PLAN.md 的上游输入。Architect 不得修改 FEATURE.md 的需求事实，只能在 PLAN 中演化设计决策。
+
+<SECTION-END:feat-end>

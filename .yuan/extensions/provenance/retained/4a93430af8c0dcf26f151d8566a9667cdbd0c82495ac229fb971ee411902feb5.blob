@@ -1,0 +1,27 @@
+### 执行步骤
+
+1. **读取 BUG-NNN.md**
+   ```
+   打开 docs/YYYYMMDD-描述/BUG-NNN-xxx.md
+   ```
+
+2. **判断是否蒸馏**（回答三个问题，任一"是"即蒸馏）
+   - 这个 Bug 的根因会在其他项目中重复出现？
+   - 这个 Bug 的修复模式值得新 Agent 提前知道？
+   - 这个 Bug 的教训可以形成一条规则？
+
+3. **调用脚本自动化**
+   ```bash
+   bash scripts/distill-pitfall.sh docs/YYYYMMDD-描述/BUG-NNN-xxx.md
+   ```
+   - 脚本自动提取 frontmatter 和正文段落
+   - 自动生成 PIT-NNN.md（含完整 frontmatter）
+   - 输出 PIT-NNN.md 的路径
+
+4. **标记已蒸馏**
+   - 在 BUG-NNN.md 末尾追加：`→ distilled to knowledge/pitfalls/PIT-NNN.md`
+   - 避免重复蒸馏
+
+5. **更新 SESSION_LOG**
+   - 在 `SESSION_LOG.md` 的「踩坑」段追加：`[PIT-NNN] BUG-NNN 的教训已蒸馏`
+

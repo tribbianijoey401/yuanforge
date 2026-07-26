@@ -1,0 +1,9 @@
+### 2.2 产出 Plan
+
+遵循 `plan-format.md` 规范：
+- 定义 Task（含 role/depends/output/timeout）
+- Dispatch Table 完整（Architect 必须声明每个 Task 的角色、依赖、产出物）
+- Plan 含技术选型理由（写入 ADR）
+
+---
+

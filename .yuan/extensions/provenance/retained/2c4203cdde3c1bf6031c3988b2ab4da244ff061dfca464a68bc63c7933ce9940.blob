@@ -1,0 +1,11 @@
+## 输出格式
+
+> 审查结论必须以 `.yuan/rules/verdict-protocol.md` 的结构化裁决开头。
+
+```
+verdict: pass | fail
+blocking: [{violation, evidence, expectation}]   # fail 时必填
+advisory: [{item, reason}]                        # 可选
+evidence: [{artifact_ref, line, note}]            # 必填
+```
+

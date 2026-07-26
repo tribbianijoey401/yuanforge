@@ -1,0 +1,6 @@
+## Pitfalls
+
+- **不要注入过多 Pitfall** — 超过 5 个时只保留 🔴 和 🟡，🟢 降级为"可选读"
+- **摘要必须准确** — 不要自己编 summary，直接从 frontmatter 复制
+- **modules 字段是关键索引** — 没有 modules 字段的 Pitfall 无法被匹配
+- **图谱和 Pitfall grep 互补** — Pitfall grep 做精确匹配，图谱做扩展发现

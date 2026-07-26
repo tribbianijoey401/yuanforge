@@ -1,0 +1,10 @@
+### 步骤 4：（可选）重建图谱
+
+如果知识文件有变更，先重建图谱：
+
+```bash
+python3 scripts/build-graph.py --incremental
+```
+
+---
+

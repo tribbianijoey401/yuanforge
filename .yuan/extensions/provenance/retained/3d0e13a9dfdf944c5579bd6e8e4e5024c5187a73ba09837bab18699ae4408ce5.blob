@@ -1,0 +1,15 @@
+def print_help_new(target: str):
+    print()
+    print(color("✅ YuanForge 初始化完成", "green"))
+    print(f"📂 {target}")
+    print()
+    print(color("╔══════════════════════════════════════════╗", "cyan"))
+    print(color("║  🚀 下一步                                ║", "cyan"))
+    print(color("╠══════════════════════════════════════════╣", "cyan"))
+    print(color("║  向 Conductor 描述你的需求:               ║", "cyan"))
+    print(color('║  "我要做一个 xxx"                        ║', "cyan"))
+    print(color("║  Conductor 启动 12 人专家团               ║", "cyan"))
+    print(color("╚══════════════════════════════════════════╝", "cyan"))
+    print()
+
+

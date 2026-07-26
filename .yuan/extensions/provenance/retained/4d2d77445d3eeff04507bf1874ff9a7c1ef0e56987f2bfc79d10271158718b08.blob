@@ -1,0 +1,13 @@
+## 16. NFT/Web3 深空金紫
+
+- **适用行业**：NFT 市场、Web3 平台、加密艺术
+- **设计意图**：深空黑 + 紫 + 金 = 数字收藏品高级感
+
+| Primary | #8B5CF6 | Background | #0F0F23 | Muted | #27273B |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #F8FAFC | Muted FG | #94A3B8 |
+| Secondary | #A78BFA | Card | #1E1D35 | Border | #4C1D95 |
+| On Secondary | #0F172A | Card FG | #F8FAFC | Destructive | #EF4444 |
+| Accent | #FBBF24 | On Destructive | #FFFFFF | Ring | #8B5CF6 |
+| On Accent | #0F172A | | | | |
+

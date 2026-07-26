@@ -1,0 +1,6 @@
+def color(text: str, code: str) -> str:
+    colors = {"red": "31", "green": "32", "yellow": "33", "cyan": "36", "bold": "1"}
+    c = colors.get(code, "0")
+    return f"\033[{c}m{text}\033[0m"
+
+

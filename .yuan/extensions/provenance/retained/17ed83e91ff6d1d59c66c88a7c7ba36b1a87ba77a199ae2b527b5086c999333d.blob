@@ -1,0 +1,14 @@
+## 一、设计原则
+
+```
+Runtime 不执行。
+Runtime 只产生 Action。
+
+Action 是 Workflow 的唯一输出。
+Platform Adapter 是 Action 的唯一执行者。
+```
+
+**铁律**：所有平台必须支持本文定义的 8 个 Action。不支持的平台用 `manual` 降级——但语义必须等价。
+
+---
+

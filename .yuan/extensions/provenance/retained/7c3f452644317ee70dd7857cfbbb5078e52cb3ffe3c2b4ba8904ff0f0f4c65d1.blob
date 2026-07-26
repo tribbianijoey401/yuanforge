@@ -1,0 +1,11 @@
+## 6. 反模式（出现即不合格）
+
+1. **巨型入口文件**：把所有路由 + 中间件 + 业务 + 启动全塞 `app.ts`。
+2. **路由处理器里写业务**：`router.post` 回调里几十行业务逻辑 + SQL。
+3. **单文件超 300 行**：尤其 controller / service / 入口。
+4. **跨层调用**：controller 直接 `prisma.task.findMany()`。
+5. **业务逻辑进 utils**：`utils/createOrder.ts` 里写订单创建流程。
+6. **按类型而非功能堆放**：所有 controller 一个文件、所有 service 一个文件。
+7. **service 返回 HTTP 响应**：`res.json(...)` 出现在 service 层。
+8. **配置硬编码散落**：连接串/密钥写进业务文件而非 `config/`。
+

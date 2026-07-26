@@ -1,0 +1,35 @@
+## 行业推理速查矩阵
+
+| 行业 | 落地页 | 主风格 | 配色主导色 | 字体首选 |
+|---|---|---|---|---|
+| SaaS 通用 | Hero+Features+CTA | Glassmorphism | 信任蓝 | Inter |
+| 微 SaaS | Hero-Centric | Motion-Driven | Indigo+Emerald | Space Grotesk |
+| 电商 | Feature-Rich Showcase | Vibrant & Block | 成功绿+橙 | Rubik |
+| 奢侈品电商 | Feature-Rich+Story | Liquid Glass | 深黑+金 | Cormorant |
+| Fintech | Trust+Features | Minimalism | 金+紫+深底 | IBM Plex Sans |
+| 银行 | Trust+Features | Minimalism | 海军蓝+金 | Lexend |
+| 保险 | Conversion+Trust | Trust & Authority | 安全蓝+绿 | Lexend |
+| 医疗诊所 | Trust+Conversion | Accessible & Ethical | 医疗青+绿 | Figtree |
+| 牙科 | Social Proof+Conversion | Soft UI Evolution | 医疗青+白 | Figtree |
+| 心理健康 | Social Proof | Neumorphism | 薰衣草+绿 | Lora+Raleway |
+| 美容水疗 | Hero+Social Proof | Soft UI Evolution | 粉+紫 | Playfair+Inter |
+| 餐饮 | Hero+Conversion | Vibrant & Block | 食欲红+金 | Playfair SC+Karla |
+| 酒店 | Hero+Social Proof | Liquid Glass | 海军蓝+金 | Cormorant+Montserrat |
+| 法律 | Trust+Minimal | Trust & Authority | 海军蓝+金 | EB Garamond+Lato |
+| 教育 | Feature+Social Proof | Claymorphism | 进度青+橙 | Poppins+Open Sans |
+| 作品集 | Portfolio Grid+Story | Motion-Driven | 单色+蓝 accent | Space Grotesk |
+| 创意机构 | Story+Feature-Rich | Brutalism | 撞色+黑边 | Syne+Manrope |
+| 游戏 | Feature-Rich Showcase | 3D & Hyperrealism | 紫+玫红+黑 | Russo One |
+| 音乐流媒体 | Feature-Rich Showcase | Dark Mode OLED | 深紫+播放绿 | Righteous+Poppins |
+| 习惯追踪 | Social Proof+Demo | Claymorphism | 橙+绿 | Fredoka+Nunito |
+| 食谱 | Hero+Feature-Rich | Claymorphism | 红橙+暖米 | Playfair SC+Karla |
+| 冥想 | Story+Social Proof | Neumorphism | 薰衣草+海雾 | Lora+Raleway |
+| 天气 | Hero-Centric | Glassmorphism | 天空蓝+极光 | Inter |
+| 日记 | Storytelling | Soft UI Evolution | 纸感米+墨水深 | Caveat+Quicksand |
+| Web3/DeFi | Feature-Rich Showcase | Cyberpunk UI | 紫+金+黑 | Space Grotesk+JetBrains Mono |
+| NFT | Feature-Rich Showcase | Cyberpunk UI | 紫+金+黑 | Orbitron+Exo 2 |
+| AI 通用 | Interactive Demo+Minimal | AI-Native UI | 紫+青 | Space Grotesk+DM Sans |
+| Chatbot | Interactive Demo+Minimal | AI-Native UI | 紫+青气泡 | Plus Jakarta Sans |
+| 网络安全 | Trust+Real-Time | Cyberpunk UI | 矩阵绿+警告红 | IBM Plex+JetBrains Mono |
+| 开发者工具 | Minimal+Documentation | Dark Mode OLED | 纯黑+单一强调 | JetBrains Mono+Inter |
+

@@ -1,0 +1,52 @@
+def write_new_shadow(
+    repo_root: pathlib.Path,
+    shadow_root: pathlib.Path,
+    files: dict[str, bytes],
+    source_manifests: list[dict[str, Any]],
+    projection_digest: str,
+) -> None:
+    shadow = safe_shadow_root(repo_root, shadow_root)
+    if shadow.exists():
+        if not shadow.is_dir():
+            raise MigrationError("shadow target exists and is not a directory")
+        marker = verify_owned_shadow(shadow)
+        if marker.get("projection_digest") != projection_digest:
+            raise GuardError("existing shadow projection differs; immutable CAS refused")
+        for relative, payload in files.items():
+            path = shadow / pathlib.PurePosixPath(relative)
+            if not path.is_file() or file_sha256(path) != hashlib.sha256(payload).hexdigest():
+                raise GuardError("existing shadow content differs; immutable CAS refused")
+        return
+
+    shadow.parent.mkdir(parents=True, exist_ok=True)
+    stage = pathlib.Path(
+        tempfile.mkdtemp(prefix=f".{shadow.name}.stage-", dir=shadow.parent)
+    )
+    try:
+        for relative, payload in sorted(files.items()):
+            target = stage / pathlib.PurePosixPath(relative)
+            try:
+                target.resolve().relative_to(stage.resolve())
+            except ValueError as error:
+                raise MigrationError(f"generated path escapes shadow: {relative}") from error
+            atomic_write(target, payload)
+        generated = generated_tree_files(stage)
+        marker = {
+            "schema_version": "yuan.shadow-root/v1",
+            "projection_digest": projection_digest,
+            "legacy_snapshot_sha256": snapshot_digest(source_manifests),
+            "source_manifests": source_manifests,
+            "generated_files": generated,
+            "immutable_digest": "0" * 64,
+        }
+        marker["immutable_digest"] = canonical_digest(
+            marker, omit=("immutable_digest",)
+        )
+        atomic_write(stage / ".yuan-shadow.json", canonical_json(marker))
+        verify_source_manifests(repo_root, source_manifests)
+        os.replace(stage, shadow)
+    finally:
+        if stage.exists():
+            shutil.rmtree(stage)
+
+

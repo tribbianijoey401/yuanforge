@@ -1,0 +1,13 @@
+### Tier 2：后台进程派发
+
+**条件：** `terminal(background=true)` 可用但 `delegate_task` 不可用
+
+| 步骤 | 动作 |
+|------|------|
+| 1. 写 TASK_BOARD「派发日志」 | `[时间] [T-ID] Tier 2 → [角色] 开始` |
+| 2. 调用 `terminal(background=true, notify_on_complete=true)` | 命令行注入角色合约路径 + 上下文 |
+| 3. 进程执行 | 后台运行，完成后自动通知 Conductor |
+| 4. 解析输出 | Conductor 从进程输出中提取 Task 结果 |
+| 5. 更新 TASK_BOARD | Conductor 更新状态行 + 上下文传递 |
+| 6. 写 Event | Conductor 写 `TASK_STATUS_CHANGED` 事件 |
+

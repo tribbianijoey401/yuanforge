@@ -1,0 +1,13 @@
+## 11. AI Personalization Landing AI 个性化
+
+- **关键词**：ai、personalization、smart、recommendation
+- **版块顺序**：
+  1. Dynamic hero（个性化）
+  2. 相关 features
+  3. 定制 testimonials
+  4. Smart CTA
+- **主 CTA 放置位置**：基于用户 segment 上下文放置
+- **配色策略**：基于用户数据自适应；A/B 测试 per segment
+- **推荐效果**：dynamic content swap、fade transition、个性化推荐
+- **转化优化要点**：个性化提升 20%+ 转化；需 analytics 集成；新用户 fallback
+

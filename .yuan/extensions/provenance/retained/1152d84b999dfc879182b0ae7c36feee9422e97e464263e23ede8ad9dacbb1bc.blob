@@ -1,0 +1,14 @@
+### 调度规则
+
+1. **Plan 必须含 Dispatch Table** — Architect 产出 Plan 时，必须声明每个 Task 的 role、依赖关系、产出物
+2. **Conductor 构建 DAG** — 解析 Dispatch Table，识别依赖关系，找出所有 ready Task（上游依赖全部完成）
+3. **并行派发** — 所有互不依赖的 Task 必须并行派发，不能串行等
+4. **平台自适应** — Conductor 按 Tier 1/2/3 选择最优派发方式：
+   - Tier 1: `delegate_task`（子 Agent，优先）
+   - Tier 2: `terminal(background=true)`（后台进程）
+   - Tier 3: role-switch（同一 Agent 切换角色，仅兜底）
+   - **禁止在 Tier 1/2 可用时降级到 Tier 3**
+5. **循环收敛** — 每个重复执行的操作有闸门限制（见铁律 Ⅹ）
+6. **自动流转** — Task 完成后，Conductor 检查是否有新的 ready Task，有则立即派发
+7. **Gates 不跳** — 所有 Task 完成后，Conductor 触发 G3 集成测试 → G4 归档
+

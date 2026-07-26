@@ -1,0 +1,28 @@
+### 硬禁（构建期失败）
+
+英文 AI 套路词，构建期 regex 直接失败：
+
+| Banned | Rationale | 替换 |
+|---|---|---|
+| `seamless` / `seamlessly` | 空心正词，不指明何处无摩擦 | 说具体无摩擦的是什么 |
+| `robust` / `robustness` | 空心正词，不引失败模式 | 引具体处理的失败模式 |
+| `elevate` / `elevates` | 营销动词 | 用具体动词（improve / raise / sharpen） |
+| `empower` / `empowers` | 营销动词 | "let you" / "make possible" |
+| `underscore` / `underscores` | AI tell | "show" / "make clear" |
+| `pivotal` | 空心正词 | "central" / "key" 或描述角色 |
+| `tapestry` | AI 风景名词 | 删 |
+| `data-driven` | 空心营销形容词 | 引数据来源（"validated against 15 briefs"） |
+| `delve` / `delves` / `delved` | 最被 flag 的 AI tell | "look at" / "explore" 或删 |
+| `load-bearing` | 几乎总是含糊 | 名具体作用（"the decision that shapes the rest"） |
+| `highest-leverage` | 含糊影响声明 | 说具体收益（"the change that moves the design most"） |
+| `biggest unlock` | 营销话 | 描述实际变化 |
+| `reflex defaults` | eval 团队行话 | "instincts" / "first guesses" |
+| `collapses into monoculture` | eval 论文腔 | 描述具体出错（"every model picked the same three fonts"） |
+| `in today's …` | 通用开场 | 直接进入要点 |
+| `gone are the days` | 陈词开场 | 直接说 |
+| `whether you're …` | 讨好受众不指任何人 | 选一个读者写给他 |
+| `let's dive in` | 清嗓子 | 直接开始 |
+| `in summary` / `in conclusion` | 复述刚说的 | 用最强句子结尾，信任读者 |
+| `moreover` / `furthermore` | 节拍器过渡 | 删或用 "also" 或重构 |
+| Em dash `—` / `--` | 决策回避（没选子句关系） | 逗号 / 冒号 / 分号 / 句号 / 括号，选关系 |
+

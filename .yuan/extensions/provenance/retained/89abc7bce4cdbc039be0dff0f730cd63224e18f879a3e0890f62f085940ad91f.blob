@@ -1,0 +1,4 @@
+## Emoji 正则扫描（VA-1）
+
+对 Frontend Dev 实现跑 `.yuan/rules/visual-absolutes.md` 的 emoji 检测正则。任何命中功能图标位置的 emoji → 打回 Frontend Dev，零容忍。UGC / 即时通讯消息中的 emoji 不在扫描范围。
+

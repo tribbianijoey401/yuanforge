@@ -1,0 +1,20 @@
+### Phase 1: Discover（需求澄清）
+
+```
+输入: 用户原始需求（vibe）
+触发: 用户说「开发 XX」
+
+Action Sequence:
+  1. Dispatch(product-analyst)
+  2. Wait: 用户确认用户故事 + 验收标准 + 风险标签
+
+产出:
+  - 用户故事
+  - 验收标准（可验证的 checkpoints）
+  - 风险标签（R0=高敏 / R1=标准 / R2=低敏）
+
+规则:
+  - Product Analyst 必须主动追问模糊点
+  - 验收标准必须可验证（不能用「用户体验好」这种）
+```
+

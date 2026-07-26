@@ -1,0 +1,21 @@
+## 6. Wellness Calm 健康平静
+
+- **类别**：Serif + Sans
+- **标题字**：Lora
+- **正文字**：Raleway
+- **情绪关键词**：calm、wellness、relaxing、natural、organic
+- **最适用于**：健康应用、Wellness、SPA、冥想、瑜伽、有机品牌
+- **Google Fonts URL**：
+```
+https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap
+```
+- **CSS @import**：
+```css
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap');
+```
+- **Tailwind config**：
+```js
+fontFamily: { serif: ['Lora', 'serif'], sans: ['Raleway', 'sans-serif'] }
+```
+- **注意事项**：Lora 有机曲线配 Raleway 简约，冥想 App 的默认选择。
+

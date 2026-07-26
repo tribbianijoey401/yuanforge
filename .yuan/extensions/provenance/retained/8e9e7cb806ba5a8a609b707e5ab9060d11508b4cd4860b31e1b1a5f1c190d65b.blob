@@ -1,0 +1,15 @@
+## 📤 Bug 文档关联模板
+
+Bug 文档中的「关联文档」表，调试时必须填满：
+
+```markdown
+## 关联文档
+
+| 关系 | 文档 |
+|------|------|
+| 📦 引入此 Bug 的 Feature | [FEAT-003 支付模块](../features/003-payment.md) |
+| 📋 相关决策 | [ADR-002 选择 Stripe](../decisions/ADR-002-stripe.md) |
+| ⚠️ 相关踩坑 | [pitfalls.md § PIT-005 回调超时](../pitfalls.md) |
+| 📝 修复 Commit | `abc1234` |
+```
+

@@ -1,0 +1,14 @@
+# 扫描已有 PIT 文件，取最大序号 +1
+NEXT_NUM=1
+if [[ -d "$KNOWLEDGE_DIR" ]]; then
+    for f in "$KNOWLEDGE_DIR"/PIT-*.md; do
+        if [[ -f "$f" ]]; then
+            num=$(basename "$f" | sed 's/PIT-\([0-9]*\)\.md/\1/')
+            if [[ $num -ge $NEXT_NUM ]]; then
+                NEXT_NUM=$((num + 1))
+            fi
+        fi
+    done
+fi
+PIT_ID=$(printf "PIT-%03d" $NEXT_NUM)
+

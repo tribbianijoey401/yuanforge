@@ -1,0 +1,11 @@
+## 🔗 相关链接
+
+| 项 | 地址 |
+|----|------|
+| GitHub | https://github.com/tribbianijoey401/yuanforge |
+| 框架内核 | `.yuan/` — Agent 角色、Skill、铁律、平台适配器 |
+| 规格书 | `.yuan/docs/` — 6 份 doc 规格书（含 OBJECT_MODEL） |
+
+---
+
+> *YuanForge: 驾驭 Agent，而非被 Agent 驾驭。*

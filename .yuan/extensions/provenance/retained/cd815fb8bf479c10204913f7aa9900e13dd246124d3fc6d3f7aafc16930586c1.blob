@@ -1,0 +1,8 @@
+## 五、与其他协议的关系
+
+| 协议 | 依赖方式 |
+|------|---------|
+| Object Protocol | Action 操作的对象由 Object Protocol 定义 |
+| State Protocol | Action 触发 State Protocol 定义的转换 |
+| Workflow Protocol | Workflow 决定何时产生哪个 Action |
+| Adapter Protocol | Adapter 执行 Action 的平台特定实现 |

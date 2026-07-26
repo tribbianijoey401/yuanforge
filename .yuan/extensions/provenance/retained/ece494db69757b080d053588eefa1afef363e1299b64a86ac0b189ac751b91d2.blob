@@ -1,0 +1,21 @@
+## 19. Crypto/Web3 加密未来
+
+- **类别**：Sans + Sans
+- **标题字**：Orbitron
+- **正文字**：Exo 2
+- **情绪关键词**：crypto、web3、futuristic、tech、blockchain
+- **最适用于**：加密平台、NFT、区块链、Web3、未来科技
+- **Google Fonts URL**：
+```
+https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap
+```
+- **CSS @import**：
+```css
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap');
+```
+- **Tailwind config**：
+```js
+fontFamily: { display: ['Orbitron', 'sans-serif'], body: ['Exo 2', 'sans-serif'] }
+```
+- **注意事项**：Orbitron 仅用于标题与 logo，正文字勿用。
+

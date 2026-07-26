@@ -1,0 +1,5 @@
+# 自演进记忆与本地回归集（商业级必读）
+
+> 一个团队如果每次交付都从零踩同样的坑，它就没有在变强。商业级交付要让**记忆变成一本随交付演进的手册**：每次只对它做**增量增删（delta）**，而不是整篇重写——整篇重写会触发**上下文坍缩**（把积累的细节抹平成一段越来越泛、越来越没用的概述）。同时，**每一个被抓到的阻断项都要沉淀成项目级的持久回归用例**，让下一次交付**无法把同一个缺陷再带回来**。
+> 这份规范定义记忆怎么演进、回归集怎么生长，是 `agentic-delivery/01-standards/context-engineering-for-delivery`（本次会话内的上下文管理）的跨次延伸，也是 `agentic-delivery/01-standards/test-discipline-for-generated-code`（回归率）与 `agentic-delivery/01-standards/eval-driven-delivery`（评测集生长）的记忆底座。它与 `ai/ai-agent-memory-context-management`（产品侧记忆分层）分工：本规范回答的是"交付经验怎么不丢、怎么不重蹈覆辙"。
+

@@ -1,0 +1,13 @@
+### 4.2 读取
+
+```
+查询"FEAT-AUTH 的所有历史事件":
+  grep '"FEAT-AUTH"' docs/events/*/events.jsonl
+
+查询"今天的所有 Blocker":
+  grep '"🔴Blocker"' docs/events/20260709/events.jsonl
+
+统计"本月蒸馏了多少 Feature":
+  grep '"DISTILLATION_COMPLETE"' docs/events/202607*/events.jsonl | wc -l
+```
+

@@ -1,0 +1,3 @@
+# PIT-002: gh-cli 国内下载极慢
+
+`gh-cli` 下载速度可能极低，并出现 Content-Length mismatch。优先采用可信国内镜像。

@@ -1,0 +1,30 @@
+## 11. Self-modification
+
+A candidate must not establish its own trust. Core, Harness, schema, validator,
+or authority changes require acceptance by at least one of:
+
+1. the previous immutable trust root;
+2. an independent held-out verifier rooted outside the candidate;
+3. explicit human authorization that names the revision and risk.
+
+Candidate conformance and author tests are development evidence only. Validator
+failure, empty validation, or missing independent root blocks authority switch.
+
+The mechanical authorizer accepts exactly one of: a positive previous-root
+proof bound to previous and candidate revisions; an independent-root proof
+bound to the candidate; or an unexpired human grant naming candidate revision,
+candidate hash, risk, human identity, and grant identity. Future-dated,
+expired, mismatched, zero-assertion, and self-rooted proofs are rejected.
+
+Every mutating Attempt whose scope resolves to Protocol, Core, Harness,
+validator, or authority data carries a structured `self_modification`
+change/proof record. Replay invokes the mechanical authorizer before it may
+reduce to `COMPLETE`; a missing, candidate-self, unbound, or invalid proof
+reduces to `BLOCKED`. Previous-root proofs additionally bind to the Work's
+pre-bound required verifier, independent-root proofs bind to independent
+Evidence, and human grants bind to a declared Work grant.
+
+Every replay projection, including early `BLOCKED` projections, derives its
+artifact scope from current Evidence, Attempt, or Work data. It never replaces
+the active Reference Port scope with a synthetic repository-wide scope.
+

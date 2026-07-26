@@ -1,0 +1,24 @@
+def verify_anti_patterns(project_path):
+    """Step 4: 对抗清单校验"""
+    ap_file = os.path.join(project_path, "docs", "anti-patterns.md")
+    if not os.path.exists(ap_file):
+        print("   ⚠️  anti-patterns.md 不存在")
+        return []
+    
+    entries = []
+    with open(ap_file) as f:
+        for line in f:
+            m = re.match(r'^(###?\s+)?(AP-[A-Z]+-\d{3}):', line.strip())
+            if m:
+                entries.append(m.group(2))
+    
+    if not entries:
+        print("   ℹ️  反模式清单中无实际条目（仅有格式模板）— 需要在运行时积累")
+    else:
+        print(f"   发现 {len(entries)} 条反模式条目:")
+        for e in entries[:5]:
+            print(f"     • {e}")
+    
+    return entries
+
+

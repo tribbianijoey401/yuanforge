@@ -1,0 +1,42 @@
+def parse_frontmatter(text: str) -> dict | None:
+    """Extract YAML frontmatter from markdown text. Returns dict or None."""
+    m = FRONTMATTER_RE.match(text)
+    if not m:
+        return None
+
+    raw = m.group(1)
+    result = {}
+    for line in raw.strip().split("\n"):
+        line = line.rstrip()
+        if not line or line.startswith("#"):
+            continue
+        # Handle simple key: value and key: [list] and key: "string"
+        if ":" in line:
+            key, _, val = line.partition(":")
+            key = key.strip()
+            val = val.strip()
+
+            # Quoted string
+            if val.startswith('"') and val.endswith('"'):
+                result[key] = val[1:-1]
+            # Inline list [a, b, c]
+            elif val.startswith("[") and val.endswith("]"):
+                inner = val[1:-1].strip()
+                result[key] = [x.strip().strip('"').strip("'") for x in inner.split(",")] if inner else []
+            # Nested list (next lines are "- item") — handled by indentation state
+            elif val == "":
+                result[key] = []
+            # Scalar
+            else:
+                result[key] = val
+        # List item continuation
+        elif line.strip().startswith("- ") and isinstance(result.get(list(result.keys())[-1] if result.keys() else None), list):
+            last_key = list(result.keys())[-1]
+            item = line.strip()[2:].strip().strip('"').strip("'")
+            result[last_key].append(item)
+
+    return result
+
+
+# ── Build ──────────────────────────────────────────────────────
+

@@ -1,0 +1,16 @@
+## Plan 文件命名与存放
+
+```bash
+# 文件命名
+{YYYY-MM-DD}_{功能名}.md
+
+# 示例
+2026-06-29_user-auth.md
+2026-06-30_payment-gateway.md
+
+# 存放路径
+docs/YYYYMMDD-描述/PLAN.md
+```
+
+---
+

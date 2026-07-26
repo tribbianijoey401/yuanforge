@@ -1,0 +1,16 @@
+#### Exit Gate（退出条件）
+
+Loop 每轮最后必须判断以下任一条件，任一成立立即退出：
+
+| # | 条件 | 说明 |
+|---|------|------|
+| ① | Goal 完成 | 当前 Goal Cluster 所有 Task 终态 |
+| ② | Token Budget | 超出分配的 Token 上限 |
+| ③ | Time Budget | 超出分配的时间上限 |
+| ④ | 无 READY Task | 当前 Goal Cluster 无就绪 Task |
+| ⑤ | 等待用户 | 触发 Human Gate |
+| ⑥ | 等待平台 | 依赖外部平台响应 |
+| ⑦ | 人工确认点 | 架构冻结/安全异常/UI 选择/破坏性变更/生产发布 |
+
+**铁律**：Loop 永远是有限循环，不是无限 Agent。
+

@@ -1,0 +1,24 @@
+### 步骤 2：匹配 Pitfall
+
+扫描 `knowledge/pitfalls/` 下所有文件，检查 frontmatter 的 `modules` 字段是否匹配：
+
+```bash
+# 方法 1：grep frontmatter 中的 modules 字段
+for f in docs/knowledge/pitfalls/PIT-*.md; do
+    if grep -q "modules:.*<keyword>" "$f"; then
+        echo "匹配: $f"
+    fi
+done
+
+# 方法 2：用 Python 解析 YAML frontmatter（更精确）
+python3 -c "
+import yaml, glob
+keywords = {'frontend', 'table', 'render'}
+for f in glob.glob('docs/knowledge/pitfalls/PIT-*.md'):
+    with open(f) as fh:
+        fm = yaml.safe_load(fh.readline(fh.read().find('---', 3)))
+        if fm and keywords & set(fm.get('modules', [])):
+            print(f'{f}: {fm[\"summary\"]}')
+"
+```
+

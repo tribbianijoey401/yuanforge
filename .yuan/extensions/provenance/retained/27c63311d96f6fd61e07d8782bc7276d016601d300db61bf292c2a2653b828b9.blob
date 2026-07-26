@@ -1,0 +1,34 @@
+#### 批量蒸馏（Workspace Close 时执行）
+
+加载 `distill-workspace` Skill，执行打勾式 Checklist：
+
+1. **FEATURE.md → knowledge/features/FEAT-NNN.md**
+   - 创建对象实例文件（含完整 frontmatter）
+   - frontmatter 字段：id / object_type / lifecycle / owner / status / summary / depends / verified_commit / confidence
+   - 正文：需求描述（2-3句）+ 设计思路 + API 端点 + 关键文件
+   - status 设为 `verified`，verified_commit 取当前 HEAD
+
+2. **ADR-NNN.md → knowledge/decisions/ADR-NNN.md**
+   - 完整复制正文，加对象 frontmatter
+   - 保留原始 ADR 编号
+
+3. **PIT-NNN.md（即时蒸馏已完成，确认即可）**
+   - 扫描 knowledge/pitfalls/ 确认无遗漏
+   - 如果 BUG-NNN.md 未标注"→ distilled to PIT-NNN" → 执行即时蒸馏
+
+4. **PLAN.md 未完成任务 → workspace/backlog.md**
+   - 所有非终态 Task ID 追加到 backlog
+
+5. **TASK_BOARD.md / SESSION_LOG.md：不蒸馏**
+   - Runtime 状态和 Human 日志，随 Workspace 归档在 archive/ 中
+
+6. **归档 Workspace**
+   - 移动 `docs/YYYYMMDD-描述/` → `docs/archive/YYYYMMDD-描述/`
+
+7. **写入蒸馏报告 + Events**
+   - 在 SESSION_LOG 追加「知识蒸馏」段
+   - 写 `DISTILLATION_COMPLETE` 事件（包含知识产出列表，合并 KNOWLEDGE_UPDATED）
+   - 运行 `python scripts/build-graph.py --incremental` 重建 Graph
+
+> 详见 `distill-workspace` Skill 的批量蒸馏 Checklist。
+

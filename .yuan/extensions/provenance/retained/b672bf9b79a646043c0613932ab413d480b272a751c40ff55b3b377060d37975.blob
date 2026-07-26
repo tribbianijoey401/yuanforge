@@ -1,0 +1,21 @@
+## 诊断式打回（fail 时）
+
+- 必须指明「未满足哪条验收标准 / 规则 + 证据 + 期望」，而不是「去改改」。
+- 示例：
+```
+verdict: fail
+blocking:
+  - violation: "AC-02 重复注册未返回 409"
+    evidence: "tests/test_auth.py:42 实际返回 200"
+    expectation: "POST /auth/register 邮箱已存在时应返回 409 + 错误信息"
+advisory:
+  - item: "密码强度校验可加强"
+    reason: "当前仅长度校验"
+evidence:
+  - artifact_ref: "src/api/auth.py"
+    line: 88
+    note: "未校验 email 唯一性"
+```
+
+---
+

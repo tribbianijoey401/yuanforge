@@ -1,0 +1,6 @@
+### 协议层
+yuanforge-init          # 初始化脚本 — 必须验证能正确创建骨架 + 同步
+.yuan/specs/runtime-protocol.md  # Runtime Protocol — 状态转换错误会导致 Loop 失能
+.yuan/specs/workflow-protocol.md  # Workflow Protocol — Gate 逻辑在此
+.yuan/specs/state-protocol.md  # State Protocol — Task/Workspace 状态机定义
+

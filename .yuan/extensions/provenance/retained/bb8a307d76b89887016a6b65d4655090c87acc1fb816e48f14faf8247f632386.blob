@@ -1,0 +1,21 @@
+### 档位分级
+
+| 档位 | 触发条件 | 审查深度 | 示例 |
+|------|---------|---------|------|
+| 🟢 轻量 | 低风险、内部工具、原型验证 | 仅 Spec Reviewer + Tester | 前端样式调整、文档更新 |
+| 🟡 标准 | 常规功能、中等风险 | 四审查官并行（Quality/UX 可跳过） | 常规 API 端点、数据库迁移 |
+| 🔴 完整 | 高敏、核心链路、对外服务 | 四审查官全量 + 规则链审计 | 支付、认证、数据导出 |
+
+**档位判定权**：Phase 1 由 Product Analyst 初步打标，Architect 确认。Phase 2 后若发现风险升级，Conductor 可动态提升档位。
+
+- **四个审查官同时启动**：Spec Reviewer (🔴) + Security Auditor (🔴) + Quality Auditor (🟢) + UX Reviewer (🟢)
+- Spec Reviewer：对照验收标准 + API 契约，不通过 → Blocker
+- Security Auditor：按 R0/R1/R2 分级投入，不通过 → Blocker
+- Quality Auditor：代码质量 + 性能 + DB，同类 3 次警告 → 自动升级 Blocker
+- UX Reviewer：有界面时触发，还原度审查，同类 3 次 → 自动升级
+- 审查由对应的 Reviewer Agent 执行，不能由 Dev 自己审查
+- 任意 Blocker → 通知其他审查官暂停 → 解决后断点恢复
+- 三次审查未通过 → 在 PROGRESS.md 标记阻塞，Conductor 通知用户
+
+<SECTION-END:3>
+

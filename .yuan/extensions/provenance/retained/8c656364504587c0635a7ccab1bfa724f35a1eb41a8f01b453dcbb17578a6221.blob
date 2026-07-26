@@ -1,0 +1,14 @@
+### 4.2 节点构建
+
+```
+每个 .md 文件 → 1 个 Node
+  id         = frontmatter.id
+  type       = frontmatter.object_type
+  status     = frontmatter.status
+  confidence = frontmatter.confidence
+  summary    = frontmatter.summary
+  owner      = frontmatter.owner
+  file       = 相对路径
+  depends    = frontmatter.depends || []
+```
+

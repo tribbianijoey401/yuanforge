@@ -1,0 +1,20 @@
+## Pitfall frontmatter 要求
+
+每个 Pitfall 必须包含 `modules` 字段，否则无法被匹配：
+
+```yaml
+---
+id: PIT-007
+object_type: pitfall
+modules: [frontend, react, table, render]  ← 必须包含
+severity: 🔴 High
+---
+```
+
+**模块标签规范**：
+- 用小写英文，逗号分隔
+- 至少 2 个标签：1 个模块名 + 1 个关键词
+- 示例：`[frontend, table, pagination]`、`[backend, sdk, aliyun]`、`[auth, security, permission]`
+
+---
+

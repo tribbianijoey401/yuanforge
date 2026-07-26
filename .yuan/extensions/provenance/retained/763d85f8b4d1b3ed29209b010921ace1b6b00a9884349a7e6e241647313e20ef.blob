@@ -1,0 +1,12 @@
+### 2.4 Timeout（超时）
+
+```
+Rule: TIMEOUT
+  触发: Task.status == 🔨进行中 AND (now - started_at) > timeout_minutes
+  动作:
+    Task.status = 🟢就绪
+    Task.attempts += 1
+    if Task.attempts >= 3:
+      Task.status = ❌阻塞
+```
+

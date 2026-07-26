@@ -1,0 +1,14 @@
+### Frontmatter 必填字段
+
+每次写入 knowledge/ 文件时，以下字段必须填写：
+
+| 字段 | 说明 |
+|------|------|
+| `id` | 全局唯一。格式 `{TYPE}-{NNN}` |
+| `object_type` | feature / decision / pitfall / module |
+| `lifecycle` | 固定 `knowledge` |
+| `owner` | 负责角色 |
+| `status` | 由各类型状态机决定 |
+| `summary` | 一句话摘要（< 200 字符） |
+| `confidence` | verified / stale / draft / deprecated |
+

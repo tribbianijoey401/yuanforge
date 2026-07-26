@@ -1,0 +1,6 @@
+## 禁止事项
+
+- ❌ 在 Tier 1/2 可用时使用此模式
+- ❌ Agent 执行后不写 TASK_BOARD（角色切换后信息丢失）
+- ❌ Conductor 切换回来后不读 TASK_BOARD（凭记忆决策）
+- ❌ 跳过 Agent 启动协议 Checklist

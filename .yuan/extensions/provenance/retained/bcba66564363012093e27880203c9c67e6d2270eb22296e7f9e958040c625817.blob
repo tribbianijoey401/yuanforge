@@ -1,0 +1,13 @@
+## 10. 个人作品集单色
+
+- **适用行业**：个人作品集、设计师、摄影师
+- **设计意图**：单色背景让作品自己说话
+
+| Primary | #18181B | Background | #FAFAFA | Muted | #E8ECF0 |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #09090B | Muted FG | #64748B |
+| Secondary | #3F3F46 | Card | #FFFFFF | Border | #E4E4E7 |
+| On Secondary | #FFFFFF | Card FG | #09090B | Destructive | #DC2626 |
+| Accent | #2563EB | On Destructive | #FFFFFF | Ring | #18181B |
+| On Accent | #FFFFFF | | | | |
+

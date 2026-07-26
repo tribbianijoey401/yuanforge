@@ -1,0 +1,74 @@
+class AttemptJournalTests(unittest.TestCase):
+    def mutating_attempt(self) -> dict:
+        attempt = fixture("attempt")
+        receipt = {
+            "schema_version": "yuan.tool-receipt/v1",
+            "kind": "file-write",
+            "operation_id": "OP-write-001",
+            "status": "REPLACED",
+            "path": ".yuan/core/0.1",
+            "before_sha256": "1" * 64,
+            "after_sha256": "2" * 64,
+        }
+        receipt_digest = conformance.canonical_digest(receipt)
+        attempt["action"].update(
+            {
+                "type": "file-write",
+                "mutating": True,
+                "side_effect_class": "filesystem",
+                "authorization_grant_id": "GRANT-core-candidate",
+            }
+        )
+        attempt["journal"] = [
+            {
+                "ordinal": index,
+                "state": state,
+                "recorded_at": f"2026-07-26T14:3{index}:00+00:00",
+                "receipt_sha256": receipt_digest if state in {"OBSERVED", "COMMITTED"} else None,
+            }
+            for index, state in enumerate(
+                ("PREPARED", "EXECUTING", "OBSERVED", "COMMITTED"), start=1
+            )
+        ]
+        attempt["side_effect_state"] = "COMMITTED"
+        attempt["tool_receipt"] = receipt
+        attempt["postcondition"] = {
+            "scope": ".yuan/core/0.1",
+            "observed_sha256": "2" * 64,
+            "satisfied": True,
+        }
+        attempt["outcome"] = "SUCCEEDED"
+        return attempt
+
+    def test_committed_side_effect_requires_bound_receipt_and_postcondition(self) -> None:
+        attempt = self.mutating_attempt()
+        self.assertEqual([], conformance.validate_document("attempt", attempt).errors)
+        for field in ("tool_receipt", "postcondition"):
+            forged = copy.deepcopy(attempt)
+            forged[field] = None
+            with self.subTest(field=field):
+                self.assertTrue(conformance.validate_document("attempt", forged).errors)
+
+    def test_unknown_cannot_succeed_and_mutating_kind_cannot_disguise_itself(self) -> None:
+        attempt = self.mutating_attempt()
+        attempt["journal"] = attempt["journal"][:2] + [
+            {
+                "ordinal": 3,
+                "state": "UNKNOWN",
+                "recorded_at": "2026-07-26T14:33:00+00:00",
+                "receipt_sha256": None,
+            }
+        ]
+        attempt["side_effect_state"] = "UNKNOWN"
+        self.assertIn(
+            "UNKNOWN_OUTCOME_MISMATCH",
+            conformance.validate_document("attempt", attempt).errors,
+        )
+        disguised = fixture("attempt")
+        disguised["action"].update(type="file-write", mutating=False)
+        self.assertIn(
+            "MUTATING_ACTION_DISGUISED",
+            conformance.validate_document("attempt", disguised).errors,
+        )
+
+

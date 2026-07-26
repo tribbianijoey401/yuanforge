@@ -1,0 +1,5 @@
+### 订阅消息
+- 一次性订阅：`wx.requestSubscribeMessage`
+- 长期订阅：需微信认证 + 类目审核
+- 模板 ID 最多 3 个/次
+

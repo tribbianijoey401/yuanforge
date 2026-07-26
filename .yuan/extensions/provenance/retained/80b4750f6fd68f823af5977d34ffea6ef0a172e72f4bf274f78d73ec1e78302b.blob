@@ -1,0 +1,19 @@
+### 步骤 3：拼接摘要
+
+对每个匹配的 Pitfall，提取：
+- **id**（如 PIT-007）
+- **summary**（frontmatter 中的摘要）
+- **severity**（frontmatter 中的严重级别）
+
+**摘要格式**（一行一条）：
+```
+⚠️ 相关 Pitfall:
+- [PIT-007] [🔴] 前端空白页：列缺少 dataIndex + localStorage 丢失 render
+- [PIT-005] [🟡] 阿里云 SDK：NewClient 缺少 Endpoint 参数
+```
+
+**如果无匹配**：
+```
+ℹ️ 无相关 Pitfall 记录。
+```
+

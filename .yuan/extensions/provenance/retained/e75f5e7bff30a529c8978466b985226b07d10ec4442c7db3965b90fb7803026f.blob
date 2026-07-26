@@ -1,0 +1,8 @@
+## 八、与其他协议的关系
+
+| 协议 | 依赖方式 |
+|------|---------|
+| State Protocol | 定义本文每个对象的状态如何变化 |
+| Action Protocol | Action 操作的对象由本文定义 |
+| Workflow Protocol | Workflow 中的角色操作本文的对象 |
+| Adapter Protocol | Adapter 必须能读写本文定义的所有对象 |

@@ -1,0 +1,16 @@
+### 限额执行
+
+```typescript
+async function checkQuota(tenantId: string, metric: string): Promise<boolean> {
+  const config = await getTenantConfig(tenantId);
+  const usage = await getCurrentUsage(tenantId, metric);
+  const limit = config.limits[metric];
+  return usage < limit;
+}
+
+// API中间件
+if (!await checkQuota(tenantId, 'api_calls')) {
+  return res.status(429).json({ error: 'QUOTA_EXCEEDED', upgradeUrl: '/billing' });
+}
+```
+

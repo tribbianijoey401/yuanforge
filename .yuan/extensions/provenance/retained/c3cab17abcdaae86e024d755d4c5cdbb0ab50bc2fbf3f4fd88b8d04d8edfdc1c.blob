@@ -1,0 +1,6 @@
+"""Author-visible conformance runner for the inert Yuan Core 0.1 candidate.
+
+This development aid cannot establish its own trust. M3 verification belongs
+to the frozen Genesis verifier and an independent held-out suite.
+"""
+

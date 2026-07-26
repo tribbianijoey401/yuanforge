@@ -1,0 +1,10 @@
+def _load_core_modules():
+    core_path = str(CORE_ROOT)
+    if core_path not in sys.path:
+        sys.path.insert(0, core_path)
+    import conformance  # type: ignore
+    import document_validation  # type: ignore
+
+    return conformance, document_validation
+
+

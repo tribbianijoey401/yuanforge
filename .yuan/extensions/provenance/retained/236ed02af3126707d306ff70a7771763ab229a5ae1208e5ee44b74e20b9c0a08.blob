@@ -1,0 +1,17 @@
+## 26. NFT 平台
+
+- **推荐落地页模式**：Feature-Rich Showcase
+- **风格优先级**：主 Cyberpunk UI / 备 Glassmorphism
+- **配色氛围**：紫 + 金 + 黑深空
+- **字体情绪**：未来 + 收藏（Orbitron + Exo 2）
+- **关键效果**：NFT 卡 hover 3D 倾斜 + 稀有度展示
+- **决策规则**：
+```json
+{
+  "if_drop_launch": "add-countdown-and-mint-progress",
+  "if_secondary_market": "add-floor-price-ticker",
+  "if_creator_tools": "add-mint-studio-preview"
+}
+```
+- **反模式**：无 gas 提示、首屏无 featured drop、隐藏 creator
+

@@ -1,0 +1,16 @@
+## 七、与 Conductor 的关系
+
+Promotion Pipeline 不替代 Conductor——它替代 Conductor 中**不需要 LLM 判断**的部分。
+
+| 操作 | 谁做 | 为什么 |
+|------|------|--------|
+| 判断 BUG 是否值得蒸馏 | Pipeline（规则匹配） | 有确定性标准 |
+| 提取 FEATURE/ADR | Pipeline（规则提取） | 有固定格式 |
+| 验证 frontmatter | Pipeline（规则检查） | 有 Checklist |
+| 合并到 knowledge/ | Pipeline（规则合并） | 有合并规则 |
+| **判断"这个 Feature 的 summary 怎么写"** | Conductor（LLM） | 需要语义理解 |
+| **判断"这个决策的后果是什么"** | Conductor（LLM） | 需要分析能力 |
+| **处理 Pipeline 无法自动处理的异常** | Conductor（LLM） | 需要判断 |
+
+---
+

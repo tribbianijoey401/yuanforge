@@ -1,0 +1,19 @@
+## 1. Boundary
+
+Yuan Core is a deterministic engineering harness around a nondeterministic LLM.
+The LLM may propose; it is never the source of facts, tool authority, evidence
+validity, or completion.
+
+Core has exactly five primitives:
+
+1. **Protocol** — the rules in this document.
+2. **Work Contract** — immutable intent, typed acceptance criteria, constraints,
+   authorization, budgets, and verifier bindings.
+3. **Run Memory** — a bounded, disposable projection of current state.
+4. **Attempt** — one bounded strategy and its side-effect journal.
+5. **Evidence** — immutable external observations bound to what was checked.
+
+Knowledge, roles, agents, phases, Git, reviews, deployment, TDD ordering, and
+platform-specific schedulers are not Core. They may supply proposals or
+Evidence, but cannot redefine this protocol.
+

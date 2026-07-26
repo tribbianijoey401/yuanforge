@@ -1,0 +1,65 @@
+### FEATURE.md → knowledge/features/ 转换示例
+
+**蒸馏前**（Workspace 中的 FEATURE.md）：
+```markdown
+# FEATURE: 用户认证系统
+> 会话: 20260709-用户认证
+> 状态: 完成
+> 负责角色: Architect
+
+## 需求描述
+实现 JWT 认证，含 token 刷新
+
+## 设计思路
+bcrypt 哈希 + JWT access/refresh token 双 token 模式
+...
+```
+
+**蒸馏后**（knowledge/features/FEAT-AUTH.md）：
+```yaml
+---
+id: FEAT-AUTH
+object_type: feature
+lifecycle: knowledge
+owner: architect
+status: verified
+summary: "JWT-based authentication with refresh token rotation"
+depends: [ADR-003]
+verified_commit: a1b2c3d
+confidence: verified
+updated_by: conductor
+updated_at: "2026-07-09T17:00:00Z"
+acceptance_criteria:
+  - "用户可用 email+password 注册并获取 JWT"
+  - "Token 过期后可用 refresh token 刷新"
+api_endpoints:
+  - POST /auth/register
+  - POST /auth/login
+  - POST /auth/refresh
+files:
+  - src/auth/handler.py
+  - src/auth/service.py
+  - tests/auth/test_login.py
+session: "20260709-用户认证系统"
+---
+# Feature: 用户认证系统
+
+## 需求描述
+实现 JWT 认证，含 token 刷新。
+
+## 设计思路
+bcrypt 哈希 + JWT access/refresh token 双 token 模式。
+详见 ADR-003。
+
+## API 端点
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | /auth/register | 注册 |
+| POST | /auth/login | 登录 |
+| POST | /auth/refresh | 刷新 token |
+
+## 关联
+- Plan: [archive/20260709-用户认证/PLAN.md](../archive/20260709-用户认证/PLAN.md)
+- ADR: [ADR-003](../knowledge/decisions/ADR-003.md)
+```
+

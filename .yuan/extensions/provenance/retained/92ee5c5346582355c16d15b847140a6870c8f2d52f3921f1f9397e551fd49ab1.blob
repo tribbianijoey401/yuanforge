@@ -1,0 +1,15 @@
+## 四、Action 与对象的关系
+
+| Action | 操作的对象 | 状态变更 |
+|--------|-----------|---------|
+| Dispatch | Task | 🟢→🔨 |
+| Complete | Task | 🔨→✅ |
+| Review | Task | ✅→✅审查/🔄返工 |
+| Snapshot | Snapshot | executing→checkpoint |
+| Checkpoint | Checkpoint | created→archived |
+| Promote | Feature/ADR/Pitfall | 创建/更新 Knowledge 对象 |
+| Archive | Workspace | distilling→archived |
+| Recover | Task/Workspace | 🔨→🟢 |
+
+---
+

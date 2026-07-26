@@ -1,0 +1,7 @@
+### 判断流程
+
+1. 看路径形态：`/about` `/pricing` `/blog/*` 落页形 → brand；`/app/*` `/dashboard` `/settings` 表单表格 → product。
+2. 看 PRODUCT.md 的 `## Register` 字段（裸值 `brand` 或 `product`）。
+3. 信号真分裂时（产品里有个大营销落地页），问用户哪个是**主要**表面，写入默认。
+4. 单一任务可临时覆盖寄存器，但项目级默认必须先定。
+

@@ -1,0 +1,13 @@
+### 步骤 3：按受众特征三选
+
+```
+受众 = 企业决策者 → 优先 {25. Enterprise Gateway, 33. Trust & Authority}
+受众 = 开发者 → 优先 {16. FAQ/Documentation, 29. Interactive 3D}
+受众 = Z 世代 → 优先 {17. Immersive, 27. Horizontal Scroll Journey, 28. Bento Grid}
+受众 = 高净值 → 优先 {26. Portfolio Grid, 10. Scroll Storytelling, 17. Immersive}
+受众 = 移动端为主 → 优先 {4. Minimal Single Column, 15. App Store Style}
+受众 = 理性比较型 → 优先 {6. Comparison Table, 8. Pricing Page}
+受众 = 感性叙事型 → 优先 {10. Scroll Storytelling, 21. Before-After}
+受众 = 紧迫驱动型 → 优先 {12. Waitlist, 18. Event, 24. Webinar}
+```
+

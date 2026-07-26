@@ -1,0 +1,29 @@
+### 格式
+
+```markdown
+# FEATURE: [功能名称]
+
+> 会话: [YYYYMMDD-描述]
+> 状态: [完成]
+> 负责角色: [Architect/Frontend/Backend Dev]
+
+## 需求描述
+[一句话]
+
+## 设计思路
+[怎么设计的]
+
+## 修改的文件
+| 文件 | 改动 | 说明 |
+
+## API/接口（如有）
+| 方法 | 路径 | 说明 |
+
+## 关联
+| 关系 | 文档 |
+|------|------|
+| Plan | [PLAN.md](./PLAN.md) |
+| ADR | [ADR-xxx](./ADR-xxx.md) |
+| Bug | [BUG-xxx](./BUG-xxx.md) |
+```
+

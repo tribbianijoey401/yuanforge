@@ -3,6 +3,62 @@
   "purpose": "Content-bound examples retained from legacy YuanForge; each case is expected to be rejected or reported as unresolved by an applicable verifier.",
   "cases": [
     {
+      "id": "AP-CONTRACT-001",
+      "source": "docs/anti-patterns.md",
+      "source_sha256": "ac591f1728c88ed67c742a624cec8994ecba2c6ec821e533ba052225a9ae8fc0",
+      "failure": "A role contract omits its gate definition, so downstream scoring cannot determine the required check.",
+      "expected": "A selected software-delivery verifier rejects the incomplete contract shape."
+    },
+    {
+      "id": "AP-FRAMEWORK-002",
+      "source": "docs/anti-patterns.md",
+      "source_sha256": "ac591f1728c88ed67c742a624cec8994ecba2c6ec821e533ba052225a9ae8fc0",
+      "failure": "Iron-rule section anchors drift from their headings and inject the wrong legacy advice.",
+      "expected": "A document verifier rejects unmatched or misnumbered anchors."
+    },
+    {
+      "id": "AP-SCHEMA-003",
+      "source": "docs/anti-patterns.md",
+      "source_sha256": "ac591f1728c88ed67c742a624cec8994ecba2c6ec821e533ba052225a9ae8fc0",
+      "failure": "Persistent schema and application contract disagree while mock-only tests remain green.",
+      "expected": "Require contract Evidence from the declared real or isolated environment."
+    },
+    {
+      "id": "AP-FRAMEWORK-004",
+      "source": "docs/anti-patterns.md",
+      "source_sha256": "ac591f1728c88ed67c742a624cec8994ecba2c6ec821e533ba052225a9ae8fc0",
+      "failure": "A seam template has no structured annotation grammar and cannot generate deterministic assertions.",
+      "expected": "A selected contract verifier rejects an unparseable or empty seam declaration."
+    },
+    {
+      "id": "AP-FRAMEWORK-005",
+      "source": "docs/anti-patterns.md",
+      "source_sha256": "ac591f1728c88ed67c742a624cec8994ecba2c6ec821e533ba052225a9ae8fc0",
+      "failure": "Repository topology changes without updating initializer synchronization rules.",
+      "expected": "A packaging verifier compares the declared inventory with a clean synchronization dry run."
+    },
+    {
+      "id": "AP-CONCURRENT-006",
+      "source": "docs/anti-patterns.md",
+      "source_sha256": "ac591f1728c88ed67c742a624cec8994ecba2c6ec821e533ba052225a9ae8fc0",
+      "failure": "Role contracts use incompatible structures and break deterministic rendering or checks.",
+      "expected": "A selected document verifier reports incompatible required fields without guessing."
+    },
+    {
+      "id": "AP-MIGRATE-007",
+      "source": "docs/anti-patterns.md",
+      "source_sha256": "ac591f1728c88ed67c742a624cec8994ecba2c6ec821e533ba052225a9ae8fc0",
+      "failure": "VERSION, initializer constants, and metadata disagree.",
+      "expected": "Treat .yuan/VERSION as the single source and reject copied-value drift."
+    },
+    {
+      "id": "AP-ENV-008",
+      "source": "docs/anti-patterns.md",
+      "source_sha256": "ac591f1728c88ed67c742a624cec8994ecba2c6ec821e533ba052225a9ae8fc0",
+      "failure": "A legacy startup checklist omits the selected physical-contract verification recipe.",
+      "expected": "Work authoring or document verification reports the missing selected dependency."
+    },
+    {
       "id": "legacy-zero-check-pass",
       "source": "scripts/run-ptg-cal-check.py",
       "source_sha256": "da2922e16f0ae0438348079fba05048638fee2547e91cded82808cbd1acbd793",

@@ -1,0 +1,56 @@
+def _attempt(
+    *,
+    attempt_id: str,
+    sequence: int,
+    work: dict[str, Any],
+    source: dict[str, Any],
+    evidence_id: str,
+    artifact_sha256: str,
+) -> dict[str, Any]:
+    receipt = {
+        "schema_version": "yuan.tool-receipt/v1",
+        "kind": "file-read",
+        "operation_id": f"OP-{attempt_id}",
+        "status": "READ",
+        "after_sha256": source["sha256"],
+    }
+    relevant = [{"scope": source["path"], "sha256": source["sha256"]}]
+    return {
+        "schema_version": "yuan.attempt/v1",
+        "attempt_id": attempt_id,
+        "work_binding": work["revision"],
+        "protocol_binding": work["protocol_binding"],
+        "harness_binding": work["harness_binding"],
+        "sequence": sequence,
+        "strategy_fingerprint": canonical_digest(
+            {"kind": "legacy-source-read", "source": source["path"]}
+        ),
+        "relevant_inputs": relevant,
+        "hypothesis": {
+            "claim": f"Legacy source {source['path']} is captured byte-for-byte.",
+            "falsification": "A before/after SHA-256 mismatch disproves capture.",
+        },
+        "action": {
+            "type": "file-read",
+            "mutating": False,
+            "side_effect_class": "none",
+            "scope": source["path"],
+            "authorization_grant_id": None,
+            "high_impact": False,
+            "self_modification": None,
+        },
+        "budget_charge": {
+            "ticks": 1,
+            "tool_calls": 1,
+            "strategies": 1,
+            "command_seconds": 0,
+        },
+        "journal": [],
+        "side_effect_state": "NOT_APPLICABLE",
+        "tool_receipt": receipt,
+        "postcondition": None,
+        "evidence_ids": [evidence_id],
+        "outcome": "SUCCEEDED",
+    }
+
+

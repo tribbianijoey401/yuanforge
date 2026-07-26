@@ -1,0 +1,13 @@
+## 23. Newsletter / Content First 简报内容
+
+- **关键词**：newsletter、content、writer、blog、subscribe
+- **版块顺序**：
+  1. Hero（Value Prop + Form）
+  2. Recent Issues/Archives
+  3. Social Proof（Subscriber count）
+  4. About Author
+- **主 CTA 放置位置**：Hero inline form + Sticky header form
+- **配色策略**：极简；纸感背景；文字聚焦；Subscribe accent
+- **推荐效果**：text highlight、typewriter effect、subtle fade-in
+- **转化优化要点**：单字段表单（仅 Email）；显示"Join X,000 readers"；sample 阅读链接
+

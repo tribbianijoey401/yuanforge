@@ -1,0 +1,11 @@
+### 4.1 加载审查官
+
+每个审查官加载对应合约 + 铁律 Ⅲ + 铁律 Ⅷ：
+
+```
+Spec Reviewer     → contracts/spec-reviewer.md
+Security Auditor  → contracts/security-auditor.md
+Quality Auditor   → contracts/quality-auditor.md
+UX Reviewer       → contracts/ux-reviewer.md
+```
+

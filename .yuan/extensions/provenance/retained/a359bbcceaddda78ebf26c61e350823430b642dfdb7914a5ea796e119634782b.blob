@@ -1,0 +1,21 @@
+# 读取 frontmatter（如果有）
+in_frontmatter=false
+frontmatter_end=false
+while IFS= read -r line; do
+    if [[ "$line" == "---" ]] && [[ "$in_frontmatter" == false ]]; then
+        in_frontmatter=true
+        continue
+    fi
+    if [[ "$line" == "---" ]] && [[ "$in_frontmatter" == true ]]; then
+        in_frontmatter=false
+        frontmatter_end=true
+        continue
+    fi
+    if [[ "$in_frontmatter" == true ]]; then
+        case "$line" in
+            *"id:"*) BUG_ID=$(echo "$line" | sed 's/^id:[[:space:]]*//' | tr -d '"' | tr -d "'") ;;
+            *"severity:"*) BUG_SEVERITY=$(echo "$line" | sed 's/^severity:[[:space:]]*//' | tr -d '"' | tr -d "'") ;;
+        esac
+    fi
+done < "$BUG_FILE"
+

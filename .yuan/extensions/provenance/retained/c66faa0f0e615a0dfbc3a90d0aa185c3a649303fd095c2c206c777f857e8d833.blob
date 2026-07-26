@@ -1,0 +1,13 @@
+def _ensure_no_symlink_path(path: pathlib.Path, stop: pathlib.Path) -> None:
+    current = path
+    stop = stop.resolve()
+    while True:
+        if current.exists() and current.is_symlink():
+            raise MigrationError(f"symlink path is not allowed: {current}")
+        if current.resolve() == stop:
+            break
+        if current.parent == current:
+            raise MigrationError(f"path escapes repository: {path}")
+        current = current.parent
+
+

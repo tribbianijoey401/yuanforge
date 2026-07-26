@@ -1,0 +1,4 @@
+### ptg-critical 清单
+
+项目维护 `docs/ptg-critical.md`，标记哪些模块必须通过 PTG。Conductor 在派发 Tester 时注入此清单，Tester 据此执行 PTG + CAL 验证。
+

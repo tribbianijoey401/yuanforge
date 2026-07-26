@@ -1,0 +1,41 @@
+def create_docs_skeleton(target: Path, mode: str, dry_run: bool = False) -> dict:
+    """创建 docs/ 目录骨架。返回 {路径: 动作}"""
+    docs_dir = target / "docs"
+    results = {}
+
+    if not dry_run:
+        docs_dir.mkdir(parents=True, exist_ok=True)
+
+    for subdir in DOCS_SKELETON_DIRS:
+        dirpath = docs_dir / subdir
+        if dirpath.exists():
+            results[subdir + "/"] = "skipped"
+            continue
+        if not dry_run:
+            dirpath.mkdir(parents=True, exist_ok=True)
+            (dirpath / ".gitkeep").touch()
+        results[subdir + "/"] = "created"
+
+    for relpath, content in DOCS_SKELETON_FILES.items():
+        filepath = docs_dir / relpath
+        if filepath.exists() and mode == "existing":
+            results[relpath] = "skipped"
+            continue
+        if dry_run:
+            results[relpath] = "created" if not filepath.exists() else "skipped"
+        else:
+            filepath.parent.mkdir(parents=True, exist_ok=True)
+            # 处理模板替换：{{ anti-patterns_template }} → 从 templates/ 读取
+            file_content = content
+            if "{{ anti-patterns_template }}" in content:
+                template_path = SOURCE_ROOT / "templates" / "anti-patterns.md"
+                if template_path.exists():
+                    file_content = template_path.read_text(encoding="utf-8")
+                else:
+                    file_content = "# 反模式清单（空白）\n"
+            filepath.write_text(file_content, encoding="utf-8")
+            results[relpath] = "created"
+
+    return results
+
+

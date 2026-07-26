@@ -1,0 +1,16 @@
+### 3.2 Complete
+
+```
+语义: Agent 完成 Task 执行，产出代码/文档/设计。
+
+输入:
+  - task_id: Task ID
+  - output_files: 产出文件列表
+  - commit_hash: 原子提交的 commit hash
+
+输出:
+  - Task 状态: 🔨进行中 → ✅完成
+  - TASK_BOARD 上下文传递段更新
+  - Event: TASK_STATUS_CHANGED
+```
+

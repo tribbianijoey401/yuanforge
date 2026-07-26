@@ -1,0 +1,21 @@
+### 3.1 Feature（功能）
+
+**语义**：一个用户可感知的功能单元。
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:---:|------|
+| `id` | string | ✅ | `FEAT-NNN` |
+| `object_type` | enum | ✅ | `feature` |
+| `status` | enum | ✅ | draft / designed / implemented / verified / deprecated |
+| `summary` | string | ✅ | 一句话摘要 |
+| `owner` | string | ✅ | 负责角色 |
+| `confidence` | enum | ✅ | verified / stale / draft / deprecated |
+| `depends` | array | — | 依赖的对象 ID |
+| `verified_commit` | string | — | 最后验证时的 commit hash |
+| `acceptance_criteria` | array | — | 验收标准 |
+| `api_endpoints` | array | — | 涉及的 API |
+| `files` | array | — | 关键源文件路径 |
+| `session` | string | — | 实现此功能的会话 |
+
+**状态机**：draft → designed → implemented → verified → deprecated
+

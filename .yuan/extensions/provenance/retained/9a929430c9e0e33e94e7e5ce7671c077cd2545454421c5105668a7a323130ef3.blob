@@ -1,0 +1,8 @@
+### 4. Dispatch Plan（调度指令）
+
+这是 Plan 最关键的段落。Conductor Agent 读这一段就知道：
+- 有哪些 Task
+- 每个 Task 谁来做（role）
+- Task 之间的依赖关系（谁等谁）
+- 哪些 Task 可以并行
+

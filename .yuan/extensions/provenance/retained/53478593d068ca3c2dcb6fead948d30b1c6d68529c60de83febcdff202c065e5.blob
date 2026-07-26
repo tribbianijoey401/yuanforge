@@ -1,0 +1,22 @@
+## 各角色职责
+
+| 角色 | 读 | 写 |
+|------|-----|-----|
+| Conductor | 全部 | 初始化任务行、promote 状态、写阻塞/审查结果/调度状态/派发日志/原因指针、注入诊断包、更新当前状态快照、渐进更新 SESSION_LOG、写 Events |
+| Product Analyst | 用户需求 | 用户故事+验收标准+风险标签 |
+| Architect | 用户故事+验收标准 | Plan+API契约+数据模型 |
+| UI Designer | 用户故事+API契约 | 视觉规范+原型 |
+| Frontend Dev | 自己角色+🟢就绪的行 + 上下文 | 状态、上下文传递 |
+| Backend Dev | 自己角色+🟢就绪的行 + 上下文 | 状态、上下文传递 |
+| Spec Reviewer | ✅完成的行 + 验收标准 | 状态、返工记录 |
+| Security Auditor | ✅完成的行 | Blocker/通过（按风险等级） |
+| Quality Auditor | ✅完成的行 | Advisory 报告 |
+| UX Reviewer | ✅完成的行 + UI原型 | Advisory 报告 |
+| Tester | 所有审查通过的行 | 状态、Bug 记录 |
+| Doc Engineer | 会话所有产出物 | 增量归档+阶段整合 |
+
+---
+
+<SECTION-END:tb-530>
+
+<SECTION-END:tb-concurrency>

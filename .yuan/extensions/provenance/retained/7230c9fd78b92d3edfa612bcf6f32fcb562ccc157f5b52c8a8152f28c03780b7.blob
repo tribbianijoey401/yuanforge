@@ -1,0 +1,1 @@
+contract_files = [f for f in staged_files if f.startswith('contracts/') and f.endswith('.md')]

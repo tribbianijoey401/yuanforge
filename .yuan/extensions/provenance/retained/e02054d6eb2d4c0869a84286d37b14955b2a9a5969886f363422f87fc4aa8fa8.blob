@@ -1,0 +1,9 @@
+### SPAR 闭环
+
+```
+Sense(感知) → Plan(规划) → Act(执行) → Reflect(反思) → [循环]
+```
+
+- 任务成功率：87.3%（使用EvoMaster后）
+- 每轮Reflect输出：改进建议 → 喂入下一轮Plan
+

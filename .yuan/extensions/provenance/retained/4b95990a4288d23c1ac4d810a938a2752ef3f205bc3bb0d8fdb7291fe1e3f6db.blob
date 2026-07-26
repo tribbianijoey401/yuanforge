@@ -1,0 +1,3 @@
+# ========== 获取 verified_commit ==========
+COMMIT_HASH=$(git -C "$PROJECT_ROOT" log -1 --oneline 2>/dev/null || echo "unknown")
+

@@ -1,0 +1,17 @@
+## 23. 天气
+
+- **推荐落地页模式**：Hero-Centric
+- **风格优先级**：主 Glassmorphism / 备 Aurora UI
+- **配色氛围**：天空蓝 + 极光渐变
+- **字体情绪**：清晰 + 直观（Inter 单字族）
+- **关键效果**：动态背景（晴/雨/雪）+ 数据可视化
+- **决策规则**：
+```json
+{
+  "if_severe_weather": "add-warning-system",
+  "if_allergy_forecast": "add-pollen-data",
+  "if_widget": "add-ios-android-widget-preview"
+}
+```
+- **反模式**：静态背景、首屏无当前位置、信息密度过低
+

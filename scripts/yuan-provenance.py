@@ -1,445 +1,338 @@
 #!/usr/bin/env python3
-"""Generate and verify deterministic clause-level YuanForge provenance."""
+"""Generate provenance only from a frozen inventory and explicit clause map."""
 
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from collections import Counter
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / ".yuan" / "extensions" / "provenance"
-POLICY_PATH = BASE / "scope-policy.json"
-SCOPE_PATH = BASE / "scope-manifest.json"
-CLAUSE_PATH = BASE / "clause-manifest.json"
-REPORT_PATH = BASE / "REPORT.md"
-FIXTURE_PATH = ROOT / ".yuan" / "extensions" / "fixtures" / "legacy-anti-patterns.json"
-
-HEADING_RE = re.compile(r"^(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$")
-FENCE_RE = re.compile(r"^[ \t]*(```+|~~~+)")
-LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+DEFAULT_PROV = ROOT / ".yuan/extensions/provenance"
+MD_HEADING = re.compile(r"^(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$")
+FENCE = re.compile(r"^[ \t]*(```+|~~~+)")
+SHELL_FUNCTION = re.compile(r"^[ \t]*(?:function[ \t]+)?([A-Za-z_][A-Za-z0-9_]*)[ \t]*(?:\(\))?[ \t]*\{[ \t]*$")
+SHELL_SECTION = re.compile(r"^[ \t]*#[ \t]*(?:[-=]{2,}[ \t]*)?([^#].*?)(?:[ \t]*[-=]{2,})?[ \t]*$")
 
 
-def digest(data: bytes) -> str:
+def sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def canonical_json(value: Any) -> bytes:
+def canonical(value: Any) -> bytes:
     return (json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
 
 
-def rel(path: Path) -> str:
-    return path.relative_to(ROOT).as_posix()
+def line_data(data: bytes) -> tuple[list[bytes], list[int]]:
+    lines = [line.encode("utf-8") for line in data.decode("utf-8").splitlines(keepends=True)]
+    offsets = [0]
+    for line in lines:
+        offsets.append(offsets[-1] + len(line))
+    return lines, offsets
 
 
-def load_policy() -> dict[str, Any]:
-    return json.loads(POLICY_PATH.read_text(encoding="utf-8"))
+def item(data: bytes, start: int, end: int, first: int, last: int, anchor: str, heading: str | None, granularity: str) -> dict[str, Any]:
+    return {
+        "anchor": anchor,
+        "heading": heading,
+        "line_start": first,
+        "line_end": last,
+        "byte_start": start,
+        "byte_end": end,
+        "clause_sha256": sha(data[start:end]),
+        "granularity": granularity,
+    }
 
 
-def ignored(path: Path, policy: dict[str, Any]) -> bool:
-    relative = path.relative_to(ROOT)
-    if any(part in policy["ignore_segments"] for part in relative.parts):
-        return True
-    return any(path.name.endswith(suffix) for suffix in policy["ignore_suffixes"])
-
-
-def discover(policy: dict[str, Any]) -> list[Path]:
-    found: set[Path] = set()
-    for name in policy["include_files"]:
-        path = ROOT / name
-        if not path.is_file():
-            raise ValueError(f"required source missing: {name}")
-        found.add(path)
-    for name in policy["include_roots"]:
-        root = ROOT / name
-        if not root.is_dir():
-            raise ValueError(f"required source root missing: {name}")
-        for path in root.rglob("*"):
-            if path.is_file() and not ignored(path, policy):
-                found.add(path)
-    paths = sorted(found, key=lambda item: rel(item))
-    names = [rel(path) for path in paths]
-    for family in policy["required_families"]:
-        if family.endswith("/"):
-            if not any(name.startswith(family) for name in names):
-                raise ValueError(f"required family empty: {family}")
-        elif family not in names:
-            raise ValueError(f"required family file missing: {family}")
-    return paths
+def partition(data: bytes, lines: list[bytes], boundaries: list[tuple[int, int, str, str | None]], granularity: str) -> list[dict[str, Any]]:
+    if not boundaries:
+        return [item(data, 0, len(data), 1, max(1, len(lines)), "whole:file", None, "content-addressed-whole-file")]
+    result: list[dict[str, Any]] = []
+    if boundaries[0][0] > 0:
+        result.append(item(data, 0, boundaries[0][0], 1, boundaries[0][1] - 1, f"{granularity}:preamble", None, f"{granularity}-preamble"))
+    for index, (start, first, anchor, heading) in enumerate(boundaries):
+        end = boundaries[index + 1][0] if index + 1 < len(boundaries) else len(data)
+        last = boundaries[index + 1][1] - 1 if index + 1 < len(boundaries) else max(first, len(lines))
+        result.append(item(data, start, end, first, last, anchor, heading, granularity))
+    return result
 
 
 def markdown_clauses(data: bytes) -> list[dict[str, Any]]:
-    text = data.decode("utf-8")
-    lines = text.splitlines(keepends=True)
-    starts: list[tuple[int, int, str]] = []
+    lines, offsets = line_data(data)
+    boundaries: list[tuple[int, int, str, str | None]] = []
+    counts: Counter[str] = Counter()
     in_fence = False
     fence_char = ""
-    offset = 0
-    for number, line in enumerate(lines, start=1):
-        plain = line.rstrip("\r\n")
-        fence = FENCE_RE.match(plain)
+    for index, raw in enumerate(lines):
+        text = raw.decode("utf-8").rstrip("\r\n")
+        fence = FENCE.match(text)
         if fence:
             marker = fence.group(1)
             if not in_fence:
-                in_fence = True
-                fence_char = marker[0]
+                in_fence, fence_char = True, marker[0]
             elif marker[0] == fence_char:
-                in_fence = False
-                fence_char = ""
-        elif not in_fence:
-            heading = HEADING_RE.match(plain)
-            if heading:
-                starts.append((offset, number, heading.group(2).strip()))
-        offset += len(line.encode("utf-8"))
+                in_fence, fence_char = False, ""
+            continue
+        if in_fence:
+            continue
+        match = MD_HEADING.match(text)
+        if not match:
+            continue
+        heading = match.group(2).strip()
+        slug = re.sub(r"[^0-9a-zA-Z\u4e00-\u9fff]+", "-", heading.lower()).strip("-") or "heading"
+        counts[slug] += 1
+        boundaries.append((offsets[index], index + 1, f"md:{slug}:{counts[slug]}", heading))
+    return partition(data, lines, boundaries, "markdown-heading")
 
-    if not starts:
-        return [{
-            "anchor": "@file",
-            "heading": None,
-            "line_start": 1,
-            "line_end": max(1, len(lines)),
-            "byte_start": 0,
-            "byte_end": len(data),
-            "clause_sha256": digest(data),
-        }]
 
-    boundaries: list[tuple[int, int, str | None, str]] = []
-    first_offset, first_line, _ = starts[0]
-    if first_offset:
-        boundaries.append((0, first_line, None, "@preamble"))
-    for index, (byte_start, line_start, heading) in enumerate(starts):
-        anchor = f"h{index + 1:04d}"
-        boundaries.append((byte_start, line_start, heading, anchor))
-
-    clauses: list[dict[str, Any]] = []
-    for index, (byte_start, line_start, heading, anchor) in enumerate(boundaries):
-        byte_end = boundaries[index + 1][0] if index + 1 < len(boundaries) else len(data)
-        if index + 1 < len(boundaries):
-            line_end = boundaries[index + 1][1] - 1
+def python_clauses(data: bytes) -> list[dict[str, Any]]:
+    tree = ast.parse(data.decode("utf-8"))
+    lines, offsets = line_data(data)
+    boundaries: list[tuple[int, int, str, str | None]] = []
+    counts: Counter[str] = Counter()
+    for node in tree.body:
+        first = getattr(node, "lineno", 1)
+        decorators = getattr(node, "decorator_list", [])
+        if decorators:
+            first = min([first] + [decorator.lineno for decorator in decorators])
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            kind, name = "function", node.name
+        elif isinstance(node, ast.ClassDef):
+            kind, name = "class", node.name
+        elif isinstance(node, (ast.Import, ast.ImportFrom)):
+            kind, name = "import", getattr(node, "module", None) or "names"
+        elif isinstance(node, (ast.Assign, ast.AnnAssign)):
+            kind, name = "assignment", f"line-{first}"
+        elif isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+            kind, name = "module-docstring", "docstring"
         else:
-            line_end = max(line_start, len(lines))
-        clauses.append({
-            "anchor": anchor,
-            "heading": heading,
-            "line_start": line_start,
-            "line_end": line_end,
-            "byte_start": byte_start,
-            "byte_end": byte_end,
-            "clause_sha256": digest(data[byte_start:byte_end]),
-        })
-    return clauses
+            kind, name = type(node).__name__.lower(), f"line-{first}"
+        base = f"py:{kind}:{name}"
+        counts[base] += 1
+        boundaries.append((offsets[first - 1], first, f"{base}:{counts[base]}", f"{kind} {name}"))
+    return partition(data, lines, boundaries, "python-ast")
 
 
-def clauses_for(path: Path, data: bytes) -> list[dict[str, Any]]:
-    if path.suffix.lower() == ".md":
+def shell_clauses(data: bytes) -> list[dict[str, Any]]:
+    lines, offsets = line_data(data)
+    boundaries: list[tuple[int, int, str, str | None]] = []
+    counts: Counter[str] = Counter()
+    for index, raw in enumerate(lines):
+        text = raw.decode("utf-8").rstrip("\r\n")
+        function = SHELL_FUNCTION.match(text)
+        section = SHELL_SECTION.match(text)
+        if function:
+            base, heading = f"sh:function:{function.group(1)}", f"function {function.group(1)}"
+        elif section and len(section.group(1).strip()) >= 4 and index > 0:
+            heading = section.group(1).strip()
+            slug = re.sub(r"[^0-9a-zA-Z\u4e00-\u9fff]+", "-", heading.lower()).strip("-") or f"line-{index + 1}"
+            base = f"sh:section:{slug}"
+        else:
+            continue
+        counts[base] += 1
+        boundaries.append((offsets[index], index + 1, f"{base}:{counts[base]}", heading))
+    return partition(data, lines, boundaries, "shell-unit")
+
+
+def split_clauses(data: bytes, path: str) -> list[dict[str, Any]]:
+    suffix = Path(path).suffix.lower()
+    first = data.splitlines()[0].decode("utf-8", "ignore") if data.splitlines() else ""
+    if suffix == ".md":
         return markdown_clauses(data)
-    return [{
-        "anchor": "@file",
-        "heading": None,
-        "line_start": 1,
-        "line_end": data.count(b"\n") + 1,
-        "byte_start": 0,
-        "byte_end": len(data),
-        "clause_sha256": digest(data),
-    }]
+    if suffix == ".py" or "python" in first:
+        return python_clauses(data)
+    if suffix in {".sh", ".bash"} or "bash" in first or first.endswith("/sh"):
+        return shell_clauses(data)
+    lines = data.decode("utf-8", "replace").splitlines()
+    return [item(data, 0, len(data), 1, max(1, len(lines)), "whole:file", None, "content-addressed-whole-file")]
 
 
-def mapping(path: str, heading: str | None, source_hash: str) -> dict[str, Any]:
-    probe = f"{path} {heading or ''}".lower()
-    extension = "software-delivery"
-    rule = "legacy-default-software-delivery"
-
-    if path.startswith(".yuan/core/0.1/"):
-        return {
-            "disposition": "core",
-            "target": ".yuan/core/0.1/protocol.md",
-            "mapping_rule": "core-candidate",
-            "rationale": "M3-approved Core candidate implementation, schema, fixture, or conformance clause.",
-        }
-    if path == "scripts/run-ptg-cal-check.py":
-        return {
-            "disposition": "obsolete-with-proof",
-            "target": ".yuan/extensions/testing.md",
-            "mapping_rule": "obsolete-simulated-ptg-runner",
-            "rationale": "Genesis Design §8 excludes this simulated/zero-selection-capable runner from the trust root.",
-            "obsolete": {
-                "source_sha256": source_hash,
-                "reason": "It simulates assertion names and can accept an empty effective test selection, so it cannot prove typed ACs.",
-                "replacement": ".yuan/core/0.1/conformance.py",
-                "fixture": ".yuan/extensions/fixtures/legacy-anti-patterns.json#legacy-zero-check-pass",
-            },
-        }
-    if path.startswith("scripts/bootstrap") or path in {
-        "scripts/bootstrap-core-verifier.py",
-        "scripts/bootstrap_verifier.py",
-        "scripts/bootstrap_verifier_support.py",
-    }:
-        return {
-            "disposition": "fixture",
-            "target": "tests/bootstrap_verifier/",
-            "mapping_rule": "genesis-verifier-fixture",
-            "rationale": "Frozen old-trust-root validation material retained as an independent verification fixture.",
-        }
-    if path in {"docs/anti-patterns.md", "templates/anti-patterns.md"}:
-        return {
-            "disposition": "fixture",
-            "target": ".yuan/extensions/fixtures/legacy-anti-patterns.json",
-            "mapping_rule": "legacy-anti-pattern-catalog",
-            "rationale": "Negative scenario retained as verifier input; it does not define Core runtime semantics.",
-        }
-    if path.startswith("references/") or path.startswith("docs/knowledge/"):
-        return {
-            "disposition": "knowledge",
-            "target": path,
-            "mapping_rule": "existing-knowledge-source",
-            "rationale": "Advisory knowledge remains at its content-addressed source and is not runtime authority.",
-        }
-
-    ui_tokens = ("ui", "ux", "visual", "design-system", "视觉", "界面", "无障碍", "颜色", "字体", "交互")
-    test_tokens = (
-        "tester", "test-integrity", "ptg", "cal", "seam", "verdict", "code-review",
-        "debug", "test-driven", "测试", "验证", "审查", "证据", "tdd", "验收",
-    )
-    docs_tokens = (
-        ".yuan/docs/", "docs-framework", "doc-engineer", "project-memory",
-        "project-audit", "文档", "memory", "docsos", "归档",
-    )
-    knowledge_tokens = (
-        "distill", "graph-query", "knowledge-injection", "promotion",
-        "self-improving-memory", "知识", "promotion",
-    )
-    platform_tokens = (
-        ".yuan/platforms/", ".yuan/adapters/", "adapter-protocol",
-        "dispatch-routing", "role-switch", "subagent", "platform", "adapter",
-        "平台", "tier", "适配",
-    )
-
-    if any(token in probe for token in ui_tokens):
-        extension, rule = "ui", "ui-advice-or-verifier"
-    elif any(token in probe for token in test_tokens):
-        extension, rule = "testing", "testing-advice-or-verifier"
-    elif any(token in probe for token in knowledge_tokens):
-        extension, rule = "knowledge", "knowledge-advice"
-    elif any(token in probe for token in docs_tokens):
-        extension, rule = "docsos", "docs-memory-advice-or-verifier"
-    elif path == "bin/yuanforge-init" or any(token in probe for token in platform_tokens):
-        extension, rule = "platform-adapters", "platform-capability-advice"
-    elif path == ".yuan/VERSION" or "version" in probe:
-        extension, rule = "platform-adapters", "version-authority-advice"
-
-    return {
-        "disposition": "extension",
-        "target": f".yuan/extensions/{extension}.md",
-        "mapping_rule": rule,
-        "rationale": "Optional authoring advice or verifier recipe; Core results, completion, and authority remain unchanged.",
-    }
+@lru_cache(maxsize=None)
+def git_source(revision: str, path: str) -> bytes:
+    return subprocess.run(
+        ["git", "show", f"{revision}:{path}"],
+        cwd=ROOT, check=True, capture_output=True,
+    ).stdout
 
 
-def build() -> tuple[dict[str, Any], dict[str, Any], str]:
-    policy = load_policy()
-    paths = discover(policy)
-    files: list[dict[str, Any]] = []
-    clauses: list[dict[str, Any]] = []
+def source_bytes(entry: dict[str, Any]) -> bytes:
+    source = entry["source"]
+    if source["kind"] == "git":
+        return git_source(source["revision"], source["path"])
+    if source["kind"] == "content-addressed-snapshot":
+        return (ROOT / source["path"]).read_bytes()
+    raise ValueError(f"unsupported source kind: {source.get('kind')}")
 
-    for path in paths:
-        name = rel(path)
-        data = path.read_bytes()
-        source_hash = digest(data)
-        source_clauses = clauses_for(path, data)
-        if not source_clauses or source_clauses[0]["byte_start"] != 0:
-            raise ValueError(f"clause coverage does not start at byte zero: {name}")
-        if source_clauses[-1]["byte_end"] != len(data):
-            raise ValueError(f"clause coverage does not end at EOF: {name}")
-        for left, right in zip(source_clauses, source_clauses[1:]):
-            if left["byte_end"] != right["byte_start"]:
-                raise ValueError(f"clause byte gap/overlap: {name}")
 
-        files.append({
-            "path": name,
-            "sha256": source_hash,
+def mapping_key(path: str, anchor: str, clause_hash: str) -> str:
+    return sha(f"{path}\n{anchor}\n{clause_hash}".encode("utf-8"))
+
+
+def build(prov: Path) -> tuple[dict[str, Any], dict[str, Any], str, dict[str, bytes]]:
+    inventory_bytes = (prov / "inventory.lock.json").read_bytes()
+    disposition_bytes = (prov / "disposition-map.json").read_bytes()
+    inventory = json.loads(inventory_bytes)
+    explicit = json.loads(disposition_bytes)["mappings"]
+    included = [entry for entry in inventory["entries"] if entry["decision"] == "include"]
+    file_records: list[dict[str, Any]] = []
+    clause_records: list[dict[str, Any]] = []
+    retained: dict[str, bytes] = {}
+    used_keys: set[str] = set()
+
+    for entry in included:
+        data = source_bytes(entry)
+        if sha(data) != entry["source_sha256"]:
+            raise ValueError(f"source hash drift: {entry['path']}")
+        clauses = split_clauses(data, entry["path"])
+        file_records.append({
+            "path": entry["path"],
+            "source_sha256": entry["source_sha256"],
+            "source_kind": entry["source"]["kind"],
             "bytes": len(data),
-            "clause_count": len(source_clauses),
+            "clause_count": len(clauses),
         })
-        for part in source_clauses:
-            record = {
-                "clause_id": digest(f"{name}:{part['anchor']}:{part['clause_sha256']}".encode("utf-8"))[:24],
-                "source": name,
-                "source_sha256": source_hash,
-                **part,
-                **mapping(name, part["heading"], source_hash),
+        for clause in clauses:
+            key = mapping_key(entry["path"], clause["anchor"], clause["clause_sha256"])
+            reviewed = explicit.get(key)
+            base = {
+                "mapping_key": key,
+                "source": entry["path"],
+                "source_sha256": entry["source_sha256"],
+                **clause,
             }
-            clauses.append(record)
+            if reviewed is None:
+                base.update({
+                    "disposition": "UNMAPPED",
+                    "destination": None,
+                    "review_rationale": "No exact source+anchor+clause-hash entry exists in disposition-map.json.",
+                })
+            else:
+                used_keys.add(key)
+                for field in (
+                    "disposition", "destination", "review_rationale",
+                    "semantic_target", "fixture_target", "obsolete",
+                ):
+                    if field in reviewed:
+                        base[field] = reviewed[field]
+                destination = reviewed["destination"]
+                retained[destination["path"]] = data[clause["byte_start"]:clause["byte_end"]]
+            clause_records.append(base)
 
-    policy_hash = digest(POLICY_PATH.read_bytes())
+    extra = sorted(set(explicit) - used_keys)
+    if extra:
+        raise ValueError(f"disposition map has {len(extra)} stale/extra entries")
+    unmapped = sum(1 for record in clause_records if record["disposition"] == "UNMAPPED")
     scope = {
-        "schema_version": "yuan.provenance-scope/v1",
-        "policy_sha256": policy_hash,
-        "source_file_count": len(files),
-        "source_byte_count": sum(item["bytes"] for item in files),
-        "source_clause_count": len(clauses),
-        "files": files,
-        "excluded_inventory": policy["excluded_inventory"],
+        "schema_version": "yuan.provenance-scope/v2",
+        "inventory_lock_sha256": sha(inventory_bytes),
+        "source_revision": inventory["source_revision"],
+        "tracked_inventory_count": inventory["source_revision_tracked_count"],
+        "out_of_band_count": inventory["out_of_band_count"],
+        "included_source_count": len(included),
+        "included_source_bytes": sum(record["bytes"] for record in file_records),
+        "source_clause_count": len(clause_records),
+        "files": sorted(file_records, key=lambda record: record["path"]),
+        "excluded_entries": [
+            {"path": entry["path"], "reason": entry["reason"]}
+            for entry in inventory["entries"] if entry["decision"] == "exclude"
+        ],
+        "filesystem_exclusions": inventory["filesystem_exclusions"],
     }
-    clause_manifest = {
-        "schema_version": "yuan.clause-provenance/v1",
-        "scope_sha256": digest(canonical_json(scope)),
+    manifest = {
+        "schema_version": "yuan.clause-provenance/v2",
+        "scope_sha256": sha(canonical(scope)),
+        "disposition_map_sha256": sha(disposition_bytes),
         "allowed_dispositions": ["core", "extension", "knowledge", "fixture", "obsolete-with-proof"],
-        "mapped_clause_count": len(clauses),
-        "unmapped_clause_count": 0,
-        "clauses": clauses,
+        "mapped_clause_count": len(clause_records) - unmapped,
+        "unmapped_clause_count": unmapped,
+        "clauses": clause_records,
     }
-    report = render_report(scope, clause_manifest)
-    return scope, clause_manifest, report
+    report = render_report(scope, manifest)
+    return scope, manifest, report, retained
 
 
 def render_report(scope: dict[str, Any], manifest: dict[str, Any]) -> str:
-    dispositions = Counter(item["disposition"] for item in manifest["clauses"])
-    targets = Counter(
-        item["target"] for item in manifest["clauses"] if item["disposition"] == "extension"
+    counts = Counter(record["disposition"] for record in manifest["clauses"])
+    coverage = (
+        100.0 * manifest["mapped_clause_count"] / scope["source_clause_count"]
+        if scope["source_clause_count"] else 0.0
     )
     lines = [
         "# M7 Clause Provenance Report",
         "",
-        "> Deterministically generated by `python -B scripts/yuan-provenance.py generate`.",
+        "> Generated only from frozen `inventory.lock.json` and explicit `disposition-map.json`.",
         "",
         "## Coverage",
         "",
-        f"- source files: {scope['source_file_count']}",
-        f"- source bytes: {scope['source_byte_count']}",
+        f"- frozen tracked inventory: {scope['tracked_inventory_count']}",
+        f"- out-of-band M0 sources: {scope['out_of_band_count']}",
+        f"- included source files: {scope['included_source_count']}",
+        f"- included source bytes: {scope['included_source_bytes']}",
         f"- source clauses: {scope['source_clause_count']}",
         f"- mapped clauses: {manifest['mapped_clause_count']}",
         f"- unmapped clauses: {manifest['unmapped_clause_count']}",
-        f"- coverage: {'100.00%' if not manifest['unmapped_clause_count'] else 'FAIL'}",
+        f"- coverage: {coverage:.2f}%",
         "",
         "## Dispositions",
         "",
         "| Disposition | Clauses |",
         "|-------------|--------:|",
     ]
-    for name in manifest["allowed_dispositions"]:
-        lines.append(f"| `{name}` | {dispositions[name]} |")
+    for name in manifest["allowed_dispositions"] + ["UNMAPPED"]:
+        lines.append(f"| `{name}` | {counts[name]} |")
     lines.extend([
         "",
-        "## Extension targets",
+        "## Trust boundary",
         "",
-        "| Target | Clauses |",
-        "|--------|--------:|",
-    ])
-    for name, count in sorted(targets.items()):
-        lines.append(f"| `{name}` | {count} |")
-    lines.extend([
-        "",
-        "## Invariants",
-        "",
-        "- Every in-scope source byte is covered by one contiguous clause partition.",
-        "- Every clause has exactly one allowed disposition and content hash.",
-        "- Every obsolete clause carries its source hash, reason, and replacement or fixture.",
-        "- Legacy source files remain in place; this report does not authorize tombstoning.",
-        "- Runtime/evidence exclusions are enumerated in the scope manifest.",
+        "- No keyword, heading-substring, default, or catch-all disposition exists.",
+        "- Unknown source+anchor+hash tuples remain `UNMAPPED` and make generation fail.",
+        "- Every mapped clause points to an exact content-addressed retained blob.",
+        "- Independent verification is performed by `scripts/verify-yuan-provenance.py`.",
+        "- Legacy sources and protected dirty paths remain untouched.",
         "",
     ])
     return "\n".join(lines)
 
 
-def validate_fixture_bindings() -> None:
-    catalog = json.loads(FIXTURE_PATH.read_text(encoding="utf-8"))
-    ids: set[str] = set()
-    for case in catalog["cases"]:
-        if case["id"] in ids:
-            raise ValueError(f"duplicate fixture id: {case['id']}")
-        ids.add(case["id"])
-        source = ROOT / case["source"]
-        if not source.is_file():
-            raise ValueError(f"fixture source missing: {case['source']}")
-        actual = digest(source.read_bytes())
-        if actual != case["source_sha256"]:
-            raise ValueError(f"fixture source hash drift: {case['id']}")
-
-
-def validate_links() -> None:
-    for path in (ROOT / ".yuan" / "extensions").rglob("*.md"):
-        for target in LINK_RE.findall(path.read_text(encoding="utf-8")):
-            clean = target.split("#", 1)[0]
-            if not clean or "://" in clean or clean.startswith("mailto:"):
-                continue
-            resolved = (path.parent / clean).resolve()
-            if not resolved.exists():
-                raise ValueError(f"broken extension link: {rel(path)} -> {target}")
-
-
-def validate_manifest(scope: dict[str, Any], manifest: dict[str, Any]) -> None:
-    allowed = set(manifest["allowed_dispositions"])
-    if manifest["unmapped_clause_count"] != 0:
-        raise ValueError("unmapped clauses are forbidden")
-    if manifest["mapped_clause_count"] != scope["source_clause_count"]:
-        raise ValueError("mapped/source clause count mismatch")
-    seen: set[str] = set()
-    for item in manifest["clauses"]:
-        if item["clause_id"] in seen:
-            raise ValueError(f"duplicate clause id: {item['clause_id']}")
-        seen.add(item["clause_id"])
-        if item["disposition"] not in allowed:
-            raise ValueError(f"invalid disposition: {item['clause_id']}")
-        if not item.get("target") or not item.get("rationale"):
-            raise ValueError(f"incomplete mapping: {item['clause_id']}")
-        if item["disposition"] == "obsolete-with-proof":
-            proof = item.get("obsolete") or {}
-            if proof.get("source_sha256") != item["source_sha256"]:
-                raise ValueError(f"obsolete source hash mismatch: {item['clause_id']}")
-            if not proof.get("reason") or not (proof.get("replacement") or proof.get("fixture")):
-                raise ValueError(f"incomplete obsolete proof: {item['clause_id']}")
-
-
-def generate() -> int:
-    scope, manifest, report = build()
-    validate_manifest(scope, manifest)
-    validate_fixture_bindings()
-    SCOPE_PATH.write_bytes(canonical_json(scope))
-    CLAUSE_PATH.write_bytes(canonical_json(manifest))
-    REPORT_PATH.write_text(report, encoding="utf-8", newline="\n")
-    validate_links()
+def generate(prov: Path) -> int:
+    scope, manifest, report, retained = build(prov)
+    retained_root = prov / "retained"
+    retained_root.mkdir(parents=True, exist_ok=True)
+    expected_names = {Path(path).name for path in retained}
+    for existing in retained_root.glob("*.blob"):
+        if existing.name not in expected_names:
+            existing.unlink()
+    for path, data in retained.items():
+        destination = ROOT / path
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(data)
+    (prov / "scope-manifest.json").write_bytes(canonical(scope))
+    (prov / "clause-manifest.json").write_bytes(canonical(manifest))
+    (prov / "REPORT.md").write_text(report, encoding="utf-8", newline="\n")
     print(
-        f"PASS generated files={scope['source_file_count']} "
-        f"clauses={scope['source_clause_count']} unmapped=0"
+        f"{'PASS' if manifest['unmapped_clause_count'] == 0 else 'FAIL'} "
+        f"files={scope['included_source_count']} clauses={scope['source_clause_count']} "
+        f"mapped={manifest['mapped_clause_count']} unmapped={manifest['unmapped_clause_count']}"
     )
-    return 0
-
-
-def verify() -> int:
-    expected_scope, expected_manifest, expected_report = build()
-    validate_manifest(expected_scope, expected_manifest)
-    validate_fixture_bindings()
-    validate_links()
-    expected = {
-        SCOPE_PATH: canonical_json(expected_scope),
-        CLAUSE_PATH: canonical_json(expected_manifest),
-        REPORT_PATH: expected_report.encode("utf-8"),
-    }
-    for path, content in expected.items():
-        if not path.is_file():
-            raise ValueError(f"generated artifact missing: {rel(path)}")
-        if path.read_bytes() != content:
-            raise ValueError(f"generated artifact stale: {rel(path)}")
-    print(
-        f"PASS coverage=100.00% files={expected_scope['source_file_count']} "
-        f"clauses={expected_scope['source_clause_count']} links=PASS hashes=PASS"
-    )
-    return 0
+    return 0 if manifest["unmapped_clause_count"] == 0 else 1
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("generate", "verify"))
+    parser.add_argument("command", choices=("generate",))
+    parser.add_argument("--provenance-dir", type=Path, default=DEFAULT_PROV)
     args = parser.parse_args()
     try:
-        return generate() if args.command == "generate" else verify()
-    except (OSError, UnicodeError, ValueError, KeyError, json.JSONDecodeError) as exc:
+        return generate(args.provenance_dir.resolve())
+    except (OSError, ValueError, KeyError, UnicodeError, json.JSONDecodeError, subprocess.CalledProcessError, SyntaxError) as exc:
         print(f"FAIL {exc}", file=sys.stderr)
         return 1
 

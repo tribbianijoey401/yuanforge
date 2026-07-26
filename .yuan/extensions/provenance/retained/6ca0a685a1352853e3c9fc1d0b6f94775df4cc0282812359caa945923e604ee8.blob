@@ -1,0 +1,13 @@
+## 3. 电商成功绿
+
+- **适用行业**：电商、订阅、零售
+- **设计意图**：绿色暗示"成功购买"，橙色制造紧迫感（限时/库存）
+
+| Primary | #059669 | Background | #ECFDF5 | Muted | #E8F1F3 |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #064E3B | Muted FG | #64748B |
+| Secondary | #10B981 | Card | #FFFFFF | Border | #A7F3D0 |
+| On Secondary | #0F172A | Card FG | #064E3B | Destructive | #DC2626 |
+| Accent | #EA580C | On Destructive | #FFFFFF | Ring | #059669 |
+| On Accent | #FFFFFF | | | | |
+

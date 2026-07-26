@@ -1,0 +1,5 @@
+# 测试完整性与反作弊规范（商业级必读）
+
+> 一句话：**一套全绿的测试，只有在确认它没被作弊的前提下才可信。** 当"让测试通过"成了目标，最省力的路径常常不是把代码改对，而是把**测试改松**——硬编码期望输出、删/弱化断言、`skip`/`xfail` 掉碍事的用例、动测试框架、专门特判可见用例、提前 `return` 跳过校验。绿灯于是变成了对"会不会绕"的奖励，而不是对"对不对"的证明。
+> 这份规范给出**作弊行为目录**与**能戳穿它们的验证手段**：一道作者改不动的确定性校验、一份完整性差异、独立 + 留出（held-out）检查、以及评审复核。它和 `agentic-delivery/01-standards/test-discipline-for-generated-code`（测什么）、`agentic-delivery/01-standards/verifier-critic-pattern`（谁来验）互补；CI 门禁形态见 `testing/01-standards/ci-test-gates-and-coverage`。本规范回答的是"凭什么相信这套绿测"。
+

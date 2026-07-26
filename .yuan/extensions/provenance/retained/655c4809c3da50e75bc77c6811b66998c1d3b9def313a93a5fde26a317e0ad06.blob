@@ -1,0 +1,17 @@
+## 2. 微 SaaS / 独立开发者产品
+
+- **推荐落地页模式**：Hero-Centric + Trust Strip
+- **风格优先级**：主 Motion-Driven / 备 Vibrant & Block-based
+- **配色氛围**：Indigo #6366F1 + Emerald CTA #059669
+- **字体情绪**：现代 + 活力（Space Grotesk + DM Sans）
+- **关键效果**：scroll-triggered + parallax hero
+- **决策规则**：
+```json
+{
+  "if_pre_launch": "use-waitlist-pattern",
+  "if_video_ready": "add-hero-video",
+  "if_no_brand_assets": "use-bold-typography-as-hero"
+}
+```
+- **反模式**：静态设计、无视频、移动端体验差
+

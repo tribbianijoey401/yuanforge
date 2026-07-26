@@ -1,0 +1,55 @@
+def parse_fields(md_text):
+    """从 Markdown 中提取字段及其 @ptg 注解。"""
+    fields = []
+    lines = md_text.split('\n')
+    current_field = None
+
+    for line in lines:
+        field_match = FIELD_RE.match(line.strip())
+        if field_match:
+            if current_field:
+                fields.append(current_field)
+            current_field = {'name': field_match.group(1), 'ptg': {}}
+
+        ptg_match = ANNOTATION_RE.search(line)
+        if ptg_match and current_field:
+            raw = ptg_match.group(1)
+            # 先提取 enum=[...] 整体避免逗号拆分破坏内容
+            enum_blocks = []
+            def replace_enum(m):
+                idx = len(enum_blocks)
+                enum_blocks.append(m.group(0))
+                return f'__ENUM_BLOCK_{idx}__'
+            clean = re.sub(r'\[([^\]\[,]+\b(?:,\s*\b[^\]\[,]+)+)\]', replace_enum, raw)
+            pairs = clean.split(',')
+            for pair in pairs:
+                pair = pair.strip()
+                if '=' not in pair:
+                    continue
+                k, v = pair.split('=', 1)
+                key = k.strip()
+                val = v.strip()
+                # 还原 enum 块
+                for i, block in enumerate(enum_blocks):
+                    val = val.replace(f'__ENUM_BLOCK_{i}__', block)
+                # 类型转换
+                if val.startswith('[') and val.endswith(']'):
+                    inner = val[1:-1]
+                    val = [x.strip().strip('"').strip("'") for x in inner.split(',')]
+                elif val.lower() == 'true':
+                    val = True
+                elif val.lower() == 'false':
+                    val = False
+                else:
+                    try:
+                        val = int(val)
+                    except ValueError:
+                        pass
+                current_field['ptg'][key] = val
+
+    if current_field:
+        fields.append(current_field)
+
+    return fields
+
+

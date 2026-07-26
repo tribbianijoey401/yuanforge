@@ -1,0 +1,1 @@
+KNOWLEDGE_DIR = REPO_ROOT / "docs" / "knowledge"

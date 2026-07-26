@@ -1,0 +1,24 @@
+### 4.6 Workspace Metrics（循环遥测）
+
+**语义**：Workspace 级别的 Loop 执行质量观测。不参与决策，只负责回答三个问题：是否在收敛？哪些环节最容易卡住？哪些协议真正提升了长期运行能力？
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:---:|------|
+| `workspace_id` | string | ✅ | 所属 Workspace |
+| `loop_count` | int | ✅ | 总 Loop 执行次数 |
+| `avg_loop_duration_seconds` | float | — | 平均 Loop 持续时间 |
+| `avg_dispatches_per_loop` | float | — | 每次 Loop 平均派发数 |
+| `review_reject_rate` | float | — | 审查驳回率（返工次数/总审查次数） |
+| `retry_count` | int | — | 修复回路触发次数 |
+| `human_gate_count` | int | — | 人工介入点触发次数 |
+| `blocked_duration_seconds` | float | — | 总阻塞时间 |
+| `checkpoint_recovery_count` | int | — | Checkpoint 恢复次数 |
+| `knowledge_promotions` | int | — | 知识晋升次数 |
+| `failed_hypotheses_distilled` | int | — | 已蒸馏到 Knowledge 的失败假设数 |
+
+**写入时机**：Workspace Close 时由 Doc Engineer 计算并写入 `docs/YYYYMMDD-描述/workspace-metrics.md`。
+
+**用途**：仅用于评估协议效果，Conductor 不做基于 Metrics 的决策。
+
+---
+

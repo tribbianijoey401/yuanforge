@@ -1,0 +1,6 @@
+### 包体积
+- 主包 ≤ 2MB，总包 ≤ 20MB
+- 分包加载：`subPackages` 配置
+- 图片走 CDN，不放在包内
+- 代码压缩 + Tree-shaking
+

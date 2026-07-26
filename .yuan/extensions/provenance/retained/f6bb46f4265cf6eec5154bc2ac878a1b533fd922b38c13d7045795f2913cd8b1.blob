@@ -1,0 +1,34 @@
+def generate_report(ptg_modules, cal_results, cal_funcs, drift_missing, 
+                   type_mismatches, ap_entries, test_results):
+    """Step 6: 生成验证报告"""
+    report = {
+        "timestamp": "2026-07-24T00:00:00",
+        "overview": {
+            "ptg_critical_modules": len(ptg_modules),
+            "cal_functions_generated": cal_funcs,
+            "schema_drift_missing": len(drift_missing),
+            "type_mismatches": len(type_mismatches),
+            "anti_pattern_entries": len(ap_entries),
+        },
+        "assertion_tests": {
+            "total": test_results["total"] if test_results else 0,
+            "passed": test_results["passed"] if test_results else 0,
+            "failed": len(test_results["failed"]) if test_results else 0,
+        },
+        "gate": {
+            "status": "PASS" if (
+                len(drift_missing) == 0 and 
+                len(type_mismatches) == 0 and 
+                test_results and 
+                (test_results["total"] == 0 or test_results["passed"] / max(test_results["total"], 1) >= 0.9)
+            ) else "NEEDS_ATTENTION",
+            "reasons": [
+                f"Schema 漂移: {len(drift_missing)} 个缺失字段",
+                f"类型不匹配: {len(type_mismatches)} 处",
+                f"断言失败: {len(test_results['failed']) if test_results else 0} 个"
+            ]
+        }
+    }
+    return report
+
+

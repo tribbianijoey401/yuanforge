@@ -1,0 +1,21 @@
+### Tier 3：角色切换派发（兜底）
+
+**条件：** Tier 1 和 Tier 2 都不可用
+
+**核心原理：** 同一个 Agent 会话内切换 persona，用 TASK_BOARD 作为状态桥梁。
+
+| 步骤 | 动作 | 执行者 |
+|------|------|--------|
+| 1. 加载 `role-switch` Skill | 获取角色切换协议 | Conductor |
+| 2. 写 TASK_BOARD「Conductor 调度状态」 | 标记「正在派发 T-ID → 角色」 | Conductor |
+| 3. 写「派发日志」 | `[时间] [T-ID] Tier 3 → [角色] 开始` | Conductor |
+| 4. 加载目标角色合约 + 铁律 | 构建目标 persona | Conductor |
+| 5. 切换 persona | 「你现在是 {role}。读 TASK_BOARD 获取任务上下文。」 | Conductor |
+| 6. 执行任务 | Agent 以目标角色身份执行（读 TASK_BOARD → 执行 → 写 TASK_BOARD） | Agent（目标角色） |
+| 7. 写产出 + 审查结果 | 更新 TASK_BOARD 状态行、上下文传递、审查结果表 | Agent（目标角色） |
+| 8. 切换回 Conductor | 「你现在是 Conductor。读 TASK_BOARD 决定下一步。」 | Agent（切换） |
+| 9. 读 TASK_BOARD | 获取任务执行结果 → 决定下一步 | Conductor |
+| 10. 写 Event | `TASK_STATUS_CHANGED` 事件 | Conductor |
+
+> **⚠️ Tier 3 的局限性：** ① 串行执行，无法并行派发多个子 Agent；② 上下文共享，超长对话可能导致 token 耗尽；③ 角色切换依赖 LLM 自律 — 如果 Agent 忘记切换回 Conductor，状态链断裂。**Tier 3 是兜底，不是设计目标。**
+

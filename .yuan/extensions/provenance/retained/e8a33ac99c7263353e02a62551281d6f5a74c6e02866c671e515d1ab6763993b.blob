@@ -1,0 +1,21 @@
+### 1.1 Task 定义
+
+```yaml
+task:
+  id: "T03"
+  priority: P2
+  title: "实现 JWT token 刷新端点"
+  role: "backend-dev"
+  depends_on: ["T02"]
+  timeout_minutes: 30
+  output: ["src/auth/refresh.py", "tests/auth/test_refresh.py"]
+  gate: "G2"
+   risk: "R1"
+  acceptance_criteria:
+    - "refresh token 必须轮转"
+    - "旧 token 必须在刷新后失效"
+  context:                         # 派发时注入的最少上下文
+    required_knowledge: ["ADR-003"]
+    input_from: ["T02"]
+```
+

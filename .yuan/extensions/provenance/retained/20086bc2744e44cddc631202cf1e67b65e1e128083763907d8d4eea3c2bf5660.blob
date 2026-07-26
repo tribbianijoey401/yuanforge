@@ -1,0 +1,16 @@
+### 1.2 识别技术栈
+
+查找以下特征文件，确定技术栈：
+
+| 文件 | 推断 |
+|------|------|
+| `package.json` | Node.js / TypeScript / JavaScript |
+| `requirements.txt` / `pyproject.toml` | Python |
+| `go.mod` | Go |
+| `Cargo.toml` | Rust |
+| `Gemfile` | Ruby |
+| `pom.xml` / `build.gradle` | Java / Kotlin |
+| `Dockerfile` | 部署方式 |
+| `docker-compose.yml` | 服务编排 |
+| `.github/workflows/` | CI/CD |
+

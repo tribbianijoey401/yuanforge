@@ -1,0 +1,13 @@
+@dataclass(frozen=True)
+class FileEnumerationReceipt:
+    schema_version: str
+    kind: str
+    operation_id: str
+    status: str
+    scope: str
+    entries: tuple[EnumeratedFile, ...]
+    max_files: int
+    max_depth: int
+    observed_at: str
+
+

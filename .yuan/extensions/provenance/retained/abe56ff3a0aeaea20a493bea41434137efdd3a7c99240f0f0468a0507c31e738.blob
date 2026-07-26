@@ -1,0 +1,29 @@
+def unknown_attempt() -> dict:
+    attempt = fixture("attempt")
+    attempt["action"].update(
+        {
+            "type": "file-write",
+            "mutating": True,
+            "side_effect_class": "filesystem",
+            "authorization_grant_id": "GRANT-core-candidate",
+        }
+    )
+    attempt["journal"] = [
+        {
+            "ordinal": ordinal,
+            "state": state,
+            "recorded_at": f"2026-07-27T00:0{ordinal}:00+00:00",
+            "receipt_sha256": None,
+        }
+        for ordinal, state in enumerate(
+            ("PREPARED", "EXECUTING", "UNKNOWN"), start=1
+        )
+    ]
+    attempt["side_effect_state"] = "UNKNOWN"
+    attempt["tool_receipt"] = None
+    attempt["postcondition"] = None
+    attempt["evidence_ids"] = []
+    attempt["outcome"] = "UNKNOWN"
+    return attempt
+
+

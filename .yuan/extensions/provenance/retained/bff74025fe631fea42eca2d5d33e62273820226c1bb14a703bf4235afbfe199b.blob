@@ -1,0 +1,20 @@
+## 三、证据层级系统（← NF-10 扩展）
+
+原 `verified_commit` 机制保留，新增 9 种结论各自需要的最低证据：
+
+| 结论 | 最低证据 |
+|------|---------|
+| "文档链接有效" | 项目自己的 doc-link/index check 或逐链接存在性 |
+| "规则已同源" | `realpath`/`readlink`/import + 平台实际加载顺序 |
+| "代码实现是 X" | 当前目标分支代码、schema、配置与相关测试 |
+| "PR 已完成" | PR state=merged + merge commit；**不能推导已部署** |
+| "已部署" | deploy marker/release 指向目标 commit + 服务 active |
+| "用户已看到新版本" | canonical 用户 URL/API 的真实响应，必要时同时比 origin/cache |
+| "可安全清场" | merged + production contains change + knowledge receipt + lane clean + 无唯一未集成文件 |
+| "已获准清场" | 完整结果已向用户汇报 + 用户在该汇报后明确确认可以清场 + 现场要求的确认凭证 |
+| "整个项目干净" | 项目内所有适用事实面 verified；warning、pending 和 out-of-scope 单列 |
+
+**铁律**：代码直觉、旧 memory、commit message 和 cache-buster URL 都只能当线索，不能单独证明生产终态。
+
+---
+

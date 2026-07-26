@@ -1,0 +1,41 @@
+def rollback_shadow(
+    repo_root: pathlib.Path,
+    shadow_root: pathlib.Path,
+    receipt_path: pathlib.Path | None,
+) -> dict[str, Any]:
+    repo = repo_root.resolve()
+    shadow = safe_shadow_root(repo, shadow_root)
+    if not shadow.is_dir():
+        raise MigrationError("shadow root does not exist")
+    marker = verify_owned_shadow(shadow)
+    manifests = marker.get("source_manifests", [])
+    verify_source_manifests(repo, manifests)
+    before = snapshot_digest(manifests)
+    if before != marker.get("legacy_snapshot_sha256"):
+        raise MigrationError("legacy snapshot does not match shadow marker")
+    shutil.rmtree(shadow)
+    verify_source_manifests(repo, manifests)
+    after = snapshot_digest(manifests)
+    receipt_document = {
+        "schema_version": "yuan.shadow-rollback-receipt/v1",
+        "status": "ROLLED_BACK",
+        "shadow_root": _relative(shadow, repo),
+        "projection_digest": marker.get("projection_digest"),
+        "legacy_before_sha256": before,
+        "legacy_after_sha256": after,
+        "legacy_unchanged": before == after,
+    }
+    if not receipt_document["legacy_unchanged"]:
+        raise MigrationError("legacy state changed during rollback")
+    if receipt_path is not None:
+        resolved_receipt = pathlib.Path(receipt_path).resolve()
+        if _is_within(resolved_receipt, shadow):
+            raise MigrationError("rollback receipt cannot be inside removed shadow")
+        try:
+            resolved_receipt.relative_to(repo)
+        except ValueError as error:
+            raise MigrationError("rollback receipt must be inside repository") from error
+        atomic_write(resolved_receipt, canonical_json(receipt_document))
+    return receipt_document
+
+

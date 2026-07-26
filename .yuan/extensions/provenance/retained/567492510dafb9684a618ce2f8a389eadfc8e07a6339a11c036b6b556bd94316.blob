@@ -1,0 +1,14 @@
+### 4.4 Proposal（变更请求）
+
+**语义**：一个 Knowledge 层的变更请求。Knowledge 写保护的事务机制。
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:---:|------|
+| `id` | string | ✅ | `prop-NNN` |
+| `status` | enum | ✅ | draft / submitted / merged / rejected / expired |
+| `target_object` | string | ✅ | 目标 Knowledge 对象 ID |
+| `change_type` | enum | ✅ | distill / update / deprecate |
+| `summary` | string | ✅ | 变更摘要 |
+
+**状态机**：5 状态 — 详见 State Protocol §五
+

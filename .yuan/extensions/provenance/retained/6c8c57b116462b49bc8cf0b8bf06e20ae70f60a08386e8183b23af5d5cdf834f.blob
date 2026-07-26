@@ -1,0 +1,1 @@
+CORE_ROOT = TOOL_REPO_ROOT / ".yuan" / "core" / "0.1"

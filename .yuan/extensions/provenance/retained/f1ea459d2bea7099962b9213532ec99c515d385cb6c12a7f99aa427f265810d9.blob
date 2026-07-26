@@ -1,0 +1,13 @@
+## 5. B2B 服务深海军
+
+- **适用行业**：B2B 服务、企业咨询、法律
+- **设计意图**：深海军蓝 + 蓝 CTA = 极致专业感
+
+| Primary | #0F172A | Background | #F8FAFC | Muted | #E8ECF1 |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #020617 | Muted FG | #64748B |
+| Secondary | #334155 | Card | #FFFFFF | Border | #E2E8F0 |
+| On Secondary | #FFFFFF | Card FG | #020617 | Destructive | #DC2626 |
+| Accent | #0369A1 | On Destructive | #FFFFFF | Ring | #0F172A |
+| On Accent | #FFFFFF | | | | |
+

@@ -1,0 +1,13 @@
+## 七、与 Events 的关系
+
+| | Proposal | Event |
+|----|:---:|:---:|
+| 时机 | 修改前 | 修改后 |
+| 内容 | 计划（我想改什么） | 事实（改了什么） |
+| 可拒绝 | 是 | 否（已经发生） |
+| 存储 | proposals/ → closed/ | events/YYYYMMDD/events.jsonl |
+
+> Proposal = 意图，Event = 事实。两者互补。
+
+---
+

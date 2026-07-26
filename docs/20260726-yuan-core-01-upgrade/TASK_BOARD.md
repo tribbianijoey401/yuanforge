@@ -2,7 +2,7 @@
 
 > 会话: 20260726-yuan-core-01-upgrade
 > 创建: 2026-07-26 18:30 +08:00
-> 最后更新: 2026-07-27 01:33 +08:00
+> 最后更新: 2026-07-27 02:08 +08:00
 
 ## 当前状态快照
 
@@ -10,9 +10,9 @@
 |----|-----|
 | **已验证实现 HEAD** | `c506b919e7a8af8dd1b0c8f3a230b16573cba7cc` |
 | **原始 Git 脏文件** | 8 tracked modified + 2 untracked；已由 `evidence/m0a/` 保护 |
-| **活跃 Agent** | task-010-r1 待返工；task-011 被 M7 Quality Blocker 阻塞 |
+| **活跃 Agent** | task-010-r1 作者修复完成，等待独立复审；task-011 继续被 M7 Gate 阻塞 |
 | **当前 authority** | 旧 YuanForge 文档运行态；新 Core 尚未接管 |
-| **最后 Conductor 巡检** | 2026-07-27 01:33 +08:00 |
+| **最后 Conductor 巡检** | 2026-07-27 02:08 +08:00 |
 
 ## 任务状态
 
@@ -27,7 +27,7 @@
 | task-007 | P0 | R0 | M4 Shadow conversion 与回退演练 | backend-dev | task-006 | ✅ 完成 | converter, rollback receipt | `evidence/m4/author-evidence.md` |
 | task-008 | P1 | R1 | M5 Canary Work | tester | task-007 | ✅ 完成 | canary Evidence + 13-check held-out Gate | `evidence/m5/final-verification.json` |
 | task-009 | P1 | R1 | M6 Adapter conformance | tester | task-008 | ✅ 完成 | 8-check adapter Gate + old-root receipt | `evidence/m6/final-verification.json` |
-| task-010 | P0 | R0 | M7 Extensions 与条款 provenance | doc-engineer | task-006 | 🔴 Blocked → r1 | extensions, provenance manifest | `evidence/m7-review/QUALITY-AUDIT.md` |
+| task-010 | P0 | R0 | M7 Extensions 与条款 provenance | doc-engineer | task-006 | 🟡 r1 作者完成，待独立复审 | extensions, provenance manifest | `evidence/m7/r1-final-verification.json` |
 | task-011 | P0 | R0 | M8 原子 authority switch | backend-dev | task-009,task-010 | ⏳ 等待 | writer guard, authority receipt | `evidence/m7-review/QUALITY-AUDIT.md` |
 | task-012 | P0 | R0 | M9 自修改 dogfood | tester | task-011 | ⏳ 等待 | self-host Evidence | `FEATURE.md#clean-room-验收标准` |
 | task-013 | P0 | R0 | M9 汇报、二次授权与 tombstone | doc-engineer | task-012 | ⏳ 等待 | 清场报告、授权回执、恢复窗口 | `PLAN.md#里程碑-gate` |
@@ -57,6 +57,7 @@
 | 01:03 | task-009-r1 | task-011 | M6 独立 Gate PASS；manual 为可执行 Reference Port，Hermes 诚实 unsupported 且 Core 不依赖 | 原样 5/5 + 独立变体 3/3；旧 Genesis 80 checks / 7 cases；M1/M3/M4/M5 与 M0a dirty 全绿；task-011 仍等待 task-010 |
 | 01:20 | task-010 | task-011,task-013 | M7 Extensions 与条款 provenance 完成；未改 Core、旧规范或 authority | 177 files / 1,701 clauses / 100% mapped；六 Extensions 只产 authoring advice/Evidence；旧根 80 checks、全回归与 M0a dirty 10/10 PASS |
 | 01:33 | task-010 Quality Audit | task-010-r1,task-011 | 作者机械 verify 通过但独立 provenance 语义审查 FAIL；M8 不得消费 M7 | M7-B01–B05：默认 catch-all、117 个错误行区间、唯一事实丢失、scope 可缩减、commit 不可独立复现；见 `evidence/m7-review/QUALITY-AUDIT.md` |
+| 02:08 | task-010-r1 | task-010 independent re-review | 显式、冻结、可复现、fail-closed provenance 作者修复完成 | 294 tracked + 2 OOB inventory；177 files / 2,207 clauses / 0 unmapped；独立 verifier、6/6 negatives、clean checkout、全回归与 M0a 10/10 PASS；M8 仍等待独立复审 |
 
 ## 故障记录
 
@@ -78,12 +79,14 @@
 | task-005 | 4 | r1 封闭 B01–B05；r2 强制 replay trust proof/修复 BLOCKED scope；r3 修复 UNKNOWN pending 原子指针；r4 封闭 M6 Adapter B01–B04 | Tester |
 | task-009 | 1 | M6 首轮发现 B01–B04，路由 task-005-r4；held-out 需原样复测 | Tester |
 | task-010 | 1 | 独立 Quality Audit 发现 M7-B01–B05；返回 Doc Engineer 重做显式、可复现、fail-closed provenance | Quality Auditor |
+| task-010 | r1 作者完成 | M7-B01–B05 已逐项修复；不得以作者证据替代独立复审 | Quality Auditor 待复审 |
 
 ## 阻塞
 
 | 时间 | 任务 | 类型 | 原因 |
 |------|------|------|------|
 | 2026-07-27 01:33 | task-011 | M7 dependency | task-010 独立 Quality Audit FAIL；M7-B01–B05 关闭并复审 PASS 前禁止 M8 authority switch |
+| 2026-07-27 02:08 | task-011 | M7 independent re-review | task-010-r1 作者修复已完成；独立 Quality Auditor 复审 PASS 前仍禁止 M8 authority switch |
 
 ## 审查结果
 
@@ -102,6 +105,7 @@
 | 2026-07-27 01:03 | task-005-r4 / task-009-r1 | Tester Adapter held-out | PASS | M6 8/8；旧 Genesis 80 checks / 7 cases；M6-B01–B04 关闭 |
 | 2026-07-27 01:20 | task-010 | Doc Engineer G4 | PASS | 177 个规范源、1,701 条 clause 全部有唯一归宿，coverage 100%；Extensions 边界、链接、hash、obsolete proof、Core regression 与 M0 dirty 全绿 |
 | 2026-07-27 01:33 | task-010 / 8513dae | Quality Auditor independent | FAIL → task-010-r1 | Extensions 边界 PASS；provenance 信任 FAIL。450 个默认 catch-all、117 个错误行区间、零 legacy→Core 映射、唯一 AP/脚本内容未保留、scope/dirty reproducibility 未闭合 |
+| 2026-07-27 02:08 | task-010-r1 | Doc Engineer author verification | PASS → independent re-review | M7-B01–B05 作者侧关闭：显式 2,207-entry disposition、冻结 294+2 inventory、独立 verifier、8 AP、PTG 函数级 obsolete、10 dirty snapshots；clean checkout 与 6/6 negatives PASS |
 
 ## Conductor 调度状态
 
@@ -128,6 +132,7 @@
 | 01:03 | task-009-r1 完成 → task-011 依赖部分满足 | backend-dev | M6 Hard Gate PASS；task-011 仍须等待 task-010 M7 |
 | 01:20 | task-010 完成 → promote task-011 | backend-dev | M7 G4 PASS；M6/M7 依赖全部满足，M8 authority switch 可派发 |
 | 01:33 | task-010 独立审查阻塞 → return task-010-r1 | doc-engineer | 关闭 M7-B01–B05 后原样重跑独立 Quality Audit；task-011 退回等待 |
+| 02:08 | task-010-r1 作者修复完成 → independent re-review | quality-auditor | 必须独立复核显式映射、冻结 scope、语义切分、目标保留、dirty 可复现与 6 个负例；复审前不得解锁 task-011 |
 
 ## 派发日志
 
@@ -154,3 +159,4 @@
 | 01:03 | task-009-r1 | Tier 1 | tester | ✅ M6_PASS：8/8 独立 trace，旧 Genesis 80 checks / 7 cases，全回归与 dirty hash 通过 |
 | 01:20 | task-010 | Tier 1 | doc-engineer | ✅ 六 Extensions、10 项 content-bound fixtures、177-file/1,701-clause provenance 与 100% coverage 完成；Core/旧载体/dirty 零覆盖 |
 | 01:33 | task-010 independent review | Tier 1 | quality-auditor | ❌ 机械 verify PASS 但语义 provenance FAIL；M7-B01–B05，返回 task-010-r1，M8 阻塞 |
+| 02:08 | task-010-r1 | Tier 1 | doc-engineer | ✅ 作者修复及 clean reproduce 完成；等待 quality-auditor 独立复审，M8 继续阻塞 |

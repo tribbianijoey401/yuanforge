@@ -1,0 +1,8 @@
+### AP-FRAMEWORK-004: Seam Agreement 模板缺失结构化注解格式
+
+- **描述**: seam-agreement.md 仅有空白字段列表（"命名规范:"后面无内容），没有约定数据结构化的方式，导致开发者自由发挥、不同项目格式完全不同。后续任何自动化工具（CAL）都无法解析。
+- **重现条件**: 首次使用 seam-agreement.md 时没有明确的结构约定，开发者填得随意。
+- **修复方式**: 在模板中追加 §6 @ptg 字段注解章节，定义统一格式。
+- **验证方式**: ptg-cal-gen.py 解析 seam-agreement.md 必须能输出非空断言；Role-Scorecard P-B 检查扣 0.3 分。
+- **@ptg**: true
+

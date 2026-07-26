@@ -1,0 +1,26 @@
+## 4. Side-effect journal
+
+A non-mutating Attempt uses `NOT_APPLICABLE`. A mutating Attempt follows only:
+
+```text
+PREPARED → EXECUTING → OBSERVED → COMMITTED
+                         └──────→ UNKNOWN
+             └─────────────────→ UNKNOWN
+```
+
+- `PREPARED` must be durable before the tool is invoked.
+- `EXECUTING` means the tool may have changed the world.
+- `OBSERVED` requires a structured receipt but is not yet committed truth.
+- `COMMITTED` requires the postcondition and receipt to be durably bound.
+- Any crash, cancellation, timeout, lost receipt, ambiguous postcondition, or
+  illegal journal transition after execution begins becomes `UNKNOWN`.
+
+`UNKNOWN` is fail-closed: it blocks completion and automatic re-execution. Only
+an independent reconciliation Attempt may establish what happened. The LLM
+must not call side-effecting tools outside the Harness/Port route.
+
+For `OBSERVED` and `COMMITTED`, each journal entry binds the canonical receipt
+digest. The postcondition binds action scope and observed artifact hash; file
+writes also bind receipt path and after-hash. `UNKNOWN` can only have outcome
+`UNKNOWN`, and mutating action kinds cannot claim `mutating: false`.
+

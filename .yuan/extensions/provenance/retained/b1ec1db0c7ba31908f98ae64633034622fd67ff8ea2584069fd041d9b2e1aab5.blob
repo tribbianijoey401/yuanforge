@@ -1,0 +1,13 @@
+## 13. 社交媒体玫红
+
+- **适用行业**：社交、社区、婚恋
+- **设计意图**：玫红表达情感连接，蓝色辅助交互
+
+| Primary | #E11D48 | Background | #FFF1F2 | Muted | #F0ECF2 |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #881337 | Muted FG | #64748B |
+| Secondary | #FB7185 | Card | #FFFFFF | Border | #FECDD3 |
+| On Secondary | #0F172A | Card FG | #881337 | Destructive | #DC2626 |
+| Accent | #2563EB | On Destructive | #FFFFFF | Ring | #E11D48 |
+| On Accent | #FFFFFF | | | | |
+

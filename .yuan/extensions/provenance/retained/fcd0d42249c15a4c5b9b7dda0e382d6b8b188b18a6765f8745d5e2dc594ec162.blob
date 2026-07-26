@@ -1,0 +1,6 @@
+## 开发框架
+- **语言**：ArkTS（TypeScript 扩展）
+- **UI 框架**：ArkUI 声明式
+- **IDE**：DevEco Studio
+- **API 版本**：API 12+（2026 年基准）
+

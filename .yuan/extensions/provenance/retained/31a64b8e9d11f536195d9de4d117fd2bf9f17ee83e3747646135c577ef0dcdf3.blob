@@ -1,0 +1,7 @@
+## Conductor 判定逻辑
+
+| Task 状态 | 判定条件 | Conductor 动作 |
+|-----------|---------|---------------|
+| **done** | Review 输出 APPROVED | 标记 done，检查下游 |
+| **retry** | Review 输出 REJECT / 测试 FAIL | 重试（最多 3 次） |
+| **blocked** | 3 次仍失败 | PROGRESS.md 记录阻塞，等人工 |

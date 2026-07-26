@@ -1,0 +1,8 @@
+def validate_document(kind: str, document: dict[str, Any]) -> ValidationResult:
+    schema = json.loads(_schema_path(kind).read_text(encoding="utf-8"))
+    errors: list[str] = []
+    assertions = validate_schema(document, schema, schema, "$", errors)
+    errors.extend(_semantic_errors(kind, document))
+    return ValidationResult(list(dict.fromkeys(errors)), assertions + 1)
+
+

@@ -1,0 +1,4 @@
+## 铁律 Ⅸ — 自主调度
+
+**Conductor Agent 按调度循环（见 Workflow Protocol「五、Conductor 调度循环」），自主将 Task 派发给对应 Role 的 Agent。**
+

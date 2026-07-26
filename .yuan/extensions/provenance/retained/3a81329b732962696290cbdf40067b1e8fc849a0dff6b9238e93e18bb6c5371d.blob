@@ -1,0 +1,22 @@
+## Subagent 上下文模板
+
+派发 Dev Agent 时注入：
+
+```markdown
+## Task: T{N}
+
+### 目标
+{Task summary}
+
+### 验收标准
+- {criterion 1}
+- {criterion 2}
+
+### 必读
+- 角色合约: contracts/{role}.md
+- 铁律: .yuan/rules/iron-rules.md
+- 上游产出: {file paths}
+
+### 产出
+- {expected output files}
+```

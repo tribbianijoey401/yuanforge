@@ -1,0 +1,13 @@
+"""
+PTG/CAL 端到端验证脚本
+
+运行流程:
+  1. 扫描 docs/ptg-critical.md → 找出 PTG 关键模块
+  2. 对含 @ptg 注解的 seam-agreement.md → 生成 CAL 断言
+  3. 检测 schema 漂移（seam vs. 实现）
+  4. 验证对抗清单（anti-patterns.md）覆盖率
+  5. 模拟合约断言测试执行
+  6. 输出验证报告
+
+用法: python3 scripts/run-ptg-cal-check.py [--project PROJECT_DIR]
+"""

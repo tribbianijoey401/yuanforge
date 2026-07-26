@@ -1,0 +1,16 @@
+def configured_limits(max_files: object, max_depth: object) -> tuple[int, int]:
+    valid_files = (
+        isinstance(max_files, int)
+        and not isinstance(max_files, bool)
+        and max_files > 0
+    )
+    valid_depth = (
+        isinstance(max_depth, int)
+        and not isinstance(max_depth, bool)
+        and max_depth >= 0
+    )
+    if not valid_files or not valid_depth:
+        raise ValueError("enumeration bounds must be non-negative integers")
+    return max_files, max_depth
+
+

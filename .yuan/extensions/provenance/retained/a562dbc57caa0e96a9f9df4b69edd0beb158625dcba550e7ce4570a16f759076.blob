@@ -1,0 +1,5 @@
+### 交互
+- 手势：Tap / LongPress / Pan / Pinch / Rotation / Swipe
+- 动画：`animateTo` / `animation` 属性动画
+- 转场：`pageTransition` 页面转场
+

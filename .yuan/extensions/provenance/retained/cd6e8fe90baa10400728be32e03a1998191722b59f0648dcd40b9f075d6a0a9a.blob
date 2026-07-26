@@ -1,0 +1,7 @@
+# Verification Policy — 知识验证规则
+
+> **适用范围**：所有 `docs/knowledge/` 文件的置信度检查 + 知识治理全流程验证。
+> **目标**：确保 Knowledge 不凌驾于 Code，所有事实面独立验证。
+
+---
+

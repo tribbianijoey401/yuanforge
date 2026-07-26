@@ -1,0 +1,17 @@
+## 6. 银行 / 传统金融
+
+- **推荐落地页模式**：Trust & Authority + Features
+- **风格优先级**：主 Minimalism / 备 Accessible & Ethical
+- **配色氛围**：海军蓝 #0F172A + 金 #A16207
+- **字体情绪**：权威 + 信赖（IBM Plex Sans / Lexend）
+- **关键效果**：极少动效 + logo 信任墙
+- **决策规则**：
+```json
+{
+  "if_senior_audience": "force-large-type-and-aaa",
+  "if_loan_product": "add-calculator-widget",
+  "if_credit_card": "use-3d-card-render"
+}
+```
+- **反模式**：渐变背景、动画过多、字体过细
+

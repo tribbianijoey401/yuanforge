@@ -1,0 +1,9 @@
+def snapshot_digest(manifests: Iterable[dict[str, Any]]) -> str:
+    return canonical_digest(
+        [
+            {"workspace_id": item["workspace_id"], "digest": item["digest"]}
+            for item in sorted(manifests, key=lambda value: value["workspace_id"])
+        ]
+    )
+
+

@@ -1,0 +1,13 @@
+## 铁律 Ⅵ — 文档即代码
+
+**任何技术决策、架构变更、踩坑经验，必须立即写入对应的文档。**
+
+- 架构变更 → `docs/ARCHITECTURE.md`
+- 技术选型 → 当前 Workspace 的 `ADR-NNN.md`；归档后进入 `docs/knowledge/decisions/`
+- 踩坑 → 当前 Workspace 的 `BUG-NNN.md`；可复用经验归档到 `docs/knowledge/pitfalls/`
+- 新术语 → `docs/glossary.md`
+- 进度变更 → `docs/PROGRESS.md`
+- 如果 Agent 没有时间写完整文档 → 先记到当前 Workspace 的 `BUG-NNN.md`，Phase 6 蒸馏
+
+<SECTION-END:6>
+

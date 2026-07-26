@@ -1,0 +1,13 @@
+def _projection_digest(files: dict[str, bytes]) -> str:
+    return canonical_digest(
+        [
+            {
+                "path": relative,
+                "sha256": __import__("hashlib").sha256(payload).hexdigest(),
+            }
+            for relative, payload in sorted(files.items())
+            if relative.startswith("workspaces/")
+        ]
+    )
+
+

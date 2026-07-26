@@ -1,0 +1,4 @@
+class GuardError(MigrationError):
+    """Raised when a writer crosses its declared authority lane or CAS fails."""
+
+

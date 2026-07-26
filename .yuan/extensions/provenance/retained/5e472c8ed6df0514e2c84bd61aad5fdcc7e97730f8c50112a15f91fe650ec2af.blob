@@ -1,0 +1,6 @@
+"""Fail-closed helpers for the Yuan legacy-to-Core shadow projection.
+
+This module never selects runtime authority.  It reads legacy documents and
+writes only to an explicitly separate shadow root.
+"""
+

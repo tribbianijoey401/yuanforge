@@ -1,0 +1,4 @@
+class MigrationError(RuntimeError):
+    """Raised when conversion cannot proceed without risking legacy state."""
+
+

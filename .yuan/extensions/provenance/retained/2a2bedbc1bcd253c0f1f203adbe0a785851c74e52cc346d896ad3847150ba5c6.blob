@@ -1,0 +1,8 @@
+### AP-FRAMEWORK-002: 铁律注释锚点与实际内容不匹配
+
+- **描述**: `.yuan/rules/iron-rules.md` 中 `<SECTION-END:N>` 标记或铁律编号（Ⅰ→Ⅻ）与实际标题不对应。Conductor 注入铁律摘要时跳过错误或注入错误的段落。
+- **重现条件**: 新增/删除铁律时忘记更新锚点编号或 `<SECTION-END>` 标签。
+- **修复方式**: `yuanforge-self-test` Skill 执行锚点闭合检查。
+- **验证方式**: 脚本提取所有 `### 铁律` 标题数与 Section-End 数量对比，不等则 Fail。
+- **@ptg**: true
+

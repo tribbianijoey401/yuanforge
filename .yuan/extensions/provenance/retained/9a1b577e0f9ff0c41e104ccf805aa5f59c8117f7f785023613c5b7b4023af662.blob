@@ -1,0 +1,7 @@
+---
+name: test-integrity
+description: 测试完整性与反作弊规范（Hard Gate 全绿必须"没被作弊"才可信）
+spec_type: rule
+version: "1.0.0"
+---
+

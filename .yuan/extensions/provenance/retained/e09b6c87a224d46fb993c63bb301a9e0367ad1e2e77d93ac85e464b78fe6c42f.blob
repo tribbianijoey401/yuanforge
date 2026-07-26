@@ -1,0 +1,4 @@
+class ManifestError(ValueError):
+    """The trusted manifest does not satisfy the bootstrap contract."""
+
+

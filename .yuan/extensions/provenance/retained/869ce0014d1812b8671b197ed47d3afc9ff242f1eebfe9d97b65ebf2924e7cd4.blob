@@ -1,0 +1,5 @@
+### 分享
+- 页面分享：`onShareAppMessage` 返回标题/路径/图片
+- 分享到朋友圈：`onShareTimeline`（仅 Android）
+- 分享图片建议：5:4 比例，500×400px
+

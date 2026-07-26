@@ -1,0 +1,31 @@
+## 会话文件夹完整生命周期
+
+```
+[新需求/新会话开始]
+    ↓ Conductor
+1. 创建文件夹 docs/YYYYMMDD-描述/
+2. 创建 PLAN.md（Architect 填）
+3. 创建 SESSION_LOG.md（Conductor 填开始时间）
+    ↓ Phase 1
+4. Architect 填 PLAN.md + FEATURE.md（需求+设计）
+5. 做决策时 → 创建 ADR-NNN.md
+    ↓ G1 ✓ → Phase 2
+6. Frontend/Backend Dev 执行，遇 Bug → 创建 BUG-NNN.md
+    ↓ Phase 2 进行中
+7. Conductor 渐进更新 SESSION_LOG「任务完成情况」表（每次任务终态时）
+    ↓ Phase 2 完成
+8. Frontend/Backend Dev 更新 FEATURE.md（修改文件+API）
+9. Conductor 更新 SESSION_LOG.md（完成/决策/踩坑）
+    ↓ Phase 4
+10. Conductor 遍历 BUG → 归档判断 → PROGRESS 更新
+11. Conductor 知识蒸馏（Workspace Close）:
+    a. FEATURE.md → knowledge/features/FEAT-NNN.md（对象实例，含 frontmatter）
+    b. ADR-NNN.md → knowledge/decisions/ADR-NNN.md（完整保留 + frontmatter）
+    c. BUG-NNN.md → 归档判断:
+       └─ 会重复出现 → knowledge/pitfalls/PIT-NNN.md（对象实例）
+       └─ 一次性 → 留在 Workspace 中归档
+    d. 未完成任务 → workspace/backlog.md 更新
+12. Conductor 归档: 移动会话文件夹 → archive/YYYYMMDD-描述/
+```
+
+#<SECTION-END:session-distill>

@@ -1,0 +1,17 @@
+## 一、设计第一性原理
+
+```
+Runtime 层回答的问题：
+  现在在做什么？（Task）
+  下一步为什么发生？（Loop）
+  为什么停止？（Checkpoint + Exit Gate）
+  为什么以后还能继续？（Checkpoint 恢复）
+
+Runtime 层不回答的问题：
+  为什么做？（Object Protocol §五 — Goal 定义/意图层）
+  怎么做？（Workflow Protocol — 方法层）
+  在什么平台上跑？（Adapter Protocol — 执行层）
+```
+
+---
+

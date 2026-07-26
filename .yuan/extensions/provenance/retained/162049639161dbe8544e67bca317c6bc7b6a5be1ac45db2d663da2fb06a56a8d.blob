@@ -1,0 +1,15 @@
+def repeated_without_new_evidence(
+    history: list[dict[str, Any]],
+    strategy_fingerprint: str,
+    relevant_inputs_digest: str,
+    *,
+    latest_evidence_sequence: int,
+) -> bool:
+    return any(
+        item.get("fingerprint") == strategy_fingerprint
+        and item.get("relevant_inputs_digest") == relevant_inputs_digest
+        and item.get("latest_evidence_sequence", -1) >= latest_evidence_sequence
+        for item in history
+    )
+
+

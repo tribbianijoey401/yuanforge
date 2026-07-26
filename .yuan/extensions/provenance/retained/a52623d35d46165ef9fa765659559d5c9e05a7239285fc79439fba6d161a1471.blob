@@ -1,0 +1,8 @@
+#### init — 初始化
+
+项目设计系统搭建。判断寄存器 + 平台 + 生成 DESIGN.md。
+
+- **执行步骤**：Step 1 加载当前状态（PRODUCT.md / DESIGN.md / live config 是否存在）→ Step 2 探索代码库（README / package.json / 组件 / 品牌资产 / token / 形成 register 与 platform 假设）→ Step 3 战略访谈（register 先 → platform 紧随 → 用户与目的 → 定位 → 品牌个性 → 反参考 → 转化与证明仅 brand → a11y）→ Step 4 写 PRODUCT.md → Step 5 决定 DESIGN.md（scan 模式或 seed 模式）→ Step 6 配置 live mode（仅 web + 有代码）→ Step 7 推荐下一步命令。
+- **检查项**：register / platform 裸值不写散文；从代码爬到的假设要用户确认；未确认不写 PRODUCT.md；至少一轮真实用户回答；不问颜色 / 字体 / 圆角（那是 DESIGN.md 的事）。
+- **反模式**：从原始 task prompt 单独合成 PRODUCT.md；把 brand-only 问题（转化与证明）和决定 register 的问题混一轮；silent overwrite 已有文件；给 native 项目配置 live mode。
+

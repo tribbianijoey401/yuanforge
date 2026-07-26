@@ -1,0 +1,24 @@
+## Agent 加载流程
+
+```
+[Agent 启动]
+    │
+    ├── 1. read_file("docs/PROGRESS.md")
+    │      → 获悉：当前 Phase/Stage/Task、阻塞项、下一步
+    │
+    ├── 2. read_file("docs/ARCHITECTURE.md")
+    │      → 了解系统全貌
+    │
+    ├── 3. read_file("knowledge/pitfalls/")
+    │      → 避开已知陷阱
+    │
+    ├── 4. 如果当前有 Plan：
+    │      read_file("当前会话文件夹中的 PLAN.md")
+    │      → 读取当前 Task 的详细规格
+    │
+    └── 5. （可选）read_file(".yuan/docs/")
+           → 了解最近做了什么
+```
+
+---
+

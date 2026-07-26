@@ -1,0 +1,23 @@
+### Candidate 结构
+
+```yaml
+candidate:
+  source: "FEATURE.md"
+  source_workspace: "20260709-用户认证"
+  target_type: "feature"
+  proposed_id: "FEAT-AUTH"         # 从 FEATURE.md 标题推断，或自动分配
+  frontmatter:
+    id: "FEAT-AUTH"
+    object_type: "feature"
+    lifecycle: "knowledge"
+    owner: "architect"             # 从 FEATURE.md 的「负责角色」提取
+    status: "verified"             # Workspace Close = 审查已通过
+    summary: ""                    # 从 FEATURE.md「需求描述」提取
+    depends: []                    # 从 FEATURE.md「关联」段提取
+    verified_commit: ""            # 取当前 HEAD
+    confidence: "verified"
+  body: ""                         # 从 FEATURE.md 精简
+```
+
+---
+

@@ -1,0 +1,11 @@
+### 用量追踪
+
+```sql
+-- 每日用量快照
+INSERT INTO tenant_usage (tenant_id, metric, value, period)
+SELECT tenant_id, 'api_calls', COUNT(*), CURRENT_DATE
+FROM api_logs
+WHERE created_at >= CURRENT_DATE
+GROUP BY tenant_id;
+```
+

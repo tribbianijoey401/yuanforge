@@ -1,0 +1,17 @@
+## 5. 金融科技 / Fintech
+
+- **推荐落地页模式**：Trust & Authority + Features
+- **风格优先级**：主 Minimalism / 备 Accessible & Ethical
+- **配色氛围**：金 #F59E0B + 紫 #8B5CF6 + 深底 #0F172A
+- **字体情绪**：严肃 + 精确（IBM Plex Sans）
+- **关键效果**：数据 ticker + 透明度提示
+- **决策规则**：
+```json
+{
+  "if_crypto_wallet": "must-have-wallet-connect",
+  "if_trading_dashboard": "use-dark-mode-default",
+  "if_compliance_required": "force-accessible-ethics"
+}
+```
+- **反模式**：默认浅色 + 无交易状态 + 隐藏手续费
+

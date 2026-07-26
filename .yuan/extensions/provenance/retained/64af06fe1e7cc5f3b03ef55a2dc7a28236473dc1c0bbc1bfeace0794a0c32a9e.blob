@@ -1,0 +1,68 @@
+### 打勾式 Checklist
+
+> 每个 `- [ ]` 是一步，做完打勾。PIT 标注"即时蒸馏已完成的"，避免重复。
+
+```
+## 知识蒸馏 Checklist
+
+- [ ] **FEATURE.md → knowledge/features/FEAT-NNN.md**
+  - 读取 docs/YYYYMMDD-描述/FEATURE.md
+  - 生成对象 ID: FEAT-{简短名}
+  - 创建 knowledge/features/FEAT-NNN.md，填 frontmatter:
+      id: FEAT-xxx
+      object_type: feature
+      lifecycle: knowledge
+      owner: architect
+      status: verified
+      summary: "一句话描述"
+      depends: [ADR-xxx]  ← 从 FEATURE.md 关联段提取
+      verified_commit: <git log -1 --oneline>
+      confidence: verified
+      updated_by: <当前角色>
+      updated_at: <ISO8601>
+      acceptance_criteria: []  ← 从验收标准提取
+      api_endpoints: []        ← 从 API 段提取
+      files: []                ← 从修改文件段提取
+      session: "YYYYMMDD-描述"
+  - 正文: 需求描述 + 设计思路 + API 端点表 + 关键文件列表 + 关联链接
+
+- [ ] **ADR-NNN.md → knowledge/decisions/ADR-NNN.md（如有）**
+  - 遍历会话中所有 ADR-NNN.md
+  - 完整复制正文 + 加 frontmatter:
+      id: ADR-NNN
+      object_type: decision
+      lifecycle: knowledge
+      owner: architect
+      status: accepted
+      date: YYYY-MM-DD
+      summary: "一句话描述"
+      verified_commit: <当前HEAD>
+      confidence: verified
+  - 如果 ADR supersedes 旧 ADR → 更新旧 ADR 的 superseded_by
+
+- [ ] **PIT-NNN.md（即时蒸馏已完成，确认即可）**
+  - 扫描 knowledge/pitfalls/ 确认无遗漏
+  - 如果 BUG-NNN.md 未标注"→ distilled to PIT-NNN" → 执行即时蒸馏
+
+- [ ] **backlog.md 更新（如有未完成任务）**
+  - 读 TASK_BOARD.md → 所有非终态任务
+  - 追加到 docs/workspace/backlog.md:
+      | Task ID | 任务名 | 角色 | 原会话 | 原因 |
+      |---------|--------|------|--------|------|
+      | T05 | xxx | xxx | YYYYMMDD-描述 | 会话结束未完成 |
+
+- [ ] **归档 Workspace**
+  - mv docs/YYYYMMDD-描述/ → docs/archive/YYYYMMDD-描述/
+
+- [ ] **更新 PROGRESS.md**
+  - 移除「当前会话」指针（如果指向此会话）
+  - 更新「历史会话」表（功能现在在 knowledge/ 中）
+
+- [ ] **蒸馏报告写入 SESSION_LOG**
+  - 在 SESSION_LOG 追加 ## 知识蒸馏 段
+  - 包含: 蒸馏产出表 / 未蒸馏表 / 未完成任务表
+
+- [ ] **重建图谱**
+  - python scripts/build-graph.py --incremental
+```
+

@@ -1,0 +1,10 @@
+## 十一、禁止事项
+
+- ❌ confidence=stale 的文件不经验证直接用于决策
+- ❌ 手动修改 confidence 字段而不更新 verified_commit
+- ❌ 蒸馏时 confidence 设为 verified 但不填 verified_commit
+- ❌ 同一失败第二次出现时盲重试 — 停止，重新检查假设、环境和命令名
+- ❌ 任何未验证项保持 `pending`，不要为了摘要好看把它降格成 warning
+
+---
+

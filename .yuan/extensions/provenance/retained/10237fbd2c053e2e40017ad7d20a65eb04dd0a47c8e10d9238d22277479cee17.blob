@@ -1,0 +1,8 @@
+def _scope_contains(parent: str, child: str) -> bool:
+    parent_path = pathlib.PurePosixPath(parent.replace("\\", "/"))
+    child_path = pathlib.PurePosixPath(child.replace("\\", "/"))
+    if child_path.is_absolute() or ".." in child_path.parts:
+        return False
+    return child_path == parent_path or parent_path in child_path.parents
+
+

@@ -1,0 +1,9 @@
+### 5.3 CONVENTIONS.md
+
+```
+从代码中归纳：
+- 命名风格: camelCase? snake_case? PascalCase?
+- 目录约定: src/ vs app/ vs lib/
+- 提交格式: 从 git log 归纳
+```
+

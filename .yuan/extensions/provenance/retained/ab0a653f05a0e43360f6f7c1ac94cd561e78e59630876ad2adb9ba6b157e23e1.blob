@@ -1,0 +1,20 @@
+def _work_errors(document: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    for field, code in (
+        ("acceptance_criteria", "DUPLICATE_AC_ID"),
+        ("safety_invariants", "DUPLICATE_SAFETY_ID"),
+    ):
+        ids = [
+            item.get("id")
+            for item in document.get(field, [])
+            if isinstance(item, dict)
+        ]
+        if len(ids) != len(set(ids)):
+            errors.append(code)
+    grants = document.get("authorization", {}).get("grants", [])
+    grant_ids = [item.get("id") for item in grants if isinstance(item, dict)]
+    if len(grant_ids) != len(set(grant_ids)):
+        errors.append("DUPLICATE_GRANT_ID")
+    return errors
+
+

@@ -1,0 +1,8 @@
+### 2.1 初始化
+
+```
+1. 读 Dispatch Table → 提取所有 Task
+2. 所有 Task 初始状态 = ⏳等待
+3. depends_on = [] 的 Task → 🟢就绪
+```
+

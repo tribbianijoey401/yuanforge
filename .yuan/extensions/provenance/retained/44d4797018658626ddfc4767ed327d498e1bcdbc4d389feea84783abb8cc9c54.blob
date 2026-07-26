@@ -1,0 +1,9 @@
+## 4. 独立（去偏）测试作者：测试作者 ≠ 代码作者
+
+去掉"自己测自己"的同义偏差，让验证有独立性：
+
+- **解耦上下文**：写实现的上下文与写/审测试的上下文分离，测试只看**需求与验收标准**、不看实现内部，避免复述实现假设。
+- **从需求反推用例**：测试用例来自结构化需求（见 `experts/product-manager/requirements-engineering-ears`）与契约（见 `experts/architect/contract-first-api-design`），而不是来自"代码现在是怎么写的"。
+- **黑盒优先**：对外部行为按输入→可观测输出断言，不绑定私有实现细节，这样重构不误伤、实现错了能被抓到。
+- **独立复核**：测试本身也要被一个不写该实现的视角复核"这些断言真能区分对错吗"，与 `agentic-delivery/01-standards/verifier-critic-pattern` 的 actor/checker 解耦一脉相承。
+

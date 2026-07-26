@@ -1,0 +1,7 @@
+### Token 引用链
+
+- 组件用 `{colors.brand-accent}` 引用，不写裸值。
+- frontmatter 中 token 引用规则：组件可引用 primitive；primitive 不互相引用。
+- 组件 sub-token 限 8 prop（`backgroundColor` / `textColor` / `typography` / `rounded` / `padding` / `size` / `height` / `width`）。阴影、动效、focus ring、backdrop-filter 不进 frontmatter，写在 sidecar。
+- 两种真相源策略二选一：项目有"OKLCH-only"教条 → frontmatter 直接 OKLCH 接受 Stitch linter warning；项目要 Stitch 严格合规 → frontmatter hex，OKLCH 在 prose 作权威参考。**不无理由分裂真相源**。
+

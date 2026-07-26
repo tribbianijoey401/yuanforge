@@ -1,0 +1,33 @@
+def assert_write_allowed(
+    repo_root: pathlib.Path,
+    pointer: dict[str, Any],
+    writer_lane: str,
+    target: str | pathlib.Path,
+    expected_before_sha256: str | None,
+) -> pathlib.Path:
+    validate_authority_pointer(pointer)
+    repo = repo_root.resolve()
+    target_path = (repo / target).resolve() if not pathlib.Path(target).is_absolute() else pathlib.Path(target).resolve()
+    if not _is_within(target_path, repo):
+        raise GuardError("write target escapes repository")
+    legacy = (repo / pointer["legacy_root"]).resolve()
+    shadow = (repo / pointer["shadow_root"]).resolve()
+    if writer_lane == "shadow":
+        allowed = _is_within(target_path, shadow) and not _is_within(target_path, legacy)
+    elif writer_lane == "legacy":
+        allowed = _is_within(target_path, legacy) and not _is_within(target_path, shadow)
+    else:
+        raise GuardError("unknown writer lane")
+    if not allowed:
+        raise GuardError(f"{writer_lane} writer cannot write {target_path}")
+    if target_path.exists():
+        if not target_path.is_file():
+            raise GuardError("CAS target is not a file")
+        actual = file_sha256(target_path)
+        if expected_before_sha256 is None or actual != expected_before_sha256:
+            raise GuardError("compare-and-swap mismatch")
+    elif expected_before_sha256 is not None:
+        raise GuardError("compare-and-swap expected an existing file")
+    return target_path
+
+

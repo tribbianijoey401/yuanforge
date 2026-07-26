@@ -1,0 +1,11 @@
+### Red：写失败的测试
+
+1. 根据 Plan Task 描述写测试代码
+2. 运行测试，**确认失败**
+3. 记下预期失败原因（功能尚未实现）
+
+```bash
+pytest tests/path/test_file.py::test_name -v
+# 预期输出：FAILED — {reason}
+```
+

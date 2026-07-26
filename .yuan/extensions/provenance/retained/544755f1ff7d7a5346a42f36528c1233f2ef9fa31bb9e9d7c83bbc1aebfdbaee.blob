@@ -1,0 +1,12 @@
+## 2. 三类归类（category）
+
+每条只归一类，用固定 slug，便于检索与统计：
+
+| 类别 slug | 含义 | 典型触发 |
+|---|---|---|
+| `waiting-on-external-condition` | 受阻于本次交付之外的条件 | 缺密钥、等下游任务、等上游答复 |
+| `design-decision-to-evaluate` | 有歧义、待重新评估的设计选择 | 会话存 cookie 还是 Redis、选哪个 ORM |
+| `existing-design-boundary` | 有保留地接受的既有边界/局限 | v1 只单区域部署、暂不做多租户 |
+
+不要发明新类别；拿不准就往最接近的一类归，把细节写进字段里。
+

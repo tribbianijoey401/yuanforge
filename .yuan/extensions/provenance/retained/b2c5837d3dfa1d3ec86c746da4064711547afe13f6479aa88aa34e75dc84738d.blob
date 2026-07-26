@@ -1,0 +1,9 @@
+### BUG → Pitfall 判断标准
+
+| 问题 | 回答"是"→ 蒸馏 | 回答"否"→ 留在 Archive |
+|------|:---:|:---:|
+| 这个 Bug 的根因会在其他项目中重复出现吗？ | → knowledge/pitfalls/ | → archive 保留 |
+| 这个 Bug 的修复模式值得新 Agent 提前知道吗？ | → knowledge/pitfalls/ | → archive 保留 |
+| 这个 Bug 的教训可以形成一条规则吗？ | → 提炼 Skill | → archive 保留 |
+
+#<SECTION-END:session-distill>

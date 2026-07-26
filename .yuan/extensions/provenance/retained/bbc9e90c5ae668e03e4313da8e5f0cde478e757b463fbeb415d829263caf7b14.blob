@@ -1,0 +1,17 @@
+## 2. 微 SaaS 靛紫
+
+- **适用行业**：独立开发者产品、AI 工具、SaaS 移动端
+- **设计意图**：Indigo 比蓝色更现代，Emerald CTA 在金融场景更具信任感
+
+| Primary | On Primary | Secondary | On Secondary | Accent | On Accent | Background | Foreground |
+|---|---|---|---|---|---|---|---|
+| #6366F1 | #FFFFFF | #818CF8 | #0F172A | #059669 | #FFFFFF | #F5F3FF | #1E1B4B |
+
+| Card | Card FG | Muted | Muted FG | Border | Destructive | On Destructive | Ring |
+|---|---|---|---|---|---|---|---|
+| #FFFFFF | #1E1B4B | #EBEFF9 | #64748B | #E0E7FF | #DC2626 | #FFFFFF | #6366F1 |
+
+```json
+"colors": { "primary": "#6366F1", "accent": "#059669", "background": "#F5F3FF", "foreground": "#1E1B4B", "ring": "#6366F1" }
+```
+

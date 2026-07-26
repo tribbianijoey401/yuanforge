@@ -1,0 +1,2 @@
+changed = [f for f in changed if f]  # filter empty
+

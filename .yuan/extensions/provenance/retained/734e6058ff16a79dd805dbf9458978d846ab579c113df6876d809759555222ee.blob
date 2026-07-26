@@ -1,0 +1,13 @@
+### Step G1: 复制框架内核
+
+```bash
+# 在你的项目根目录执行（从 yuanforge 复制）
+cp -r yuanforge/.yuan        ./
+cp -r yuanforge/contracts     ./
+cp -r yuanforge/protocols     ./
+cp -r yuanforge/templates     ./
+cp    yuanforge/AGENTS.md     ./
+```
+
+> 如果项目已有 .gitignore，合并 yuanforge 的 .gitignore 内容，不要覆盖。
+

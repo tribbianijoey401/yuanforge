@@ -1,0 +1,13 @@
+## 26. 房地产青蓝
+
+- **适用行业**：房地产、物业、室内设计
+- **设计意图**：青蓝 = 信任专业，蓝 CTA = 联系
+
+| Primary | #0F766E | Background | #F0FDFA | Muted | #E8F0F3 |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #134E4A | Muted FG | #64748B |
+| Secondary | #14B8A6 | Card | #FFFFFF | Border | #99F6E4 |
+| On Secondary | #0F172A | Card FG | #134E4A | Destructive | #DC2626 |
+| Accent | #0369A1 | On Destructive | #FFFFFF | Ring | #0F766E |
+| On Accent | #FFFFFF | | | | |
+

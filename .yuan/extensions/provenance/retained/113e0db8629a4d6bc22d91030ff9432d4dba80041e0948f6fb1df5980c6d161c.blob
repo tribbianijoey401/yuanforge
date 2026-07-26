@@ -1,0 +1,15 @@
+### 2.3 Dispatch（任务派发）
+
+```
+Rule: DISPATCH
+  触发: 存在 🟢就绪 Task + 有空闲 Agent
+  动作:
+    1. 选出优先级最高的 🟢就绪 Task
+    2. 构建 Dispatch Context:
+       - Task 自身的 title + acceptance_criteria
+       - context.required_knowledge → 加载对应 knowledge/ 文件
+       - context.input_from → 加载上游 Task 的 output 文件
+    3. 派发到匹配 role 的 Agent
+    4. Task.status = 🔨进行中
+```
+

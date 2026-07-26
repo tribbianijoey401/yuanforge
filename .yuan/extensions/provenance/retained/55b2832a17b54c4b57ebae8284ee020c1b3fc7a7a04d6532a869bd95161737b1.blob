@@ -1,0 +1,16 @@
+def _extract_section(text: str, heading: str) -> str | None:
+    match = re.search(
+        rf"^##\s+{re.escape(heading)}\s*$\n+(.*?)(?=^##\s+|\Z)",
+        text,
+        re.MULTILINE | re.DOTALL,
+    )
+    if not match:
+        return None
+    paragraphs = [
+        item.strip()
+        for item in re.split(r"\n\s*\n", match.group(1))
+        if item.strip() and not item.lstrip().startswith("|")
+    ]
+    return paragraphs[0] if paragraphs else None
+
+

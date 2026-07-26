@@ -1,0 +1,11 @@
+### 升级隔离级别
+
+```
+共享Schema → 独立Schema
+1. 创建新Schema
+2. 迁移数据（INSERT INTO new_schema.table SELECT * FROM public.table WHERE tenant_id = ?）
+3. 切换连接路由
+4. 验证数据一致性
+5. 清理旧数据
+```
+

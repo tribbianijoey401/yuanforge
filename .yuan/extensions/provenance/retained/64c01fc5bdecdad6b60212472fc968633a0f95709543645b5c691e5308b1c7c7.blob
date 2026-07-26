@@ -1,0 +1,6 @@
+## 3. 三个最常被略过、最该钉死的
+
+- **明确不做（out-of-scope）**：不写清楚不做什么，执行者就会顺手加未被要求的特性——这既是浪费也是风险（见 `agentic-delivery/01-standards/verifier-critic-pattern` 的过度设计护栏）。每份规格都要有一节"本次不包含"。
+- **版本锚定**：不锚版本，执行者会按"通用印象"写 API，版本不符即幻觉签名（见 `agentic-delivery/01-standards/generated-code-failure-modes`）。先确认已安装的实际版本，再按它写。
+- **内嵌已知坑**：把项目记忆里这块的高频坑（见 `agentic-delivery/01-standards/self-improving-memory-and-regression-sets`）直接写进规格，让执行者事前避开，而不是又踩一遍再被回归集抓。
+

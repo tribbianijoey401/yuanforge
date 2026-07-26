@@ -1,0 +1,8 @@
+## 生命周期
+
+| 阶段 | 操作 | 执行者 |
+|------|------|--------|
+| 项目初始化 | 从模板创建，状态=初始化 | project-bootstrap |
+| Phase 切换 | 更新当前 Phase | Conductor |
+| 每个会话 | 更新当前会话、功能清单、历史会话 | Conductor |
+| Phase 4 | 归档总结 | Conductor |

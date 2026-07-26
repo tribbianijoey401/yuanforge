@@ -1,0 +1,14 @@
+## 1. Hero + Features + CTA 经典三段式
+
+- **关键词**：hero-centric、features、call-to-action
+- **版块顺序**：
+  1. Hero（headline + image）
+  2. Value proposition
+  3. Key features（3-5 个）
+  4. CTA section
+  5. Footer
+- **主 CTA 放置位置**：Hero（sticky navbar）+ Bottom
+- **配色策略**：Hero 用品牌主色或鲜艳色；Features 卡片底 #FAFAFA；CTA 用对比 accent
+- **推荐效果**：hero parallax、feature card hover lift、CTA glow on hover
+- **转化优化要点**：CTA 对比 ≥ 7:1；navbar 持续 sticky CTA；features 一卡一核心信息
+

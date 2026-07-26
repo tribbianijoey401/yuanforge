@@ -1,0 +1,3 @@
+ENVIRONMENT_FINGERPRINT = hashlib.sha256(
+    b"yuan-shadow-filesystem-environment/v1"
+).hexdigest()

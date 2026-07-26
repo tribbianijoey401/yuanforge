@@ -1,0 +1,6 @@
+### 第三步：逐层派发 Dev
+
+1. API 契约 freeze 后 → Frontend Dev + Backend Dev 并行派发
+2. Dev 不得修改 API 契约；如需变更 → 回退 Architect
+3. 更新 TASK_BOARD
+

@@ -1,0 +1,52 @@
+def replay_self_modification_authorized(
+    work: dict[str, Any],
+    attempt: dict[str, Any],
+    evidence_items: list[dict[str, Any]],
+    trusted_now: Any,
+) -> bool:
+    action = attempt.get("action", {})
+    target_kind = protected_target_kind(action.get("scope"))
+    if action.get("mutating") is not True or target_kind is None:
+        return True
+    record = action.get("self_modification")
+    if not isinstance(record, dict):
+        return False
+    change = record.get("change")
+    proofs = record.get("proofs")
+    receipt = attempt.get("tool_receipt")
+    if (
+        not isinstance(change, dict)
+        or not isinstance(proofs, list)
+        or change.get("target_kind") != target_kind
+        or not isinstance(receipt, dict)
+        or change.get("candidate_binding", {}).get("sha256")
+        != receipt.get("after_sha256")
+    ):
+        return False
+    required_verifiers = [
+        item.get("verifier_binding")
+        for item in work.get("acceptance_criteria", [])
+        if isinstance(item, dict) and item.get("required") is True
+    ]
+    for proof in proofs:
+        if not isinstance(proof, dict):
+            continue
+        if proof.get("kind") == "previous-root" and not any(
+            immutable_binding_matches(change.get("previous_binding"), verifier)
+            for verifier in required_verifiers
+        ):
+            return False
+        if proof.get("kind") == "independent-root" and not any(
+            item.get("independence", {}).get("independent") is True
+            and item.get("verifier_binding", {}).get("trust_root_id")
+            == proof.get("root_id")
+            for item in evidence_items
+        ):
+            return False
+        if proof.get("kind") == "human-grant" and proof.get("grant_id") not in {
+            item.get("id")
+            for item in work.get("authorization", {}).get("grants", [])
+            if isinstance(item, dict)
+        }:
+            return False
+    return self_modification_authorized(change, proofs, now=trusted_now)

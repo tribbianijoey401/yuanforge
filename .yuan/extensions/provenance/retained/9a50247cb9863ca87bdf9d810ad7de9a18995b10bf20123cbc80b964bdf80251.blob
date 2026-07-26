@@ -1,0 +1,6 @@
+@dataclass(frozen=True)
+class ValidationResult:
+    errors: list[str]
+    assertions: int
+
+

@@ -1,0 +1,24 @@
+### Feature
+
+```
+draft → designed → implemented → verified → deprecated
+            ↑          │             ↑
+            └──────────┘             │
+            (返工)                    │
+                          (重新验证)   │
+                                     │
+                          ┌──────────┘
+                          ▼
+                      deprecated
+```
+
+| 从 | 到 | 条件 |
+|----|-----|------|
+| draft | designed | Architect 完成设计 |
+| designed | implemented | Dev 完成实现 |
+| designed | draft | 设计被否决 |
+| implemented | verified | 审查通过 + 测试通过 |
+| implemented | implemented | 返工重做（version 递增） |
+| verified | deprecated | 功能废弃 |
+| verified | implemented | 重新实现 |
+

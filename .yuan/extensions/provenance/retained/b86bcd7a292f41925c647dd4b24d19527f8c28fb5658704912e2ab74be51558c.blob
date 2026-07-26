@@ -1,0 +1,72 @@
+### 3.2 KNOWLEDGE_UPDATED
+
+**触发**：knowledge/ 文件被创建或修改时（蒸馏或手动更新）。
+
+**优化**：此事件类型已合并到 `DISTILLATION_COMPLETE` 中。仅在**非蒸馏场景**下手动更新 knowledge 时使用（如手动添加 Pitfall）。
+
+```json
+{
+  "type": "KNOWLEDGE_UPDATED",
+  "timestamp": "2026-07-09T17:00:00Z",
+  "session": "20260709-用户认证",
+  "actor": "conductor",
+  "payload": {
+    "action": "manual_add",
+    "object_id": "PIT-013",
+    "object_type": "pitfall",
+    "file": "knowledge/pitfalls/PIT-013.md"
+  }
+}
+```
+
+> **注意**：蒸馏产生的知识变更不再单独写 KNOWLEDGE_UPDATED 事件。`DISTILLATION_COMPLETE` 已包含完整的产出列表。
+```
+
+### 3.3 API_CHANGED
+
+**触发**：API 契约变更时（新增/修改/废弃端点）。
+
+```json
+{
+  "type": "API_CHANGED",
+  "timestamp": "2026-07-09T12:00:00Z",
+  "session": "20260709-用户认证",
+  "actor": "architect",
+  "payload": {
+    "action": "added",
+    "method": "POST",
+    "path": "/auth/refresh",
+    "feature": "FEAT-AUTH",
+    "freeze_commit": "x9y0z1"
+  }
+}
+```
+
+### 3.4 REVIEW_RESULT
+
+**触发**：审查官完成审查时。
+
+**优化**：只记录结论摘要和最重要的 1-2 条对抗发现。完整报告在 TASK_BOARD「审查结果」段。
+
+```json
+{
+  "type": "REVIEW_RESULT",
+  "timestamp": "2026-07-09T15:00:00Z",
+  "session": "20260709-用户认证",
+  "actor": "spec-reviewer",
+  "payload": {
+    "task_id": "T03",
+    "gate": "🔴Blocker",
+    "verdict": "passed",
+    "top_findings": [
+      "对抗测试: 构造了 3 个边界输入（空字符串、null、超长字段），全部通过",
+      "合规检查: 验收标准 AC-1 ~ AC-5 全部覆盖"
+    ],
+    "adversarial_attempts": 3
+  }
+}
+```
+
+> **优化点**：移除了 `issues_found` 字段。改为 `top_findings`（最重要的 1-2 条发现），让人不看 TASK_BOARD 就能知道"这次审查过了没，发现了什么"。
+```
+

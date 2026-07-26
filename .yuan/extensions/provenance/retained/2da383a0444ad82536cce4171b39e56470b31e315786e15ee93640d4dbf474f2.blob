@@ -1,0 +1,17 @@
+### 3.7 Archive
+
+```
+语义: 归档已关闭的 Workspace。
+
+输入:
+  - workspace_id: Workspace ID
+  - archive_path: 归档目标路径
+
+输出:
+  - Workspace 目录移入 archive/
+  - Workspace 状态: distilling → archived
+  - Event: WORKSPACE_CLOSED
+
+触发: Promote 完成后
+```
+

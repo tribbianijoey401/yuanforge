@@ -1,0 +1,13 @@
+### 步骤 5：可选 — 追加图谱查询结果
+
+配合 `graph-query` Skill 使用：
+- 调用 `graph-query` 获取相关知识
+- 将图谱结果追加到 Pitfall 摘要之后
+
+```markdown
+## 相关知识图谱
+FEAT-AUTH → depends: [ADR-003, PIT-005, PIT-007]
+```
+
+---
+

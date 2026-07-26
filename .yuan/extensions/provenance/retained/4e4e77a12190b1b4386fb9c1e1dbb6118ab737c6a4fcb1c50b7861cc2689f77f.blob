@@ -1,0 +1,25 @@
+def verify_owned_shadow(shadow_root: pathlib.Path) -> dict[str, Any]:
+    marker_path = shadow_root / ".yuan-shadow.json"
+    if not marker_path.is_file():
+        raise MigrationError("shadow ownership marker missing")
+    try:
+        marker = json.loads(marker_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise MigrationError("shadow ownership marker is invalid") from error
+    expected = marker.get("generated_files")
+    if not isinstance(expected, dict):
+        raise MigrationError("shadow generated-file manifest missing")
+    if marker.get("immutable_digest") != canonical_digest(
+        marker, omit=("immutable_digest",)
+    ):
+        raise MigrationError("shadow ownership marker digest mismatch")
+    actual = generated_tree_files(shadow_root)
+    expected_paths = set(expected) | {".yuan-shadow.json"}
+    if set(actual) != expected_paths:
+        raise MigrationError("shadow contains unknown or missing files")
+    for relative, digest in expected.items():
+        if actual.get(relative) != digest:
+            raise MigrationError(f"shadow file changed: {relative}")
+    return marker
+
+

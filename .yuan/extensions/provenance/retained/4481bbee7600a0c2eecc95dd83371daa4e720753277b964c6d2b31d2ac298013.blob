@@ -1,0 +1,14 @@
+### 25. Modern Dark Cinema Mobile 现代深色影院
+- **关键词**：cinematic、precision、premium utility
+- **主色方向**：纯黑 + 渐变白文字（#FFFFFF → rgba 0.7）
+- **辅助色**：单一品牌强调色
+- **效果与动效**：mask-view + linear-gradient 文字渐变
+- **最适用于**：开发者工具、金融交易、AI Dashboard、流媒体
+- **不适用于**：儿童、长文阅读
+- **浅色模式**：不推荐
+- **深色模式**：完美适配
+- **性能影响**：良好
+- **无障碍**：AA
+- **移动端友好度**：高
+- **转化导向**：中
+

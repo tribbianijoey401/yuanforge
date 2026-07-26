@@ -1,0 +1,27 @@
+### 继承流程
+
+```
+Session N 结束                          Session N+1 开始
+══════════════                          ═══════════════
+
+TASK_BOARD.md (冻结归档)                新 TASK_BOARD.md
+  T01 ✅完成                            T03 🟢就绪（重置 + 依赖已满足）
+  T02 ✅完成                            T04 ⏳等待（依赖 T03）
+  T03 🔨进行中 ← 中断！                  T05 🟢就绪（新增任务）
+  T04 ⏳等待
+  T05 — (本次未开始)
+
+SESSION_LOG.md                         Conductor 继承逻辑（TASK_BOARD 优先）:
+  T01 ✅测试通过       ────────→         1. 读上一个 Session 的 **TASK_BOARD.md**
+  T02 ✅完成                               （唯一真相源，不依赖 SESSION_LOG）
+  T03 🔨进行中                          2. 提取非终态任务 → 新 TASK_BOARD
+  T04 ⏳等待                            3. 读 SESSION_LOG「任务完成情况」表
+  T05 —                                   （兜底/补充 — 获取已完成任务的简述/决策/产出/Commit）
+                                         4. 重置状态 + 重算依赖
+                                         5. 复制相关「上下文传递」行
+                                         6. 如果 TASK_BOARD 不存在 → 回退用 SESSION_LOG（降级路径）
+
+PROGRESS.md                            PROGRESS.md
+  当前会话: Session N     ────────→      当前会话: Session N+1
+```
+

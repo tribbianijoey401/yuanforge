@@ -1,0 +1,5 @@
+## 门禁定义
+- 档位：🟢 Advisory↗（开发阶段）
+- 通过判定：TDD Red→Green→Refactor 完成 + 对抗式自检 ≥1 次通过 + 自检循环（lint/type-check/test）通过 + emoji 正则扫描无命中（VA-1）
+- 稳定性分类：演进型
+

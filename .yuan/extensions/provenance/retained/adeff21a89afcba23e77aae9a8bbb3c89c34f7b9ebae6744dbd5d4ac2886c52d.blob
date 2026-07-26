@@ -1,0 +1,25 @@
+## 一、设计原则
+
+```
+YuanForge 不构建 Runtime。
+LLM 自己就是 Runtime。
+
+但不同的 LLM 平台有不同的能力：
+  - Hermes: delegate_task（子 Agent 派发）
+  - Claude Code: subagent 模式
+  - Codex CLI: 新 Session 派发
+  - Cursor: 角色切换
+  - Manual: 人工执行
+
+Adapter Protocol 就是让每个平台回答同一个问题：
+  「你如何执行 Dispatch？你如何执行 Review？...」
+
+Intent 即 Trigger：
+  用户通过自然语言表达意图，Conductor 解析意图并推进状态机。
+  无需记忆命令，只需说「开始」「确认」「修改」。
+```
+
+**铁律**：平台只需要告诉 YuanForge「这些 Action 如何实现」——其余协议完全不用修改。
+
+---
+

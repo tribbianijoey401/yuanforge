@@ -1,0 +1,4 @@
+## 关键文件
+- src/auth/handler.py — API 处理器
+- src/auth/service.py — 业务逻辑
+

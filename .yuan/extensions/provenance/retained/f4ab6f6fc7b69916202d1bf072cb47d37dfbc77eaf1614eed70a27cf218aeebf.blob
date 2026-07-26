@@ -1,0 +1,6 @@
+## VA-2 禁止紫粉渐变主视觉
+
+- 禁止 `linear-gradient(135deg, #7C3AED→#A855F7→#EC4899)` 及 Indigo→Pink 任意渐变组合。
+- Indigo `#6366F1` 和 Slate Blue `#4F46E5` 作为纯色使用允许。
+- 红线禁止的是"Indigo→Pink 渐变 + 发光边框 + 毛玻璃"的三位一体 AI 模板套路。
+

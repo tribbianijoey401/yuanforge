@@ -1,0 +1,6 @@
+### 与 CAL 的关系
+
+CAL（Contract Assertion Layer）解析 seam-agreement 中的 `@ptg` 注解生成运行时断言。CAL 断言脚本在 PTG 执行时同步运行——断言断裂同样是 🔴 Blocker。
+
+---
+

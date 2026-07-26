@@ -1,0 +1,8 @@
+### 检索规则（设计某页面时执行）
+
+1. Read `design-system/MASTER.md` 获取全局设计源
+2. 检查 `design-system/pages/<page>.md` 是否存在
+   - 存在 → 该文件的字段覆盖 Master 对应字段，其余用 Master
+   - 不存在 → 完全用 Master
+3. 输出该页面的最终设计参数（Master + Override 合并结果）
+

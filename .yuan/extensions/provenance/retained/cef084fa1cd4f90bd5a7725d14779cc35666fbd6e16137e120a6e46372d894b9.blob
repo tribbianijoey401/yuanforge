@@ -1,0 +1,14 @@
+## 10. Scroll-Triggered Storytelling 滚动叙事
+
+- **关键词**：storytelling、scroll、narrative、immersive
+- **版块顺序**：
+  1. Intro hook
+  2. Chapter 1（problem）
+  3. Chapter 2（journey）
+  4. Chapter 3（solution）
+  5. Climax CTA
+- **主 CTA 放置位置**：每章末尾 mini + 最终 climax CTA
+- **配色策略**：渐进 reveal；每章不同色；构建 intensity
+- **推荐效果**：ScrollTrigger、parallax layers、progressive disclosure、chapter transition
+- **转化优化要点**：叙事提升 3x 停留时长；进度指示器；移动端简化动画
+

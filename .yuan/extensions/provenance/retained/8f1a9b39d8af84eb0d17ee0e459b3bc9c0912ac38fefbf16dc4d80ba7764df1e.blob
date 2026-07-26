@@ -1,0 +1,6 @@
+def _schema_path(kind: str) -> pathlib.Path:
+    if kind not in KINDS:
+        raise ValueError(f"unknown document kind: {kind}")
+    return CORE_ROOT / f"{kind}.schema.yaml"
+
+

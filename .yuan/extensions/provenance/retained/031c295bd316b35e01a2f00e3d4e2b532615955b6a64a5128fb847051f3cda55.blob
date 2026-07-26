@@ -1,0 +1,15 @@
+## 五、平台适配器文件位置
+
+```
+.yuan/platforms/
+├── hermes.md       ← Hermes Agent 平台适配
+├── manual.md       ← 通用人工兜底方案
+├── claude.md       ← Claude Code（未来）
+├── codex.md        ← Codex CLI（未来）
+└── cursor.md       ← Cursor（未来）
+```
+
+每个文件按 §三 的格式描述平台 Action 映射 + 能力声明。
+
+---
+

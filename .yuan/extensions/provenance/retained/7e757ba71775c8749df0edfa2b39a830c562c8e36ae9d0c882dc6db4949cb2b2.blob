@@ -1,0 +1,15 @@
+def authority_pointer(
+    repo_root: pathlib.Path,
+    shadow_root: pathlib.Path,
+    legacy_snapshot_sha256: str,
+) -> dict[str, Any]:
+    return {
+        "schema_version": "yuan.authority-pointer/v1",
+        "revision": 1,
+        "authority": "legacy",
+        "legacy_root": "docs",
+        "shadow_root": _relative(shadow_root, repo_root),
+        "legacy_snapshot_sha256": legacy_snapshot_sha256,
+    }
+
+

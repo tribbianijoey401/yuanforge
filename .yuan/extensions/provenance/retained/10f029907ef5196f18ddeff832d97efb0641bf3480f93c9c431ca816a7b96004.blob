@@ -1,0 +1,7 @@
+# Graph Query — 知识图谱查询 Skill
+
+> **让知识图谱从"死数据"变成"活索引"。**
+> Conductor 派发 Task 前，查询图谱获取 Feature/ADR/Pitfall 的依赖关系。
+
+---
+

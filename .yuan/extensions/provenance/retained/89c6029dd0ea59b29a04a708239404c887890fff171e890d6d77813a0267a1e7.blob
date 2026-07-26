@@ -1,0 +1,14 @@
+def _canonical_bytes(value: object) -> bytes:
+    try:
+        encoded = json.dumps(
+            value,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+    except (TypeError, ValueError) as error:
+        raise PortError("proposal data must be canonical JSON") from error
+    return encoded.encode("utf-8")
+
+

@@ -1,0 +1,8 @@
+#### adapt — 适配
+
+响应式与多平台适配。**适配不是缩放像素，是为新上下文重新思考体验**。
+
+- **执行步骤**：评估适配挑战（源上下文假设 / 目标上下文约束 / 适配挑战）→ 策略（移动 / 平板 / 桌面 / 打印 / 邮件各自策略）→ 实施（响应式断点 / 布局技术 / 触控适配 / 内容适配 / 导航适配）。
+- **检查项**：mobile-first（`min-width` 查询叠加复杂度）；内容驱动断点而非设备尺寸；检测输入方式（`@media (pointer: fine/coarse)` `@media (hover: hover/none)`）；`env(safe-area-inset-*)` + `viewport-fit=cover`；`srcset` + `sizes` 响应式图；触控 44×44；不依赖 hover 传递功能。
+- **反模式**：desktop-first；设备检测代替特性检测；分离 mobile/desktop 代码库；忽略平板与横屏；假设所有移动设备都强；隐藏核心功能；跨上下文用不同 IA（混淆）。
+

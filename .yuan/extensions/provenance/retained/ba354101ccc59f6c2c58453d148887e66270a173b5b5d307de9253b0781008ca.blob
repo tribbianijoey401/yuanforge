@@ -1,0 +1,15 @@
+def format_short(results):
+    """输出 short 格式（一行摘要）。"""
+    lines = []
+    for node in results:
+        nid = node.get("id", "?")
+        ntype = node.get("type", "?")
+        metadata = node.get("metadata", {})
+        depends = metadata.get("depends", [])
+        
+        dep_str = ", ".join(depends) if depends else "(无依赖)"
+        lines.append(f"{nid} ({ntype}) → depends: [{dep_str}]")
+    
+    return "\n".join(lines) if lines else "(无结果)"
+
+

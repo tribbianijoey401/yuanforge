@@ -1,0 +1,12 @@
+### 档位分级（引用 contract-conventions.md + NF-03 吸收）
+
+Conductor 根据任务重要程度决定审查深度：
+
+| 档位 | 触发条件 | 审查深度 | 示例 |
+|------|---------|---------|------|
+| 🟢 轻量 | 低风险、内部工具、原型验证 | 仅 Spec Reviewer + Tester | 前端样式调整、文档更新 |
+| 🟡 标准 | 常规功能、中等风险 | 四审查官并行（Quality/UX 可跳过） | 常规 API 端点、数据库迁移 |
+| 🔴 完整 | 高敏、核心链路、对外服务 | 四审查官全量 + 规则链审计（引用 contract-conventions.md「输出格式 · 要求」+ distill-workspace Skill） | 支付、认证、数据导出、用户可见界面 |
+
+**档位判定权**：Conductor 在 Phase 1 阶段由 Product Analyst 初步打标，Architect 确认。Phase 2 后若发现风险升级，Conductor 可动态提升档位。
+

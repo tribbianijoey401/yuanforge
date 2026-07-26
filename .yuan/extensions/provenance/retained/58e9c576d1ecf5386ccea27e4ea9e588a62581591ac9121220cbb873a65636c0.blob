@@ -1,0 +1,15 @@
+## 8. Scope, authorization, and budget
+
+Every action declares its type, mutability, relative scope, and budget charge.
+The Harness rejects absolute or escaping filesystem paths, symlink/junction
+escape, shell command strings, unbound executables, undeclared side-effect
+classes, and charges beyond remaining budget.
+
+Authorization is deny-by-default. A grant matches action type, side-effect
+class, and scope. Expired, absent, ambiguous, or broader-than-Work grants do not
+authorize execution. Human confirmation is required only for an otherwise legal
+step outside the frozen grant, a high-impact side effect, or a value judgment.
+
+Budgets are immutable maxima in Work and decrement in Run Memory. Exhaustion
+produces `BUDGET_EXIT`; silently extending a budget creates a new Work revision.
+

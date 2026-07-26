@@ -1,0 +1,24 @@
+## 五、发布状态机（← NF-12 新增）
+
+```text
+implemented
+  -> locally verified
+  -> pushed / PR opened
+  -> CI + required backtest/visual review passed
+  -> merged
+  -> deployed
+  -> live verified
+  -> knowledge closed + receipt recorded
+  -> full result reported while evidence is preserved
+  -> user explicitly approved cleanup after the report
+  -> workspace cleaned
+  -> post-cleanup audit passed
+  -> cleanup result appended
+```
+
+- 跳过的状态必须有项目规则允许的原因
+- 失败停在哪一格，就按那一格汇报，不能用"基本完成"覆盖
+- 只验证其中一个表面时，在结论里明确限制范围
+
+---
+

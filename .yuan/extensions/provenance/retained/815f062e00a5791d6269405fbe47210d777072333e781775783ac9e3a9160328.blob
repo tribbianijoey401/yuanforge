@@ -1,0 +1,22 @@
+### 失败假设生命周期
+
+```
+ACTIVE
+  ↓ [已验证不正确]
+VERIFIED_FALSE
+  ↓ [蒸馏到 knowledge/]
+DISTILLED
+  ↓ [归档]
+ARCHIVED
+```
+
+**规则**：
+- Checkpoint 只保留 `ACTIVE` 状态的假设（当前仍在怀疑的）
+- 假设一旦 `VERIFIED_FALSE`，立即蒸馏到 `knowledge/pitfalls/` 或留在当前 Checkpoint 的 `failed_hypotheses` 段
+- `DISTILLED` 状态的假设从 Checkpoint 中删除，不再占用空间
+- `ARCHIVED` 状态的假设随 Workspace 归档
+
+**目的**：LLM 最容易重复犯同一个错误。Checkpoint 记录失败假设，下次恢复时不会重新走上同一条死路。
+
+---
+

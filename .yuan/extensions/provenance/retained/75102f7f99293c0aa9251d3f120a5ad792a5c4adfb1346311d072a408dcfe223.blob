@@ -1,0 +1,15 @@
+### 事件类型
+
+| type | 含义 | 写入时机 |
+|------|------|---------|
+| `TASK_STATUS_CHANGED` | 任务状态变更 | 每次 Task 状态变化 |
+| `REVIEW_RESULT` | 审查结果 | 审查完成后 |
+| `DISTILLATION_COMPLETE` | 蒸馏完成 | Workspace Close 时 |
+| `WORKSPACE_CLOSED` | 工作区关闭 | 归档时 |
+| `CRASH_RECOVERED` | 崩溃恢复 | 跨会话恢复时 |
+| `SESSION_EXITED` | 会话退出 | 用户触发暂停/自然结束 |
+| `HUMAN_GATE_TRIGGERED` | 人工介入点触发 | 遇到 Gate 时 |
+| `LOOP_METRICS` | Loop 遥测数据 | 每次 Loop 结束时 |
+
+---
+

@@ -1,0 +1,11 @@
+def resolve_within(root: pathlib.Path, relative: Any, field: str) -> pathlib.Path:
+    if not isinstance(relative, str) or not relative or pathlib.Path(relative).is_absolute():
+        raise ManifestError(f"{field} must be a non-empty relative path")
+    resolved = (root / relative).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError as error:
+        raise ManifestError(f"{field} escapes the manifest directory") from error
+    return resolved
+
+

@@ -1,0 +1,9 @@
+#   失败: 打印错误信息，返回 1
+
+set -euo pipefail
+
+# ========== 配置 ==========
+PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+KNOWLEDGE_DIR="$PROJECT_ROOT/docs/knowledge/pitfalls"
+EVENTS_DIR="$PROJECT_ROOT/docs/events"
+

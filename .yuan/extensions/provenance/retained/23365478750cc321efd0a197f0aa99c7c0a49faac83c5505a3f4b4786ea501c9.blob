@@ -1,0 +1,13 @@
+## 一、设计原则
+
+```
+Workflow 决定：下一步应该干什么。
+Workflow 不决定：谁来做、怎么做。
+
+Conductor 是 Workflow 的解释器，不是 Scheduler。
+它不知道这是 Claude 还是 Codex。
+它只读 Protocol → 产出 Action → 交给 Adapter。
+```
+
+---
+

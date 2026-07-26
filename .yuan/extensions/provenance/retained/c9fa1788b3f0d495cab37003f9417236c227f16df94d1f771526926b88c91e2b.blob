@@ -1,0 +1,22 @@
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--candidate", type=pathlib.Path, default=CORE_ROOT)
+    parser.add_argument("--receipt", type=pathlib.Path)
+    args = parser.parse_args()
+    try:
+        result = run_candidate(args.candidate.resolve())
+    except (OSError, ValueError, KeyError, json.JSONDecodeError) as error:
+        result = {
+            "schema_version": "yuan.validator-result/v1",
+            "status": "FAIL",
+            "assertions": 1,
+            "checks": [{"id": "candidate-readable", "status": "FAIL"}],
+            "error": str(error),
+        }
+    payload = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
+    if args.receipt:
+        args.receipt.write_text(payload, encoding="utf-8", newline="\n")
+    print(payload, end="")
+    return 0 if result["status"] == "PASS" and result["assertions"] > 0 else 1
+
+

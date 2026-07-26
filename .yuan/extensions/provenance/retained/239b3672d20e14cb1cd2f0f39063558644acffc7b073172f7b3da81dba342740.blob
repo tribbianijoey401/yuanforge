@@ -1,0 +1,14 @@
+### 5.2 Goal Stack（嵌套 Goal）
+
+```
+Goal (parent=null, priority=1)
+  ├─ Goal G1.1 (parent=G1, priority=2)
+  │    └─ Task T01..T05
+  └─ Goal G1.2 (parent=G1, priority=3)
+       └─ Task T06..T10
+```
+
+- 子 Goal 完成 → 父 Goal 自动推进
+- 父 Goal 取消 → 所有子 Goal 级联取消
+- Conductor 按 `priority` 升序选择下一个 Goal 推进
+

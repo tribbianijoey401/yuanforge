@@ -1,0 +1,14 @@
+## 产出
+
+| 输出 | 位置 | 内容 |
+|------|------|------|
+| **设计理解书** | 提交 Conductor → 用户确认 | 核心实体 + 数据流 + 关键交互 |
+| **Plan 文件** | `docs/YYYYMMDD-描述/PLAN.md` | 含完整的 Dispatch Table |
+| **Dispatch Table** | Plan 中的 `## Dispatch Plan` 段 | Task ID、role、依赖、产出物、门禁 |
+| 架构更新 | `docs/ARCHITECTURE.md`（只追加"模块说明"片段；总览图/索引/一致性校验归 Doc Engineer） |
+| 技术决策 | 会话中的 ADR-NNN.md | 每个选型一个 ADR |
+| 术语 | `docs/glossary.md` | 引入的新概念 |
+| OPEN-DECISIONS 登记 | `docs/decisions/OPEN-DECISIONS.md` | 悬决项只追加+就地关闭，三类固定 slug（architect 产出时即登记） |
+
+---
+

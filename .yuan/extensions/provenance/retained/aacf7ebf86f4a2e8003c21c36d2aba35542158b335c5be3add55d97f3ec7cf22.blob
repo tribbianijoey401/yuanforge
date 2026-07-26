@@ -1,0 +1,14 @@
+### 恢复规则
+
+```
+新 Agent 领取任务时:
+  1. 读 TASK_BOARD → 确认任务是 🔨进行中 还是 🟢就绪
+  2. 读 agents/<role>.yaml:
+     ├─ 不存在 → 全新开始
+     ├─ status=completed → 任务已完成，检查 TASK_BOARD 状态是否匹配
+     ├─ status=failed → 读 failure_reason，决定是否重新尝试
+     └─ status=executing/checkpoint → 从 current.step + next_action 接续
+  3. 检查 files.modified → git status 对比 → 处理脏文件
+  4. 接续工作
+```
+

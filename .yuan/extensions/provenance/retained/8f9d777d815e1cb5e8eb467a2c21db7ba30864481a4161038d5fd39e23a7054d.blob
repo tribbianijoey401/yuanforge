@@ -1,0 +1,26 @@
+def reduce_tick(signals: dict[str, Any]) -> str:
+    states = signals.get("side_effect_states", [])
+    if (
+        signals.get("state_consistent") is not True
+        or "UNKNOWN" in states
+        or signals.get("legal_next_step") is False
+    ):
+        return "BLOCKED"
+    if signals.get("authorization_required") is True:
+        return "WAIT_AUTH"
+    if signals.get("budget_exhausted") is True:
+        return "BUDGET_EXIT"
+    if signals.get("completion_satisfied") is True:
+        return "COMPLETE"
+    if (
+        signals.get("hypothesis_refuted") is True
+        and signals.get("different_strategy_available") is True
+    ):
+        return "CORRECT"
+    if signals.get("new_relevant_evidence") is True and signals.get(
+        "legal_next_step"
+    ) is True:
+        return "CONTINUE"
+    return "BLOCKED"
+
+

@@ -1,0 +1,8 @@
+def generated_tree_files(root: pathlib.Path) -> dict[str, str]:
+    return {
+        path.relative_to(root).as_posix(): file_sha256(path)
+        for path in sorted(root.rglob("*"))
+        if path.is_file()
+    }
+
+

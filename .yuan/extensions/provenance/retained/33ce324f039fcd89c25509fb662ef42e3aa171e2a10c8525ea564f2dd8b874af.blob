@@ -1,0 +1,54 @@
+## Action 映射（Adapter Protocol §三）
+
+本平台如何实现 8 个统一 Action：
+
+```yaml
+platform: manual
+transport: human-operated
+
+dispatch:
+  implementation: prompt_user
+  notes: |
+    提示用户:
+    1. 打开 contracts/<role>.md 了解角色合约
+    2. 读 TASK_BOARD.md 找到 🟢就绪 任务
+    3. 以对应角色身份执行 Task
+    4. 完成后更新 TASK_BOARD.md 状态行
+
+review:
+  implementation: prompt_user
+  notes: |
+    提示用户:
+    1. 选择审查角色（spec-reviewer / security-auditor / quality-auditor / ux-reviewer）
+    2. 读对应合约 + 验收标准
+    3. 执行审查（合规路径 + 对抗路径）
+    4. 输出审查报告（独立呈现）
+
+snapshot:
+  implementation: manual_checkpoint
+  notes: "提示用户记录当前进度到 agents/<role>.yaml"
+
+checkpoint:
+  implementation: manual_archive
+  notes: "提示用户打包 Workspace"
+
+recover:
+  implementation: manual_check
+  notes: "提示用户检查 TASK_BOARD 异常并手动恢复"
+
+archive:
+  implementation: manual_move
+  notes: "提示用户移动 Workspace 目录到 archive/"
+
+promote:
+  implementation: manual_extract
+  notes: |
+    提示用户按 distillation-checklist 执行:
+    1. FEATURE.md → knowledge/features/
+    2. ADR → knowledge/decisions/
+    3. BUG → 判断 → knowledge/pitfalls/ 或跳过
+    4. 运行 scripts/build-graph.py
+```
+
+---
+

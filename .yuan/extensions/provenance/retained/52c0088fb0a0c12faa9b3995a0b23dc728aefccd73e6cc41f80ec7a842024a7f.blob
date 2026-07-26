@@ -1,0 +1,25 @@
+for filepath, required_anchors in REQUIRED_ANCHORS.items():
+    if filepath not in staged_files:
+        continue
+    
+    path = REPO_ROOT / filepath
+    if not path.exists():
+        print(f"⚠️  {filepath}: file not found, skipping anchor check")
+        continue
+    
+    content = path.read_text()
+    missing = []
+    for anchor in required_anchors:
+        if anchor not in content:
+            missing.append(anchor)
+    
+    if missing:
+        print(f"❌ {filepath}: missing required anchors: {missing}")
+        sys.exit(1)
+    else:
+        print(f"  ✓ {filepath}: all {len(required_anchors)} anchors present")
+
+
+# ── Scorecard audit (event-driven, after contract creation/modification) ──
+
+# Check if any contract file was staged

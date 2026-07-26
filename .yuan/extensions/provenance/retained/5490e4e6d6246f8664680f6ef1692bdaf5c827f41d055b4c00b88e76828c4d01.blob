@@ -1,0 +1,14 @@
+## Memory 文件体系
+
+| 文件 | 优先级 | 读取时机 | 用途 |
+|------|--------|---------|------|
+| **`docs/PROGRESS.md`** | 🔴 必读 | 每次启动 | 当前在哪？下一步做什么？ |
+| **`docs/ARCHITECTURE.md`** | 🔴 必读 | 首次 + 架构变更 | 系统怎么设计的？ |
+| **`docs/knowledge/pitfalls/`** | 🔴 必读 | 每次启动 | 踩过什么坑？别重复 |
+| **当前 Workspace 的 `ADR-NNN.md`** | 🟡 按需 | 技术选型时 | 为什么选这些技术？ |
+| **`docs/knowledge/decisions/`** | 🟡 按需 | 查询已归档决策时 | 为什么选这些技术？ |
+| **`docs/glossary.md`** | 🟡 按需 | 遇到陌生术语 | 这个词什么意思？ |
+| **当前 Workspace 的 `SESSION_LOG.md`** | 🟢 深挖 | 需要了解历史 | 上次干了什么？ |
+
+---
+

@@ -1,0 +1,22 @@
+## 平台能力描述符
+
+```yaml
+platform: manual
+version: "2.0"
+
+capabilities:
+  subagent: false
+  parallel: false
+  filesystem: manual
+  shell: manual
+  persistent_session: false
+  knowledge_graph: false
+  event_store: manual
+  git: manual
+
+execution:
+  strategies: [sequential, manual]
+```
+
+---
+

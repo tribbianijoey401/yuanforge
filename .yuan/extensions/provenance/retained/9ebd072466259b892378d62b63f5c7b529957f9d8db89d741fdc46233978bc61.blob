@@ -1,0 +1,6 @@
+### 4. 查 Landing Page 模式
+
+```bash
+grep -i "<模式>" <skill_dir>/references/landing.csv
+```
+

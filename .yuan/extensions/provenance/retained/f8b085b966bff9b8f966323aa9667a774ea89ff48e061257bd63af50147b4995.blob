@@ -1,0 +1,28 @@
+def atomic_write(
+    path: pathlib.Path,
+    payload: bytes,
+    *,
+    expected_before_sha256: str | None = None,
+) -> None:
+    if path.exists():
+        if not path.is_file():
+            raise MigrationError(f"write target is not a file: {path}")
+        actual = file_sha256(path)
+        if expected_before_sha256 is None or actual != expected_before_sha256:
+            raise GuardError(f"compare-and-swap mismatch: {path}")
+    elif expected_before_sha256 is not None:
+        raise GuardError(f"compare-and-swap target missing: {path}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    temporary = pathlib.Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(payload)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+
+

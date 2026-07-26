@@ -1,0 +1,26 @@
+## 二、平台能力声明 (capability.yaml)
+
+> 每个平台 Adapter 必须声明自身能力，用于 Conductor 做调度决策。
+
+```yaml
+# 示例：Hermes 平台能力声明
+platform: hermes
+supports_goal: native | markdown   # 是否原生支持持久化 Goal
+supports_subagent: true | false    # 是否可派发独立子 Agent
+supports_resume: native | markdown # 是否原生恢复会话
+supports_async: true | false       # 是否支持后台运行
+```
+
+| 字段 | 说明 |
+|------|------|
+| `supports_goal` | `native`=平台原生支持 Goal 概念（如 Codex/Claude Code 的 /goal 命令）；`markdown`=需写入文件 |
+| `supports_subagent` | 是否可派发独立子 Agent |
+| `supports_resume` | 是否原生支持会话恢复 |
+| `supports_async` | 是否支持后台异步执行 |
+
+**Goal 适配**：
+- 若 `supports_goal: native`：Adapter 将 `Goal Activated` 事件翻译为平台命令
+- 若 `supports_goal: markdown`：Adapter 将 Goal 对象写入 `docs/runtime/current-goal.md`
+
+---
+

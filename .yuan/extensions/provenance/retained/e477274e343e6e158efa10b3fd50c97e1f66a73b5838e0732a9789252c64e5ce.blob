@@ -1,0 +1,27 @@
+### Phase 2: Plan（方案设计）
+
+```
+输入: 用户故事 + 验收标准
+触发: Phase 1 用户确认后
+
+Action Sequence:
+  1. Dispatch(architect)
+     输入: 用户故事 + 验收标准
+     动作: 输出「设计理解书」（核心实体 + 数据流 + 关键交互 + 推导链标注）
+  2. Wait: Conductor 审视推导链完整性 → 用户确认理解正确
+  3. Architect 产出: API 契约(freeze) + 数据模型 + Plan(含 Dispatch Table)
+  4. [有界面时] Dispatch(ui-designer) — 与 Architect 并行
+     产出: 视觉规范 + 交互原型
+
+Gate G1:
+  - 用户确认 Plan ✓
+  - API 契约已 freeze
+  - Dispatch Table 完整（每个 Task 有 role/depends/output）
+
+产出:
+  - Plan（含 Dispatch Table）
+  - API 契约（冻结）
+  - 数据模型
+  - [有界面] 视觉规范 + 原型
+```
+

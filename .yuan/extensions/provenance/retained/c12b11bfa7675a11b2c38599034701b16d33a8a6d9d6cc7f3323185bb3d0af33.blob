@@ -1,0 +1,7 @@
+@dataclass(frozen=True)
+class EnumeratedFile:
+    path: str
+    sha256: str
+    size_bytes: int
+
+

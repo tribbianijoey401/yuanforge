@@ -1,0 +1,8 @@
+### AP-CONCURRENT-006: 合约结构不一致导致模板渲染失败
+
+- **描述**: 13 个合约有 10 种结构（v2.6 审计发现，v3.0 仍未统一）。Architect 参照旧合约模板创建新合约时，结构差异导致 Conductor 解析失败或 Key Auditor 无法标准化检查。
+- **重现条件**: 新角色合约创建时未引用 role-contract.md 模板结构。
+- **修复方式**: 以 TEMPLATE.md 为权威结构，所有合约引用而非重抄。
+- **验证方式**: Role-Scorecard P-F 骨架检查 + pre-commit 脚本验证。
+- **@ptg**: false  — 这是文档结构性问题，通过 self-test 和 Scorecard 覆盖即可。
+

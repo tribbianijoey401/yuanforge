@@ -1,0 +1,16 @@
+### G2 审查三档 + 并行规则
+
+```
+                    ┌── Spec Reviewer ──→ 🔴 Blocker (必须解决)
+Dev 完成 Task ──→ │
+                    ├── Security Auditor ──→ 🔴 Blocker (按 R0/R1/R2 分级执行)
+                    │
+                    ├── Quality Auditor ──→ 🟢 Advisory (DB+性能合并)
+                    │                          🟠 同类警告 ≥3 次 → 自动升级 🔴
+                    │
+                    └── UX Reviewer ──→ 🟢 Advisory (有界面时触发)
+                                            🟠 同类警告 ≥3 次 → 自动升级 🔴
+```
+
+**并行规则**：四个审查官同时启动。任意审查官发现 🔴 Blocker → 立即通知其他审查官暂停。Blocker 解决后 → Conductor 通知从断点恢复。
+

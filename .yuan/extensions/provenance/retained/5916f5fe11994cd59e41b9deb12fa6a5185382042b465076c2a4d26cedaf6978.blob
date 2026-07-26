@@ -1,0 +1,13 @@
+def write_target_version(target: Path, dry_run: bool = False):
+    """写入当前框架版本到目标。"""
+    if dry_run:
+        return
+    ver_file = target / ".yuan" / "VERSION"
+    ver_file.parent.mkdir(parents=True, exist_ok=True)
+    ver_file.write_text(FRAMEWORK_VERSION + "\n")
+
+
+# ═══════════════════════════════════════════════════════════
+# 输出
+# ═══════════════════════════════════════════════════════════
+

@@ -1,0 +1,16 @@
+def cleanup_known_stale(target: Path, dry_run: bool = False) -> list:
+    """删除已知的旧文件/目录。"""
+    removed = []
+    for relpath in KNOWN_STALE_PATHS:
+        filepath = target / relpath
+        if not filepath.exists():
+            continue
+        if not dry_run:
+            if filepath.is_dir():
+                shutil.rmtree(filepath)
+            else:
+                filepath.unlink()
+        removed.append(relpath)
+    return removed
+
+

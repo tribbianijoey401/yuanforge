@@ -1,0 +1,10 @@
+## 四、可选后续增强（未做，待确认）
+
+1. **emoji 正则扫描接入 pre-commit**：把 `visual-absolutes.md` 的正则接到 `scripts/pre-commit`，CI 层拦截（对应 AP-ENV-008 类问题）。
+2. **OPEN-DECISIONS 登记**：在 `docs/decisions/` 建 `OPEN-DECISIONS.md`（3 slug + 只追加关闭），由 Doc Engineer 在 Phase 5 蒸馏时归档。
+3. **pitfall 自学习闭环**：让 `knowledge-injection` 从"全局注入"升级为"按 package.json 指纹召回相关坑"，对齐 MVP 团的坑触发机制。
+4. **Spec 12 章模板**：把 architect.md 的「Spec 即契约」落成 `templates/spec-contract.md`，由 Conductor 在 G1 门禁前要求。
+5. **P0 视觉分进 role-scorecard**：在 scorecard 增加"VA 违规数"维度，量化压制模板味。
+
+---
+

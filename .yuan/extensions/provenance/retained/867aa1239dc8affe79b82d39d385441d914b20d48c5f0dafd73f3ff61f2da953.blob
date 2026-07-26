@@ -1,0 +1,2 @@
+VALID_MODULE_STATUS = {'active', 'deprecated'}
+

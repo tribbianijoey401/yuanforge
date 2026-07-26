@@ -1,0 +1,14 @@
+### 13. Motion-Driven 动效驱动
+- **关键词**：GSAP、scroll-driven、cinematic、narrative
+- **主色方向**：服务于动效的中性背景
+- **辅助色**：动效高亮色
+- **效果与动效**：scroll-trigger、pinned scene、parallax、scrub
+- **最适用于**：品牌官网、产品发布页、Agency 作品集、奢侈汽车
+- **不适用于**：后台管理、文档站、电商列表
+- **浅色模式**：完美适配
+- **深色模式**：完美适配
+- **性能影响**：⚠ 必须配合 will-change 与 transform
+- **无障碍**：⚠ 必须支持 reduced-motion
+- **移动端友好度**：中（移动端动效需简化）
+- **转化导向**：中（沉浸感强但跳出率需监控）
+

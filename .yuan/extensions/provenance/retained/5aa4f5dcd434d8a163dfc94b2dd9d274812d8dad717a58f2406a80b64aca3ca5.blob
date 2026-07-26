@@ -1,0 +1,26 @@
+### 恢复报告格式
+
+```markdown
+<SECTION-END:session-crash-recovery>
+## 崩溃恢复
+
+> 检测时间: YYYY-MM-DD HH:MM
+> 恢复原因: Conductor 异常中断（SESSION_LOG 不完整 / TASK_BOARD 有 🔨 任务 / 其他）
+
+### Git 状态
+| HEAD | 脏文件 |
+|------|--------|
+| a1b2c3d | src/auth/login.py (modified), tests/test_auth.py (untracked) |
+
+### 恢复操作
+| 任务 | 原状态 | 新状态 | 已有进度 |
+|------|--------|--------|---------|
+| T03 | 🔨进行中 | 🟢就绪（崩溃恢复） | SESSION_LOG 记录: 简述="登录 UI 组件", Commit=— |
+| T04 | ⏳等待 | ⏳等待（保留） | — |
+
+### 注意事项
+- ⚠️ Git working tree 有未提交修改，新 Agent 先 `git stash` 或检查后决定保留/丢弃
+```
+
+---
+

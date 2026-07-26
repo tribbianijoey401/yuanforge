@@ -1,0 +1,13 @@
+## 四、验证规则
+
+合并前 Conductor 必须验证：
+
+| 检查项 | 不通过的处理 |
+|--------|-------------|
+| Proposal 的 frontmatter 是否完整？ | 打回 Agent |
+| Proposal 是否更新了 verified_commit？ | 打回 Agent（必须验代码） |
+| 目标正文是否仍然有效（未被其他人改动）？ | 先更新目标，再合并 |
+| 是否引用了不存在的 depends？ | 打回 Agent（错误引用） |
+
+---
+

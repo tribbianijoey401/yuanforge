@@ -1,0 +1,8 @@
+#### hooks — 设计检测钩子
+
+管理 per-project 设计检测器。edit 后 post-tool-use 推 reminder（Claude Code / Codex / Copilot）或 preToolUse 阻止坏写（Cursor）。
+
+- **执行步骤**：路由 action（status / on / off / ignore-rule / ignore-file / ignore-value / reset）→ 调 `hook-admin.mjs` → 用户验证后持久化例外。
+- **检查项**：例外收窄到最具体（`ignore-value` 优于 `ignore-rule`，file-scoped 优于 `ignore-file`）；共享 config 默认，`--local` 仅用户明确要私人例外；inline 注释 disable marker 仅随导出文件离开仓库时用。
+- **反模式**：手工编辑项目设计 config（必须走 admin 脚本保 schema 一致）；detector clean 当作设计好的证据；用 `ignore-file` 静音真 UI 文件（应 `ignore-value "*" --file`）。
+

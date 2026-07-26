@@ -1,0 +1,26 @@
+def _extract_goal(workspace: LegacyWorkspace) -> tuple[str, list[dict[str, str]]]:
+    unresolved: list[dict[str, str]] = []
+    feature = workspace.documents.get("FEATURE.md")
+    if feature:
+        text = feature.read_text(encoding="utf-8")
+        goal = _extract_section(text, "用户意图")
+        if goal:
+            return goal, unresolved
+    plan = workspace.documents.get("PLAN.md")
+    if plan:
+        text = plan.read_text(encoding="utf-8")
+        match = re.search(
+            r"^-\s+\*\*目标:?\*\*\s*:?\s*(.+)$", text, re.MULTILINE
+        )
+        if match:
+            return match.group(1).strip(), unresolved
+    unresolved.append(
+        {
+            "code": "GOAL_UNRESOLVED",
+            "source": workspace.workspace_id,
+            "detail": "no verbatim user intent or Plan goal found",
+        }
+    )
+    return f"Unresolved legacy intent for workspace {workspace.workspace_id}", unresolved
+
+

@@ -1,0 +1,15 @@
+## 依赖
+
+**YuanForge 不依赖任何特定工具。** 它是一套规则（Markdown 文件），任何能读懂规则、执行命令的 Agent 平台都能运行。
+
+| 你需要什么 | 说明 |
+|-----------|------|
+| 一个 Agent 平台 | Hermes Agent / Cursor / Claude Code / Codex CLI / Copilot ... 任意一个 |
+| Git | 版本控制 |
+| Python 3（仅 `yuanforge-init`） | 项目初始化脚本 |
+| 无其他依赖 | 具体项目需要的运行时由 Agent 按需安装 |
+
+> YuanForge 是规则，不是代码。它不绑定语言、不绑定框架、不绑定平台。
+
+---
+

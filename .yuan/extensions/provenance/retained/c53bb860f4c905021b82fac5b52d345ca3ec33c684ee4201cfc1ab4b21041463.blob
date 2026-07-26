@@ -1,0 +1,13 @@
+## TASK_BOARD 管理
+
+| 操作 | 谁 | 时机 |
+|------|-----|------|
+| 初始化 | Conductor | Phase 3 开始，从 Dispatch Table 复制 |
+| 领取 Task | Agent | 找到自己角色 + 🟢就绪 的行 |
+| 更新状态 | Agent | 🔨→✅ 完成时 |
+| Promote 下游 | Conductor | 每次 Task Complete 后重算依赖 |
+| 巡检 | Conductor | 持续：超时回退、阻塞升级、更新快照 |
+| 上下文传递 | Agent | 完成时追加「上下文传递」行 |
+
+---
+

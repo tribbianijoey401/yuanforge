@@ -1,0 +1,4 @@
+class ProposalProvider(Protocol):
+    def propose(self, request: dict[str, Any]) -> dict[str, Any]: ...
+
+

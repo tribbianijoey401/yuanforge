@@ -1,0 +1,12 @@
+## 四、归档后访问
+
+归档的 Workspace 仍然可读：
+
+- `docs/archive/YYYYMMDD-描述/PLAN.md` — 回顾设计
+- `docs/archive/YYYYMMDD-描述/SESSION_LOG.md` — 回顾过程
+- `docs/archive/YYYYMMDD-描述/BUG-NNN.md` — 追溯 Bug
+
+Knowledge 文件中已包含指向 archive 的链接（如 `[PLAN](../archive/YYYYMMDD-描述/PLAN.md)`）。
+
+---
+

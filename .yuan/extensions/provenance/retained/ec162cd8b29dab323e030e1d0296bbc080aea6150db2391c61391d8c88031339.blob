@@ -1,0 +1,6 @@
+## 五、Goal 定义（逻辑分组）
+
+> **Goal 不是 Runtime 对象**，是 Task 的 `goal` 字段的逻辑分组。
+> **协议最小化**：所有 Goal 信息从 TASK_BOARD 推导，不单独存储 Goal 状态。
+> **铁律**：Goal 不参与调度、派发或状态机维护。Goal 的状态由其包含 Task 的状态纯函数推导。
+

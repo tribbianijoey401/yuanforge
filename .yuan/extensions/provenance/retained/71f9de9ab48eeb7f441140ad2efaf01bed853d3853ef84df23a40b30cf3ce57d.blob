@@ -1,0 +1,8 @@
+## 触发条件
+
+- Dev subagent 启动（Phase 2 执行 Task）
+- 用户说「写测试」「TDD」
+- Dev 准备写代码时自动加载
+
+---
+

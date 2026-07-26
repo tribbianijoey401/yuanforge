@@ -1,0 +1,17 @@
+### 文档入库流水线
+```
+原始文档(PDF/Word/HTML/Markdown)
+    ↓
+文档解析(Python-docx/PyPDF/BeautifulSoup)
+    ↓
+元数据提取(标题/作者/日期/分类/权限标签)
+    ↓
+分块(混合策略: 语义断点 + 滑动窗口)
+    ↓
+向量化(OpenAI/BGE/GLM embedding)
+    ↓
+存储(pgvector + 关系数据库)
+    ↓
+索引构建(HNSW + BM25 + 业务索引)
+```
+

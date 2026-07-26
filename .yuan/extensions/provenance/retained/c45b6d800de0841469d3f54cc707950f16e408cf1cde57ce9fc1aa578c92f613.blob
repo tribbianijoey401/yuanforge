@@ -1,0 +1,11 @@
+## 铁律 Ⅳ — 原子提交
+
+**一个 Task 一个 Commit。不混入无关修改。**
+
+- Commit message 格式：`feat(task-NNN): 简短描述`
+- 一个 Commit 只包含一个 Task 的实现 + 测试
+- 禁止"顺便修了个 typo""顺便重构了XX" — 开新 Task
+- 禁止提交未完成的工作（WIP）到主分支
+
+<SECTION-END:4>
+

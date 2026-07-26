@@ -1,0 +1,17 @@
+## 12. 餐饮 / 餐厅
+
+- **推荐落地页模式**：Hero-Centric + Conversion
+- **风格优先级**：主 Vibrant & Block-based / 备 Motion-Driven
+- **配色氛围**：食欲红 #DC2626 + 暖金 #A16207
+- **字体情绪**：诱人 + 优雅（Playfair Display SC + Karla）
+- **关键效果**：菜品大图 parallax + 在线点单 CTA
+- **决策规则**：
+```json
+{
+  "if_online_order": "add-sticky-order-button",
+  "if_reservation": "add-opentable-widget",
+  "if_menu_pdf": "replace-with-html-menu"
+}
+```
+- **反模式**：PDF 菜单、无图片、无营业时间、过暗
+

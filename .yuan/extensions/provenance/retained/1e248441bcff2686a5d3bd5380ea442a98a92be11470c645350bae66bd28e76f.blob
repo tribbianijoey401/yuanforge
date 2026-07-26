@@ -1,0 +1,8 @@
+def read_target_version(target: Path) -> str:
+    """读取目标项目的框架版本。"""
+    ver_file = target / ".yuan" / "VERSION"
+    if ver_file.exists():
+        return ver_file.read_text().strip()
+    return "none"
+
+

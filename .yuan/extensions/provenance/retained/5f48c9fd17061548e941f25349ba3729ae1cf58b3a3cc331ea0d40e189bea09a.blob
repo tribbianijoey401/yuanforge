@@ -1,0 +1,16 @@
+class _ProposalProvider:
+    provider_id = "author-test-provider"
+    model_id = "author-test-model"
+
+    def propose(self, request: dict[str, object]) -> dict[str, object]:
+        return {
+            "proposal": {
+                "action": {
+                    "type": "file-write",
+                    "scope": request["target"],
+                    "content": "proposal only",
+                }
+            }
+        }
+
+

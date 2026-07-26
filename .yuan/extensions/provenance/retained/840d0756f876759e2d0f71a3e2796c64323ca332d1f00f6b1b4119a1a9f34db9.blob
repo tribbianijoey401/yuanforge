@@ -1,0 +1,11 @@
+## 蒸馏规则
+
+| 源文件 | 蒸馏去向 | 动作 | 执行者 |
+|--------|---------|------|--------|
+| FEATURE.md | `knowledge/features/FEAT-NNN.md` | **重新创建为对象实例**：填完整 frontmatter（id/object_type/owner/status/summary/depends/verified_commit/confidence），正文精简为需求描述+设计思路+API+修改文件 | Conductor |
+| ADR-NNN.md | `knowledge/decisions/ADR-NNN.md` | **完整复制 + 加 frontmatter**：保留背景/决策/备选方案/后果，加对象元数据 | Conductor |
+| BUG-NNN.md | **归档判断** → `knowledge/pitfalls/PIT-NNN.md` 或留在 archive | 会重复出现 → 蒸馏为 Pitfall 对象（填 severity/type/cause/fix）。一次性 → 不蒸馏，留在 Workspace 归档中 | Conductor |
+| PLAN.md | `workspace/backlog.md` | 未完成任务的 Task ID 追加到 backlog | Conductor |
+| TASK_BOARD.md | — | **不蒸馏**。Runtime 状态，随 Workspace 归档 | — |
+| SESSION_LOG.md | — | **不蒸馏**。Human 日志，随 Workspace 归档 | — |
+

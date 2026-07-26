@@ -1,0 +1,4 @@
+### 脚本层
+scripts/ptg-cal-gen.py  # CAL 断言生成器 — 解析错误导致契约断裂逃逸
+.yuan/skills/ptg-runner.md  # PTG Runner Skill — 框架标准执行能力
+

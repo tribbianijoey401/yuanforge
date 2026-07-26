@@ -1,0 +1,72 @@
+### 3.5 DISTILLATION_COMPLETE
+
+**触发**：Workspace Close 蒸馏完成时。
+
+**优化**：此事件已合并 `KNOWLEDGE_UPDATED` 的信息，包含完整的知识产出列表。
+
+```json
+{
+  "type": "DISTILLATION_COMPLETE",
+  "timestamp": "2026-07-09T17:00:00Z",
+  "session": "20260709-用户认证",
+  "actor": "conductor",
+  "payload": {
+    "outputs": [
+      {"type": "feature", "id": "FEAT-AUTH"},
+      {"type": "decision", "id": "ADR-003"},
+      {"type": "pitfall", "id": "PIT-012"}
+    ],
+    "not_distilled": [
+      {"source": "BUG-006.md", "reason": "一次性环境问题"}
+    ],
+    "backlog_items": ["T05"]
+  }
+}
+```
+```
+
+### 3.6 WORKSPACE_CLOSED
+
+**触发**：Workspace 归档完成时。
+
+```json
+{
+  "type": "WORKSPACE_CLOSED",
+  "timestamp": "2026-07-09T17:05:00Z",
+  "session": "20260709-用户认证",
+  "actor": "conductor",
+  "payload": {
+    "archive_path": "archive/20260709-用户认证/",
+    "total_tasks": 5,
+    "completed_tasks": 4,
+    "duration_minutes": 390
+  }
+}
+```
+
+### 3.7 CRASH_RECOVERED
+
+**触发**：崩溃恢复完成时。
+
+```json
+{
+  "type": "CRASH_RECOVERED",
+  "timestamp": "2026-07-09T10:00:00Z",
+  "session": "20260709-用户认证",
+  "actor": "conductor",
+  "payload": {
+    "previous_session": "20260708-对抗式审查",
+    "recovered_tasks": ["T03", "T04"],
+    "dirty_files": ["src/auth/login.py"],
+    "git_head_at_recovery": "d4e5f6g"
+  }
+}
+```
+
+### 3.8 ERROR_OCCURRED（已废弃）
+
+> **已合并到其他事件**。错误信息现在作为 `payload.error` 字段附加到对应事件中。
+> 例如：TASK_STATUS_CHANGED 的 BLOCK 类型可以携带 error 字段。
+> 此事件类型保留仅供向后兼容，新代码不应再使用。
+```
+

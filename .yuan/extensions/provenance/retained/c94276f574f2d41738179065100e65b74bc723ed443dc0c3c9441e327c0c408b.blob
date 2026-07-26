@@ -1,0 +1,27 @@
+## 六、Event 对象
+
+Event 回答了「发生了什么」。**不可变、Append Only。**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:---:|------|
+| `type` | enum | ✅ | 8 种事件类型 |
+| `timestamp` | datetime | ✅ | 发生时间 |
+| `workspace` | string | ✅ | 所属 Workspace |
+| `actor` | string | ✅ | 触发者 |
+| `payload` | object | ✅ | 事件数据 |
+
+**事件类型（8 种）**：
+
+| type | 含义 |
+|------|------|
+| TASK_STATUS_CHANGED | 任务状态变更 |
+| KNOWLEDGE_UPDATED | 知识对象变更 |
+| API_CHANGED | API 契约变更 |
+| REVIEW_RESULT | 审查结果 |
+| DISTILLATION_COMPLETE | 蒸馏完成 |
+| WORKSPACE_CLOSED | 工作区关闭 |
+| CRASH_RECOVERED | 崩溃恢复 |
+| ERROR_OCCURRED | 错误发生 |
+
+---
+

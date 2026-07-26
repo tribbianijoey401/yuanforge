@@ -1,0 +1,6 @@
+# ========== 可选：写 Event ==========
+if [[ -d "$EVENTS_DIR" ]]; then
+    TODAY=$(date -u +"%Y%m%d")
+    mkdir -p "$EVENTS_DIR/$TODAY"
+    echo "{\"event\": \"KNOWLEDGE_UPDATED\", \"pitfall\": \"$PIT_ID\", \"source\": \"$(basename "$BUG_FILE")\", \"time\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"}" >> "$EVENTS_DIR/$TODAY/events.jsonl"
+fi

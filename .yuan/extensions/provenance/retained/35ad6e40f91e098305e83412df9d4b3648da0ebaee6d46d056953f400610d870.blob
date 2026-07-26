@@ -1,0 +1,20 @@
+## 结构化格式 / 字段
+
+成员回传产出时，必须使用以下 Markdown 代码块格式：
+
+```
+verdict: pass | fail
+blocking: [{violation, evidence, expectation}]   # fail 时必填
+advisory: [{item, reason}]                        # 可选
+evidence: [{artifact_ref, line, note}]            # 必填
+```
+
+| 字段 | 必填 | 含义 |
+|------|------|------|
+| `verdict` | 是 | pass=通过 / fail=未通过 |
+| `blocking` | fail 时 | 阻断项：违反的验收标准 / 规则 + 证据 + 期望 |
+| `advisory` | 可选 | 建议项：非阻断的可改进点 + 理由 |
+| `evidence` | 是 | 证据：产出物引用 + 行号 + 具体说明 |
+
+---
+

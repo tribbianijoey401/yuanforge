@@ -1,0 +1,11 @@
+## 八、生命周期
+
+|| 阶段 | 操作 | 执行者 |
+|------|------|--------|
+| 任务状态变更 | 追加 TASK_STATUS_CHANGED（只写 reason，不写 old/new status） | Conductor / Dev |
+| 审查完成 | 追加 REVIEW_RESULT（只写 verdict + top findings） | Reviewer |
+| 蒸馏完成 | 追加 DISTILLATION_COMPLETE（包含知识产出列表） | Conductor |
+| Workspace 关闭 | 追加 WORKSPACE_CLOSED | Conductor |
+| 崩溃恢复 | 追加 CRASH_RECOVERED | Conductor |
+| 会话退出 | 追加 SESSION_EXITED（phase + completed/remaining + reason） | Conductor |
+| 每日 | 自动按日期创建新 events.jsonl | Conductor |

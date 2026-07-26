@@ -1,0 +1,10 @@
+## 可用数据集
+
+| 文件 | 行数 | 内容 |
+|------|------|------|
+| `references/ui-reasoning.csv` | 161 | 行业 → 推荐模式 + 风格优先级 + 色彩情绪 + 字体个性 + 反模式（**核心文件**） |
+| `references/styles.csv` | 67 | UI 风格详情（关键词、适用场景、禁用场景、色彩、动效、实现清单） |
+| `references/ux-guidelines.csv` | 99 | UX 最佳实践 + 反模式（导航、表单、无障碍、性能、动效、触摸……） |
+| `references/landing.csv` | 24 | Landing Page 布局模式（Hero-Centric / Conversion / Feature-Rich……） |
+| `references/products.csv` | 161 | 产品/行业分类索引 |
+

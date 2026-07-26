@@ -1,0 +1,85 @@
+{
+  "schema_version": "yuan.m7-r1-final-verification/v1",
+  "task_id": "task-010-r1",
+  "frozen_source_revision": "c1fd815a85395351e7ebc23e3ff72507326977f2",
+  "created_at": "2026-07-27T02:07:41.0465851+08:00",
+  "role": "doc-engineer",
+  "status": "PASS",
+  "gate": "M7_R1_AUTHOR_COMPLETE_AWAITING_INDEPENDENT_REVIEW",
+  "resolved_blockers": ["M7-B01", "M7-B02", "M7-B03", "M7-B04", "M7-B05"],
+  "provenance": {
+    "tracked_inventory": 294,
+    "out_of_band_sources": 2,
+    "included_sources": 177,
+    "included_bytes": 1407492,
+    "clauses": 2207,
+    "mapped": 2207,
+    "unmapped": 0,
+    "coverage_percent": 100.0,
+    "legacy_to_core": 12,
+    "anti_patterns": 8,
+    "ptg_obsolete_functions": 1,
+    "dirty_snapshots": 10,
+    "dispositions": {
+      "core": 297,
+      "extension": 1115,
+      "knowledge": 729,
+      "fixture": 65,
+      "obsolete-with-proof": 1
+    }
+  },
+  "held_out_negatives": {
+    "tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "cases": [
+      "scope-shrink",
+      "removed-explicit-mapping-produces-unmapped",
+      "contradictory-heading",
+      "invalid-range",
+      "missing-destination",
+      "dirty-source-unreproducible"
+    ]
+  },
+  "clean_checkout": {
+    "base": "c1fd815a85395351e7ebc23e3ff72507326977f2",
+    "candidate_input": "staged-binary-patch-only",
+    "author_generate": "PASS",
+    "independent_verify": "PASS",
+    "held_out_negatives": "6/6 PASS",
+    "output_hashes_equal": 6,
+    "output_hashes_different": 0
+  },
+  "regressions": {
+    "py_compile": "PASS",
+    "m1_bootstrap": "31/31 PASS",
+    "core_author": "35/35 PASS",
+    "m3_independent": "30/30 PASS",
+    "m4_shadow": "10/10 PASS",
+    "m5_canary": "1/1 PASS (13 internal checks)",
+    "m6_adapter": "8/8 PASS",
+    "old_genesis": "80 checks / 7 cases PASS",
+    "m0a_dirty": "10/10 PASS"
+  },
+  "hashes": {
+    ".yuan/extensions/fixtures/legacy-anti-patterns.json": "dc8c5bf44578ab5053582d63104985d366960a4c98cd6ddd0bee98b08b561111",
+    ".yuan/extensions/provenance/README.md": "0e44ca62c9d19749c16f5e1cd15495d2b358d81f5f9b76fc2df7ae66d1a53fc4",
+    ".yuan/extensions/provenance/inventory.lock.json": "cbe645f8c50291dca352cefcd461a3300d635c2a87011592383d00cc847a1f34",
+    ".yuan/extensions/provenance/disposition-map.json": "f0284469a582ba8a204d2cf2807b3b7df67d46742ed61ffbf4f46fecfc427bf3",
+    ".yuan/extensions/provenance/dirty-source-receipt.json": "cc773b7073ae7cb85ee2d081e6e6febe50deb2fd973a5b60cdad22708666bb0f",
+    ".yuan/extensions/provenance/scope-manifest.json": "50e2ea028cf2fbb9092c85188b3e03a13b86b0e69ba1456ecbadc4dbde47e895",
+    ".yuan/extensions/provenance/clause-manifest.json": "a3ee1d290bd5d949b2fed1123315badfdcd9d001ae3b01c7b01be38caa5f0429",
+    ".yuan/extensions/provenance/REPORT.md": "0dd24b4fa62ac03d95b607180213a23aa1154e09ba0b4d701ae488c146d895df",
+    "scripts/yuan-provenance.py": "3fe0cb4a9d3291fea3b03c17cc97e7e0d01a4cd7fb5837eb301a846b217ba4f2",
+    "scripts/yuan_provenance_verify.py": "d42095454088a2e36614f77654d571660192df117efc2b893d04a169c101c82d",
+    "scripts/verify-yuan-provenance.py": "2c9eabd4c94c99533ad42a037b711da1ecca3a8c02cd176157178c659402b9a4",
+    "tests/provenance/test_m7_held_out.py": "be80f5ff2a9ee1972b0fe7a5564bb35be086d46fe39ecd9242286272ece26c46"
+  },
+  "protected_user_dirty": {
+    "tracked_modified": 8,
+    "untracked": 2,
+    "staged": 0,
+    "hashes_passed": 10,
+    "hashes_failed": 0
+  }
+}

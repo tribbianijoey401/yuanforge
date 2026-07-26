@@ -1,0 +1,11 @@
+## 铁律 Ⅴ — 上下文隔离
+
+**每个 Task 由全新 Subagent 执行，不继承上一 Task 的上下文。**
+
+- 每个 Dev Agent 只知道自己 Task 的 spec + 上游产出物引用
+- 不依赖"上一个 Agent 记得什么"
+- Subagent 通过读取项目文档（PROGRESS.md、ARCHITECTURE.md）了解上下文
+- 项目记忆是 Agent 之间唯一的持久化通信渠道
+
+<SECTION-END:5>
+

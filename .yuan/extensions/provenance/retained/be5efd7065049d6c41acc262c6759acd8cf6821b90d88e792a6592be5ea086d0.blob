@@ -1,0 +1,164 @@
+def build_history(
+    workspace: LegacyWorkspace,
+    manifest: dict[str, Any],
+    work: dict[str, Any],
+    unresolved: list[dict[str, str]],
+    legacy_records: list[dict[str, Any]] | None = None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    attempts: list[dict[str, Any]] = []
+    evidence_items: list[dict[str, Any]] = []
+    created_at = _timestamp_for_workspace(workspace.workspace_id)
+    artifact_scope = work["acceptance_criteria"][0]["artifact_scope"]
+    artifact_sha256 = manifest["digest"]
+    for index, source in enumerate(manifest["files"], start=1):
+        attempt_id = f"ATT-{work['work_id']}-{index:04d}"
+        evidence_id = f"EVD-{work['work_id']}-{index:04d}"
+        attempt = _attempt(
+            attempt_id=attempt_id,
+            sequence=index,
+            work=work,
+            source=source,
+            evidence_id=evidence_id,
+            artifact_sha256=artifact_sha256,
+        )
+        checks = [
+            {
+                "id": f"SOURCE-{index:04d}",
+                "status": "PASS",
+                "observation": f"{source['path']} sha256={source['sha256']}",
+            }
+        ]
+        if index == 1:
+            checks.append(
+                {
+                    "id": "SAFE-LEGACY-READ-ONLY",
+                    "status": "PASS",
+                    "observation": "source hash was stable across conversion",
+                }
+            )
+        evidence = _evidence(
+            evidence_id=evidence_id,
+            sequence=index,
+            work=work,
+            ac_id="AC-SOURCE-INTEGRITY",
+            attempt_id=attempt_id,
+            status="PASS",
+            checks=checks,
+            artifact_scope=artifact_scope,
+            artifact_sha256=artifact_sha256,
+            receipt_sha256=canonical_digest(attempt["tool_receipt"]),
+            created_at=created_at,
+        )
+        attempts.append(attempt)
+        evidence_items.append(evidence)
+
+    source_by_path = {item["path"]: item for item in manifest["files"]}
+    for record in legacy_records or []:
+        index = len(attempts) + 1
+        source = source_by_path[record["source"]]
+        attempt_id = f"ATT-{work['work_id']}-{index:04d}"
+        evidence_id = f"EVD-{work['work_id']}-{index:04d}"
+        attempt = _attempt(
+            attempt_id=attempt_id,
+            sequence=index,
+            work=work,
+            source=source,
+            evidence_id=evidence_id,
+            artifact_sha256=artifact_sha256,
+        )
+        attempt["action"]["type"] = "verify"
+        identity = (
+            record.get("task_id")
+            or record.get("event", {}).get("payload", {}).get("task_id")
+            or f"line-{record['line']}"
+        )
+        attempt["hypothesis"] = {
+            "claim": (
+                f"Legacy record {identity} is replayed as an observation, "
+                "not as completion truth."
+            ),
+            "falsification": "A source hash or verbatim record mismatch disproves replay.",
+        }
+        observation = json.dumps(
+            record, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        )
+        evidence = _evidence(
+            evidence_id=evidence_id,
+            sequence=index,
+            work=work,
+            ac_id="AC-SOURCE-INTEGRITY",
+            attempt_id=attempt_id,
+            status="PASS",
+            checks=[
+                {
+                    "id": f"RECORD-{index:04d}",
+                    "status": "PASS",
+                    "observation": observation,
+                }
+            ],
+            artifact_scope=artifact_scope,
+            artifact_sha256=artifact_sha256,
+            receipt_sha256=canonical_digest(attempt["tool_receipt"]),
+            created_at=created_at,
+        )
+        attempts.append(attempt)
+        evidence_items.append(evidence)
+
+    index = len(attempts) + 1
+    semantic_attempt_id = f"ATT-{work['work_id']}-{index:04d}"
+    semantic_evidence_id = f"EVD-{work['work_id']}-{index:04d}"
+    synthetic_source = {
+        "path": artifact_scope,
+        "sha256": artifact_sha256,
+    }
+    semantic_attempt = _attempt(
+        attempt_id=semantic_attempt_id,
+        sequence=index,
+        work=work,
+        source=synthetic_source,
+        evidence_id=semantic_evidence_id,
+        artifact_sha256=artifact_sha256,
+    )
+    semantic_attempt["action"]["type"] = "verify"
+    semantic_attempt["hypothesis"] = {
+        "claim": "Legacy semantics can be represented without inference.",
+        "falsification": "Any missing typed verifier or source document makes mapping unresolved.",
+    }
+    if unresolved:
+        checks = [
+            {
+                "id": f"UNRESOLVED-{position:04d}",
+                "status": "FAIL",
+                "observation": f"{item['code']}: {item['detail']}",
+            }
+            for position, item in enumerate(unresolved, start=1)
+        ]
+        status = "FAIL"
+        semantic_attempt["outcome"] = "FAILED"
+    else:
+        checks = [
+            {
+                "id": "SEMANTIC-MAPPING",
+                "status": "PASS",
+                "observation": "all recognized semantics were mapped without inference",
+            }
+        ]
+        status = "PASS"
+    semantic_evidence = _evidence(
+        evidence_id=semantic_evidence_id,
+        sequence=index,
+        work=work,
+        ac_id="AC-SEMANTIC-MAPPING",
+        attempt_id=semantic_attempt_id,
+        status=status,
+        checks=checks,
+        artifact_scope=artifact_scope,
+        artifact_sha256=artifact_sha256,
+        receipt_sha256=canonical_digest(semantic_attempt["tool_receipt"]),
+        created_at=created_at,
+    )
+    attempts.append(semantic_attempt)
+    evidence_items.append(semantic_evidence)
+    return attempts, evidence_items
+
+

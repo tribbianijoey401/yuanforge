@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuanforge.local/migration/authority-pointer.schema.json",
+  "title": "Yuan single writable authority pointer",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "revision",
+    "authority",
+    "legacy_root",
+    "shadow_root",
+    "legacy_snapshot_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "yuan.authority-pointer/v1"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "authority": {
+      "enum": [
+        "legacy",
+        "shadow"
+      ]
+    },
+    "legacy_root": {
+      "type": "string",
+      "const": "docs"
+    },
+    "shadow_root": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?![/\\\\])(?!.*(?:^|[/\\\\])\\.\\.(?:[/\\\\]|$)).+$"
+    },
+    "legacy_snapshot_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

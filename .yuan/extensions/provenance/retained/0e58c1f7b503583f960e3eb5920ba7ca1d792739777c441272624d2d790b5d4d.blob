@@ -1,0 +1,17 @@
+### 执行流程
+
+```
+退出协议:
+    1. 读 TASK_BOARD.md 全部行
+    2. 提取关键状态:
+       a. 所有非终态任务（🟢就绪 / 🔨进行中 / 🔄返工 / ❌阻塞）
+       b. 当前调度状态（最后派发到哪个 Task）
+       c. 最近的审查结果摘要（如有）
+    3. 更新 PROGRESS.md「会话日志」表:
+       - 追加一行: [日期] [会话ID] [当前Phase] [完成Task] [遗留Task] [备注]
+       - 保留最近 10 条，超出删除最旧的
+    4. 写 Event Log: SESSION_EXITED
+       - 包含: phase, completed_tasks, remaining_tasks, reason
+    5. 通知用户: "会话已保存进度。下次启动会自动恢复。"
+```
+

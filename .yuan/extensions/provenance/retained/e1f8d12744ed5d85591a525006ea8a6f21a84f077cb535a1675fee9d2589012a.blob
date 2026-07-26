@@ -1,0 +1,30 @@
+def collect_protected_inputs(
+    manifest: dict[str, Any],
+    root: pathlib.Path,
+    manifest_path: pathlib.Path,
+) -> list[pathlib.Path]:
+    cases = manifest.get("cases")
+    if not isinstance(cases, list):
+        raise ManifestError("cases must be a list")
+    protected = [manifest_path]
+    for index, case in enumerate(cases):
+        if not isinstance(case, dict):
+            raise ManifestError(f"cases[{index}] must be an object")
+        candidate = resolve_within(
+            root,
+            case.get("candidate"),
+            f"cases[{index}].candidate",
+        )
+        protected.append(candidate)
+        validator = case.get("validator")
+        if not isinstance(validator, dict):
+            raise ManifestError(f"cases[{index}].validator must be an object")
+        trusted = validate_hash_specs(
+            validator.get("trusted_files"),
+            root,
+            f"cases[{index}].validator.trusted_files",
+        )
+        protected.extend(path for path, _, _ in trusted)
+    return list(dict.fromkeys(protected))
+
+

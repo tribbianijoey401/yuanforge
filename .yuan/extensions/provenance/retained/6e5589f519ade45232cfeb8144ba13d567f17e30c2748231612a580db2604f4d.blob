@@ -1,0 +1,11 @@
+## 七、与 Object Model 的关系
+
+Graph 不定义 Schema——Object Model 定义了 Schema。Graph 只是 Schema 实例的可视化索引。
+
+```
+object-model.yaml     → 定义什么对象存在、什么字段、什么关系
+knowledge/ files      → 对象实例（frontmatter + 正文）
+graph/index.json      → 从实例自动构建的关系图
+```
+
+改变 Object Model → frontmatter 跟着变 → Graph 自动反映变化。不需要改 Graph 本身。

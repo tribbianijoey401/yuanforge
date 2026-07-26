@@ -1,0 +1,8 @@
+# 结构化裁决协议（RoleVerdict）
+
+> **来源**：参考 MVP 开发专家团的 RoleVerdict 协议。
+> **目的**：任何审查官 / 测试官的结论都必须以**结构化**形式呈现，便于 Conductor 自动路由（打回 Dev / 升级 Architect / 通知 Tester），而非"我觉得还行"式自由文本。
+> **与 YuanForge 的衔接**：YuanForge 已有"对抗式审查 + 三档阻塞"机制，本规则在其上叠加**结构化 verdict 字段**，使 Conductor 的 `dispatch-routing.md` 能机械判定打回 / 升级。
+
+---
+

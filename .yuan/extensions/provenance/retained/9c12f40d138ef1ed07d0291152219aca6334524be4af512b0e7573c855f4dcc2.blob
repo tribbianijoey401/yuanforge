@@ -1,0 +1,14 @@
+## 步骤
+
+1. 读取 Conductor 注入的 `docs/ptg-critical.md`（任务行中的原因指针列指向此文件）
+2. 对每个标记模块：
+   a. 启动本地化环境（内存 DB / 临时 FS / 随机端口）
+   b. 应用所有 migration 到 head
+   c. 运行该模块的 L1 集成测试
+3. 执行 CAL 断言生成 + 执行：
+   ```bash
+   python scripts/ptg-cal-gen.py -i docs/seam-agreement.md -o tests/test_contract_assertions.py
+   python -m pytest tests/test_contract_assertions.py
+   ```
+4. 对抗模式匹配：读取 `docs/anti-patterns.md`，逐条验证
+

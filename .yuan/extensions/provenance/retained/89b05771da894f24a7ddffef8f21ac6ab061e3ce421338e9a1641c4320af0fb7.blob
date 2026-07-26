@@ -1,0 +1,61 @@
+def _evidence(
+    *,
+    evidence_id: str,
+    sequence: int,
+    work: dict[str, Any],
+    ac_id: str,
+    attempt_id: str,
+    status: str,
+    checks: list[dict[str, str]],
+    artifact_scope: str,
+    artifact_sha256: str,
+    receipt_sha256: str,
+    created_at: str,
+) -> dict[str, Any]:
+    verifier = work["acceptance_criteria"][0]["verifier_binding"]
+    item: dict[str, Any] = {
+        "schema_version": "yuan.evidence/v1",
+        "evidence_id": evidence_id,
+        "sequence": sequence,
+        "work_binding": work["revision"],
+        "ac_id": ac_id,
+        "kind": "structure",
+        "created_at": created_at,
+        "source_attempt_id": attempt_id,
+        "status": status,
+        "assertions": len(checks),
+        "checks": checks,
+        "artifact_binding": {
+            "scope": artifact_scope,
+            "sha256": artifact_sha256,
+        },
+        "environment_binding": {
+            "id": ENVIRONMENT_ID,
+            "fingerprint": ENVIRONMENT_FINGERPRINT,
+        },
+        "verifier_binding": {
+            key: verifier[key]
+            for key in ("id", "revision", "sha256", "trust_root_id")
+        },
+        "harness_binding": work["harness_binding"],
+        "logs": {
+            "stdout_sha256": EMPTY_SHA256,
+            "stderr_sha256": EMPTY_SHA256,
+            "receipt_sha256": receipt_sha256,
+        },
+        "freshness": {
+            "observed_artifact_sha256": artifact_sha256,
+            "not_after": None,
+        },
+        "independence": {
+            "method": "old-trust-root",
+            "author_identity": "legacy-workspace",
+            "verifier_identity": "yuan-shadow-migrator",
+            "independent": True,
+        },
+        "immutable_digest": "0" * 64,
+    }
+    item["immutable_digest"] = canonical_digest(item, omit=("immutable_digest",))
+    return item
+
+

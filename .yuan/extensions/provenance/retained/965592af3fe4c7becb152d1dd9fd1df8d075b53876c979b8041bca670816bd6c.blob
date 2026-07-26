@@ -1,0 +1,11 @@
+## 十、过期检测粒度
+
+| 变更类型 | 影响范围 | 检测方式 |
+|---------|---------|---------|
+| 源文件修改 | 对应 Feature 的 files 字段 | `git diff verified_commit..HEAD -- <file>` |
+| API 变更 | 对应 Feature 的 api_endpoints | 扫描路由定义文件 |
+| 依赖变更 | depends 指向的 ADR 状态变更 | 读 depends 列表中每个对象的 status |
+| 模块重构 | Module 的 directory 字段 | 检查目录是否存在 |
+
+---
+

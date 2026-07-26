@@ -1,0 +1,10 @@
+### 新增 2 个 crown jewels 规则文件
+- **`.yuan/rules/visual-absolutes.md`** — P0 视觉绝对禁令 VA-1~VA-5：
+  - VA-1 禁止 emoji 作功能图标（含 emoji 检测正则）
+  - VA-2 禁止紫粉渐变
+  - VA-3 禁止 AI 模板味占位文案
+  - VA-4 禁止硬编码颜色（除 #fff/#000）
+  - VA-5 禁止弹跳/弹性缓动
+  - 绑定 G2/G3 门禁
+- **`.yuan/rules/verdict-protocol.md`** — RoleVerdict 结构化裁决协议：`verdict/pass|fail + blocking[] + advisory[] + evidence[]` + 诊断式打回 + 过度设计护栏 + Bounded ≤3 轮
+

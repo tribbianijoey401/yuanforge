@@ -1,0 +1,7 @@
+def file_sha256(path: Path) -> str:
+    """返回文件的 SHA256 摘要。用于内容对比。"""
+    if not path.is_file():
+        return ""
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+

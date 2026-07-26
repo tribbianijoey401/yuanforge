@@ -1,0 +1,10 @@
+### 修复回路（引用 dispatch-routing.md 路由表）
+
+> 修复回路/审查修正路由表的权威定义见 `.yuan/rules/dispatch-routing.md`。本合约仅保留触发条件说明。
+
+| 触发条件 | 说明 |
+|---------|------|
+| Tester 🟡 Hard Gate 失败 | 按 `dispatch-routing.md` 路由表分发 |
+| 审查官 🔴 Blocker 打回 | 按 `dispatch-routing.md` 路由表分发 |
+| Dev 连续 ≥2 次修复失败 | 触发 Debug 模式 |
+

@@ -1,0 +1,8 @@
+---
+name: PROGRESS
+description: >
+  文档格式规格书：进度中枢格式
+spec_type: document-format
+version: "3.0.0"
+---
+

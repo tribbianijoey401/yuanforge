@@ -1,0 +1,23 @@
+## 后果
+- 正面: [...]
+- 负面: [...]
+```
+
+#### pitfalls/
+
+**命名**：`PIT-NNN.md`（递增编号）。
+
+```markdown
+---
+id: PIT-NNN
+object_type: pitfall
+lifecycle: knowledge
+owner: [发现者角色]
+status: active
+severity: blocker|warning|info
+type: backend|frontend|db|deploy|process|env
+summary: "一句话描述此陷阱"
+verified_commit: abc123
+confidence: verified
+---
+

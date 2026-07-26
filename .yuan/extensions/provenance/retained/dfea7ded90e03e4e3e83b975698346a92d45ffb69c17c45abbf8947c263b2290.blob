@@ -1,0 +1,10 @@
+### 5.2 Agent 查询
+
+```
+Agent 问"FEAT-AUTH 依赖什么？"
+  → 读 graph/index.json
+  → 找 nodes[FEAT-AUTH].depends → [ADR-003, FEAT-LOGIN]
+  → 找 edges from FEAT-AUTH → 列出所有 DEPENDS_ON 边
+  → 如果有 stale 标记 → 提示验证
+```
+

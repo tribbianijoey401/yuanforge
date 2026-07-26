@@ -1,0 +1,6 @@
+def fixture(kind: str) -> dict:
+    return json.loads(
+        (CORE_ROOT / "fixtures" / "valid" / f"{kind}.json").read_text(encoding="utf-8")
+    )
+
+

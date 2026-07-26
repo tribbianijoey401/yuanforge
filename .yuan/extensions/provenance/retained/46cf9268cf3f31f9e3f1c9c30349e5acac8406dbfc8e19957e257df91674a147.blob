@@ -1,0 +1,28 @@
+#### 4.2 任务派发表
+
+```markdown
+### 任务派发表
+
+| Task ID | 优 | 标题 | Role | 上游依赖 | ⏱超时 | 产出物 | 门禁 | 风险 |
+|---------|----|------|------|---------|-------|--------|------|------|
+| task-002 | P1 | 数据模型 | backend-dev | task-001 | 30 | src/models/user.py, tests/ | G2 | P1 |
+| task-003 | P1 | 用户管理 API | backend-dev | task-002 | 30 | src/api/users.py, tests/ | G2 | P1 |
+| task-004 | P1 | 用户管理前端 | frontend-dev | task-001 | 30 | src/ui/UserList.tsx, tests/ | G2 | P1 |
+| task-005 | P1 | 集成测试 | tester | task-003,task-004 | 20 | tests/integration/ | G3 | — |
+| task-006 | P2 | 文档归档 | doc-engineer | task-005 | 10 | docs/CHANGELOG.md | G4 | — |
+```
+
+**字段说明：**
+
+| 字段 | 必填 | 说明 |
+|------|------|------|
+| **Task ID** | ✅ | `task-NNN` 格式，NNN 从 001 开始连续编号 |
+| **优** | ✅ | 优先级：P0=紧急, P1=高, P2=中(默认), P3=低 |
+| **标题** | ✅ | 人类可读的 Task 描述 |
+| **Role** | ✅ | 角色名：`product-analyst` / `architect` / `ui-designer` / `frontend-dev` / `backend-dev` / `spec-reviewer` / `security-auditor` / `quality-auditor` / `ux-reviewer` / `tester` / `doc-engineer` |
+| **上游依赖** | ✅ | Task ID 列表，逗号分隔。无依赖填 `-` |
+| **⏱超时** | ✅ | 分钟数，Architect 覆写默认值 |
+| **产出物** | ✅ | 完成后的产出文件列表，逗号分隔 |
+| **门禁** | ✅ | 该 Task 触发的 Gate：G1 / G2 / G3 / G4 |
+| **风险** | ✅ | Product Analyst 产出：R0/R1/R2，决定 Security Auditor 投入 |
+

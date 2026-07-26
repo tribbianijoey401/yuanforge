@@ -1,0 +1,26 @@
+### 3.1 整体
+
+```json
+{
+  "generated_at": "2026-07-09T17:00:00Z",
+  "generated_by": "build-graph.py",
+  "source": "docs/knowledge/",
+  "stats": {
+    "total_nodes": 12,
+    "total_edges": 18,
+    "by_type": {
+      "feature": 5,
+      "decision": 3,
+      "pitfall": 2,
+      "module": 2
+    }
+  },
+  "nodes": [
+    { ... }
+  ],
+  "edges": [
+    { ... }
+  ]
+}
+```
+

@@ -1,0 +1,6 @@
+### 4.2 从代码注释中找
+
+```bash
+grep -r "TODO\|FIXME\|HACK\|NOTE\|为什么\|因为" --include="*.py" --include="*.ts" | head -20
+```
+

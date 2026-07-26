@@ -1,0 +1,4 @@
+class EnumerationLimitExceeded(PortError):
+    pass
+
+

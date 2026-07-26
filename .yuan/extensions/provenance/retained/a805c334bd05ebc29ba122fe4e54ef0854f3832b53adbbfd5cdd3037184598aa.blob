@@ -1,0 +1,5 @@
+# 生成式代码失效模式目录（商业级必读）
+
+> 生成式代码在演示里"能跑"，在生产里翻车，几乎总是因为同一批**可预测的失效模式**：只覆盖 happy path、把不在测试里的行为悄悄写错、引用不存在的依赖/接口、缺少系统约束（权限/限额/网络策略）、对性能毫无考虑、import 缺失却静默失败。这些不是随机 bug，是这一类产出的**结构性偏差**——可以逐条预判、逐条防住。
+> 这份规范把每一类失效配上**唯一能治它的纪律**：从"愿景式提醒"升级成"出现即不合格 + 配套防线"。测试侧的定向与回归纪律见 `agentic-delivery/01-standards/test-discipline-for-generated-code`，验证者解耦见 `agentic-delivery/01-standards/verifier-critic-pattern`，错误模型见 `backend/01-standards/error-handling-taxonomy`，供应链/依赖核验见 `security/01-standards/supply-chain-security`。本规范回答的是"生成式代码会怎么坏、对应要立哪条死规矩"。
+

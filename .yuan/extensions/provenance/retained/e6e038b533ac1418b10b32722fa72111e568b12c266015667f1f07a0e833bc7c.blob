@@ -1,0 +1,13 @@
+### 圆角系统
+```css
+:root {
+  --radius-none: 0;
+  --radius-sm: 4px;    /* 小元素：Badge、Tag */
+  --radius-md: 8px;    /* 标准元素：按钮、输入框 */
+  --radius-lg: 12px;   /* 大元素：卡片 */
+  --radius-xl: 16px;   /* 弹窗 */
+  --radius-2xl: 24px;  /* 特殊场景 */
+  --radius-full: 9999px; /* 头像、圆形按钮 */
+}
+```
+

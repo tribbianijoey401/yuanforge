@@ -1,0 +1,10 @@
+### 示例
+
+```
+feat: 用户注册端点
+
+POST /api/users/register — 邮箱+密码注册，返回 JWT token
+```
+
+---
+

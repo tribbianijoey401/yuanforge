@@ -1,0 +1,6 @@
+### 3.2 并行派发
+
+- 所有 🟢就绪 Task 同时派发
+- Frontend Dev + Backend Dev 各自独立上下文
+- 每个 Dev Agent 加载：角色合约 + TDD skill + 上游产出物 + pitfalls
+

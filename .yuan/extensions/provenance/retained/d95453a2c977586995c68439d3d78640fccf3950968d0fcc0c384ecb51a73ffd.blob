@@ -1,0 +1,18 @@
+### 2. 技术方案
+
+```markdown
+## 技术方案
+
+### 技术栈选择
+
+| 层 | 选型 | 原因 |
+|----|------|------|
+| 语言 | Python 3.11 | xxx |
+| 框架 | FastAPI | xxx |
+| 数据库 | PostgreSQL | xxx |
+
+### 架构决策
+
+[关键决策简述，详细 ADR 见当前 Workspace 的 ADR-NNN.md；归档后见 docs/knowledge/decisions/]
+```
+

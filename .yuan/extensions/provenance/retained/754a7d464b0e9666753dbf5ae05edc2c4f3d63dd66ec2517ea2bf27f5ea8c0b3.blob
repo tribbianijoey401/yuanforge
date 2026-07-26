@@ -1,0 +1,65 @@
+for f in md_files:
+    path = REPO_ROOT / f
+    if not path.exists():
+        continue
+    content = path.read_text()
+    
+    # Check for YAML frontmatter
+    if not content.startswith('---'):
+        continue
+    
+    # Extract frontmatter
+    parts = content.split('---', 2)
+    if len(parts) < 3:
+        continue
+    
+    try:
+        import yaml
+        fm = yaml.safe_load(parts[1])
+    except Exception:
+        continue  # not YAML frontmatter
+    
+    if not fm or not isinstance(fm, dict):
+        continue
+    
+    # Skip non-knowledge files (specs, rules, contracts, etc.)
+    object_type = fm.get('object_type', '')
+    if object_type not in VALID_OBJECT_TYPES:
+        continue
+    
+    # ── 3a. Required fields ──
+    missing = REQUIRED_FIELDS - set(fm.keys())
+    if missing:
+        print(f"[ERROR] {f}: missing required frontmatter fields: {missing}")
+        sys.exit(1)
+    
+    # ── 3b. Enum validation ──
+    if fm['object_type'] not in VALID_OBJECT_TYPES:
+        print(f"[ERROR] {f}: invalid object_type '{fm['object_type']}'")
+        sys.exit(1)
+    
+    if fm['confidence'] not in VALID_CONFIDENCE:
+        print(f"[ERROR] {f}: invalid confidence '{fm['confidence']}'")
+        sys.exit(1)
+    
+    if fm['lifecycle'] not in VALID_LIFECYCLE:
+        print(f"[ERROR] {f}: invalid lifecycle '{fm['lifecycle']}'")
+        sys.exit(1)
+    
+    # ── 3c. Type-specific status validation ──
+    status = fm['status']
+    if object_type == 'feature' and status not in VALID_FEATURE_STATUS:
+        print(f"[ERROR] {f}: invalid feature status '{status}'")
+        sys.exit(1)
+    elif object_type == 'decision' and status not in VALID_DECISION_STATUS:
+        print(f"[ERROR] {f}: invalid decision status '{status}'")
+        sys.exit(1)
+    elif object_type == 'pitfall' and status not in VALID_PITFALL_STATUS:
+        print(f"[ERROR] {f}: invalid pitfall status '{status}'")
+        sys.exit(1)
+    elif object_type == 'module' and status not in VALID_MODULE_STATUS:
+        print(f"[ERROR] {f}: invalid module status '{status}'")
+        sys.exit(1)
+
+# ── 4. Proposal validation ────────────────────────────────────────
+

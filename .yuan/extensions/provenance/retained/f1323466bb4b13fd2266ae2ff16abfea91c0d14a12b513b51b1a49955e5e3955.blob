@@ -1,0 +1,14 @@
+### Task 字段
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:---:|------|
+| `id` | string | ✅ | 任务唯一标识 |
+| `goal` | string | ✅ | 所属 Goal ID（逻辑分组） |
+| `goal_cluster` | string | — | 所属 Goal Cluster（一组关联 Goal） |
+| `description` | string | ✅ | 任务描述 |
+| `owner` | string | ✅ | 负责角色 |
+| `depends_on` | array | — | 依赖的 Task ID |
+| `status` | enum | ✅ | READY / RUNNING / DONE / RETURN / BLOCKED |
+| `acceptance` | string | ✅ | 验收标准（Given/When/Then） |
+| `output` | string | ✅ | 产出文件路径 |
+

@@ -1,0 +1,6 @@
+# ========== 验证输入 ==========
+if [[ ! -f "$BUG_FILE" ]]; then
+    echo "错误: 文件不存在: $BUG_FILE" >&2
+    exit 1
+fi
+

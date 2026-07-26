@@ -1,0 +1,13 @@
+## 29. 保险安全蓝绿
+
+- **适用行业**：保险、保障类
+- **设计意图**：蓝 = 安全保障，绿 = 续保成功
+
+| Primary | #0369A1 | Background | #F0F9FF | Muted | #E7EFF5 |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #0C4A6E | Muted FG | #64748B |
+| Secondary | #0EA5E9 | Card | #FFFFFF | Border | #BAE6FD |
+| On Secondary | #0F172A | Card FG | #0C4A6E | Destructive | #DC2626 |
+| Accent | #16A34A | On Destructive | #FFFFFF | Ring | #0369A1 |
+| On Accent | #FFFFFF | | | | |
+

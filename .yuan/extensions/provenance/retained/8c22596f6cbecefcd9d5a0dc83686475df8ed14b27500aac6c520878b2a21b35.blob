@@ -1,0 +1,190 @@
+def main():
+    parser = argparse.ArgumentParser(
+        description="YuanForge 项目初始化 / 框架同步",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=textwrap.dedent("""\
+            示例:
+              yuanforge-init ./my-app                          从零开始
+              yuanforge-init ./my-app --name "用户认证系统"      指定项目名
+              yuanforge-init ./existing --mode existing         嫁接已有项目
+              yuanforge-init ./existing --mode existing --clean 嫁接 + 清理孤文件
+              yuanforge-init ./project --mode existing --update 仅更新框架文件
+              yuanforge-init ./project --sync                  智能增量同步
+              yuanforge-init ./my-app --dry-run                 预览
+        """),
+    )
+    parser.add_argument("target", help="目标项目目录")
+    parser.add_argument("--name", default=None, help="项目名称")
+    parser.add_argument(
+        "--mode", choices=["new", "existing"], default="new",
+        help="new=从零开始(默认), existing=嫁接/更新已有项目",
+    )
+    parser.add_argument("--sync", action="store_true",
+                        help="智能增量同步：对比源和目标，新增/更新/检测孤文件")
+    parser.add_argument("--update", action="store_true",
+                        help="仅更新框架文件，不操作 docs/（需配合 --mode existing）")
+    parser.add_argument("--clean", action="store_true",
+                        help="清理已知旧文件 + 孤文件（需配合 --mode existing 或 --sync）")
+    parser.add_argument("--dry-run", action="store_true", help="只显示会做什么，不执行")
+    parser.add_argument("--force", action="store_true", help="跳过确认")
+
+    args = parser.parse_args()
+    target = Path(args.target).resolve()
+
+    # ── 验证源目录 ──
+    for item in ALL_FRAMEWORK_ITEMS:
+        src = SOURCE_ROOT / item
+        if not src.exists():
+            print(color(f"✗ 框架文件缺失: {src}", "red"))
+            print("  请确保从 yuanforge 仓库根目录运行此脚本")
+            sys.exit(1)
+
+    # ── 如果指定 --sync，自动使用 existing + update 模式 ──
+    if args.sync:
+        args.mode = "existing"
+        args.update = True
+
+    # ── 模式验证 ──
+    if args.mode == "new":
+        if target.exists() and any(target.iterdir()):
+            print(color(f"✗ 目标目录已有文件: {target}", "red"))
+            print("  --mode new 要求目标目录不存在或为空")
+            print("  如果是已有项目，请使用 --mode existing 或 --sync")
+            sys.exit(1)
+    elif args.mode == "existing":
+        if not target.exists():
+            print(color(f"✗ 目标目录不存在: {target}", "red"))
+            print("  --mode existing 要求目标目录已存在")
+            sys.exit(1)
+
+    # ── 版本信息（仅展示，不阻止同步）──
+    from_version = ""
+    if args.mode == "existing":
+        from_version = read_target_version(target)
+        if from_version and from_version != "none":
+            print(color(f"  当前框架版本: {from_version} → {FRAMEWORK_VERSION}", "yellow"))
+
+    # ── 确认 ──
+    if not args.force and not args.dry_run:
+        print()
+        print(f"  目标: {target}")
+        if args.mode == "new":
+            print("  模式: 从零开始")
+        elif args.sync:
+            print("  模式: 智能增量同步")
+        elif args.update:
+            print("  模式: 仅更新框架文件")
+        else:
+            print("  模式: 嫁接已有项目")
+        if args.clean:
+            print("  清理: 是（已知旧文件 + 孤文件）")
+        print()
+        confirm = input("  确认? [Y/n] ").strip().lower()
+        if confirm and confirm != "y":
+            print("  已取消")
+            sys.exit(0)
+
+    # ═══ 执行 ═══
+    if args.dry_run:
+        print(color("\n🔍 预览模式 — 不会实际修改文件\n", "yellow"))
+
+    if not args.dry_run:
+        target.mkdir(parents=True, exist_ok=True)
+
+    # ── 1. 清理已知旧文件 ──
+    stale_cleaned = []
+    if args.clean:
+        print(color("🧹 清理已知旧文件:", "bold"))
+        stale_cleaned = cleanup_known_stale(target, args.dry_run)
+        if stale_cleaned:
+            for item in stale_cleaned:
+                print(f"  🗑 {item}")
+        else:
+            print("  · 没有需要清理的已知旧文件")
+
+    # ── 2. 同步框架子目录（粒度化 diff）──
+    print(color("\n📋 同步框架 (.yuan/ subdirs):", "bold"))
+    for subdir in FRAMEWORK_SUBDIRS:
+        src = SOURCE_ROOT / subdir
+        results = sync_framework_item(subdir, SOURCE_ROOT, target, args.dry_run, args.clean)
+        added = sum(1 for v in results.values() if v == "added")
+        updated = sum(1 for v in results.values() if v == "updated")
+        orphans = results.get("__orphans__", [])
+        cleaned = results.get("__orphans_cleaned__", [])
+        parts = []
+        if added: parts.append(f"+{added}")
+        if updated: parts.append(f"~{updated}")
+        if cleaned: parts.append(color(f"-{len(cleaned)}", "red"))
+        elif orphans: parts.append(color(f"!{len(orphans)} orphaned", "yellow"))
+        if parts:
+            print(f"  {subdir}: {' '.join(parts)}")
+            if orphans:
+                for f in orphans[:5]:
+                    print(f"      ! {f}")
+                if len(orphans) > 5:
+                    print(f"      ... and {len(orphans) - 5} more (use --clean to remove)")
+
+    # ── 3. 同步框架顶层目录（增量同步，不清理孤儿保护用户自定义文件）──
+    print(color("\n📋 同步框架 (contracts/protocols/templates/scripts):", "bold"))
+    for topdir in FRAMEWORK_TOP_DIRS:
+        src = SOURCE_ROOT / topdir
+        results = sync_framework_item(topdir, SOURCE_ROOT, target, args.dry_run, clean_orphans=False)
+        added = sum(1 for v in results.values() if v == "added")
+        updated = sum(1 for v in results.values() if v == "updated")
+        skipped = sum(1 for v in results.values() if v == "skipped")
+        if added or updated or skipped:
+            print(f"  {topdir}/: +{added} ~{updated} ·{skipped}")
+
+    # ── 4. 同步框架单文件 ──
+    print(color("\n📋 同步框架文件:", "bold"))
+    for f in FRAMEWORK_FILES:
+        results = sync_framework_item(f, SOURCE_ROOT, target, args.dry_run, args.clean)
+        for rel, action in results.items():
+            if action == "added":
+                print(f"  + {rel}")
+            elif action == "updated":
+                print(f"  ~ {rel}")
+
+    # ── 5. 写入版本 ──
+    if not args.dry_run:
+        write_target_version(target)
+
+    # ── 6. 生成 docs/ ──
+    if not args.update:
+        print(color("\n📄 生成 docs/ 骨架:", "bold"))
+        doc_results = create_docs_skeleton(target, args.mode, args.dry_run)
+        created = sum(1 for v in doc_results.values() if v == "created")
+        skipped = sum(1 for v in doc_results.values() if v == "skipped")
+        print(f"  +{created} created, ·{skipped} skipped")
+    else:
+        print(color("\n📄 docs/ → 跳过（--update 模式）", "bold"))
+
+    # ── 7. .gitignore ──
+    print(color("\n📄 .gitignore:", "bold"))
+    git_status = generate_gitignore(target, args.dry_run)
+    if git_status == "created":
+        print("  ✓ .gitignore")
+    else:
+        print("  · .gitignore → 跳过（已存在）")
+
+    # ── 8. git init (仅 new 模式) ──
+    if args.mode == "new" and not args.dry_run:
+        print(color("\n📦 git init:", "bold"))
+        result = subprocess.run(
+            ["git", "init"], cwd=target, capture_output=True, text=True
+        )
+        print(f"  {result.stdout.strip()}")
+
+    # ═══ 完成 ═══
+    if args.dry_run:
+        print(color("\n🔍 预览完成 — 以上操作不会实际执行", "yellow"))
+        return
+
+    if args.mode == "new":
+        print_help_new(str(target))
+    elif args.sync:
+        print_help_sync(str(target), from_version)
+    else:
+        print_help_existing(str(target), stale_cleaned)
+
+

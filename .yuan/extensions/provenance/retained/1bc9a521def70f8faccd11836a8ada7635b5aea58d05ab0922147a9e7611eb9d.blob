@@ -1,0 +1,8 @@
+## Context
+
+N13 缺陷暴露了 `goal-protocol.md` 和 `workflow-protocol.md` 之间的命名冲突。
+深入分析发现：
+- Human Gate 被错误地定义在意图层文件里，本质是控制流闸门，应该归 workflow
+- 质量闸 G1-G4 扎根于 6 个活跃文件，命名空间大；Human Gate G1-G4 只活在待删文件中
+- 第一性原理结论：框架 irreducibly 需要"流程程序"和"意图/状态模型"两份文件，但当前形态不是最小必要形式
+

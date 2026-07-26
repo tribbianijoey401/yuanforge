@@ -1,0 +1,13 @@
+## 12. Fintech 金紫
+
+- **适用行业**：加密货币、DeFi、投资 App
+- **设计意图**：金 = 价值信任，紫 = 技术未来感
+
+| Primary | #F59E0B | Background | #0F172A | Muted | #272F42 |
+|---|---|---|---|---|---|
+| On Primary | #0F172A | Foreground | #F8FAFC | Muted FG | #94A3B8 |
+| Secondary | #FBBF24 | Card | #222735 | Border | #334155 |
+| On Secondary | #0F172A | Card FG | #F8FAFC | Destructive | #EF4444 |
+| Accent | #8B5CF6 | On Destructive | #FFFFFF | Ring | #F59E0B |
+| On Accent | #FFFFFF | | | | |
+

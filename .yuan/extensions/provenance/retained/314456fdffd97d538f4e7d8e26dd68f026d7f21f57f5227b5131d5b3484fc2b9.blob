@@ -1,0 +1,17 @@
+### 3. 踩坑记录
+
+如有，在当前 Workspace 创建或更新 `BUG-NNN.md`；会复用的经验在会话关闭时蒸馏到 `docs/knowledge/pitfalls/`：
+
+```markdown
+### PIT-NNN: FastAPI middleware 顺序问题
+**日期:** 2026-06-29
+**类型:** 后端
+**严重程度:** 🟡
+**现象:** CORS 不生效
+**原因:** middleware 注册顺序错误，CORS 必须在路由前
+**修复:** 调整 app.add_middleware() 顺序
+**教训:** FastAPI middleware 按注册逆序执行
+```
+
+---
+

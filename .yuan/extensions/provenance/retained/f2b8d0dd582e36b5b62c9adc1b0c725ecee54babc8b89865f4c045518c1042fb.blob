@@ -1,0 +1,5 @@
+## 五、禁止事项
+
+- ❌ 两个冲突的 Proposal 同时合并（不做 merge conflict resolution，直接排队）
+- ❌ 合并时不更新 version 字段
+- ❌ Proposal 关闭不通知原 Agent

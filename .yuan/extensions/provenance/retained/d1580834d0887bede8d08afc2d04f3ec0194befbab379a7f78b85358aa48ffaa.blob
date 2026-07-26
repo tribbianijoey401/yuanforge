@@ -1,0 +1,49 @@
+def expand_trusted_command(
+    command: Any,
+    *,
+    root: pathlib.Path,
+    candidate: pathlib.Path,
+    trusted: list[tuple[pathlib.Path, str, str]],
+    field: str,
+    python_executable: str,
+) -> list[str]:
+    if (
+        not isinstance(command, list)
+        or not command
+        or not all(isinstance(token, str) and token for token in command)
+    ):
+        raise ManifestError(f"{field} is invalid")
+    uses_python = command[0] == "{python}"
+    if uses_python and (
+        len(command) < 2
+        or command[1] in {"{python}", "{candidate}"}
+        or command[1].startswith("-")
+    ):
+        raise ManifestError(f"{field} requires a trusted script after {{python}}")
+    trusted_paths = {path for path, _, _ in trusted}
+    expanded: list[str] = []
+    for index, token in enumerate(command):
+        if token == "{python}":
+            if index != 0:
+                raise ManifestError(f"{field} uses {{python}} outside argv[0]")
+            expanded.append(python_executable)
+        elif token == "{candidate}":
+            if index == 0:
+                raise ManifestError(f"{field} cannot execute the candidate")
+            expanded.append(str(candidate))
+        elif "{" in token or "}" in token:
+            raise ManifestError(f"{field} contains an unknown placeholder")
+        elif token.startswith("-"):
+            if not re.fullmatch(r"--?[A-Za-z0-9][A-Za-z0-9_.:@+-]*(?:=[A-Za-z0-9_.:@+-]+)?", token):
+                raise ManifestError(f"{field}[{index}] contains an unsafe option")
+            expanded.append(token)
+        else:
+            bound_path = resolve_within(root, token, f"{field}[{index}]")
+            if bound_path not in trusted_paths:
+                raise ManifestError(f"{field}[{index}] is not bound by trusted_files")
+            expanded.append(str(bound_path))
+    if not uses_python and pathlib.Path(expanded[0]) not in trusted_paths:
+        raise ManifestError(f"{field}[0] is not a trusted executable")
+    return expanded
+
+

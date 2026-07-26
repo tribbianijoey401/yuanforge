@@ -1,0 +1,8 @@
+## 铁律 ⅩⅢ — 发布状态机（← NF-12 吸收）
+
+**发布状态必须区分：draft → PR → merged → deployed → live verified → knowledge closed → cleaned。**
+
+跳过的状态必须有项目规则允许的原因。失败停在哪一格，就按那一格汇报。
+
+<SECTION-END:13>
+

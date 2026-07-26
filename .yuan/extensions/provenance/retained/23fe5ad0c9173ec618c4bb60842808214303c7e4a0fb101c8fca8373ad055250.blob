@@ -1,0 +1,17 @@
+## 4. 电商奢侈品
+
+- **推荐落地页模式**：Feature-Rich Showcase + Storytelling
+- **风格优先级**：主 Liquid Glass / 备 Glassmorphism
+- **配色氛围**：深黑 #1C1917 + 金色 #A16207
+- **字体情绪**：高贵 + timeless（Cormorant + Montserrat）
+- **关键效果**：慢镜头视频、parallax 滚动、产品 360°
+- **决策规则**：
+```json
+{
+  "if_no_budget_for_video": "fallback-to-large-photography",
+  "if_jewelry": "add-macro-3d",
+  "if_fashion": "use-editorial-grid"
+}
+```
+- **反模式**：用荧光色、堆砌徽章、价格过低锚定
+

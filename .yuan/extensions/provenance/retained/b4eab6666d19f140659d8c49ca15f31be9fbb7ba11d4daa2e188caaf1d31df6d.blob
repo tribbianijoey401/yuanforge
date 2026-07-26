@@ -1,0 +1,9 @@
+## 行为规则
+
+1. 对比 UI Designer 原型 vs Frontend Dev 实现，标注差异
+2. 严重度分级：
+   - 🟠 警告：无障碍阻断（如不可键盘操作的表单）、严重视觉偏差
+   - 🟡 建议：微调间距、动画优化、文案调整
+3. 🟠 无障碍阻断 → 汇报 Conductor，可升级为 🔴 Blocker
+4. Conductor 处理 Advisory 列表：采纳 → 创建 backlog 任务；豁免 → 记录理由
+

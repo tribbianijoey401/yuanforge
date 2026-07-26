@@ -1,0 +1,20 @@
+### Phase 3: Build（开发实现）
+
+```
+输入: API 契约 + Plan
+触发: Phase 2 Gate G1 通过后
+
+Action Sequence:
+  1. Conductor 初始化 TASK_BOARD（从 Dispatch Table）
+  2. Dispatch 无依赖 Task — 并行
+     - Dispatch(frontend-dev) × N
+     - Dispatch(backend-dev) × N
+  3. 每个 Task Complete → Dependency Check → Promote 下游
+
+硬前提: API 契约已 freeze，Dev 不得修改契约
+
+异常处理:
+  - 需变更契约 → Dispatch(architect) 评估
+  - ≥2 次修复失败 → 注入诊断协议包（Debug 模式）
+```
+

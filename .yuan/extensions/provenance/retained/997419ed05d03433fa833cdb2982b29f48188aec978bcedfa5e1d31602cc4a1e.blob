@@ -1,0 +1,10 @@
+## 十、与现有规格书的关系
+
+| 规格书 | 关联 |
+|--------|------|
+| RUNTIME_MODEL.md | Candidate/Proposal/Checkpoint 对象定义 |
+| OBJECT_MODEL.md | Knowledge 对象 Schema（验证依据） |
+| PROPOSAL.md | Proposal 生命周期和格式 |
+| SESSION.md | Workspace Close 触发 Promotion Pipeline |
+| EVENTS.md | Pipeline 产出 KNOWLEDGE_UPDATED 事件 |
+| verification-policy.md | 晋升前必须完成六维验证（NF-02）+ 证据层级（NF-10） |

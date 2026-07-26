@@ -1,0 +1,6 @@
+### 最小可行 RAG（1天可上线）
+1. PostgreSQL + pgvector 扩展
+2. OpenAI/BGE embedding API
+3. 简单余弦相似度检索 Top-10
+4. 前端搜索框 + 结果列表
+

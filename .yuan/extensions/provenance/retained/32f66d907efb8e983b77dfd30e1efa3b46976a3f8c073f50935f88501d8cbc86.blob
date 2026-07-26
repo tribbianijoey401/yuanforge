@@ -1,0 +1,92 @@
+def extract_legacy_records(
+    repo_root: pathlib.Path, workspace: LegacyWorkspace
+) -> list[dict[str, Any]]:
+    """Extract task/event observations without treating status text as truth."""
+
+    repo = repo_root.resolve()
+    records: list[dict[str, Any]] = []
+    board = workspace.documents.get("TASK_BOARD.md")
+    if board:
+        lines = board.read_text(encoding="utf-8").splitlines()
+        for index, line in enumerate(lines):
+            if not line.lstrip().startswith("|"):
+                continue
+            headers = [item.strip() for item in line.strip().strip("|").split("|")]
+            id_column = next(
+                (
+                    position
+                    for position, header in enumerate(headers)
+                    if header in {"ID", "Task ID", "Task"}
+                ),
+                None,
+            )
+            status_column = next(
+                (
+                    position
+                    for position, header in enumerate(headers)
+                    if "状态" in header
+                ),
+                None,
+            )
+            if id_column is None or status_column is None or index + 1 >= len(lines):
+                continue
+            separator = lines[index + 1]
+            if not separator.lstrip().startswith("|") or "---" not in separator:
+                continue
+            for line_number in range(index + 2, len(lines)):
+                row_line = lines[line_number]
+                if not row_line.lstrip().startswith("|"):
+                    break
+                cells = [
+                    item.strip() for item in row_line.strip().strip("|").split("|")
+                ]
+                if max(id_column, status_column) >= len(cells):
+                    continue
+                task_id = cells[id_column]
+                if not re.fullmatch(r"(?:task-\d+|T\d+)", task_id, re.IGNORECASE):
+                    continue
+                records.append(
+                    {
+                        "kind": "task-snapshot",
+                        "source": _relative(board, repo),
+                        "line": line_number + 1,
+                        "task_id": task_id,
+                        "observed_status": cells[status_column],
+                        "cells": {
+                            headers[position]: value
+                            for position, value in enumerate(cells)
+                            if position < len(headers)
+                        },
+                    }
+                )
+            break
+    for event_file in workspace.event_files:
+        for line_number, line in enumerate(
+            event_file.read_text(encoding="utf-8").splitlines(), start=1
+        ):
+            if not line.strip():
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if record.get("session") != workspace.workspace_id:
+                continue
+            records.append(
+                {
+                    "kind": "event-observation",
+                    "source": _relative(event_file, repo),
+                    "line": line_number,
+                    "event": record,
+                }
+            )
+    return sorted(
+        records,
+        key=lambda item: (
+            item["source"],
+            item["line"],
+            item["kind"],
+        ),
+    )
+
+

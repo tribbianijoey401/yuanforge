@@ -1,0 +1,20 @@
+## 四、真相矩阵模板（← NF-11 新增）
+
+对每个发现至少记录：
+
+```text
+topic: <事实主题>
+authority: <当前权威来源>
+code: verified-current | stale | n/a
+runtime: verified-current | stale | unverified | n/a
+docs: verified-current | stale | changed
+rules: verified-current | stale | changed | n/a
+memory: verified-current | stale | generated-read-only | changed | n/a
+action: <做了什么或为什么没做>
+verification: <命令、页面或门禁>
+```
+
+用户不需要看到完整矩阵，但最终摘要必须保留未闭合状态。
+
+---
+

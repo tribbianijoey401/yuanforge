@@ -1,0 +1,13 @@
+### 租户上下文中间件
+
+```typescript
+// Express 中间件
+async function tenantContext(req, res, next) {
+  const tenantId = req.user.tenantId;  // 从JWT提取
+  // 注入到数据库会话
+  await db.query(`SET app.tenant_id = '${tenantId}'`);
+  req.tenant = await getTenantConfig(tenantId);
+  next();
+}
+```
+

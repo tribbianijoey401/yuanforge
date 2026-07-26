@@ -1,0 +1,14 @@
+### Decision / ADR
+
+```
+proposed → accepted → deprecated
+                ↓
+           superseded
+```
+
+| 从 | 到 | 条件 |
+|----|-----|------|
+| proposed | accepted | 决策采纳 |
+| accepted | deprecated | 不适用 |
+| accepted | superseded | 被新 ADR 取代 |
+

@@ -1,0 +1,6 @@
+## 12. Inert-candidate rule
+
+Files in this directory define a candidate only. They must not modify the
+repository entrypoint, current runtime authority, initializer, pre-commit
+configuration, or existing user work. Authority changes require later migration
+milestones and independent Evidence.

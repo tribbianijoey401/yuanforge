@@ -1,0 +1,25 @@
+def canonical_digest(
+    value: Any,
+    *,
+    omitted_paths: Iterable[tuple[str, ...]] = (),
+) -> str:
+    canonical = copy.deepcopy(value)
+    for path in omitted_paths:
+        current = canonical
+        for token in path[:-1]:
+            if not isinstance(current, dict) or token not in current:
+                break
+            current = current[token]
+        else:
+            if isinstance(current, dict):
+                current.pop(path[-1], None)
+    payload = json.dumps(
+        canonical,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+

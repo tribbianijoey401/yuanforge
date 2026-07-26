@@ -1,0 +1,2 @@
+"""Derive minimal pending side-effect pointers from immutable Attempts."""
+

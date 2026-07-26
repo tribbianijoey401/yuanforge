@@ -1,0 +1,167 @@
+class AdapterPortTests(unittest.TestCase):
+    @staticmethod
+    def _port(root: Path | str, **kwargs: object) -> ReferencePort:
+        return ReferencePort(
+            root,
+            allowed_executables=[sys.executable],
+            max_command_seconds=1.0,
+            max_output_bytes=256,
+            **kwargs,
+        )
+
+    def test_enumeration_is_stable_bounded_and_content_bound(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            port = self._port(
+                root,
+                max_enumeration_files=3,
+                max_enumeration_depth=2,
+            )
+            port.atomic_write("z.txt", b"z", expected_sha256=None)
+            port.atomic_write("nested/a.txt", b"alpha", expected_sha256=None)
+
+            first = port.enumerate_files(".")
+            second = port.enumerate_files(".")
+
+            self.assertEqual(first.schema_version, "yuan.tool-receipt/v1")
+            self.assertEqual(first.kind, "file-enumeration")
+            self.assertEqual(first.status, "OBSERVED")
+            self.assertEqual(
+                [entry.path for entry in first.entries],
+                ["nested/a.txt", "z.txt"],
+            )
+            self.assertEqual(first.entries, second.entries)
+            self.assertEqual(
+                first.entries[0].sha256,
+                hashlib.sha256(b"alpha").hexdigest(),
+            )
+            self.assertEqual(first.entries[0].size_bytes, 5)
+
+            port.atomic_write("third.txt", b"3", expected_sha256=None)
+            with self.assertRaises(EnumerationLimitExceeded):
+                port.enumerate_files(".", max_files=2)
+            with self.assertRaises(EnumerationLimitExceeded):
+                port.enumerate_files(".", max_depth=0)
+            with self.assertRaises(ScopeViolation):
+                port.enumerate_files("../escape")
+            with self.assertRaises(ValueError):
+                self._port(root, max_enumeration_files=True)
+
+    def test_enumeration_rejects_links_or_junctions(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            outside = root.parent / f"{root.name}-outside"
+            outside.mkdir()
+            try:
+                (outside / "secret.txt").write_text("secret", encoding="utf-8")
+                link = root / "linked"
+                try:
+                    os.symlink(outside, link, target_is_directory=True)
+                except (OSError, NotImplementedError):
+                    link.mkdir()
+                    with mock.patch(
+                        "port_enumeration._is_link_or_junction",
+                        side_effect=lambda path: path.name == "linked",
+                    ):
+                        with self.assertRaises(ScopeViolation):
+                            self._port(root).enumerate_files(".")
+                    return
+                with self.assertRaises(ScopeViolation):
+                    self._port(root).enumerate_files(".")
+            finally:
+                if outside.exists():
+                    for child in outside.iterdir():
+                        child.unlink()
+                    outside.rmdir()
+
+    def test_propose_returns_bound_receipt_without_side_effect(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / "must-not-exist.txt"
+            port = self._port(root, proposal_provider=_ProposalProvider())
+            request = {"target": str(target), "intent": "draft a write"}
+
+            receipt = port.propose(request)
+
+            self.assertFalse(target.exists())
+            self.assertEqual(receipt["schema_version"], "yuan.tool-receipt/v1")
+            self.assertEqual(receipt["kind"], "llm-propose")
+            self.assertEqual(receipt["status"], "PROPOSED")
+            self.assertEqual(receipt["provider_id"], "author-test-provider")
+            self.assertEqual(receipt["model_id"], "author-test-model")
+            self.assertEqual(
+                receipt["input_sha256"],
+                hashlib.sha256(
+                    json.dumps(
+                        request,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ).encode("utf-8")
+                ).hexdigest(),
+            )
+            self.assertRegex(receipt["result_sha256"], r"^[0-9a-f]{64}$")
+            binding = {
+                key: receipt[key]
+                for key in (
+                    "input_sha256",
+                    "provider_id",
+                    "model_id",
+                    "result_sha256",
+                )
+            }
+            self.assertEqual(
+                receipt["binding_sha256"],
+                hashlib.sha256(
+                    json.dumps(
+                        binding,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ).encode("utf-8")
+                ).hexdigest(),
+            )
+            self.assertEqual(receipt["proposal"]["action"]["type"], "file-write")
+
+    def test_propose_fails_closed_on_malformed_or_unserializable_data(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            malformed = self._port(
+                temporary,
+                proposal_provider=_MalformedProvider(),
+            )
+            with self.assertRaises(PortError):
+                malformed.propose({"target": "x"})
+            with self.assertRaises(PortError):
+                malformed.propose({"target": object()})
+
+    def test_descriptors_are_json_compatible_and_explicit(self) -> None:
+        project_root = Path(__file__).resolve().parents[4]
+        manual = json.loads(
+            (project_root / ".yuan/adapters/manual.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        hermes = json.loads(
+            (project_root / ".yuan/adapters/hermes.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+
+        self.assertEqual(manual["status"], "supported")
+        self.assertTrue(manual["executable_port"])
+        port_path = project_root / manual["executable_port"]
+        self.assertEqual(
+            manual["executable_port_sha256"],
+            hashlib.sha256(port_path.read_bytes()).hexdigest(),
+        )
+        self.assertTrue(manual["conformance"]["entrypoint"])
+        self.assertEqual(hermes["status"], "unsupported")
+        self.assertTrue(hermes["unsupported_reason"])
+        self.assertNotIn("executable_port", hermes)
+        for descriptor in (manual, hermes):
+            expected = descriptor["status"]
+            for family in descriptor["capabilities"].values():
+                self.assertTrue(family)
+                self.assertTrue(all(value == expected for value in family.values()))
+
+

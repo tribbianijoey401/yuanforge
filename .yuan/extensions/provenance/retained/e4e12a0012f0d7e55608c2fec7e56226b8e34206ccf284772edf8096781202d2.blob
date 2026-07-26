@@ -1,0 +1,14 @@
+## 2. 七维 × 三档评分矩阵
+
+| 维度 | Bronze（最低可上线） | Silver（生产稳健） | Gold（加固） |
+|---|---|---|---|
+| 测试 + 回归 | 核心流有测试、构建/lint 绿 | 影响图定向覆盖、回归率为零、回归集进门禁 | 关键路径 pass^k、变异加固、独立测试作者 |
+| 契约 | 主要接口有定义 | 契约先行、前后端对照、错误模型统一 | 契约破坏在 CI 即红、版本与弃用策略闭环 |
+| 安全 | 鉴权到位、无明显高危、密钥不入库 | 授权(RBAC)/限额/输入校验齐、依赖存在性核验 | 供应链加固、SAST/扫描门、威胁面复核 |
+| 无障碍 | 核心流可键盘完成 | 对比度/焦点/语义达 AA、自动扫描 0 阻断 | 屏读端到端走查 + 回归断言 |
+| 性能 | 无明显 N+1/全量加载、关键页可用 | 热点路径达标、分页/索引/超时到位 | 容量/压测验证、预算守恒、退化阻断 |
+| 可观测 | 有日志、出错看得见 | 结构化日志 + 关键指标 + SLI/SLO | 告警/追踪/错误预算闭环、可定位根因 |
+| 发布安全 | 能回退 | 渐进发布 + 回滚预案演练 | 自动回滚触发、特性开关、变更可审计 |
+
+各维度权威标准：测试见 `agentic-delivery/01-standards/test-discipline-for-generated-code` 与 `testing/01-standards/ci-test-gates-and-coverage`；回归集见 `agentic-delivery/01-standards/self-improving-memory-and-regression-sets`；契约见 `experts/architect/contract-first-api-design`、`testing/01-standards/contract-testing-and-api-contracts`；安全/供应链见 `security/01-standards/supply-chain-security`；无障碍见 `frontend/01-standards/accessibility-acceptance-gate`；可观测见 `observability/01-standards/observability-and-slo-operations`；发布安全见 `release-engineering/01-standards/progressive-delivery-and-release`；pass^k 见 `agentic-delivery/01-standards/eval-driven-delivery`。
+

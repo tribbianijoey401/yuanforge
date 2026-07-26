@@ -1,0 +1,13 @@
+## 19. Product Review / Ratings Focused 评价驱动
+
+- **关键词**：reviews、ratings、testimonials、stars
+- **版块顺序**：
+  1. Hero（product + aggregate rating）
+  2. Rating breakdown
+  3. Individual reviews
+  4. Buy/CTA
+- **主 CTA 放置位置**：reviews summary 后 + Buy 旁
+- **配色策略**：trust 色；星评金；verified 绿；review sentiment 色
+- **推荐效果**：star fill animation、review filtering、helpful vote、photo lightbox
+- **转化优化要点**：UGC 建立信任；verified purchase；按评分筛选；回应差评
+

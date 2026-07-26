@@ -1,0 +1,20 @@
+#### Goal Cluster（目标簇）
+
+```
+User Intent
+    │
+    ├─ Authentication
+    │    ├─ Login (goal=login)
+    │    ├─ Register (goal=register)
+    │    └─ Forgot Password (goal=forgot-password)
+    │
+    └─ Payment
+         ├─ Checkout (goal=checkout)
+         └─ Refund (goal=refund)
+```
+
+- **Goal** = Task 的 `goal` 字段分组，不是独立对象
+- **Goal Cluster** = 一组天然关联的 Goal（如 Authentication 下的 Login/Register/ForgotPassword）
+- 同一 Goal Cluster 的 Task 可以在同一个 Loop 内并行推进
+- 不同 Goal Cluster 之间完全隔离，不会混在同一 Loop
+

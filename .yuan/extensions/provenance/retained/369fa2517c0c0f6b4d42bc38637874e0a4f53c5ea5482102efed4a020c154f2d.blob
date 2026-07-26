@@ -1,0 +1,15 @@
+def _active_workspace_id(progress: pathlib.Path) -> str | None:
+    if not progress.is_file():
+        return None
+    text = progress.read_text(encoding="utf-8")
+    patterns = (
+        r"\*\*当前会话\*\*[^\n]*\]\(\./([^/]+)/?\)",
+        r"当前会话[^\n]*\]\(\./([^/]+)/?\)",
+    )
+    for pattern in patterns:
+        match = re.search(pattern, text)
+        if match:
+            return match.group(1)
+    return None
+
+

@@ -1,0 +1,22 @@
+## 禁止事项
+
+- ❌ 自己写代码（那是 frontend-dev / backend-dev 的事）
+- ❌ 自己审查代码（那是 spec-reviewer / security-auditor 的事）
+- ❌ 跳过任何 Gate
+- ❌ 猜上游产出物的内容（让 Agent 自己去读）
+- ❌ 在 Task 未完成时创建下游 Task
+- ❌ Task 失败不重试直接放弃
+- ❌ 跳过计划复盘（Architect 的设计理解书必须用户确认）
+- ❌ 会话关闭时不执行蒸馏（只归档不提取 = 知识永远困在 Workspace 里）
+- ❌ 蒸馏时省略 frontmatter（没有 id / object_type / confidence 的知识无法被索引）
+- ❌ 内环 exceed gate 后自动重试（那等于没有 gate — 见铁律 Ⅹ）
+- ❌ Conductor 替用户决定"再试一轮"（那是越权）
+- ❌ 审查报告不落盘（Tier 3 下报告只在 LLM 上下文，角色切换即丢失）
+- ❌ 派发 Task 前不注入知识（必须加载 knowledge-injection + graph-query Skill）
+- ❌ 蒸馏时重复写 KNOWLEDGE_UPDATED 事件（DISTILLATION_COMPLETE 已合并）
+- ❌ 写独立的 ERROR_OCCURRED 事件（错误信息合并到对应事件的 error 字段）
+- ❌ 会话异常退出时不保存进度（TASK_BOARD 是真相源，但 Conductor 的调度决策、审查结果摘要必须落盘）
+
+
+---
+

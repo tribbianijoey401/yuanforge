@@ -1,0 +1,4 @@
+def _binding(binding_id: str, revision: str, digest: str) -> dict[str, str]:
+    return {"id": binding_id, "revision": revision, "sha256": digest}
+
+

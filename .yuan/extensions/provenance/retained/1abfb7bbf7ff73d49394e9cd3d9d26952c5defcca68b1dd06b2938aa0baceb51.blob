@@ -1,0 +1,21 @@
+## 23. Chinese Traditional 中文繁体
+
+- **类别**：Serif + Sans
+- **标题字**：Noto Serif TC
+- **正文字**：Noto Sans TC
+- **情绪关键词**：chinese、traditional、elegant、cultural、readable
+- **最适用于**：繁体中文站、文化内容、港台市场
+- **Google Fonts URL**：
+```
+https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap
+```
+- **CSS @import**：
+```css
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap');
+```
+- **Tailwind config**：
+```js
+fontFamily: { serif: ['Noto Serif TC', 'serif'], sans: ['Noto Sans TC', 'sans-serif'] }
+```
+- **注意事项**：繁体字笔画多，正文 ≥ 16px 阅读舒适。
+

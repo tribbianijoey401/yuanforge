@@ -1,0 +1,8 @@
+FRAMEWORK_TOP_DIRS = [
+    "contracts",
+    "protocols",
+    "templates",
+    "scripts",
+]
+
+# 框架单文件

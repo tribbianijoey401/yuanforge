@@ -1,0 +1,20 @@
+### 3.2 Decision / ADR（架构决策）
+
+**语义**：一个不可逆的技术选择。
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:---:|------|
+| `id` | string | ✅ | `ADR-NNN` |
+| `object_type` | enum | ✅ | `decision` |
+| `status` | enum | ✅ | proposed / accepted / deprecated / superseded |
+| `summary` | string | ✅ | 决策摘要 |
+| `owner` | string | ✅ | architect |
+| `confidence` | enum | ✅ | verified / stale / draft / deprecated |
+| `date` | date | ✅ | 决策日期 |
+| `supersedes` | string | — | 取代的旧 ADR |
+| `superseded_by` | string | — | 被取代 |
+| `alternatives` | array | — | 备选方案 |
+| `consequences` | object | — | 后果（positive / negative） |
+
+**状态机**：proposed → accepted → deprecated / superseded
+

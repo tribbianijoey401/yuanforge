@@ -1,0 +1,13 @@
+### Phase 6: 归档
+
+```
+Dispatch(doc-engineer)
+  - 增量: 合入主干时异步更新
+  - 阶段: Milestone 结束全局归档
+
+Conductor 蒸馏:
+  - Promote → Archive → 重建 Graph
+```
+
+---
+

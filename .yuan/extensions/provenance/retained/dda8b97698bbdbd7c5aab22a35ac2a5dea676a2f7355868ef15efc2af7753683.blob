@@ -1,0 +1,21 @@
+## 18. Medical Clean 医疗清洁
+
+- **类别**：Sans + Sans
+- **标题字**：Figtree
+- **正文字**：Noto Sans
+- **情绪关键词**：medical、clean、accessible、professional、trustworthy
+- **最适用于**：医疗、诊所、制药、健康应用、无障碍
+- **Google Fonts URL**：
+```
+https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;700&display=swap
+```
+- **CSS @import**：
+```css
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;700&display=swap');
+```
+- **Tailwind config**：
+```js
+fontFamily: { heading: ['Figtree', 'sans-serif'], body: ['Noto Sans', 'sans-serif'] }
+```
+- **注意事项**：Noto Sans 国际字符覆盖广，多语言医疗站必备。
+

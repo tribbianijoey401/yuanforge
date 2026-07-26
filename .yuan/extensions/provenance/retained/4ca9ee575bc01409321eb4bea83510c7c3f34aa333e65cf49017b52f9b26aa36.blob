@@ -1,0 +1,20 @@
+### 3. 开始 Vibecoding
+
+YuanForge 不绑定平台。选你习惯的 Agent 工具：
+
+| 平台 | 操作 |
+|------|------|
+| **Hermes Agent** | 直接说「开发一个 TODO API」 |
+| **Cursor** | 打开项目，Agent 自动读取 AGENTS.md |
+| **Claude Code** | `claude` 启动，自动加载 AGENTS.md |
+| **任何平台** | 参考 `.yuan/platforms/manual.md` |
+
+无论哪个平台，Yuan 的工作流都一样：
+1. Architect 分析需求 → 设计架构 → 产出 Plan
+2. 你确认 Plan
+3. Conductor 解析 Dispatch Table → 并行派发 Agent
+4. Dev → 4 Reviewers → Tester → Doc Engineer 逐层流转
+5. 交付可运行代码
+
+---
+

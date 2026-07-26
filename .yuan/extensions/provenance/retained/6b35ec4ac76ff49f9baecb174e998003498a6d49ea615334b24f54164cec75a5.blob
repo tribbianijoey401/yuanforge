@@ -1,0 +1,13 @@
+### 2.1 入口文件
+
+```bash
+# 找到入口点
+grep -r "if __name__" --include="*.py" -l | head -5   # Python
+grep -r "app.listen\|server.start" --include="*.ts" --include="*.js" -l | head -5  # Node
+```
+
+读取入口文件，理解：
+- 启动时加载了什么？
+- 有哪些中间件/插件？
+- 路由是怎么组织的？
+

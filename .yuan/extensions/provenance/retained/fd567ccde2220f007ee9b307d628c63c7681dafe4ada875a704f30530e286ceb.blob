@@ -1,0 +1,5 @@
+class _MalformedProvider:
+    def propose(self, request: dict[str, object]) -> dict[str, object]:
+        return {"action": {"type": "file-write", "scope": request["target"]}}
+
+

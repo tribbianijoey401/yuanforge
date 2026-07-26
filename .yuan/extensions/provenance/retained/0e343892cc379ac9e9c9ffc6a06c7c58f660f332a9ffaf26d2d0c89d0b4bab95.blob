@@ -1,0 +1,30 @@
+def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8")
+    args = _parser().parse_args(argv)
+    try:
+        if args.command == "migrate":
+            result = migrate(
+                args.repo, args.shadow_root, dry_run=args.dry_run
+            )
+        elif args.command == "rollback":
+            result = rollback(args.repo, args.shadow_root, args.receipt)
+        else:
+            result = verify(args.repo, args.shadow_root, args.receipt)
+    except (MigrationError, GuardError, OSError, UnicodeError, json.JSONDecodeError) as error:
+        result = {
+            "schema_version": "yuan.shadow-operation-error/v1",
+            "status": "BLOCKED",
+            "error": str(error),
+        }
+        print(
+            json.dumps(result, ensure_ascii=False, sort_keys=True),
+            file=sys.stderr,
+        )
+        return 2
+    print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+    return 0 if result.get("status") != "FAIL" else 1
+
+

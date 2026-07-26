@@ -1,0 +1,98 @@
+def discover_legacy(repo_root: pathlib.Path) -> LegacyScan:
+    repo = repo_root.resolve()
+    docs = repo / "docs"
+    if not docs.is_dir():
+        raise MigrationError("legacy docs root does not exist")
+    active_id = _active_workspace_id(docs / "PROGRESS.md")
+    candidates: dict[str, tuple[str, pathlib.Path]] = {}
+    for child in sorted(docs.iterdir(), key=lambda item: item.name):
+        if (
+            child.is_dir()
+            and child.name not in {"archive", "events", "knowledge", "workspace", "graph", "policies", "proposals", "decisions"}
+            and any((child / name).is_file() for name in LEGACY_NAMES)
+        ):
+            candidates[child.name] = (
+                "active" if child.name == active_id else "historical",
+                child,
+            )
+    archive = docs / "archive"
+    if archive.is_dir():
+        for child in sorted(archive.iterdir(), key=lambda item: item.name):
+            if child.is_dir() and any((child / name).is_file() for name in LEGACY_NAMES):
+                candidates[child.name] = ("archive", child)
+
+    event_index: dict[str, list[pathlib.Path]] = {}
+    global_unresolved: list[dict[str, str]] = []
+    if active_id is None:
+        global_unresolved.append(
+            {
+                "code": "ACTIVE_POINTER_MISSING",
+                "source": "docs/PROGRESS.md",
+                "detail": "no active Workspace pointer could be parsed",
+            }
+        )
+    events_root = docs / "events"
+    if events_root.is_dir():
+        for event_file in sorted(events_root.rglob("*.jsonl")):
+            sessions, errors = _event_sessions(event_file)
+            global_unresolved.extend(errors)
+            for session in sessions:
+                event_index.setdefault(session, []).append(event_file)
+
+    workspaces: list[LegacyWorkspace] = []
+    for workspace_id, (kind, root) in sorted(candidates.items()):
+        documents = {
+            name: root / name for name in LEGACY_NAMES if (root / name).is_file()
+        }
+        unresolved: list[dict[str, str]] = []
+        for name, code in (
+            ("FEATURE.md", "MISSING_FEATURE"),
+            ("PLAN.md", "MISSING_PLAN"),
+            ("TASK_BOARD.md", "MISSING_TASK_BOARD"),
+        ):
+            if name not in documents:
+                unresolved.append(
+                    {
+                        "code": code,
+                        "source": _relative(root, repo),
+                        "detail": f"{name} is absent",
+                    }
+                )
+        if not ({"SESSION_LOG.md", "SESSION.md"} & set(documents)):
+            unresolved.append(
+                {
+                    "code": "MISSING_SESSION",
+                    "source": _relative(root, repo),
+                    "detail": "SESSION_LOG.md and SESSION.md are absent",
+                }
+            )
+        event_files = sorted(event_index.get(workspace_id, []))
+        if not event_files:
+            unresolved.append(
+                {
+                    "code": "MISSING_EVENTS",
+                    "source": _relative(root, repo),
+                    "detail": "no session-bound JSONL events found",
+                }
+            )
+        workspaces.append(
+            LegacyWorkspace(
+                workspace_id=workspace_id,
+                kind=kind,
+                root=root,
+                documents=documents,
+                event_files=event_files,
+                unresolved=unresolved,
+            )
+        )
+    if active_id and active_id not in candidates:
+        global_unresolved.append(
+            {
+                "code": "ACTIVE_WORKSPACE_UNRECOGNIZED",
+                "source": "docs/PROGRESS.md",
+                "detail": active_id,
+            }
+        )
+    return LegacyScan(active_id, workspaces, global_unresolved)
+
+

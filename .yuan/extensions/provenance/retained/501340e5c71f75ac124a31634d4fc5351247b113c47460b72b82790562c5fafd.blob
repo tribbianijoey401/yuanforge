@@ -1,0 +1,13 @@
+## 28. 法律权威蓝金
+
+- **适用行业**：法律、会计、咨询
+- **设计意图**：深蓝 + 金 = 律所传统色彩
+
+| Primary | #1E3A8A | Background | #F8FAFC | Muted | #E9EEF5 |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #0F172A | Muted FG | #64748B |
+| Secondary | #1E40AF | Card | #FFFFFF | Border | #CBD5E1 |
+| On Secondary | #FFFFFF | Card FG | #0F172A | Destructive | #DC2626 |
+| Accent | #B45309 | On Destructive | #FFFFFF | Ring | #1E3A8A |
+| On Accent | #FFFFFF | | | | |
+

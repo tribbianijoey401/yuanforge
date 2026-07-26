@@ -1,0 +1,10 @@
+### 多模型路由架构
+```typescript
+interface ModelRoute {
+  taskType: 'code' | 'writing' | 'analysis' | 'multimodal';
+  primary: ModelConfig;
+  fallback: ModelConfig[];
+  circuitBreaker: { threshold: number; timeout: number };
+}
+```
+

@@ -1,0 +1,56 @@
+class SchemaContractTests(unittest.TestCase):
+    def test_candidate_self_check_covers_negative_fixtures_and_manifest(self) -> None:
+        result = conformance.run_candidate(CORE_ROOT)
+        self.assertEqual("PASS", result["status"])
+        check_ids = {item["id"] for item in result["checks"]}
+        self.assertIn("negative-evidence-zero-assertions.json", check_ids)
+        self.assertIn("manifest-protocol.md", check_ids)
+
+    def test_all_four_schemas_parse_as_json_compatible_yaml(self) -> None:
+        for filename in (
+            "work-contract.schema.yaml",
+            "run-memory.schema.yaml",
+            "attempt.schema.yaml",
+            "evidence.schema.yaml",
+        ):
+            with self.subTest(filename=filename):
+                schema = json.loads((CORE_ROOT / filename).read_text(encoding="utf-8"))
+                self.assertEqual("https://json-schema.org/draft/2020-12/schema", schema["$schema"])
+                self.assertEqual("object", schema["type"])
+
+    def test_valid_author_fixtures_satisfy_schema_and_semantics(self) -> None:
+        for kind in ("work-contract", "run-memory", "attempt", "evidence"):
+            with self.subTest(kind=kind):
+                document = json.loads(
+                    (CORE_ROOT / "fixtures" / "valid" / f"{kind}.json").read_text(
+                        encoding="utf-8"
+                    )
+                )
+                result = conformance.validate_document(kind, document)
+                self.assertEqual([], result.errors)
+                self.assertGreater(result.assertions, 0)
+
+    def test_invalid_author_fixtures_are_rejected(self) -> None:
+        expected = {
+            "work-contract-duplicate-ac.json": "DUPLICATE_AC_ID",
+            "attempt-invalid-journal.json": "INVALID_JOURNAL_TRANSITION",
+            "evidence-zero-assertions.json": "ZERO_ASSERTIONS",
+            "run-memory-unknown-complete.json": "COMPLETE_WITH_PENDING_SIDE_EFFECT",
+        }
+        for filename, reason in expected.items():
+            with self.subTest(filename=filename):
+                kind = {
+                    "work-contract-duplicate-ac.json": "work-contract",
+                    "attempt-invalid-journal.json": "attempt",
+                    "evidence-zero-assertions.json": "evidence",
+                    "run-memory-unknown-complete.json": "run-memory",
+                }[filename]
+                document = json.loads(
+                    (CORE_ROOT / "fixtures" / "invalid" / filename).read_text(
+                        encoding="utf-8"
+                    )
+                )
+                result = conformance.validate_document(kind, document)
+                self.assertIn(reason, result.errors)
+
+

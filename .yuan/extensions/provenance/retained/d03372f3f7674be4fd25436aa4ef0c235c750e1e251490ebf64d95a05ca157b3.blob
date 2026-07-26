@@ -1,0 +1,13 @@
+## 24. 餐厅食欲红金
+
+- **适用行业**：餐厅、外卖、食谱
+- **设计意图**：红激发食欲，金暗示品质
+
+| Primary | #DC2626 | Background | #FEF2F2 | Muted | #F0EDF1 |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #450A0A | Muted FG | #64748B |
+| Secondary | #F87171 | Card | #FFFFFF | Border | #FECACA |
+| On Secondary | #0F172A | Card FG | #450A0A | Destructive | #DC2626 |
+| Accent | #A16207 | On Destructive | #FFFFFF | Ring | #DC2626 |
+| On Accent | #FFFFFF | | | | |
+

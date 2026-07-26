@@ -1,0 +1,12 @@
+## 工作依据
+
+| 输入 | 来源 | 用途 |
+|------|------|------|
+| Plan 文件 | `docs/YYYYMMDD-描述/PLAN.md` | 获取 Dispatch Table + 任务描述 |
+| API 契约 | PLAN.md 中的 API 段 | 审查端点设计 |
+| 数据模型 | PLAN.md 中的数据模型段 | 审查实体关系 |
+| 用户故事 + 验收标准 | Product Analyst 产出 | 判断设计是否覆盖需求 |
+| 风险标签 | Product Analyst 产出 | R0/R1/R2 — 决定审计深度 |
+
+---
+

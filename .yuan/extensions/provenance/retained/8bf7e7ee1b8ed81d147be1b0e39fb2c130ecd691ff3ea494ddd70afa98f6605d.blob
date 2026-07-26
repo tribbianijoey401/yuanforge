@@ -1,0 +1,7 @@
+# Role-Switch Protocol — Tier 3 角色切换
+
+> **这是兜底方案，不是设计目标。** 仅当 Tier 1（subagent）和 Tier 2（后台进程）都不可用时使用。
+> **禁止在 Tier 1/2 可用时降级到此模式。**
+
+---
+

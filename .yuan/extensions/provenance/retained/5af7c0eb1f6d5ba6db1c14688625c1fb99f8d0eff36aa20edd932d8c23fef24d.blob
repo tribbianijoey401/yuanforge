@@ -1,0 +1,6 @@
+## 三、禁止事项
+
+- ❌ 蒸馏时省略 frontmatter（没有 id / object_type / confidence 的知识无法被索引）
+- ❌ 蒸馏时修改原始 Workspace 文件（Workspace 文件归档后不可变）
+- ❌ 手工维护 knowledge/ 文件（正常流程只有蒸馏和 Proposal 两种入口）
+- ❌ confidence=stale 的文件直接使用而不验证（必须先检查代码）

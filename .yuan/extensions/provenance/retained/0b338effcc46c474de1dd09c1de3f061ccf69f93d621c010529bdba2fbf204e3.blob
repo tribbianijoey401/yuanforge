@@ -1,0 +1,3 @@
+#   bash scripts/distill-pitfall.sh <BUG-NNN.md> [--auto]
+#
+# 参数:

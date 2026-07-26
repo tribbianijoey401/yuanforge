@@ -1,0 +1,8 @@
+## Pitfalls
+
+- **图谱是增量构建的** — 使用 `--incremental` 模式，只扫描新增/修改的文件
+- **graph/index.json 不提交 git** — 确保 `.gitignore` 中有 `docs/graph/`
+- **图谱和 Pitfall grep 互补** — 不要互相替代：
+  - Pitfall grep：精确匹配模块标签，速度快
+  - 图谱查询：提供 Feature 之间的依赖关系，发现间接关联
+- **查询结果要精简** — 注入 context 时用 short 格式，不超过 10 行

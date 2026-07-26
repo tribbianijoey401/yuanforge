@@ -1,0 +1,4 @@
+## Git 规范
+- Commit 格式: `type: 简短描述`
+- 一个 Commit 一件事
+

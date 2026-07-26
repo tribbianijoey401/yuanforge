@@ -1,0 +1,19 @@
+## 1. 分层架构原则（依赖只能向下）
+
+```
+表现层 (Routes / Controllers)   ← 只做：参数校验、调用 service、组装 HTTP 响应
+        ↓ 依赖
+业务层 (Services)               ← 只做：业务规则、事务编排、调用 repository
+        ↓ 依赖
+数据层 (Repositories / Models)  ← 只做：数据读写、ORM 查询、映射
+        ↓
+基础设施 (DB / Cache / 第三方)   ← 连接、客户端实例
+```
+
+**铁律**：
+- 依赖**只能向下**：上层 import 下层，下层**禁止**反向 import 上层。
+- Controller **禁止**直接操作数据库（必须经 service）。
+- Service **禁止** import HTTP 对象（`req`/`res`），不返回 HTTP 响应，只返回业务结果/抛业务异常。
+- Repository **禁止**含业务逻辑（if 余额 > 0 之类），只做数据存取。
+- 跨模块（如订单调用户）通过对方的 **service 接口**，不跨层、不直连对方 repository。
+

@@ -1,0 +1,8 @@
+## 注意事项
+
+- Hermes 的 `delegate_task` 是 **同步**的 — 父 Agent 等待子 Agent 完成
+- 最多 3 个并行子 Agent（可配置 `delegation.max_concurrent_children`）
+- 子 Agent 没有父会话的记忆 — 必须通过 context 传递全部信息
+
+---
+

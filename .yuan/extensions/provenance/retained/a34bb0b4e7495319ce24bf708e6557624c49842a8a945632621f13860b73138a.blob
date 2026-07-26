@@ -1,0 +1,1 @@
+GRAPH_DIR = REPO_ROOT / "docs" / "graph"

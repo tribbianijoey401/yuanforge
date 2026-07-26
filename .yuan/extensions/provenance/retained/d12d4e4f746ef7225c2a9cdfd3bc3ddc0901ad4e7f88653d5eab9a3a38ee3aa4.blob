@@ -1,0 +1,13 @@
+## 30. 物流追踪蓝橙
+
+- **适用行业**：物流、快递、配送
+- **设计意图**：蓝 = 追踪可视化，橙 = 配送行动
+
+| Primary | #2563EB | Background | #EFF6FF | Muted | #E9EFF8 |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #1E40AF | Muted FG | #64748B |
+| Secondary | #3B82F6 | Card | #FFFFFF | Border | #BFDBFE |
+| On Secondary | #FFFFFF | Card FG | #1E40AF | Destructive | #DC2626 |
+| Accent | #EA580C | On Destructive | #FFFFFF | Ring | #2563EB |
+| On Accent | #FFFFFF | | | | |
+

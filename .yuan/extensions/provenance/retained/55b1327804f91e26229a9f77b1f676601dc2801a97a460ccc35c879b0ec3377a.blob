@@ -1,0 +1,43 @@
+def print_sync_summary(results: dict, label: str):
+    """打印同步摘要。"""
+    added = [k for k, v in results.items() if v == "added" and not k.startswith("__")]
+    updated = [k for k, v in results.items() if v == "updated" and not k.startswith("__")]
+    skipped = [k for k, v in results.items() if v == "skipped" and not k.startswith("__")]
+    orphans = results.get("__orphans__", [])
+    cleaned = results.get("__orphans_cleaned__", [])
+
+    print(f"\n{color(label, 'bold')}")
+
+    if added:
+        print(color(f"  + {len(added)} new:", "green"))
+        for f in added[:10]:
+            print(f"      {f}")
+        if len(added) > 10:
+            print(f"      ... and {len(added) - 10} more")
+
+    if updated:
+        print(color(f"  ~ {len(updated)} updated:", "yellow"))
+        for f in updated[:10]:
+            print(f"      {f}")
+        if len(updated) > 10:
+            print(f"      ... and {len(updated) - 10} more")
+
+    if skipped:
+        print(f"  · {len(skipped)} unchanged (skipped)")
+
+    if cleaned:
+        print(color(f"  - {len(cleaned)} orphaned files cleaned:", "red"))
+        for f in cleaned[:10]:
+            print(f"      {f}")
+        if len(cleaned) > 10:
+            print(f"      ... and {len(cleaned) - 10} more")
+
+    if orphans:
+        print(color(f"  ! {len(orphans)} orphaned files (not in source):", "yellow"))
+        for f in orphans[:10]:
+            print(f"      {f}")
+        if len(orphans) > 10:
+            print(f"      ... and {len(orphans) - 10} more")
+        print(color("    Use --clean to remove them", "yellow"))
+
+

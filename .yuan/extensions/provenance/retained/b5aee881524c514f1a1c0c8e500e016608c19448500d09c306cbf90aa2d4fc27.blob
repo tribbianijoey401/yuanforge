@@ -1,0 +1,12 @@
+### DocsOS 七层
+
+| 层 | 目录 | 内容 | 何时读 |
+|----|------|------|--------|
+| Object Model | [object-model.yaml](./object-model.yaml) | 知识对象 Schema | 需要了解对象定义时 |
+| Knowledge | [knowledge/](./knowledge/) | 长期知识（Feature/ADR/Pitfall/Module） | 每次必读 |
+| Runtime | [YYYYMMDD-描述/](./) | 活跃 Workspace（唯一真相源 TASK_BOARD） | 当前工作时 |
+| Events | events/（未来） | 结构化事件日志 | 崩溃恢复、变更追溯 |
+| Graph | graph/（未来） | 自动生成的知识索引 | 依赖查询 |
+| Policy | [policies/](./policies/) | 系统规则（平台无关） | 需要了解规则时 |
+| Archive | [archive/](./archive/) | 已关闭的 Workspace 快照 | 回顾历史 |
+

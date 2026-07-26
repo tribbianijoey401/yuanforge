@@ -1,0 +1,21 @@
+### 3.5 Cursor（未来）
+
+```yaml
+platform: cursor
+transport: role-switch
+
+dispatch:
+  implementation: prompt_role_switch
+  notes: "提示用户切换到对应角色，新对话中执行 Task"
+
+review:
+  implementation: prompt_role_switch
+  notes: "提示用户切换为 Reviewer 角色"
+
+capabilities:
+  parallel: false
+  filesystem: full
+  shell: full
+  subagent: false
+```
+

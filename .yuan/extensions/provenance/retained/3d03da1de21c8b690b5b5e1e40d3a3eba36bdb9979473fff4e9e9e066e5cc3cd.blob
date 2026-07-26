@@ -1,0 +1,12 @@
+## 四、Conductor 如何解析（LLM 兜底）
+
+当 Runtime Engine 不可用时，Conductor 使用 LLM 推理作为兜底：
+
+1. 解析「任务派发表」→ 提取所有 Task
+2. 解析「依赖关系」→ 构建 DAG
+3. 找出 `上游依赖 = "-"` 的 Task → 第一批 ready
+4. 并行派发所有 ready Task
+5. 任意 Task 完成后 → PROMOTE 规则 → 新的 ready
+6. 重复直到全部 done
+
+> **当前阶段**：无独立 Runtime Engine，Conductor 通过 LLM 推理执行派发。但派发逻辑（§二）已明确为确定性规则，未来可直接由 Runtime Engine 执行。

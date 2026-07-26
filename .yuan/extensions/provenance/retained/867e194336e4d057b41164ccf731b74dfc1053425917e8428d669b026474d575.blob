@@ -1,0 +1,67 @@
+def _workspace_projection(
+    repo_root: pathlib.Path,
+    workspace: Any,
+    manifest: dict[str, Any],
+) -> tuple[dict[str, bytes], dict[str, Any]]:
+    unresolved = [dict(item) for item in workspace.unresolved]
+    legacy_records = extract_legacy_records(repo_root, workspace)
+    work = build_work_contract(
+        workspace,
+        manifest,
+        unresolved,
+        replay_record_count=len(legacy_records),
+    )
+    attempts, evidence_items = build_history(
+        workspace, manifest, work, unresolved, legacy_records
+    )
+    memory, core_result = rebuild_projection(
+        work,
+        attempts,
+        evidence_items,
+        unresolved,
+        manifest["digest"],
+    )
+    validation_errors = validate_projection(
+        work, attempts, evidence_items, memory
+    )
+    legacy_acs = []
+    feature = workspace.documents.get("FEATURE.md")
+    if feature:
+        for line in feature.read_text(encoding="utf-8").splitlines():
+            cells = [item.strip() for item in line.strip().strip("|").split("|")]
+            if len(cells) >= 3 and cells[0].startswith("AC-"):
+                legacy_acs.append(
+                    {
+                        "legacy_ac_id": cells[0],
+                        "predicate": cells[1],
+                        "required_evidence": cells[2],
+                    }
+                )
+    replay_report = {
+        "schema_version": "yuan.shadow-replay-report/v1",
+        "workspace_id": workspace.workspace_id,
+        "workspace_kind": workspace.kind,
+        "covered": [item["path"] for item in manifest["files"]],
+        "covered_count": len(manifest["files"]),
+        "legacy_acceptance_criteria": legacy_acs,
+        "replayed_records": legacy_records,
+        "replayed_record_count": len(legacy_records),
+        "unresolved": unresolved,
+        "unresolved_count": len(unresolved),
+        "core_rebuild_result": core_result,
+        "projected_result": memory["last_result"],
+        "validation_errors": validation_errors,
+    }
+    files: dict[str, bytes] = {
+        "source-manifest.json": canonical_json(manifest),
+        "work-contract.json": canonical_json(work),
+        "run-memory.json": canonical_json(memory),
+        "replay-report.json": canonical_json(replay_report),
+    }
+    for index, attempt in enumerate(attempts, start=1):
+        files[f"attempts/{index:04d}.json"] = canonical_json(attempt)
+    for index, evidence in enumerate(evidence_items, start=1):
+        files[f"evidence/{index:04d}.json"] = canonical_json(evidence)
+    return files, replay_report
+
+

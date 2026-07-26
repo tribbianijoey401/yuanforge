@@ -1,0 +1,14 @@
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Verify a frozen Yuan bootstrap fixture suite and emit a receipt."
+    )
+    parser.add_argument("--manifest", required=True, type=pathlib.Path)
+    parser.add_argument(
+        "--manifest-sha256",
+        required=True,
+        help="Trusted lowercase SHA-256 of the frozen manifest.",
+    )
+    parser.add_argument("--receipt", required=True, type=pathlib.Path)
+    return parser.parse_args()
+
+

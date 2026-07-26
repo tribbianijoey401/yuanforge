@@ -1,0 +1,25 @@
+def source_manifest(repo_root: pathlib.Path, workspace: LegacyWorkspace) -> dict[str, Any]:
+    repo = repo_root.resolve()
+    paths = sorted(
+        {*workspace.documents.values(), *workspace.event_files},
+        key=lambda item: _relative(item, repo),
+    )
+    files = [
+        {
+            "path": _relative(path, repo),
+            "sha256": file_sha256(path),
+            "bytes": path.stat().st_size,
+        }
+        for path in paths
+    ]
+    manifest = {
+        "schema_version": "yuan.legacy-source-manifest/v1",
+        "workspace_id": workspace.workspace_id,
+        "workspace_kind": workspace.kind,
+        "workspace_root": _relative(workspace.root, repo),
+        "files": files,
+    }
+    manifest["digest"] = canonical_digest(manifest)
+    return manifest
+
+

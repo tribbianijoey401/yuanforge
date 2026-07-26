@@ -1,0 +1,9 @@
+FRAMEWORK_SUBDIRS = [
+    ".yuan/specs",
+    ".yuan/docs",
+    ".yuan/rules",
+    ".yuan/skills",
+    ".yuan/platforms",
+]
+
+# 框架顶层目录 — 改为增量同步（不再 rmtree+copytree，保护用户自定义文件）

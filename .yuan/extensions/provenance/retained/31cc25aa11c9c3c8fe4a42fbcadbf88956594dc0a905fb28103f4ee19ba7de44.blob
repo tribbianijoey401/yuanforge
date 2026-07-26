@@ -1,0 +1,53 @@
+def generate_cal_assertions(project_path):
+    """Step 2: 运行 ptg-cal-gen.py 生成 CAL 断言"""
+    cal_script = os.path.join(project_path, "scripts", "ptg-cal-gen.py")
+    if not os.path.exists(cal_script):
+        print("   ❌ ptg-cal-gen.py 不存在")
+        return None, 0
+    
+    # 查找所有含 @ptg 的 seam 文件
+    seam_files = []
+    docs_dir = os.path.join(project_path, "docs")
+    for root, dirs, files in os.walk(docs_dir):
+        for fname in files:
+            if fname.endswith(("-agreement.md", "-api.md", "-contract.md")):
+                seam_files.append(os.path.join(root, fname))
+    
+    if not seam_files:
+        # 也搜根目录下的 *-agreement.md
+        for fname in os.listdir(project_path):
+            if "-agreement.md" in fname and fname.endswith(".md"):
+                seam_files.append(os.path.join(project_path, fname))
+    
+    if not seam_files:
+        print("   ⚠️  未找到 seam-agreement.md / API 契约文件")
+        return None, 0
+    
+    total_funcs = 0
+    output_dir = os.path.join(project_path, "tests")
+    os.makedirs(output_dir, exist_ok=True)
+    
+    cal_results = {}
+    for seam_file in seam_files:
+        output_file = os.path.join(output_dir, f"test_{os.path.basename(seam_file).replace('-agreement', 'seam-assertions')}.py")
+        
+        r = __import__('subprocess').run(
+            ["python3", cal_script, "-i", seam_file, "-o", output_file],
+            capture_output=True, text=True, cwd=project_path
+        )
+        
+        if r.returncode == 0:
+            func_count = 0
+            if os.path.exists(output_file):
+                func_count = open(output_file).read().count("def test_")
+            cal_results[seam_file] = {"output": output_file, "functions": func_count}
+            total_funcs += func_count
+        else:
+            cal_results[seam_file] = {"error": r.stderr.strip(), "functions": 0}
+    
+    if total_funcs == 0 and len(cal_results) == 0:
+        print("   ❌ 所有 seam 文件均未通过 CAL 生成")
+    
+    return cal_results, total_funcs
+
+

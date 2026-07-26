@@ -1,0 +1,2 @@
+proposal_files = [f for f in changed if 'proposals/' in f and f.endswith('.md')]
+

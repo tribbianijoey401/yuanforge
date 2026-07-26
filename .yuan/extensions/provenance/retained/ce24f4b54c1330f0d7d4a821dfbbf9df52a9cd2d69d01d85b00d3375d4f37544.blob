@@ -1,0 +1,4 @@
+### Adaptive 判据
+
+按**渲染的设计语言**判，不是按工具链判。Flutter 默认 Material-everywhere 一套视觉打两端，算 `android`（同视觉）；真正 Cupertino on iOS + Material on Android 的才算 `adaptive`。
+

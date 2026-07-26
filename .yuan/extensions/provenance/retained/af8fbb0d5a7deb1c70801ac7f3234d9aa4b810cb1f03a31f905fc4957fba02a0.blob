@@ -1,0 +1,7 @@
+### AP-ENV-008: Agent 启动 Checklist 缺少 PTG/CAL 项
+
+- **描述**: Agent 进入新会话时读 checklist，但 checklist 不包含 PTG/CAL 相关文件（ptg-critical.md, anti-patterns.md），导致 Agent 可能遗漏关键验证步骤直接开始开发。
+- **重现条件**: 更新 Agent Checklist 时未同步更新到 PTG 相关文件的引用。
+- **修复方式**: AGENTS.md Checklist 第 5-8 条后追加 PTG/CAL 相关文件的读取要求。
+- **验证方式**: 检查 AGENTS.md 的 Agent 启动 Checklist 是否包含 `.yuan/rules/role-scorecard.md` 等新增引用。
+- **@ptg**: false

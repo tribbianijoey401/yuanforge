@@ -1,0 +1,17 @@
+## 17. 创意机构 / Agency
+
+- **推荐落地页模式**：Storytelling + Feature-Rich
+- **风格优先级**：主 Brutalism / 备 Motion-Driven
+- **配色氛围**：大胆撞色 + 黑边
+- **字体情绪**：先锋 + 强势（Syne + Manrope）
+- **关键效果**：案例研究滚动叙事 + 大字号 manifesto
+- **决策规则**：
+```json
+{
+  "if_award_winner": "add-trophy-strip",
+  "if_client_logos": "add-marquee-row",
+  "if_team_personality": "add-meet-the-team-bento"
+}
+```
+- **反模式**：模板感、行业套话、无作品案例
+

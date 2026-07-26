@@ -1,0 +1,3 @@
+PURE_ACTION_TYPES = {"file-read", "verify", "llm-propose"}
+
+

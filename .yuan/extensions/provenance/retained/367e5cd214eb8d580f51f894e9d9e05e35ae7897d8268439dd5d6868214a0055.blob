@@ -1,0 +1,27 @@
+### 3.9 SESSION_EXITED
+
+**触发**：会话退出协议执行完成时。
+
+**设计原则**：记录"为什么退出"和"退出了什么状态"，作为下次会话恢复的入口锚点。
+
+```json
+{
+  "type": "SESSION_EXITED",
+  "timestamp": "2026-07-14T18:30:00Z",
+  "session": "20260714-用户认证",
+  "actor": "conductor",
+  "payload": {
+    "phase": "Phase 4",
+    "completed_tasks": ["T01", "T02"],
+    "remaining_tasks": ["T03"],
+    "reason": "用户说「明天继续」",
+    "last_dispatch": "T03 → backend-dev",
+    "review_summary": "4 审查官全部通过"
+  }
+}
+```
+
+> **与 WORKSPACE_CLOSED 的区别**：SESSION_EXITED 是会话级退出（可能还有未完成的任务），WORKSPACE_CLOSED 是 Feature 级完全关闭（所有任务终态 + 蒸馏完成）。一个 Feature 可能有多个 SESSION_EXITED，但只有一个 WORKSPACE_CLOSED。
+
+---
+

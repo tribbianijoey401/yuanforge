@@ -1,0 +1,11 @@
+## 在会话文件夹中的位置
+
+```
+docs/YYYYMMDD-描述/
+├── PLAN.md      ← Architect 产出（冻结）
+├── FEATURE.md   ← Product Analyst 产出（本规格书）
+├── TASK_BOARD.md
+├── SESSION_LOG.md / ADR-NNN.md / BUG-NNN.md
+```
+
+<SECTION-END:feat-fmt>

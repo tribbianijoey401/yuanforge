@@ -1,0 +1,13 @@
+## 22. 知识库/文档中性
+
+- **适用行业**：文档站、知识库、技术文档
+- **设计意图**：中性灰让内容为主，蓝链接不抢戏
+
+| Primary | #475569 | Background | #F8FAFC | Muted | #EAEFF3 |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #1E293B | Muted FG | #64748B |
+| Secondary | #64748B | Card | #FFFFFF | Border | #E2E8F0 |
+| On Secondary | #FFFFFF | Card FG | #1E293B | Destructive | #DC2626 |
+| Accent | #2563EB | On Destructive | #FFFFFF | Ring | #475569 |
+| On Accent | #FFFFFF | | | | |
+

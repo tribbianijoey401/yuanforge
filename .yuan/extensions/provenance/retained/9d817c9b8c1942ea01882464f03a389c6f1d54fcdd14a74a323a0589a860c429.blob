@@ -1,0 +1,7 @@
+def _work_id(workspace_id: str) -> str:
+    date = re.match(r"(\d{8})", workspace_id)
+    prefix = date.group(1) if date else "legacy"
+    suffix = hashlib.sha256(workspace_id.encode("utf-8")).hexdigest()[:12]
+    return f"legacy-{prefix}-{suffix}"
+
+

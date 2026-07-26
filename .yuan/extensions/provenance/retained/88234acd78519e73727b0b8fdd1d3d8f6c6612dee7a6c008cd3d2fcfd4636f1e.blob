@@ -1,0 +1,46 @@
+### 格式
+
+```yaml
+# Agent Snapshot: backend-dev
+# 此文件由 Agent 在任务执行过程中自动写入
+# 崩溃恢复时，新 Agent 读取此文件即可接续工作
+
+agent:
+  role: backend-dev
+  task_id: "T03"
+  status: executing        # executing | checkpoint | completed | failed
+
+current:
+  goal: "实现 JWT 认证 API 的 token 刷新端点"
+  step: "正在写 refresh token 的数据库查询逻辑"
+  step_index: 4            # 在第几个子步骤
+
+files:
+  modified:
+    - src/auth/service.py
+    - src/auth/handler.py
+  created:
+    - tests/auth/test_refresh.py
+  staged: false            # git 尚未 add
+
+reasoning:
+  summary: "选择在 service 层做 refresh token 验证，而非 handler 层——便于后续复用"
+  assumptions:
+    - "refresh token 存储在数据库的 refresh_tokens 表中"
+    - "token 过期时间 7 天，与 access token 共用同一密钥"
+  open_questions:
+    - "refresh token 是否需要在 logout 时主动失效？当前假设不需要"
+
+dependencies:
+  resolved:
+    - "API 契约来自 Architect（ADDR-003）"
+    - "User 模型来自 T02 的产出"
+  pending: []
+
+next_action: "完成 refresh token DB 查询后，写单元测试验证 token 旋转逻辑"
+
+checkpoint:
+  time: "2026-07-09T14:25:00Z"
+  commit: "d4e5f6g"       # 最后一个 commit（可能不是此任务的 commit）
+```
+

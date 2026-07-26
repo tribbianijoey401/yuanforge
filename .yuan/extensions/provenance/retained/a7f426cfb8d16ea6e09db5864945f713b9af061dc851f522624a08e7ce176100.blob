@@ -1,0 +1,13 @@
+### 全局文档
+
+| 文档 | 何时读 | 优先级 |
+|------|--------|--------|
+| [PROGRESS.md](./PROGRESS.md) | 每次必读 | 🔴 |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | 首次接手 | 🔴 |
+| [knowledge/pitfalls/](./knowledge/pitfalls/) | 每次必读 | 🔴 |
+| [SETUP.md](./SETUP.md) | 首次接手 | 🟡 |
+| [CONVENTIONS.md](./CONVENTIONS.md) | 修改框架文件前 | 🟡 |
+| [glossary.md](./glossary.md) | 查术语时 | 🟢 |
+
+---
+

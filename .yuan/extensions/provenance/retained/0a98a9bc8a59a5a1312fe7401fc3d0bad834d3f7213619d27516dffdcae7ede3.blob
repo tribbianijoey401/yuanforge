@@ -1,0 +1,12 @@
+### 改写 5 个合约 + AGENTS.md 的 Checklists（不碰 role-scorecard / anti-patterns.md）
+- `contracts/ui-designer.md`：新增「视觉绝对禁令（P0）」段，禁止事项补 VA-1~5，门禁加 emoji 正则扫描
+- `contracts/ux-reviewer.md`：新增「Emoji 正则扫描（VA-1）」+「五源对齐」，输出格式前置 verdict-protocol 结构化块，门禁加 VA-1 扫描 + 五源对齐
+- `contracts/frontend-dev.md`：禁止事项补 emoji/渐变/硬编码/弹跳，新增「自检循环 lint→type-check→test ≤3 轮」+ emoji 扫描，门禁加自检 + 扫描
+- `contracts/quality-auditor.md`：审计表加「代码组织」行（分层/≤300 行/单一职责/入口只装配），新增「代码组织门禁」段，门禁改为五段
+- `contracts/architect.md`：新增「Spec 即契约（增强要求）」段（Design Token 锁定 / EARS 验收 / 内嵌已知坑 / e2e 验证 / OPEN-DECISIONS 登记 + 3 slug）
+- `AGENTS.md`：核心规则表加 `visual-absolutes.md` / `verdict-protocol.md` 两行；Agent 启动 Checklist 加第 8（UI 任务读视觉禁令）、第 9（审查官读裁决协议）条，原第 8 顺延为第 10
+
+> 说明：**仅新增 + 局部改写**，未触碰任何 YuanForge 既有 G1~G4/HG1~HG4 门禁、role-scorecard、anti-patterns.md 等核心机制。
+
+---
+

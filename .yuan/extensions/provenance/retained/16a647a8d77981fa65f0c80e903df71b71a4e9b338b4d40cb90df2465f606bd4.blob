@@ -1,0 +1,10 @@
+### 1. 初始化项目
+
+```bash
+# 从零开始
+./bin/yuanforge-init ./my-awesome-project --name "我的项目"
+
+# 嫁接到已有项目
+./bin/yuanforge-init ./existing-project --mode existing
+```
+

@@ -1,0 +1,16 @@
+def protected_target_kind(scope: Any) -> str | None:
+    if not isinstance(scope, str):
+        return None
+    normalized = scope.replace("\\", "/").strip("/")
+    for prefix, kind in (
+        (".yuan/core", "core"),
+        (".yuan/protocol", "protocol"),
+        (".yuan/harness", "harness"),
+        (".yuan/validator", "validator"),
+        (".yuan/authority", "authority"),
+    ):
+        if normalized == prefix or normalized.startswith(f"{prefix}/"):
+            return kind
+    return None
+
+

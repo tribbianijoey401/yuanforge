@@ -1,0 +1,11 @@
+### 提取规则
+
+| Workspace 源文件 | 提取为 | 提取条件 |
+|-----------------|--------|---------|
+| `FEATURE.md` | feature candidate | 总是提取 |
+| `ADR-NNN.md` | decision candidate | 总是提取 |
+| `BUG-NNN.md` | pitfall candidate | 见判断规则 |
+| `PLAN.md` | 不提取 | 未完成任务 → workspace/backlog |
+| `TASK_BOARD.md` | 不提取 | Runtime 状态 |
+| `SESSION_LOG.md` | 不提取 | Human 日志 |
+

@@ -1,0 +1,93 @@
+def build_work_contract(
+    workspace: LegacyWorkspace,
+    manifest: dict[str, Any],
+    unresolved: list[dict[str, str]],
+    *,
+    replay_record_count: int = 0,
+) -> dict[str, Any]:
+    protocol_binding, harness_binding = _core_bindings()
+    goal, goal_unresolved = _extract_goal(workspace)
+    unresolved.extend(goal_unresolved)
+    legacy_acs = _extract_legacy_acs(workspace)
+    for ac in legacy_acs:
+        unresolved.append(
+            {
+                "code": "AC_BINDING_UNRESOLVED",
+                "source": workspace.workspace_id,
+                "detail": (
+                    f"{ac['legacy_ac_id']} preserved in replay report; "
+                    "typed verifier binding absent from legacy source"
+                ),
+            }
+        )
+    verifier = {
+        **harness_binding,
+        "trust_root_id": "yuan-core-0.1-m3-approved",
+        "environment_ids": [ENVIRONMENT_ID],
+        "environment_fingerprints": {
+            ENVIRONMENT_ID: ENVIRONMENT_FINGERPRINT
+        },
+        "minimum_assertions": 1,
+    }
+    work_id = _work_id(workspace.workspace_id)
+    work: dict[str, Any] = {
+        "schema_version": "yuan.work-contract/v1",
+        "work_id": work_id,
+        "revision": _binding(work_id, "shadow-1", "0" * 64),
+        "protocol_binding": protocol_binding,
+        "harness_binding": harness_binding,
+        "intent": {
+            "goal": goal,
+            "non_goals": [
+                "Do not claim legacy task completion from status text alone.",
+                "Do not select shadow runtime authority.",
+            ],
+            "constraints": [
+                "Legacy source is read-only.",
+                "Unmapped semantics remain structured unresolved items.",
+            ],
+        },
+        "scope": {
+            "allowed_paths": [
+                item["path"] for item in manifest["files"]
+            ]
+            or [manifest["workspace_root"]],
+            "denied_paths": [".git"],
+            "side_effect_classes": ["none"],
+        },
+        "authorization": {"default": "deny", "grants": []},
+        "budget": {
+            "ticks": max(3, len(manifest["files"]) + replay_record_count + 2),
+            "tool_calls": max(3, len(manifest["files"]) + replay_record_count + 2),
+            "strategies": max(3, len(manifest["files"]) + replay_record_count + 2),
+            "command_seconds": 1.0,
+        },
+        "acceptance_criteria": [
+            {
+                "id": "AC-SOURCE-INTEGRITY",
+                "type": "structure",
+                "required": True,
+                "predicate": "All recognized legacy documents are content-addressed and unchanged during conversion.",
+                "artifact_scope": manifest["workspace_root"],
+                "verifier_binding": verifier,
+            },
+            {
+                "id": "AC-SEMANTIC-MAPPING",
+                "type": "structure",
+                "required": True,
+                "predicate": "Every legacy semantic is preserved verbatim or explicitly recorded as unresolved.",
+                "artifact_scope": manifest["workspace_root"],
+                "verifier_binding": verifier,
+            },
+        ],
+        "safety_invariants": [
+            {
+                "id": "SAFE-LEGACY-READ-ONLY",
+                "predicate": "No legacy source byte changes during shadow conversion.",
+            }
+        ],
+    }
+    work["revision"]["sha256"] = canonical_digest(work, omit=("revision", "sha256"))
+    return work
+
+

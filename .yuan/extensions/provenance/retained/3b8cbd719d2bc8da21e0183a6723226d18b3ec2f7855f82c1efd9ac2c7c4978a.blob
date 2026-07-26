@@ -1,0 +1,14 @@
+### 2.3 数据模型
+
+```bash
+# Python: SQLAlchemy / Django models
+grep -r "class.*Model\|class.*Base" --include="*.py" -l | head -10
+
+# Node: Prisma / TypeORM / Mongoose
+grep -r "model\|schema" --include="*.ts" --include="*.js" -l | head -10
+```
+
+读取数据模型文件，列出所有实体和关系。
+
+---
+

@@ -1,0 +1,21 @@
+### 字段说明
+
+| 字段 | 说明 |
+|------|------|
+| `agent.role` | Agent 角色名 |
+| `agent.task_id` | 当前执行的 Task ID |
+| `agent.status` | executing（执行中）/ checkpoint（已存档）/ completed（已完成）/ failed（失败） |
+| `current.goal` | 当前任务的目标描述 |
+| `current.step` | 当前正在做的具体步骤 |
+| `current.step_index` | 在第几个子步骤 |
+| `files.modified` | 已修改的文件列表 |
+| `files.created` | 新创建的文件列表 |
+| `files.staged` | git 是否已 add |
+| `reasoning.summary` | 一段话总结当前思路 |
+| `reasoning.assumptions` | 当前基于的假设 |
+| `reasoning.open_questions` | 尚未解决的问题 |
+| `dependencies` | 已知的依赖（已解决 vs 待解决） |
+| `next_action` | 恢复时下一个要执行的步骤 |
+| `checkpoint.time` | 快照时间 |
+| `checkpoint.commit` | 最后一个 commit hash |
+

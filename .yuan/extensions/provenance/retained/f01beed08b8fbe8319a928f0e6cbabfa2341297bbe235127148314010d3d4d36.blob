@@ -1,0 +1,9 @@
+### 验证
+
+```bash
+pytest tests/ -q
+# 预期：全部 PASS
+```
+
+---
+

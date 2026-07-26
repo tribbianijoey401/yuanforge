@@ -1,0 +1,10 @@
+### 5.2 SETUP.md
+
+```
+从 Makefile/README/docker-compose 中提取：
+- 前置依赖: Node 18+, PostgreSQL 15+, ...
+- 安装步骤: npm install / pip install -r requirements.txt
+- 环境变量: 从 .env.example 或代码中搜索 process.env / os.getenv
+- 启动命令: npm run dev / python main.py
+```
+

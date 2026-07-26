@@ -1,0 +1,11 @@
+## 为什么需要 TASK_BOARD 的 4 个新段
+
+| 段 | Tier 1/2 替代品 | Tier 3 没有它会怎样 |
+|----|----------------|-------------------|
+| **审查结果** | subagent return value → Conductor 上下文 | 角色切换后报告内容丢失。Dev 拿到 🔄返工 但不知道为什么 |
+| **Conductor 调度状态** | Conductor 自身的"思维" | 切换回来时忘记派发过谁 |
+| **派发日志** | subagent 自动回传状态 | 无法审计调度轨迹 |
+| **Agent 启动协议** | subagent context 自动注入 | 新 persona 空上下文，不知道从哪开始 |
+
+---
+

@@ -1,0 +1,18 @@
+"""YuanForge 项目初始化 / 框架同步脚本
+
+用法:
+  yuanforge-init /path/to/new-project                     # 从零开始
+  yuanforge-init /path/to/new-project --name "我的项目"     # 指定项目名
+  yuanforge-init /path/to/existing --mode existing         # 嫁接已有项目
+  yuanforge-init /path/to/existing --mode existing --clean # 嫁接 + 清理孤文件
+  yuanforge-init /path/to/project --mode existing --update # 仅同步框架文件
+  yuanforge-init /path/to/project --sync                  # 智能增量同步（推荐日常使用）
+  yuanforge-init /path/to/new-project --dry-run            # 预览不执行
+
+模式说明:
+  从零开始 (--mode new):        目标目录必须不存在或为空
+  嫁接已有 (--mode existing):   目标目录已存在。框架文件覆盖，docs/ 补缺不覆盖
+  框架更新 (--mode existing --update): 仅覆盖框架文件，不操作 docs/ 和 git
+  增量同步 (--sync):            智能 diff — 新增/更新/删除，内容不变跳过
+"""
+

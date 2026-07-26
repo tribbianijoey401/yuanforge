@@ -1,0 +1,9 @@
+---
+name: knowledge-injection
+description: >
+  Conductor 派发 Task 前的知识注入 Skill。
+  根据 Task 模块标签匹配 Pitfall，把摘要注入到子 Agent 的 context 中。
+  任何人都能在任何阶段调用。
+version: 1.0.0
+---
+

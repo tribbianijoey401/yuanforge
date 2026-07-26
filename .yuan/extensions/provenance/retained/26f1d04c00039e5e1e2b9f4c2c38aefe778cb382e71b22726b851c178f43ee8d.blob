@@ -1,0 +1,8 @@
+## 触发条件
+
+- Conductor 派发 Task 前（配合 knowledge-injection 使用）
+- 需要查询 Feature 之间的依赖关系
+- 需要发现间接相关的知识（跨模块的隐含关联）
+
+---
+

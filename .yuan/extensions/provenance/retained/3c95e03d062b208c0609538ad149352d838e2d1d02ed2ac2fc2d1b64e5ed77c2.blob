@@ -1,0 +1,59 @@
+def detect_schema_drift(project_path):
+    """Step 3: Schema 漂移检测"""
+    # 解析 seam-agreement.md 中的字段定义
+    field_info = {}
+    seam_files = [os.path.join(project_path, "docs", "seam-agreement.md")]
+    docs_dir = os.path.join(project_path, "docs")
+    if os.path.exists(docs_dir):
+        for f in os.listdir(docs_dir):
+            if f.endswith("-agreement.md") and f != "seam-agreement.md":
+                seam_files.append(os.path.join(docs_dir, f))
+    
+    for seam_path in seam_files:
+        if os.path.exists(seam_path):
+            with open(seam_path) as f:
+                content = f.read()
+            for line in content.split('\n'):
+                m = re.match(r'^[-•]\s*(\w+):\s+(\w+)', line.strip())
+                if m:
+                    field_info[m.group(1)] = m.group(2)
+    
+    if not field_info:
+        print("   ⚠️  未在 seam-agreement.md 中找到字段定义")
+        return [], []
+    
+    print(f"   Seam 定义字段: {json.dumps(field_info)}")
+    
+    # 搜索实际代码文件中的字段使用
+    impl_fields = {}
+    src_dir = os.path.join(project_path, "src")
+    if not os.path.isdir(src_dir):
+        # 搜索当前目录下所有 .py 文件
+        for root, dirs, files in os.walk(project_path):
+            if ".git" in root or "__pycache__" in root:
+                continue
+            for fname in files:
+                if fname.endswith(".py"):
+                    fpath = os.path.join(root, fname)
+                    try:
+                        with open(fpath) as f:
+                            for line in f:
+                                m = re.search(r'\b(\w+)\s*:\s*(int|str|bool|float|list|dict)', line)
+                                if m:
+                                    impl_fields[m.group(1)] = m.group(2)
+                    except:
+                        pass
+    
+    missing = list(set(field_info.keys()) - set(impl_fields.keys()))
+    type_mismatches = []
+    for field in field_info:
+        if field in impl_fields:
+            expected = field_info[field]
+            actual = impl_fields[field]
+            type_map = {"integer": "int", "string": "str", "boolean": "bool"}
+            if type_map.get(expected) != actual:
+                type_mismatches.append(f"{field}: seam={expected}, impl={actual}")
+    
+    return missing, type_mismatches
+
+

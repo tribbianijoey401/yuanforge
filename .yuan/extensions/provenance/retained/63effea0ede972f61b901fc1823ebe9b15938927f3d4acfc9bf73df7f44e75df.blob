@@ -1,0 +1,12 @@
+## ⚠️ 两层 docs 体系区分
+
+| 目录 | 用途 | 谁维护 | 何时读取 |
+|------|------|--------|---------|
+| **`.yuan/docs/`** | YuanForge **框架自身**的记忆 | YuanForge 维护者 | 维护框架时 |
+| **`docs/`** | **具体项目**的说明书 | 项目 Agent 军团 | 开发项目时 |
+
+**本文档描述 `.yuan/docs/`（框架层）。**
+项目层的 `docs/` 规范见 [`.yuan/rules/docs-framework.md`](../rules/docs-framework.md)。
+
+---
+

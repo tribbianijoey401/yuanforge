@@ -1,0 +1,22 @@
+### 3.3 Claude Code（未来）
+
+```yaml
+platform: claude-code
+transport: claude-subagent
+
+dispatch:
+  implementation: Task tool (subagent)
+  notes: "Claude Code 的 Task 工具派发子 Agent"
+  max_concurrent: TBD
+
+review:
+  implementation: Task tool
+  notes: "以 Reviewer 角色创建子 Agent"
+
+capabilities:
+  parallel: true
+  filesystem: full
+  shell: full
+  subagent: true
+```
+

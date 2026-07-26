@@ -1,0 +1,12 @@
+## 工作依据
+
+| 输入 | 来源 | 用途 |
+|------|------|------|
+| FEATURE.md | 当前会话 | API 变更、修改文件列表 |
+| ADR-NNN.md | 当前会话 | 技术决策 |
+| BUG-NNN.md | 当前会话 | 踩坑经验 |
+| SESSION_LOG.md | Conductor | 会话摘要、新术语 |
+| 代码中的 docstring/注释 | Dev 产出 | 公开 API 文档 |
+
+---
+

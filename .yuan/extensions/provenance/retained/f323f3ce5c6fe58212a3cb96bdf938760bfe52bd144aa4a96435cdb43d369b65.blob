@@ -1,0 +1,10 @@
+### 存储位置
+
+```
+docs/YYYYMMDD-描述/agents/
+├── backend-dev.yaml      ← Backend Dev 的状态快照
+├── frontend-dev.yaml     ← Frontend Dev 的状态快照
+├── architect.yaml        ← Architect 的状态快照
+└── ...
+```
+

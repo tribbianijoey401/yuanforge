@@ -1,0 +1,21 @@
+## 24. Accessibility First 无障碍优先
+
+- **类别**：Sans + Sans（单字族）
+- **标题字**：Atkinson Hyperlegible
+- **正文字**：Atkinson Hyperlegible
+- **情绪关键词**：accessible、readable、inclusive、dyslexia-friendly、clear
+- **最适用于**：无障碍关键场景、政府、医疗、包容性设计
+- **Google Fonts URL**：
+```
+https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap
+```
+- **CSS @import**：
+```css
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+```
+- **Tailwind config**：
+```js
+fontFamily: { sans: ['Atkinson Hyperlegible', 'sans-serif'] }
+```
+- **注意事项**：Braille Institute 设计，字母形态对低视力用户更友好。
+

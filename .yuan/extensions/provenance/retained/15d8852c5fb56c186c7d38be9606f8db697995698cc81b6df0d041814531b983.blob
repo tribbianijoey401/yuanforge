@@ -1,0 +1,20 @@
+### 1. 按行业查设计建议（最常用）
+
+```bash
+# 在核心推理规则中搜索行业关键词
+grep -i "<行业关键词>" <skill_dir>/references/ui-reasoning.csv
+```
+
+`ui-reasoning.csv` 的列结构：
+```
+行业名 | 推荐Landing模式 | 风格优先级 | 色彩情绪 | 字体个性 | 关键动效 | 反模式
+```
+
+示例：
+```bash
+grep -i "beauty\|spa\|wellness" references/ui-reasoning.csv
+# → Beauty/Spa → Soft UI Evolution + Organic Biophilic
+# → 色彩: soft pink + sage green + gold
+# → 反模式: bright neon colors + harsh animations + dark mode + AI purple/pink gradients
+```
+

@@ -1,0 +1,48 @@
+### 3.2 Manual（兜底方案）
+
+```yaml
+platform: manual
+transport: human-operated
+
+dispatch:
+  implementation: prompt_user
+  notes: |
+    提示用户:
+    1. 在终端执行: cd project && echo "Task: [summary]"
+    2. 加载 contracts/[role].md 为 Agent 角色
+    3. 读 TASK_BOARD.md 获取上下文
+    4. 执行任务
+    5. 更新 TASK_BOARD.md 状态行
+
+review:
+  implementation: prompt_user
+  notes: "提示用户手动执行审查 Checklist"
+
+snapshot:
+  implementation: manual_checkpoint
+  notes: "提示用户记录当前进度到 agents/"
+
+checkpoint:
+  implementation: manual_archive
+  notes: "提示用户打包 Workspace"
+
+recover:
+  implementation: manual_check
+  notes: "提示用户检查异常并手动恢复"
+
+archive:
+  implementation: manual_move
+  notes: "提示用户移动目录到 archive/"
+
+promote:
+  implementation: manual_extract
+  notes: "提示用户按 distillation-checklist 手动提取知识"
+
+capabilities:
+  parallel: false
+  filesystem: manual
+  shell: manual
+  subagent: false
+  persistent_session: false
+```
+

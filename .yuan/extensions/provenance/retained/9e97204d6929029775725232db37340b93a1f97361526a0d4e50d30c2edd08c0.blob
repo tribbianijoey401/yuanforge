@@ -1,0 +1,10 @@
+### Tighten the loop
+
+拿到一个 loop 后，收紧它：
+
+- **更快？** cache setup、跳过无关初始化、缩小测试范围
+- **信号更尖锐？** assert 具体症状，不是"没 crash"
+- **更确定？** 固定时间、seed RNG、隔离文件系统、冻结网络
+
+30 秒的 flaky loop ≈ 没有 loop。2 秒的确定性 loop = 调试超能力。
+

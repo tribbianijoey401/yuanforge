@@ -1,0 +1,24 @@
+## 蒸馏后的目录效果
+
+```
+蒸馏前（Workspace 活跃时）:
+  docs/
+    YYYYMMDD-描述/          ← 唯一的 Workspace（通常 1 个）
+      FEATURE.md            原始格式
+      ADR-NNN.md
+      BUG-NNN.md
+  
+蒸馏后（Workspace Close 后）:
+  docs/
+    knowledge/               ← 长期知识（蒸馏产物，逐次增长）
+      features/FEAT-NNN.md  对象实例，含完整 frontmatter
+      decisions/ADR-NNN.md
+      pitfalls/PIT-NNN.md
+    archive/                 ← 已关闭 Workspace 快照
+      YYYYMMDD-描述/
+        FEATURE.md          原始格式（保留作为追溯）
+        ...
+```
+
+---
+

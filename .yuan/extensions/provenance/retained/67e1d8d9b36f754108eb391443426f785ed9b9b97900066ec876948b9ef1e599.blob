@@ -1,0 +1,11 @@
+### 2.1 Architect 计划复盘
+
+**必加载**：`contracts/architect.md` + `iron-rules.md`
+
+流程：
+1. 读用户故事 + 验收标准
+2. 输出「设计理解书」
+3. Conductor 审视推导链完整性
+4. 用户确认 → API 契约 freeze + Plan(含 Dispatch Table)
+5. [有界面] UI Designer 并行
+

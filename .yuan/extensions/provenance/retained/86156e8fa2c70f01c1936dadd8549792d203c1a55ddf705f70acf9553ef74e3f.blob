@@ -1,0 +1,20 @@
+### 3.3 Pitfall（已知陷阱）
+
+**语义**：一个已被验证会重复出现的问题模式。
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:---:|------|
+| `id` | string | ✅ | `PIT-NNN` |
+| `object_type` | enum | ✅ | `pitfall` |
+| `status` | enum | ✅ | active / resolved / archived |
+| `summary` | string | ✅ | 陷阱摘要 |
+| `owner` | string | ✅ | 发现者角色 |
+| `confidence` | enum | ✅ | verified / stale |
+| `severity` | enum | ✅ | blocker / warning / info |
+| `type` | enum | ✅ | backend / frontend / db / deploy / process / env |
+| `cause` | string | ✅ | 根因 |
+| `fix` | string | ✅ | 修复方法 |
+| `session` | string | — | 发现此坑的会话 |
+
+**状态机**：active → resolved → archived（resolved 可回 active）
+

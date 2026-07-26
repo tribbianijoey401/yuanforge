@@ -1,0 +1,6 @@
+### 3.1 Conductor 初始化 TASK_BOARD
+
+- 从 Plan 的 Dispatch Table 提取所有 Task
+- 所有 Task 初始状态 = ⏳等待
+- 无依赖 Task = 🟢就绪
+

@@ -1,0 +1,7 @@
+## 通用规范
+
+- 所有字体均来自 Google Fonts（免费可商用），少数顶级品牌字体（Satoshi、Clash Display）会给出 Fontshare 替代方案
+- 字重选择遵循"少即是多"原则：单字族 3-4 个字重足够，避免全字重加载
+- 中文场景需补 `Noto Sans SC` 或 `Noto Serif SC` 作为 fallback
+- 性能建议：`<link rel="preconnect" href="https://fonts.googleapis.com">` + `display=swap`
+

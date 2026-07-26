@@ -1,0 +1,17 @@
+## 20. 习惯追踪 / 自我提升
+
+- **推荐落地页模式**：Social Proof-Focused + Demo
+- **风格优先级**：主 Claymorphism / 备 Vibrant & Block-based
+- **配色氛围**：成就感橙 + 成功绿 + 暖背景
+- **字体情绪**：鼓励 + 友好（Fredoka + Nunito）
+- **关键效果**：streak 计数动画 + 答卡堆叠
+- **决策规则**：
+```json
+{
+  "if_premium_unlock": "add-streak-recovery-preview",
+  "if_community": "add-shared-goals-feed",
+  "if_gamification": "add-badges-showcase"
+}
+```
+- **反模式**：失败惩罚感强、深色压抑、无快速试玩
+

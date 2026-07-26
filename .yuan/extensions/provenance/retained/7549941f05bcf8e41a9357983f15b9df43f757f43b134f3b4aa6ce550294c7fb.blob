@@ -1,0 +1,5 @@
+### 流式 Function Calling
+- 增量tool_calls按index累积
+- 递归_stream_with_tools，max_depth=3
+- 前端逐Token渲染 + 工具调用可视化
+

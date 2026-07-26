@@ -1,0 +1,21 @@
+### 3.4 Module（模块）
+
+**语义**：系统中的一个逻辑模块。
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:---:|------|
+| `id` | string | ✅ | `MOD-NNN` |
+| `object_type` | enum | ✅ | `module` |
+| `status` | enum | ✅ | active / deprecated |
+| `summary` | string | ✅ | 模块摘要 |
+| `owner` | string | ✅ | architect |
+| `confidence` | enum | ✅ | verified / stale |
+| `language` | string | ✅ | 主要语言 |
+| `framework` | string | — | 框架 |
+| `directory` | string | ✅ | 模块根目录 |
+| `features` | array | — | 包含的 Feature ID |
+
+**状态机**：active → deprecated
+
+---
+

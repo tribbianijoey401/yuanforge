@@ -1,0 +1,1 @@
+VALID_FEATURE_STATUS = {'draft', 'designed', 'implemented', 'verified', 'deprecated'}

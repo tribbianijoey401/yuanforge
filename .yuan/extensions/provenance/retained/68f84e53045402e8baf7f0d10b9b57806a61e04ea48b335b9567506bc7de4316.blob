@@ -1,0 +1,10 @@
+@dataclass
+class LegacyWorkspace:
+    workspace_id: str
+    kind: str
+    root: pathlib.Path
+    documents: dict[str, pathlib.Path] = field(default_factory=dict)
+    event_files: list[pathlib.Path] = field(default_factory=list)
+    unresolved: list[dict[str, str]] = field(default_factory=list)
+
+

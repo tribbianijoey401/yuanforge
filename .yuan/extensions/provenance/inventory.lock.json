@@ -1,0 +1,3570 @@
+{
+  "entries": [
+    {
+      "decision": "include",
+      "dirty_override": true,
+      "family": "platform-adapters",
+      "path": ".gitignore",
+      "reason": "required framework entry/version/packaging surface",
+      "source": {
+        "kind": "content-addressed-snapshot",
+        "path": ".yuan/extensions/provenance/sources/e3ea7c19edc937c649c0751b0fb38070fad601655cadd9db44cde07f8b8e1059.blob"
+      },
+      "source_sha256": "e3ea7c19edc937c649c0751b0fb38070fad601655cadd9db44cde07f8b8e1059",
+      "tracked_at_source": true,
+      "tracked_sha256": "8fca4da36ed4ad9506c7cf7b3d0e588cf135195ed1f758b437efdc457d22a541"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "platform-adapters",
+      "path": ".yuan/VERSION",
+      "reason": "required framework entry/version/packaging surface",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/VERSION",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "2985be8b28d3ade858e8d8fb4bc22f565b1bf6020dff982dce141f7721b9999c",
+      "tracked_at_source": true,
+      "tracked_sha256": "2985be8b28d3ade858e8d8fb4bc22f565b1bf6020dff982dce141f7721b9999c"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "platform-adapters",
+      "path": ".yuan/adapters/hermes.yaml",
+      "reason": "required Adapter/migration/platform contract family",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/adapters/hermes.yaml",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "e1bdf3b09e0627f31d3fb3f3be18f3767cffa3e934d820be144fa3c921fdbed0",
+      "tracked_at_source": true,
+      "tracked_sha256": "e1bdf3b09e0627f31d3fb3f3be18f3767cffa3e934d820be144fa3c921fdbed0"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "platform-adapters",
+      "path": ".yuan/adapters/manual.yaml",
+      "reason": "required Adapter/migration/platform contract family",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/adapters/manual.yaml",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "ad9f9650b41a432cbb5e3dda0c7913cdfc5f2f6b9abfacd1f584cc9559d26616",
+      "tracked_at_source": true,
+      "tracked_sha256": "ad9f9650b41a432cbb5e3dda0c7913cdfc5f2f6b9abfacd1f584cc9559d26616"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/attempt.schema.yaml",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/attempt.schema.yaml",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "98bff43675cabf103b6507c6241e658ce64578e475c17847a328b22b95e19c2b",
+      "tracked_at_source": true,
+      "tracked_sha256": "98bff43675cabf103b6507c6241e658ce64578e475c17847a328b22b95e19c2b"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/authorization_semantics.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/authorization_semantics.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "0b17df23a4ebd56832add261430df73be9e66bd666b931163c2d4c711246b7fd",
+      "tracked_at_source": true,
+      "tracked_sha256": "0b17df23a4ebd56832add261430df73be9e66bd666b931163c2d4c711246b7fd"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/candidate-manifest.json",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/candidate-manifest.json",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "20ac1cbb7f2377d5cecadf3347a40d81e14e8469c6c914701f585a49903d9768",
+      "tracked_at_source": true,
+      "tracked_sha256": "20ac1cbb7f2377d5cecadf3347a40d81e14e8469c6c914701f585a49903d9768"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/command_sandbox.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/command_sandbox.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "bc2d87b4a3f30fdae46d3ab5f908f91d038f6e372ba9bcd6d667ef35c0302cc5",
+      "tracked_at_source": true,
+      "tracked_sha256": "bc2d87b4a3f30fdae46d3ab5f908f91d038f6e372ba9bcd6d667ef35c0302cc5"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/completion_semantics.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/completion_semantics.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "12beab1dc3b76d1378bff3c20119c006b11875baff27d228b66e870431558609",
+      "tracked_at_source": true,
+      "tracked_sha256": "12beab1dc3b76d1378bff3c20119c006b11875baff27d228b66e870431558609"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/conformance.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/conformance.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "66351b4de21ba12f3db03a1e9683ad1b109911ccc23d1336f4d7f4d3c51c6366",
+      "tracked_at_source": true,
+      "tracked_sha256": "66351b4de21ba12f3db03a1e9683ad1b109911ccc23d1336f4d7f4d3c51c6366"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/document_validation.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/document_validation.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "26041e7c0f78d226dde7a23b8086d6780f89e2712f03d20665d754828b8999ec",
+      "tracked_at_source": true,
+      "tracked_sha256": "26041e7c0f78d226dde7a23b8086d6780f89e2712f03d20665d754828b8999ec"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/evidence.schema.yaml",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/evidence.schema.yaml",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "9211e878074c31e27d8e34003de5f92072192c503e2d3d07c3eb68a796088f1b",
+      "tracked_at_source": true,
+      "tracked_sha256": "9211e878074c31e27d8e34003de5f92072192c503e2d3d07c3eb68a796088f1b"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/fixtures/invalid/attempt-invalid-journal.json",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/fixtures/invalid/attempt-invalid-journal.json",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "8867bcf06374f64a7956c631f2f5c35a191bb779dcbd9a82bd371bfa7411a270",
+      "tracked_at_source": true,
+      "tracked_sha256": "8867bcf06374f64a7956c631f2f5c35a191bb779dcbd9a82bd371bfa7411a270"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/fixtures/invalid/evidence-zero-assertions.json",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/fixtures/invalid/evidence-zero-assertions.json",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "efe17107e4a038a7cb3c44c26bb8b60a3558cb41e12ab88e7cd116a3d18e4d58",
+      "tracked_at_source": true,
+      "tracked_sha256": "efe17107e4a038a7cb3c44c26bb8b60a3558cb41e12ab88e7cd116a3d18e4d58"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/fixtures/invalid/run-memory-unknown-complete.json",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/fixtures/invalid/run-memory-unknown-complete.json",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "cf20071e8631e160fe65a3c65420f797532171838342629ddda3501fc7c6fae0",
+      "tracked_at_source": true,
+      "tracked_sha256": "cf20071e8631e160fe65a3c65420f797532171838342629ddda3501fc7c6fae0"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/fixtures/invalid/work-contract-duplicate-ac.json",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/fixtures/invalid/work-contract-duplicate-ac.json",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "349c99a3f7b796fb0ee30254ab59794781f616b8e4097822cacffcb7b31da443",
+      "tracked_at_source": true,
+      "tracked_sha256": "349c99a3f7b796fb0ee30254ab59794781f616b8e4097822cacffcb7b31da443"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/fixtures/valid/attempt.json",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/fixtures/valid/attempt.json",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "66e5e372384bcca1e8ab4498c356f7179522ea8a10e313b2b794811a38edfc3b",
+      "tracked_at_source": true,
+      "tracked_sha256": "66e5e372384bcca1e8ab4498c356f7179522ea8a10e313b2b794811a38edfc3b"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/fixtures/valid/evidence.json",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/fixtures/valid/evidence.json",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "b8bcb58bfdb3cba38c5eb86880991bfa618d78c8e16c5f8dd53f9aef53a60a18",
+      "tracked_at_source": true,
+      "tracked_sha256": "b8bcb58bfdb3cba38c5eb86880991bfa618d78c8e16c5f8dd53f9aef53a60a18"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/fixtures/valid/run-memory.json",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/fixtures/valid/run-memory.json",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "ff7eb8e470ffeebd4a98458b3327c39360361116a7cbf25cbf9f90f8426797da",
+      "tracked_at_source": true,
+      "tracked_sha256": "ff7eb8e470ffeebd4a98458b3327c39360361116a7cbf25cbf9f90f8426797da"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/fixtures/valid/work-contract.json",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/fixtures/valid/work-contract.json",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "2600bfbb735028c5970f03f955a930ca707cf6d86fbfe311e8d516d0448254cb",
+      "tracked_at_source": true,
+      "tracked_sha256": "2600bfbb735028c5970f03f955a930ca707cf6d86fbfe311e8d516d0448254cb"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/port_enumeration.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/port_enumeration.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "726597c6362e1bd2fd0748e23d531221deaa9d39e292b4b3a830fac4eaa24459",
+      "tracked_at_source": true,
+      "tracked_sha256": "726597c6362e1bd2fd0748e23d531221deaa9d39e292b4b3a830fac4eaa24459"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/port_proposal.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/port_proposal.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "b7ebf15c79628484aa460cc981282d8ab07324d7cfd4e3add131a19d771628ec",
+      "tracked_at_source": true,
+      "tracked_sha256": "b7ebf15c79628484aa460cc981282d8ab07324d7cfd4e3add131a19d771628ec"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/port_types.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/port_types.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "6f6eabd205308b4af8f14dfdefbb5ebaf7567381acccca67dc4e17bcf470a3de",
+      "tracked_at_source": true,
+      "tracked_sha256": "6f6eabd205308b4af8f14dfdefbb5ebaf7567381acccca67dc4e17bcf470a3de"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/protocol.md",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/protocol.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3",
+      "tracked_at_source": true,
+      "tracked_sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/reference_port.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/reference_port.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "6c78e412a565644a3b9dda7452f4bc957e2c474a8b5271ff0e2f265d5075b182",
+      "tracked_at_source": true,
+      "tracked_sha256": "6c78e412a565644a3b9dda7452f4bc957e2c474a8b5271ff0e2f265d5075b182"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/replay_pending.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/replay_pending.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "216b0fbda5928ec83233f39d2ff2d88fcc4d54fea62d648886d109fdbf8dac9f",
+      "tracked_at_source": true,
+      "tracked_sha256": "216b0fbda5928ec83233f39d2ff2d88fcc4d54fea62d648886d109fdbf8dac9f"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/replay_trust.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/replay_trust.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "697a4b31fdd2238d885a922cb528062177bcd9ff16dfd271c91e06ec5dcbc3b3",
+      "tracked_at_source": true,
+      "tracked_sha256": "697a4b31fdd2238d885a922cb528062177bcd9ff16dfd271c91e06ec5dcbc3b3"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/run-memory.schema.yaml",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/run-memory.schema.yaml",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "50fa5993ba210e34f7fa4a1b334654f264fedfa87882160e926c80ff045a9c6d",
+      "tracked_at_source": true,
+      "tracked_sha256": "50fa5993ba210e34f7fa4a1b334654f264fedfa87882160e926c80ff045a9c6d"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/runtime_replay.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/runtime_replay.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "bb54e84bb42eb10e044c3e18c70738571f052768d4390202d65e5c21787166b9",
+      "tracked_at_source": true,
+      "tracked_sha256": "bb54e84bb42eb10e044c3e18c70738571f052768d4390202d65e5c21787166b9"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/schema_runtime.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/schema_runtime.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "b419619e68d952a5fa0b25366de607d8c1c378becb5a79bc88eebbefefaf568e",
+      "tracked_at_source": true,
+      "tracked_sha256": "b419619e68d952a5fa0b25366de607d8c1c378becb5a79bc88eebbefefaf568e"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/tests/_load.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/tests/_load.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "a3daec2c5b24f688415904ccb1c94ce5fdb9afbf5adb8117c1433c366d09741d",
+      "tracked_at_source": true,
+      "tracked_sha256": "a3daec2c5b24f688415904ccb1c94ce5fdb9afbf5adb8117c1433c366d09741d"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/tests/test_adapter_port.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "74abe6544a1755264de4317dbf822d38a78f0f422a92a586e5e778fca96c73b2",
+      "tracked_at_source": true,
+      "tracked_sha256": "74abe6544a1755264de4317dbf822d38a78f0f422a92a586e5e778fca96c73b2"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/tests/test_conformance.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/tests/test_conformance.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "bfb2b59f1e9c4c6e40d951ce627de81d350b71c1ab1ca960b98a45dc74ce06b6",
+      "tracked_at_source": true,
+      "tracked_sha256": "bfb2b59f1e9c4c6e40d951ce627de81d350b71c1ab1ca960b98a45dc74ce06b6"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/tests/test_reference_port.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/tests/test_reference_port.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "a0811c0dc54bfcc5850631d981f019fc4383d98946ad69dd216de64f7d860fe9",
+      "tracked_at_source": true,
+      "tracked_sha256": "a0811c0dc54bfcc5850631d981f019fc4383d98946ad69dd216de64f7d860fe9"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/tests/test_replay_pending.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "5c928063597bf365a83f0ff87d26880cb4e24cee46655a78554c16b4bb51bdd4",
+      "tracked_at_source": true,
+      "tracked_sha256": "5c928063597bf365a83f0ff87d26880cb4e24cee46655a78554c16b4bb51bdd4"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/tests/test_replay_trust.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "81fffd03cfe9442870d4cb0f123e0bd041bc56ccef63621b8b45ee68c5b9ff1d",
+      "tracked_at_source": true,
+      "tracked_sha256": "81fffd03cfe9442870d4cb0f123e0bd041bc56ccef63621b8b45ee68c5b9ff1d"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/tests/test_trust_gaps.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "891679fb6507d4c11946b17815bd76af0e61a38cd599049e9d717030f97a611c",
+      "tracked_at_source": true,
+      "tracked_sha256": "891679fb6507d4c11946b17815bd76af0e61a38cd599049e9d717030f97a611c"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/trust_semantics.py",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/trust_semantics.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "c1eca06f3044d2cb655189f1dcb684d9e9842759947a4d534f5a3e399b97e445",
+      "tracked_at_source": true,
+      "tracked_sha256": "c1eca06f3044d2cb655189f1dcb684d9e9842759947a4d534f5a3e399b97e445"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "core",
+      "path": ".yuan/core/0.1/work-contract.schema.yaml",
+      "reason": "M3-approved Core candidate source",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/core/0.1/work-contract.schema.yaml",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "a2c3344331e7083ea4bdced30e221d27c5d52f7cd9f0e03f5205765144aff660",
+      "tracked_at_source": true,
+      "tracked_sha256": "a2c3344331e7083ea4bdced30e221d27c5d52f7cd9f0e03f5205765144aff660"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/docs/ARCHITECTURE.md",
+      "reason": "framework document template/specification",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/docs/ARCHITECTURE.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "0e6755fe4a69d5ca73fa29571fc1096b72712e999baa93dc9f083c63dd1ecdc8",
+      "tracked_at_source": true,
+      "tracked_sha256": "0e6755fe4a69d5ca73fa29571fc1096b72712e999baa93dc9f083c63dd1ecdc8"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/docs/EVENTS.md",
+      "reason": "framework document template/specification",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/docs/EVENTS.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "97b4a4ba7979338390a929f51cd578156d8a81fb3b794a3bcac19a18f87b5bee",
+      "tracked_at_source": true,
+      "tracked_sha256": "97b4a4ba7979338390a929f51cd578156d8a81fb3b794a3bcac19a18f87b5bee"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/docs/FEATURE.md",
+      "reason": "framework document template/specification",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/docs/FEATURE.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "a23e3032509362a59b23439b3338c20077182c730bd2ad8081617a9e1e6e4127",
+      "tracked_at_source": true,
+      "tracked_sha256": "a23e3032509362a59b23439b3338c20077182c730bd2ad8081617a9e1e6e4127"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/docs/GLOBAL.md",
+      "reason": "framework document template/specification",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/docs/GLOBAL.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "be65ea9469d14bb0f09e389b944703f12070d89458cb611a5b5fca19ebb9f948",
+      "tracked_at_source": true,
+      "tracked_sha256": "be65ea9469d14bb0f09e389b944703f12070d89458cb611a5b5fca19ebb9f948"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/docs/GRAPH.md",
+      "reason": "framework document template/specification",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/docs/GRAPH.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "3ef503398e9604a9f1969028c175c557df89bb30baa6fe6a03d409a501c93174",
+      "tracked_at_source": true,
+      "tracked_sha256": "3ef503398e9604a9f1969028c175c557df89bb30baa6fe6a03d409a501c93174"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/docs/PROGRESS.md",
+      "reason": "framework document template/specification",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/docs/PROGRESS.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "262a046a387187745988380f0c6423a8a1d1e7467e0ce684ae5518b0167d7e8d",
+      "tracked_at_source": true,
+      "tracked_sha256": "262a046a387187745988380f0c6423a8a1d1e7467e0ce684ae5518b0167d7e8d"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/docs/PROPOSAL.md",
+      "reason": "framework document template/specification",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/docs/PROPOSAL.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "52ba160cce2caaf8770487b569e1542f8a60afd059c96f5817663c48c1ea7c69",
+      "tracked_at_source": true,
+      "tracked_sha256": "52ba160cce2caaf8770487b569e1542f8a60afd059c96f5817663c48c1ea7c69"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/docs/SESSION.md",
+      "reason": "framework document template/specification",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/docs/SESSION.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "7986bdbac10e5a858af56c987bbb04acae080380f8d090df6d9b4b8b5e2f3aa4",
+      "tracked_at_source": true,
+      "tracked_sha256": "7986bdbac10e5a858af56c987bbb04acae080380f8d090df6d9b4b8b5e2f3aa4"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/docs/TASK_BOARD.md",
+      "reason": "framework document template/specification",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/docs/TASK_BOARD.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "433015554471535d625eb1481bed176578e8db5a068638cc93d2a988005bf1ae",
+      "tracked_at_source": true,
+      "tracked_sha256": "433015554471535d625eb1481bed176578e8db5a068638cc93d2a988005bf1ae"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/README.md",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "eb3ea98fb593ef70930d93846dbdc511b05bfce7a498696f917066f3f608e136"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/docsos.md",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "82411f48ef4aed3ba935674d38e76eb4d5196cf943679d0a65f59f96349fae46"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/fixtures/legacy-anti-patterns.json",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "e797f4c482bebb5a6fa3ba6de9df1e477fa54797aa1b583bc96e1968fd8c1142"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/knowledge.md",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "40ba9a52e8790aaa71b0f40b6e1c270dc0c4d07b4d8a4e12ec1fadd051680f2d"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/platform-adapters.md",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "e76f86eb42a944ef417e7a3d8814e9aaf28bf5d9f9bb2c5613c7ad3b70d6bb23"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/provenance/README.md",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "02ae7db43d148036d22978eff3358c47d5b7588f2f4ab125c6f78ad51eff6590"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/provenance/REPORT.md",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "bd96520394dc21accf357eead12bede89c5f8b83938b4e40c61a2f314aa2cd69"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/provenance/clause-manifest.json",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "4f584fef7f35cf3cfcdf4297ef9c120e3e0c7e9b84399db63cf5a4056d4cd3ec"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/provenance/scope-manifest.json",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "0ae97eb51a619494935556484682dd183e9c43a25127763da01ed4d3dd8499cd"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/provenance/scope-policy.json",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "71d0b407ee9a335be65f312492ba9dcb6a1ba07ff9a8ab3dfceeb293fbc940c9"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/software-delivery.md",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "da7c86f85583b7aa870b04b668cb2904bd28e9ea5937e1d56c5a3d4b657fbf6d"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/testing.md",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "4fa105dacf6033d483b69b925a7e05ac61356f2ec70d2bacb49869d189ab9421"
+    },
+    {
+      "decision": "exclude",
+      "path": ".yuan/extensions/ui.md",
+      "reason": "M7 generated target; excluded from legacy source corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "f3543a7bb9d2f8e2b51346fa35ba7e3cade4e440efb46b8a137271b86c5220b5"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "platform-adapters",
+      "path": ".yuan/migration/authority-pointer.schema.json",
+      "reason": "required Adapter/migration/platform contract family",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/migration/authority-pointer.schema.json",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "6a40009659e9a2217d3294fff360f20eb4a42ed461e93b583164b45ba4162656",
+      "tracked_at_source": true,
+      "tracked_sha256": "6a40009659e9a2217d3294fff360f20eb4a42ed461e93b583164b45ba4162656"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "platform-adapters",
+      "path": ".yuan/platforms/hermes.md",
+      "reason": "required Adapter/migration/platform contract family",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/platforms/hermes.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "42fd3fb0af5b821c7c188eb8bc751596af03b47dd334d724797b3bf687453a5a",
+      "tracked_at_source": true,
+      "tracked_sha256": "42fd3fb0af5b821c7c188eb8bc751596af03b47dd334d724797b3bf687453a5a"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "platform-adapters",
+      "path": ".yuan/platforms/manual.md",
+      "reason": "required Adapter/migration/platform contract family",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/platforms/manual.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "a7128dd6c8d5ca50806e621cebc9a4e58b198c62394f0f4c929e240697b73b3f",
+      "tracked_at_source": true,
+      "tracked_sha256": "a7128dd6c8d5ca50806e621cebc9a4e58b198c62394f0f4c929e240697b73b3f"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/rules/contract-conventions.md",
+      "reason": "legacy rule clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/rules/contract-conventions.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "18e04d8939b1a70e276a51c56418050f77e86d337c201ef5c2bd303c3907fe6b",
+      "tracked_at_source": true,
+      "tracked_sha256": "18e04d8939b1a70e276a51c56418050f77e86d337c201ef5c2bd303c3907fe6b"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "platform-adapters",
+      "path": ".yuan/rules/dispatch-routing.md",
+      "reason": "legacy rule clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/rules/dispatch-routing.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "6cc6a36b101ded5d8e745e7b6191a0e977cdade1dd597e07e2c7072e53200472",
+      "tracked_at_source": true,
+      "tracked_sha256": "6cc6a36b101ded5d8e745e7b6191a0e977cdade1dd597e07e2c7072e53200472"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/rules/docs-framework.md",
+      "reason": "legacy rule clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/rules/docs-framework.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "ed4d9f452eefc2e72e97779a183359005b8475327569b18b6edb84af10e3f077",
+      "tracked_at_source": true,
+      "tracked_sha256": "ed4d9f452eefc2e72e97779a183359005b8475327569b18b6edb84af10e3f077"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": ".yuan/rules/iron-rules.md",
+      "reason": "legacy rule clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/rules/iron-rules.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "b15e906a66b24538df1ede666203a32c35db79da30d9f9877a79c9cde01959fb",
+      "tracked_at_source": true,
+      "tracked_sha256": "b15e906a66b24538df1ede666203a32c35db79da30d9f9877a79c9cde01959fb"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": ".yuan/rules/plan-format.md",
+      "reason": "legacy rule clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/rules/plan-format.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "f94de91eb33b84da65ee4314cef20e542d3247b92ae611205007f60d7ddf148a",
+      "tracked_at_source": true,
+      "tracked_sha256": "f94de91eb33b84da65ee4314cef20e542d3247b92ae611205007f60d7ddf148a"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": ".yuan/rules/role-scorecard.md",
+      "reason": "legacy rule clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/rules/role-scorecard.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "5f32be2f51fb7c4bf7f3b4020501ef023490047313c539d4779052d06ba6e03c",
+      "tracked_at_source": true,
+      "tracked_sha256": "5f32be2f51fb7c4bf7f3b4020501ef023490047313c539d4779052d06ba6e03c"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "testing",
+      "path": ".yuan/rules/seam-agreement.md",
+      "reason": "legacy rule clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/rules/seam-agreement.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "3c060a702401f1a8f53d0e66993e50bda1f65080c7a7214bd1e6395dad6f1564",
+      "tracked_at_source": true,
+      "tracked_sha256": "3c060a702401f1a8f53d0e66993e50bda1f65080c7a7214bd1e6395dad6f1564"
+    },
+    {
+      "decision": "include",
+      "dirty_override": true,
+      "family": "testing",
+      "path": ".yuan/rules/test-integrity.md",
+      "reason": "legacy rule clause requires explicit disposition",
+      "source": {
+        "kind": "content-addressed-snapshot",
+        "path": ".yuan/extensions/provenance/sources/73924d897e515e2bd201650f2356c35e98237f29af7cc85d502111157729ce4b.blob"
+      },
+      "source_sha256": "73924d897e515e2bd201650f2356c35e98237f29af7cc85d502111157729ce4b",
+      "tracked_at_source": false,
+      "tracked_sha256": null
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "testing",
+      "path": ".yuan/rules/verdict-protocol.md",
+      "reason": "legacy rule clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/rules/verdict-protocol.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "8392e19cf546b4493acc392bb323691f28f243c95cd8a2077e8ad080104b026b",
+      "tracked_at_source": true,
+      "tracked_sha256": "8392e19cf546b4493acc392bb323691f28f243c95cd8a2077e8ad080104b026b"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "ui",
+      "path": ".yuan/rules/visual-absolutes.md",
+      "reason": "legacy rule clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/rules/visual-absolutes.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "10a2a149c174b0c6be8a2e4487e2c9b262c81b67c833e77078fb8fcfa4882c49",
+      "tracked_at_source": true,
+      "tracked_sha256": "10a2a149c174b0c6be8a2e4487e2c9b262c81b67c833e77078fb8fcfa4882c49"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "testing",
+      "path": ".yuan/skills/debug-feedback-loop/SKILL.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/debug-feedback-loop/SKILL.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "961ee7a4cd8866972f9ca44e43c2470dec768e604c24c49a33fe77f363e9a1bb",
+      "tracked_at_source": true,
+      "tracked_sha256": "961ee7a4cd8866972f9ca44e43c2470dec768e604c24c49a33fe77f363e9a1bb"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": ".yuan/skills/distill-workspace.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/distill-workspace.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "882db1cabc5eb2285df9cace34c75d2cb9d6f0861e6af52be3e90d48c0a3b9e7",
+      "tracked_at_source": true,
+      "tracked_sha256": "882db1cabc5eb2285df9cace34c75d2cb9d6f0861e6af52be3e90d48c0a3b9e7"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": ".yuan/skills/graph-query.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/graph-query.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "d2ebad58a0db000baccb67ba83e0af166ef30fc9ab26750583392879e92e2079",
+      "tracked_at_source": true,
+      "tracked_sha256": "d2ebad58a0db000baccb67ba83e0af166ef30fc9ab26750583392879e92e2079"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": ".yuan/skills/grilling/SKILL.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/grilling/SKILL.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "dbe06a2764490688fd4ea64983ef240f24eb578b80a6ec1c4757dc71b274325f",
+      "tracked_at_source": true,
+      "tracked_sha256": "dbe06a2764490688fd4ea64983ef240f24eb578b80a6ec1c4757dc71b274325f"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": ".yuan/skills/knowledge-injection.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/knowledge-injection.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "cc93abb2565a337976daa684b7a797ce415b4f9215e909f553b915f397345af4",
+      "tracked_at_source": true,
+      "tracked_sha256": "cc93abb2565a337976daa684b7a797ce415b4f9215e909f553b915f397345af4"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/skills/project-audit.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/project-audit.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "7eb0f326e7327406a2788122e0b913db2290161f77b38d9201768f7afb7110f3",
+      "tracked_at_source": true,
+      "tracked_sha256": "7eb0f326e7327406a2788122e0b913db2290161f77b38d9201768f7afb7110f3"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/skills/project-bootstrap.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/project-bootstrap.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "a1d6372082edeac2a12b5d2617c9839d259dcb4253495643268655d32c128e7c",
+      "tracked_at_source": true,
+      "tracked_sha256": "a1d6372082edeac2a12b5d2617c9839d259dcb4253495643268655d32c128e7c"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": ".yuan/skills/project-memory.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/project-memory.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "1ca9c51197659bbd13fe2da21ec86b85e86ae4a015c9bb502fcb6a8766397922",
+      "tracked_at_source": true,
+      "tracked_sha256": "1ca9c51197659bbd13fe2da21ec86b85e86ae4a015c9bb502fcb6a8766397922"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": ".yuan/skills/promotion.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/promotion.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "7dd4a2fdcf360dd4e114ebbecbcfa0ebf62b10db74b8c1a6ec9507f478c3944d",
+      "tracked_at_source": true,
+      "tracked_sha256": "7dd4a2fdcf360dd4e114ebbecbcfa0ebf62b10db74b8c1a6ec9507f478c3944d"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "testing",
+      "path": ".yuan/skills/ptg-runner.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/ptg-runner.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "9ce92f1cac2ce31a16806460b670ea030a8bfc33ca861376a2d85d4d5b8c9838",
+      "tracked_at_source": true,
+      "tracked_sha256": "9ce92f1cac2ce31a16806460b670ea030a8bfc33ca861376a2d85d4d5b8c9838"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "ui",
+      "path": ".yuan/skills/query-ux-pro-max/SKILL.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/query-ux-pro-max/SKILL.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "ded17771037b9bb0f3324ad0f9301f2cc72823cea3a4b85bd5ac76e3f575c227",
+      "tracked_at_source": true,
+      "tracked_sha256": "ded17771037b9bb0f3324ad0f9301f2cc72823cea3a4b85bd5ac76e3f575c227"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "ui",
+      "path": ".yuan/skills/query-ux-pro-max/references/landing.csv",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/query-ux-pro-max/references/landing.csv",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "080cedbcd61ff8ec9520f33929baa76bee9589e783f83b2f8d824a466b6a46d7",
+      "tracked_at_source": true,
+      "tracked_sha256": "080cedbcd61ff8ec9520f33929baa76bee9589e783f83b2f8d824a466b6a46d7"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "ui",
+      "path": ".yuan/skills/query-ux-pro-max/references/products.csv",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/query-ux-pro-max/references/products.csv",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "e9749e4fd8f7d4c94919c25ebd347a4adaddb671e7b01d33fbc2c87d447e6667",
+      "tracked_at_source": true,
+      "tracked_sha256": "e9749e4fd8f7d4c94919c25ebd347a4adaddb671e7b01d33fbc2c87d447e6667"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "ui",
+      "path": ".yuan/skills/query-ux-pro-max/references/styles.csv",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/query-ux-pro-max/references/styles.csv",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "1bf9c1d8484a0a7a54fb67555902380446865b604c8449e47a449cb3d9c1ef88",
+      "tracked_at_source": true,
+      "tracked_sha256": "1bf9c1d8484a0a7a54fb67555902380446865b604c8449e47a449cb3d9c1ef88"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "ui",
+      "path": ".yuan/skills/query-ux-pro-max/references/ui-reasoning.csv",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/query-ux-pro-max/references/ui-reasoning.csv",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "41976082ecae1100da937c949215dc6694393e03f3c2a7444dd92a9edb43cb11",
+      "tracked_at_source": true,
+      "tracked_sha256": "41976082ecae1100da937c949215dc6694393e03f3c2a7444dd92a9edb43cb11"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "ui",
+      "path": ".yuan/skills/query-ux-pro-max/references/ux-guidelines.csv",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/query-ux-pro-max/references/ux-guidelines.csv",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "1870ee048f2a2bdd60709f8f7adf7f3b6dcad560bc005c8b2915a8ac8639820d",
+      "tracked_at_source": true,
+      "tracked_sha256": "1870ee048f2a2bdd60709f8f7adf7f3b6dcad560bc005c8b2915a8ac8639820d"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "testing",
+      "path": ".yuan/skills/requesting-code-review.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/requesting-code-review.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "b5be1c36fa3563169958025c541909e7cba38f08cc5d4cd4b49c2fe867d4864d",
+      "tracked_at_source": true,
+      "tracked_sha256": "b5be1c36fa3563169958025c541909e7cba38f08cc5d4cd4b49c2fe867d4864d"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "platform-adapters",
+      "path": ".yuan/skills/role-switch.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/role-switch.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "e978808e337380349c487b5eadb6140c68cf728e76fb995b413087309b5106fe",
+      "tracked_at_source": true,
+      "tracked_sha256": "e978808e337380349c487b5eadb6140c68cf728e76fb995b413087309b5106fe"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "platform-adapters",
+      "path": ".yuan/skills/subagent-driven-development.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/subagent-driven-development.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "466eb1f6b0091d167db6df6f8fe011f0b854665838989aaf1465eff6adea67ec",
+      "tracked_at_source": true,
+      "tracked_sha256": "466eb1f6b0091d167db6df6f8fe011f0b854665838989aaf1465eff6adea67ec"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "testing",
+      "path": ".yuan/skills/systematic-debugging.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/systematic-debugging.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "d1ba7694454bbb21267169101d64a7dff030ab9787b416fe9283641d7a814dc7",
+      "tracked_at_source": true,
+      "tracked_sha256": "d1ba7694454bbb21267169101d64a7dff030ab9787b416fe9283641d7a814dc7"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "testing",
+      "path": ".yuan/skills/test-driven-development.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/test-driven-development.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "6d64ae2800e91f37e3d2900c1e0e8dc494ce09ae5211d5b00c125c125cdf716a",
+      "tracked_at_source": true,
+      "tracked_sha256": "6d64ae2800e91f37e3d2900c1e0e8dc494ce09ae5211d5b00c125c125cdf716a"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": ".yuan/skills/vibecoding-workflow.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/vibecoding-workflow.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "9ffea6776eee9e54061518de12bcef399775d39110e89e05d699e7ad6cec0646",
+      "tracked_at_source": true,
+      "tracked_sha256": "9ffea6776eee9e54061518de12bcef399775d39110e89e05d699e7ad6cec0646"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": ".yuan/skills/writing-plans.md",
+      "reason": "legacy Skill retained as optional advice/recipe",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/skills/writing-plans.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "a19b78a5cbadd280941d00716672e638d4ed2d42f52c225881e5301919dc6352",
+      "tracked_at_source": true,
+      "tracked_sha256": "a19b78a5cbadd280941d00716672e638d4ed2d42f52c225881e5301919dc6352"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": ".yuan/specs/action-protocol.md",
+      "reason": "legacy protocol clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/specs/action-protocol.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "95e81445d2ee8848cb88d61ab114881f85dd3a327a9f9e48ab118410c7cbb412",
+      "tracked_at_source": true,
+      "tracked_sha256": "95e81445d2ee8848cb88d61ab114881f85dd3a327a9f9e48ab118410c7cbb412"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "platform-adapters",
+      "path": ".yuan/specs/adapter-protocol.md",
+      "reason": "legacy protocol clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/specs/adapter-protocol.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "cca01c1057bbd3049811e05f66d5604d7a792919d51cc13965ca6f35e7ad8bd0",
+      "tracked_at_source": true,
+      "tracked_sha256": "cca01c1057bbd3049811e05f66d5604d7a792919d51cc13965ca6f35e7ad8bd0"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": ".yuan/specs/object-protocol.md",
+      "reason": "legacy protocol clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/specs/object-protocol.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "b6f0d989691ca553042003e05cc447e83f1215a9c6dcc61c93db222ee1cc8f51",
+      "tracked_at_source": true,
+      "tracked_sha256": "b6f0d989691ca553042003e05cc447e83f1215a9c6dcc61c93db222ee1cc8f51"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "testing",
+      "path": ".yuan/specs/runtime-protocol.md",
+      "reason": "legacy protocol clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/specs/runtime-protocol.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "d445a7577d71e7c4b68507af569357040c90722291b259d575d048ed21576115",
+      "tracked_at_source": true,
+      "tracked_sha256": "d445a7577d71e7c4b68507af569357040c90722291b259d575d048ed21576115"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": ".yuan/specs/state-protocol.md",
+      "reason": "legacy protocol clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/specs/state-protocol.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "fda157cbb6e748393f859d3e74d4bbf8d4e6e876f9068b2aa4eaee808dac2ff7",
+      "tracked_at_source": true,
+      "tracked_sha256": "fda157cbb6e748393f859d3e74d4bbf8d4e6e876f9068b2aa4eaee808dac2ff7"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": ".yuan/specs/workflow-protocol.md",
+      "reason": "legacy protocol clause requires explicit disposition",
+      "source": {
+        "kind": "git",
+        "path": ".yuan/specs/workflow-protocol.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "84053c080349ff93f9269a9333fb2a6c7b1162a64ff119c50a83354649d54a8d",
+      "tracked_at_source": true,
+      "tracked_sha256": "84053c080349ff93f9269a9333fb2a6c7b1162a64ff119c50a83354649d54a8d"
+    },
+    {
+      "decision": "include",
+      "dirty_override": true,
+      "family": "software-delivery",
+      "path": "AGENTS.md",
+      "reason": "required framework entry/version/packaging surface",
+      "source": {
+        "kind": "content-addressed-snapshot",
+        "path": ".yuan/extensions/provenance/sources/d282f61862b19ab42fe4933584fa4dd5b893650c38776ba2e9a3c97fb8d45d7a.blob"
+      },
+      "source_sha256": "d282f61862b19ab42fe4933584fa4dd5b893650c38776ba2e9a3c97fb8d45d7a",
+      "tracked_at_source": true,
+      "tracked_sha256": "20932d899dd2bb634b463b420a37b54b85aa63f562cb1980ea6e798c4b869edc"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "README.md",
+      "reason": "required framework entry/version/packaging surface",
+      "source": {
+        "kind": "git",
+        "path": "README.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "042f91c7f51215a67e3876d60f7103c5556200fd736d5e6e10d473bfb959cae8",
+      "tracked_at_source": true,
+      "tracked_sha256": "042f91c7f51215a67e3876d60f7103c5556200fd736d5e6e10d473bfb959cae8"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "platform-adapters",
+      "path": "bin/yuanforge-init",
+      "reason": "required framework entry/version/packaging surface",
+      "source": {
+        "kind": "git",
+        "path": "bin/yuanforge-init",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "80dec219457d55839c7a8b8659945bb4f9eaa700b24899a60e664f9f708d0f19",
+      "tracked_at_source": true,
+      "tracked_sha256": "80dec219457d55839c7a8b8659945bb4f9eaa700b24899a60e664f9f708d0f19"
+    },
+    {
+      "decision": "include",
+      "dirty_override": true,
+      "family": "software-delivery",
+      "path": "contracts/architect.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "content-addressed-snapshot",
+        "path": ".yuan/extensions/provenance/sources/e4efcce9c7cc0fc8770a2f54e8173c632f42ca54c15d259267c59c0b641aacba.blob"
+      },
+      "source_sha256": "e4efcce9c7cc0fc8770a2f54e8173c632f42ca54c15d259267c59c0b641aacba",
+      "tracked_at_source": true,
+      "tracked_sha256": "a5649350b6fa4a680c66bd78eabda33441931f6a842b9402b0371c1d9163b072"
+    },
+    {
+      "decision": "include",
+      "dirty_override": true,
+      "family": "software-delivery",
+      "path": "contracts/backend-dev.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "content-addressed-snapshot",
+        "path": ".yuan/extensions/provenance/sources/2505b3668124beda352e2174399b16396c9b0b0c4ec2ace9ac1b138a20fb1ef9.blob"
+      },
+      "source_sha256": "2505b3668124beda352e2174399b16396c9b0b0c4ec2ace9ac1b138a20fb1ef9",
+      "tracked_at_source": true,
+      "tracked_sha256": "aef930e9b5274fd0d8b85bc4191c4acb38409d2f28c20b52943d47bda8280155"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "contracts/conductor.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "git",
+        "path": "contracts/conductor.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "d6d5e84517f5edf1cbb64e46108b8a0c45f40f9991dc248f60fe5fa3aab3d409",
+      "tracked_at_source": true,
+      "tracked_sha256": "d6d5e84517f5edf1cbb64e46108b8a0c45f40f9991dc248f60fe5fa3aab3d409"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "contracts/design-reviewer.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "git",
+        "path": "contracts/design-reviewer.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "08c3edca03681c9723220a3620d5c548b66bfafa703d7bc491469415fa830a3e",
+      "tracked_at_source": true,
+      "tracked_sha256": "08c3edca03681c9723220a3620d5c548b66bfafa703d7bc491469415fa830a3e"
+    },
+    {
+      "decision": "include",
+      "dirty_override": true,
+      "family": "docsos",
+      "path": "contracts/doc-engineer.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "content-addressed-snapshot",
+        "path": ".yuan/extensions/provenance/sources/8fbdde4c6bd6c13f16527ae97b6bb5bb49a49cdf04fafe4da5e662ebcc5d3b47.blob"
+      },
+      "source_sha256": "8fbdde4c6bd6c13f16527ae97b6bb5bb49a49cdf04fafe4da5e662ebcc5d3b47",
+      "tracked_at_source": true,
+      "tracked_sha256": "75c54c1ea55f040f51478d404ba86b79a5a27e9d0d9527de5b4b724883edae30"
+    },
+    {
+      "decision": "include",
+      "dirty_override": true,
+      "family": "software-delivery",
+      "path": "contracts/frontend-dev.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "content-addressed-snapshot",
+        "path": ".yuan/extensions/provenance/sources/4f74c507acc57ed7955f5d76e179455e77361cace72783dd80da9be6b2d8bc86.blob"
+      },
+      "source_sha256": "4f74c507acc57ed7955f5d76e179455e77361cace72783dd80da9be6b2d8bc86",
+      "tracked_at_source": true,
+      "tracked_sha256": "dc7e727db253a56f2b19deb703eca9a4ee5a669131374e562eefd66ff732d23d"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "contracts/product-analyst.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "git",
+        "path": "contracts/product-analyst.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "0e556bb11566c2b0de3783708e67f90f93d31dcc8714dd076b9d7954381fccd5",
+      "tracked_at_source": true,
+      "tracked_sha256": "0e556bb11566c2b0de3783708e67f90f93d31dcc8714dd076b9d7954381fccd5"
+    },
+    {
+      "decision": "include",
+      "dirty_override": true,
+      "family": "software-delivery",
+      "path": "contracts/quality-auditor.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "content-addressed-snapshot",
+        "path": ".yuan/extensions/provenance/sources/2bd8814567b7db8e28f816c98727cc3cfdb9d8e491b0011c0f4a20a5b839d26e.blob"
+      },
+      "source_sha256": "2bd8814567b7db8e28f816c98727cc3cfdb9d8e491b0011c0f4a20a5b839d26e",
+      "tracked_at_source": true,
+      "tracked_sha256": "57d785d9aef97b063882afc77cf621c1ece9893230e83fdc4d34504dd72b014a"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "contracts/security-auditor.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "git",
+        "path": "contracts/security-auditor.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "d55cc19e98ffa7c9a487ba4dd34a7ca4db19692c76250d02743d4903d072681e",
+      "tracked_at_source": true,
+      "tracked_sha256": "d55cc19e98ffa7c9a487ba4dd34a7ca4db19692c76250d02743d4903d072681e"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "contracts/spec-reviewer.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "git",
+        "path": "contracts/spec-reviewer.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "ec35a22915482c086b0db5c2524d4ea975505c894465442123f86380aee38f6b",
+      "tracked_at_source": true,
+      "tracked_sha256": "ec35a22915482c086b0db5c2524d4ea975505c894465442123f86380aee38f6b"
+    },
+    {
+      "decision": "include",
+      "dirty_override": true,
+      "family": "testing",
+      "path": "contracts/tester.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "content-addressed-snapshot",
+        "path": ".yuan/extensions/provenance/sources/4da6edcfa5a7cbc11fbbb3ab2a5dbec7486ad26a2e041339e704a34b71eb57a2.blob"
+      },
+      "source_sha256": "4da6edcfa5a7cbc11fbbb3ab2a5dbec7486ad26a2e041339e704a34b71eb57a2",
+      "tracked_at_source": true,
+      "tracked_sha256": "adf5b4843d826f3118d9269e7f0f8c9d83c6c4259846dec44a7203c432a18b7f"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "ui",
+      "path": "contracts/ui-designer.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "git",
+        "path": "contracts/ui-designer.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "a66a88b41f7dc9e0c9416f714e1c455fb2634ef8a1da68f09a3c1ff6d94b7d07",
+      "tracked_at_source": true,
+      "tracked_sha256": "a66a88b41f7dc9e0c9416f714e1c455fb2634ef8a1da68f09a3c1ff6d94b7d07"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "ui",
+      "path": "contracts/ux-reviewer.md",
+      "reason": "legacy role advice retained as optional Extension input",
+      "source": {
+        "kind": "git",
+        "path": "contracts/ux-reviewer.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "258832700f5e7cabc43563377a5cb6f85245288da361250c17411f301eb691cf",
+      "tracked_at_source": true,
+      "tracked_sha256": "258832700f5e7cabc43563377a5cb6f85245288da361250c17411f301eb691cf"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260707-框架v2/SESSION_LOG.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "829dfb39da9792a583dc9a319abc1355c5cc497c46c4f8c21062a3b84e292a35"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/.gitattributes",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "053fcdf438e9ffd5f9591208d2bd8f1164e4525dcae58cbff87c67ac6ce46f93"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/DESIGN.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "2df44b233cff79874a06c2ebe1b8c5876518b8b1fe9cca7e0ea1e4932835b827"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/FEATURE.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "93005ba3516cf81df41ba485ec8fc2ec33aa21d236cb5eae0dcf21d3a4f3eba8"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/PLAN.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "9516c6d83d9738f31510c98ea2620a1870f6d7ac06681ebbf880bd0effd54534"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/SESSION_LOG.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "0de9c7de0595998a9fc8c41a20ee92f63bc60f9ec10c4b317abaaf95bcdfea97"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/TASK_BOARD.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "fff12265ba06bdc158fcae641ded305f597ac8353c24b8b37f11eec79e7aec12"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m0a/base-commit.txt",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "2d42cd4936960eb78e05909a39858b65a4dff0cd240e2ff6ddb33a4c5221be26"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m0a/git-diff.binary.patch",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "ab559d842f0bd629d538b7905a90d83ae72feee38fdc92951c79da53eb58b48f"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m0a/git-status-porcelain-v2.txt",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "4d8b4a914504831a1f22d5e761679fda8ff176058b44bd6e3ea144c83a6b3612"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m0a/git-status-short.txt",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "6bcab38d87aa0cb84d391d5431e0e0f480889958b4b8a4b6a47546f76d0970cc"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m0a/snapshot-manifest.tsv",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "6cc081e9425b9e32bf086bf2f994c14051578394a5ff73b04c850c612d1feeb4"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m0a/tracked-dirty.tsv",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "5b4fd0dedc15e86122352ac4ad495ca66b085cf8147aa7d07dcabe2a35e3ceaa"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m0a/untracked-files.tsv",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "9db4d3eb3aed0e5261b748c07e021342f53377e5edc5653a90a8ff877e7ac6cd"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m0a/untracked/.yuan/rules/test-integrity.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "73924d897e515e2bd201650f2356c35e98237f29af7cc85d502111157729ce4b"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m0a/untracked/docs/decisions/OPEN-DECISIONS.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "e77cdb53b29d3a218ad892fd9e9cfb728e349293ab0a1ab880eed6e1b6b3411a"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m1/held-out-blocker-review.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "15fa446667e4db3f0ff87b82994ae2b159378d1a601c1e29b80e9e26e101657e"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m1/held-out-final.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "4e46d9eed583e64b3c96ab5d0a421fe3bd1062e84d46b1d8f9beb39222fb115b"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m1/held-out-pre-fix.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "b32614939785915835df3b4e48dca6ae19497481cce0b6f62ae51096299a0c38"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m1/held-out-r1-pre-fix.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "1c1919753adab39737fec7d383dc557eaa6ba7e06530319f9c42ce45234fc5cd"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m1/receipt.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "13a592ca3455d6d4f2a937fc117c9aa15bca694ec011ad2dd2367f0b0557028f"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m2/author-conformance.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "09312415cd0f1b17cee49cc2f3300d3b6cbfbd6f04c0ed1c7e46e86a8980a966"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m2/author-final.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "56c7a2cc707a73033aca41890ada4ee4a82638624c08adb7d5678cb1f2740925"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m3/bootstrap-manifest.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "6598f2ad6630814f6ef29a279c00e5023711105db5beb66bbb80e28f7a42748c"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m3/bootstrap-receipt.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "f17f168acf97d7d21c68b9aef21bd26d86d41607834b45618950c70df186b3d2"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m3/final.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "c13298ff08df0af1c370d15732bec9db55795f66a3ace03cbdcc0f6af5ef6d71"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m3/held-out-result.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "86074b741c35c602aeb59a015b177efa4979648c3f665a994f516ce7e24f55ca"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m3/independent-review.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "f9fa96a261d2ff1b19f958d98a1c6b454dee141000d7cc85057bf1a82c0e4454"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m4/author-evidence.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "de21f7c6a3b715bc0f7aec6bbda2675cec52a7a696b7d1d1351817da21d51e4a"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m4/final-verification.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "ade1739eeb8006c2eb6ee6a8436fd895cee9f84eb332576ee66ef122e90da11c"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m4/rollback-receipt.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "dab22f869a3c827198419e96267a01e7706e3bb8871ccafcac27ffdd39480189"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/M5-TEST-REPORT.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "15095939dccbdb37d1442a2bcfe8d801ce326fee2dfecee8a4bf474c45efe1cf"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/artifact.txt",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "c30e40fbf27d6ca297746483e1cad0dd04d7ef726c3565ff7f8fef98b5e3dc9c"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/attempts/0001.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "99520776ef27f6d566264d1f370de5c72f9c7ba1bd7242e179567fc977711317"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/evidence/0001.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "4512560776ac9dcbb58e739de7d6b14ec4893f9cba6a1fa038962d73fa37bff1"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/negative/missing-attempt-run-memory.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "32bbf0987e376a67e4404d3673d7f9e3807d374fffa1d934c6fbce7bbd0e5859"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/negative/read-attempt.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "ac6b745772cfd2a0ba6e5c6594b6e9d5390e723fce4040bea4601fc68f3f320d"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/negative/read-run-memory.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "a6c0ead81cf6cf7c8542384d015ba82a262e07891f6aaced0d65cd6521d2ce53"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/negative/stale-evidence.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "f0c700c8e3e863c353655b295249e3aff4260c1977b8b1eee77598cf91b60367"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/negative/stale-run-memory.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "e2911b50f63e7c6e47a8890d6160704b48e00eaccc77467172fbdf5decf6f9ed"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/negative/unknown-attempt.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "9e1647adc4c3d81c4a281dfc7d77fae1455496735d674ecbffa54b68a51e8837"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/negative/unknown-run-memory.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "1657eb5a5c7e34f507430e52c2cd1a90ca03156742a81f6c026726aaf65c96d5"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/receipt.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "6f21b581800734878c8c043795194f2fa3b2e4afd4180a8128f72a4561f056c7"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/receipts/validator-command.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "9f64bf903de8ea4d1d873c0c4c876d16fe560f2f1023158f322e38a216294719"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/receipts/validator-result.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "76bf2f93a7895bd819dd8e1a9e85323e27fe9c4ad61c95be4cbeea7007c1da6f"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/run-memory.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "f6ad0557562982ccc2e11879072e7c9f4bd7e391ab110e5db1f0d47c50085b4e"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/canary-run/work-contract.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "f69c17d64ba5abdd41a5d5c37be7e0a32f2011ce425790260f0b1e5def1cf697"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/final-verification.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "68ce9fd0852e40481a55f0ba08f968d68f07ac57cfcdd96d187caa33c52e0bba"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/independent-verification.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "742d60a6c850438fe49d328a795512400d8885168afc5bd774cd6e1325efbd1e"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/r3-bootstrap-manifest.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "3d205794305095bb91496d301e8f42c753d9a9716edc4d042695adc3b44835cf"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m5/r3-bootstrap-receipt.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "059434e8e1c2c8f655e8f7817f47f0ec3f445e6660249ccbc9b1546c44bdc5ca"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m6/M6-TEST-REPORT.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "ff3ab56e5270504f1653aabe5389cf6dede8b3dc7a56586d8a45fc7c28a9bae4"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m6/final-verification.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "460e174345e103a1eb2ffd892ae1125845b8b93cd173ea48b2d1cd236987f9ea"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m6/held-out-initial.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "e453d3924356468173baa051f07304bd562e7ba5728b554673f8b6c277d250ad"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m6/old-root-manifest.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "179a68bd6f841908e3c8616cea304ab5a41709d8830b921622b0e3c84f998e7b"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m6/old-root-receipt.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "2e62c9191d76235665fb649d698c4ee1d638999d6363bed43b54b1cffdaf3ddd"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m7-review/QUALITY-AUDIT.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "03417cb184d901a7c702aede384ba7a028b2c97910b0ae9658b3cf093707a66e"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m7/M7-REPORT.md",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "c910617f7f7ec24a365d922f36ff45be6e7921abd075e11a1790223d18c7ce9c"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m7/final-verification.json",
+      "reason": "Workspace runtime state or Evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "90e7a59e81a7106d326cdad62760c87d6f1d5437b5532bc53232a159de0fd596"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": "docs/ARCHITECTURE.md",
+      "reason": "declared normative documentation surface",
+      "source": {
+        "kind": "git",
+        "path": "docs/ARCHITECTURE.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "a884e54bdfb5e0b7dd7efe02ed2f08f337174a62e503db2e812a5c016669cdc3",
+      "tracked_at_source": true,
+      "tracked_sha256": "a884e54bdfb5e0b7dd7efe02ed2f08f337174a62e503db2e812a5c016669cdc3"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": "docs/CONVENTIONS.md",
+      "reason": "declared normative documentation surface",
+      "source": {
+        "kind": "git",
+        "path": "docs/CONVENTIONS.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "2c6faf3b5582c178c4e0481f045f0c6abdf5dfeff0bc3f5da8def5e3718b3f4f",
+      "tracked_at_source": true,
+      "tracked_sha256": "2c6faf3b5582c178c4e0481f045f0c6abdf5dfeff0bc3f5da8def5e3718b3f4f"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": "docs/INDEX.md",
+      "reason": "declared normative documentation surface",
+      "source": {
+        "kind": "git",
+        "path": "docs/INDEX.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "883b5119466cc1db9b3f5be0cb1c3af26440b6f116d9a23933ab713cb0b8fd94",
+      "tracked_at_source": true,
+      "tracked_sha256": "883b5119466cc1db9b3f5be0cb1c3af26440b6f116d9a23933ab713cb0b8fd94"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": "docs/MVP专家团对标与YuanForge优化.md",
+      "reason": "declared normative documentation surface",
+      "source": {
+        "kind": "git",
+        "path": "docs/MVP专家团对标与YuanForge优化.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "5660d9c267fcbb913fa3b0cc65b1eda7f184ec75d6b784b8a2c2d2ddb6a65072",
+      "tracked_at_source": true,
+      "tracked_sha256": "5660d9c267fcbb913fa3b0cc65b1eda7f184ec75d6b784b8a2c2d2ddb6a65072"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/PROGRESS.md",
+      "reason": "project runtime projection/decision state",
+      "tracked_at_source": true,
+      "tracked_sha256": "40ec88125e61fe8723541c9d105b504f5f1aebc275f0c51b4abffbe216e379b6"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": "docs/SETUP.md",
+      "reason": "declared normative documentation surface",
+      "source": {
+        "kind": "git",
+        "path": "docs/SETUP.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "928b496e76ac61b9ed19dfbd5eda806eea39db45b4373e99ac23c8754ea54fe5",
+      "tracked_at_source": true,
+      "tracked_sha256": "928b496e76ac61b9ed19dfbd5eda806eea39db45b4373e99ac23c8754ea54fe5"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "fixture",
+      "path": "docs/anti-patterns.md",
+      "reason": "declared normative documentation surface",
+      "source": {
+        "kind": "git",
+        "path": "docs/anti-patterns.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "67ed6ea993b09029e1ac68db43f3c57c0301c038a9cd84841061f97ef86301bf",
+      "tracked_at_source": true,
+      "tracked_sha256": "67ed6ea993b09029e1ac68db43f3c57c0301c038a9cd84841061f97ef86301bf"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/archive/.gitkeep",
+      "reason": "historical Workspace evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/archive/20260717-framework-audit/PLAN.md",
+      "reason": "historical Workspace evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "0d5f08c5ac0d87a879764b44ac9b139f7070fc1f601ca726089360c89118cd69"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/archive/20260717-framework-audit/SESSION_LOG.md",
+      "reason": "historical Workspace evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "c2f86e48dc0f5448776c28fa6401ee08c0b271c40f687f11b63b943a494b265d"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/archive/20260717-framework-audit/T03-spec-review-r2.md",
+      "reason": "historical Workspace evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "ff597b5e5739edd8c0a32ef7a07e415f50c66ae8439597bb3359e44e73d36867"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/archive/20260717-framework-audit/T03-spec-review.md",
+      "reason": "historical Workspace evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "08f4fa2fec250c7235d62cf050dd758fb7e6a9d8155182228ebe37c7ab6db798"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/archive/20260717-framework-audit/T04-security-review.md",
+      "reason": "historical Workspace evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "c5f59c52c0f866b0dc33df53a4ba411cdff47a44498713ae2134456835b4b79c"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/archive/20260717-framework-audit/T05-quality-review.md",
+      "reason": "historical Workspace evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "2dfa1076cd9ae5b532890727b6ee355306b5ca91488847005165bceed57cbdbd"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/archive/20260717-framework-audit/T06-ux-review.md",
+      "reason": "historical Workspace evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "b8cf79cf8f5a35a4d97b457cfa769cbd1702f662ebe92ce2376d9102c9395e43"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/archive/20260717-framework-audit/T07-test-report.md",
+      "reason": "historical Workspace evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "27a87c237e308bbe932f4096e1cd8129526478ea95605deb9f50391722aad958"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/archive/20260717-framework-audit/TASK_BOARD.md",
+      "reason": "historical Workspace evidence",
+      "tracked_at_source": true,
+      "tracked_sha256": "93cf8f904c94e6c48625ee1052b93daff46c2da7bc92bacb9e3f9a3faea06f97"
+    },
+    {
+      "decision": "exclude",
+      "dirty_override": true,
+      "path": "docs/decisions/OPEN-DECISIONS.md",
+      "reason": "project runtime projection/decision state",
+      "source": {
+        "kind": "content-addressed-snapshot",
+        "path": ".yuan/extensions/provenance/sources/e77cdb53b29d3a218ad892fd9e9cfb728e349293ab0a1ab880eed6e1b6b3411a.blob"
+      },
+      "source_sha256": "e77cdb53b29d3a218ad892fd9e9cfb728e349293ab0a1ab880eed6e1b6b3411a",
+      "tracked_at_source": false,
+      "tracked_sha256": null
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/events/.gitkeep",
+      "reason": "runtime event journal",
+      "tracked_at_source": true,
+      "tracked_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/events/20260726/events.jsonl",
+      "reason": "runtime event journal",
+      "tracked_at_source": true,
+      "tracked_sha256": "d1be9feb9d51004b95abf5631e0a8b699e6b9a29bb0da25531a90e0e36784583"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": "docs/glossary.md",
+      "reason": "declared normative documentation surface",
+      "source": {
+        "kind": "git",
+        "path": "docs/glossary.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "55463a264cf4b9347e09e2e34ce358e2b38c25578272378da758ae3f180e5e98",
+      "tracked_at_source": true,
+      "tracked_sha256": "55463a264cf4b9347e09e2e34ce358e2b38c25578272378da758ae3f180e5e98"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/graph/.gitkeep",
+      "reason": "repository placeholder/configuration without normative clauses",
+      "tracked_at_source": true,
+      "tracked_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "docs/knowledge/decisions/.gitkeep",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "docs/knowledge/decisions/.gitkeep",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_at_source": true,
+      "tracked_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "docs/knowledge/decisions/ADR-001.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "docs/knowledge/decisions/ADR-001.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "32d7b7788528d62a1bf13a2c453c5c121bf10de9e66570deb304813e88a8902e",
+      "tracked_at_source": true,
+      "tracked_sha256": "32d7b7788528d62a1bf13a2c453c5c121bf10de9e66570deb304813e88a8902e"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "docs/knowledge/features/.gitkeep",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "docs/knowledge/features/.gitkeep",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_at_source": true,
+      "tracked_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "docs/knowledge/modules/.gitkeep",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "docs/knowledge/modules/.gitkeep",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_at_source": true,
+      "tracked_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "docs/knowledge/pitfalls/.gitkeep",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "docs/knowledge/pitfalls/.gitkeep",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_at_source": true,
+      "tracked_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "docs/knowledge/pitfalls/PIT-001-github-ssh.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "docs/knowledge/pitfalls/PIT-001-github-ssh.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "3e81eb4b415ec0ebd7db09331f78fb28e1919bf7acd79f5a097dc702e34b48e5",
+      "tracked_at_source": true,
+      "tracked_sha256": "3e81eb4b415ec0ebd7db09331f78fb28e1919bf7acd79f5a097dc702e34b48e5"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "docs/knowledge/pitfalls/PIT-002-gh-cli-mirror.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "docs/knowledge/pitfalls/PIT-002-gh-cli-mirror.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "97b6fd6ea729bc5368cd9b64b96086b4dd92e6a2b77e0e704ff8422ea3dbdf49",
+      "tracked_at_source": true,
+      "tracked_sha256": "97b6fd6ea729bc5368cd9b64b96086b4dd92e6a2b77e0e704ff8422ea3dbdf49"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "docs/knowledge/pitfalls/PIT-003-docs-template-separation.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "docs/knowledge/pitfalls/PIT-003-docs-template-separation.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "e5d611ff202aa1059d393408ce70675163b9de64a3a6750740080fafc94839bf",
+      "tracked_at_source": true,
+      "tracked_sha256": "e5d611ff202aa1059d393408ce70675163b9de64a3a6750740080fafc94839bf"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "docs/knowledge/pitfalls/PIT-004-optimize-preserve-content.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "docs/knowledge/pitfalls/PIT-004-optimize-preserve-content.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "db2914e16ce8c70969324294c05c5d6d46bc2b82f639cc92226038df972a2d73",
+      "tracked_at_source": true,
+      "tracked_sha256": "db2914e16ce8c70969324294c05c5d6d46bc2b82f639cc92226038df972a2d73"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": "docs/object-model.yaml",
+      "reason": "declared normative documentation surface",
+      "source": {
+        "kind": "git",
+        "path": "docs/object-model.yaml",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "0c70fb3977885517369dcb1f6ae4ed69cd2d251ba581e5c72dd183d91c242a81",
+      "tracked_at_source": true,
+      "tracked_sha256": "0c70fb3977885517369dcb1f6ae4ed69cd2d251ba581e5c72dd183d91c242a81"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": "docs/pitfalls.md",
+      "reason": "declared normative documentation surface",
+      "source": {
+        "kind": "git",
+        "path": "docs/pitfalls.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "8954e0cdc621185db27bfb0a13a875372efb71b49a66efb4fe8fd974f5776b40",
+      "tracked_at_source": true,
+      "tracked_sha256": "8954e0cdc621185db27bfb0a13a875372efb71b49a66efb4fe8fd974f5776b40"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "docsos",
+      "path": "docs/policies/archive-policy.md",
+      "reason": "knowledge/document governance policy",
+      "source": {
+        "kind": "git",
+        "path": "docs/policies/archive-policy.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "1399cbdb779b40705e378c4ee83a2360fd4be9de5ee6f38f0f74ca65fa4d3b99",
+      "tracked_at_source": true,
+      "tracked_sha256": "1399cbdb779b40705e378c4ee83a2360fd4be9de5ee6f38f0f74ca65fa4d3b99"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "docs/policies/merge-policy.md",
+      "reason": "knowledge/document governance policy",
+      "source": {
+        "kind": "git",
+        "path": "docs/policies/merge-policy.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "2f2f5f2b63d875f04c5a36dd62c42670344894005a9aaaec197f87838deb98f5",
+      "tracked_at_source": true,
+      "tracked_sha256": "2f2f5f2b63d875f04c5a36dd62c42670344894005a9aaaec197f87838deb98f5"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "docs/policies/verification-policy.md",
+      "reason": "knowledge/document governance policy",
+      "source": {
+        "kind": "git",
+        "path": "docs/policies/verification-policy.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "dd9dfd4ccf699faefed16b5ddbe7f24f4a279433565badb8d789f4cbae506a69",
+      "tracked_at_source": true,
+      "tracked_sha256": "dd9dfd4ccf699faefed16b5ddbe7f24f4a279433565badb8d789f4cbae506a69"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "docs/policies/write-policy.md",
+      "reason": "knowledge/document governance policy",
+      "source": {
+        "kind": "git",
+        "path": "docs/policies/write-policy.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "794d19cdcc1a433f2b013c98e794a2b638b198f44a526e5d0b44d3784c625230",
+      "tracked_at_source": true,
+      "tracked_sha256": "794d19cdcc1a433f2b013c98e794a2b638b198f44a526e5d0b44d3784c625230"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/proposals/.gitkeep",
+      "reason": "repository placeholder/configuration without normative clauses",
+      "tracked_at_source": true,
+      "tracked_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "testing",
+      "path": "docs/ptg-critical.md",
+      "reason": "declared normative documentation surface",
+      "source": {
+        "kind": "git",
+        "path": "docs/ptg-critical.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "9f1d5fd562ebadc577ba6228dd00039effcb322dd97d9781e48ec7dad7c62af2",
+      "tracked_at_source": true,
+      "tracked_sha256": "9f1d5fd562ebadc577ba6228dd00039effcb322dd97d9781e48ec7dad7c62af2"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/workspace/backlog.md",
+      "reason": "project runtime projection/decision state",
+      "tracked_at_source": true,
+      "tracked_sha256": "92b31b80d1d37c6c2c4845faea2ad6c6de549bb8f2efe0553d91761c3461ef6b"
+    },
+    {
+      "decision": "exclude",
+      "path": "docs/workspace/roadmap.md",
+      "reason": "project runtime projection/decision state",
+      "tracked_at_source": true,
+      "tracked_sha256": "a7c8950e9cba18de6873114f3ef6ebfc3f1414741d6d4d7220bb4877cd6d999f"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "protocols/dispatch-table.md",
+      "reason": "legacy dispatch/output protocol",
+      "source": {
+        "kind": "git",
+        "path": "protocols/dispatch-table.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "2bed618ef9440125dbc3bd26387da0368065d642502f2373c1b082c66fb2f125",
+      "tracked_at_source": true,
+      "tracked_sha256": "2bed618ef9440125dbc3bd26387da0368065d642502f2373c1b082c66fb2f125"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "protocols/task-output.md",
+      "reason": "legacy dispatch/output protocol",
+      "source": {
+        "kind": "git",
+        "path": "protocols/task-output.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "46a3c9a4536b3e253b981f2a4e921401605efaea5a961b3e20fa07a3270b6a3f",
+      "tracked_at_source": true,
+      "tracked_sha256": "46a3c9a4536b3e253b981f2a4e921401605efaea5a961b3e20fa07a3270b6a3f"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/01-standards/code-organization.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/01-standards/code-organization.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "5dc4948a6eda7efb25430614805f4a33393f9e03dd56f8e7e5156eb0b36417d3",
+      "tracked_at_source": true,
+      "tracked_sha256": "5dc4948a6eda7efb25430614805f4a33393f9e03dd56f8e7e5156eb0b36417d3"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/01-standards/context-engineering.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/01-standards/context-engineering.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "da48bfc4c3926ef2bc6c0683495a4179bc7bfefd8bfa4f19bd99c265e06ef06b",
+      "tracked_at_source": true,
+      "tracked_sha256": "da48bfc4c3926ef2bc6c0683495a4179bc7bfefd8bfa4f19bd99c265e06ef06b"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/01-standards/eval-driven-delivery.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/01-standards/eval-driven-delivery.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "04903ee88c4c0c57c952cf384806ea8610b007c1006eb3c922bff0df10680c7c",
+      "tracked_at_source": true,
+      "tracked_sha256": "04903ee88c4c0c57c952cf384806ea8610b007c1006eb3c922bff0df10680c7c"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/01-standards/generated-code-failure-modes.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/01-standards/generated-code-failure-modes.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "7f18f326745b853d841a76b35a744e88aaf183941419c5d3f0a30df39858122a",
+      "tracked_at_source": true,
+      "tracked_sha256": "7f18f326745b853d841a76b35a744e88aaf183941419c5d3f0a30df39858122a"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/01-standards/open-decisions-register.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/01-standards/open-decisions-register.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "490a9d55a444ca27d3523e343abf187e7cbbe3f7c60c670342874915f1a02cd1",
+      "tracked_at_source": true,
+      "tracked_sha256": "490a9d55a444ca27d3523e343abf187e7cbbe3f7c60c670342874915f1a02cd1"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/01-standards/production-readiness-scorecard.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/01-standards/production-readiness-scorecard.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "c708099b0ae6e0f8be7ae72ec89fef78efedff879c9aa6d81fa18686492913b6",
+      "tracked_at_source": true,
+      "tracked_sha256": "c708099b0ae6e0f8be7ae72ec89fef78efedff879c9aa6d81fa18686492913b6"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/01-standards/self-improving-memory.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/01-standards/self-improving-memory.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "1c64d4d721a63f4024f3713aabd1b9d23263c97bed5d968f8411520d4edaf6cb",
+      "tracked_at_source": true,
+      "tracked_sha256": "1c64d4d721a63f4024f3713aabd1b9d23263c97bed5d968f8411520d4edaf6cb"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/01-standards/spec-as-contract.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/01-standards/spec-as-contract.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "8c43bbf585f94a01670c25e30dd831b849feff5adc8307a3ee316f87e895e048",
+      "tracked_at_source": true,
+      "tracked_sha256": "8c43bbf585f94a01670c25e30dd831b849feff5adc8307a3ee316f87e895e048"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/01-standards/test-discipline.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/01-standards/test-discipline.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "7ecf69a72da398523ab789d360aa7e079235213e9e50cc2acb07ec07dd32a602",
+      "tracked_at_source": true,
+      "tracked_sha256": "7ecf69a72da398523ab789d360aa7e079235213e9e50cc2acb07ec07dd32a602"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/01-standards/test-integrity-anti-gaming.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/01-standards/test-integrity-anti-gaming.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "585d77c085599482e164560091cd2f698f0c3af212d97756d41f83f7c20dc5e5",
+      "tracked_at_source": true,
+      "tracked_sha256": "585d77c085599482e164560091cd2f698f0c3af212d97756d41f83f7c20dc5e5"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/01-standards/verifier-critic-pattern.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/01-standards/verifier-critic-pattern.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "9798760204130028ec929aa3519a4ae3ab797d393b5d7a222328b1e489a56c18",
+      "tracked_at_source": true,
+      "tracked_sha256": "9798760204130028ec929aa3519a4ae3ab797d393b5d7a222328b1e489a56c18"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/README.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/README.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "8e0ce7bb671437bf5bed4a75983594e9a19aa378367cb64feeaffaefd02c7fc9",
+      "tracked_at_source": true,
+      "tracked_sha256": "8e0ce7bb671437bf5bed4a75983594e9a19aa378367cb64feeaffaefd02c7fc9"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/architecture/ai-agent-patterns.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/architecture/ai-agent-patterns.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "ac37a55a38ad8cf509235386b16fe413a073dc8f4949d997580a78610077b4f2",
+      "tracked_at_source": true,
+      "tracked_sha256": "ac37a55a38ad8cf509235386b16fe413a073dc8f4949d997580a78610077b4f2"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/architecture/multi-tenant-saas.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/architecture/multi-tenant-saas.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "b6cf755d8828bf4de1c72ddfe429ab115fccbc8408e1bf2f4f11bbd5ecddd0e4",
+      "tracked_at_source": true,
+      "tracked_sha256": "b6cf755d8828bf4de1c72ddfe429ab115fccbc8408e1bf2f4f11bbd5ecddd0e4"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/architecture/mvp-stack.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/architecture/mvp-stack.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "2c9c03a99c8abc0a91e326eee966f0bbdf2d49e18f741bfeec7157d8807d0da2",
+      "tracked_at_source": true,
+      "tracked_sha256": "2c9c03a99c8abc0a91e326eee966f0bbdf2d49e18f741bfeec7157d8807d0da2"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/architecture/rag-knowledge-base.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/architecture/rag-knowledge-base.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "e2979e5f392a8a2a8c68213bba91bc3e20ff027981803b4d5174786f721c450f",
+      "tracked_at_source": true,
+      "tracked_sha256": "e2979e5f392a8a2a8c68213bba91bc3e20ff027981803b4d5174786f721c450f"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/cost-models/development-costs.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/cost-models/development-costs.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "e70c78dd3a476731bfa004d86979358be062c8e412a037890b8c0f4f588babac",
+      "tracked_at_source": true,
+      "tracked_sha256": "e70c78dd3a476731bfa004d86979358be062c8e412a037890b8c0f4f588babac"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/design-systems/color-palettes.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/design-systems/color-palettes.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "a0da7addbae41bd351b6e022da2977dbdbfd7540459585161fa02e8a9fe9bc27",
+      "tracked_at_source": true,
+      "tracked_sha256": "a0da7addbae41bd351b6e022da2977dbdbfd7540459585161fa02e8a9fe9bc27"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/design-systems/design-commands.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/design-systems/design-commands.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "261159bdd47ce025c71ad356ce22b3469198414b84e241e3f305e718ef8fe942",
+      "tracked_at_source": true,
+      "tracked_sha256": "261159bdd47ce025c71ad356ce22b3469198414b84e241e3f305e718ef8fe942"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/design-systems/industry-design-systems.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/design-systems/industry-design-systems.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "279267d442d2874416ef7c76861b08ce8b6467cf689868240e4cdfc412e29e2c",
+      "tracked_at_source": true,
+      "tracked_sha256": "279267d442d2874416ef7c76861b08ce8b6467cf689868240e4cdfc412e29e2c"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/design-systems/landing-patterns.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/design-systems/landing-patterns.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "371638b6d83bb6b10c82593a431e514ea7b18b8cf0e86596b6c645f550c81038",
+      "tracked_at_source": true,
+      "tracked_sha256": "371638b6d83bb6b10c82593a431e514ea7b18b8cf0e86596b6c645f550c81038"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/design-systems/token-standard.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/design-systems/token-standard.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "7e719864903e3436fddd9f5067e93d6600c55eb2fb7f80511e49d50e0b79a7f9",
+      "tracked_at_source": true,
+      "tracked_sha256": "7e719864903e3436fddd9f5067e93d6600c55eb2fb7f80511e49d50e0b79a7f9"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/design-systems/typography-pairings.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/design-systems/typography-pairings.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "d0c9cec061eaa4a330205b332b6cbceca6e327f2a5f85706b655ac0d277253d6",
+      "tracked_at_source": true,
+      "tracked_sha256": "d0c9cec061eaa4a330205b332b6cbceca6e327f2a5f85706b655ac0d277253d6"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/design-systems/ui-styles-library.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/design-systems/ui-styles-library.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "cd06b73f768cb9d2b1c0914c4c1c3e04b96449e12deec36789d749c5b0bc4c24",
+      "tracked_at_source": true,
+      "tracked_sha256": "cd06b73f768cb9d2b1c0914c4c1c3e04b96449e12deec36789d749c5b0bc4c24"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/industries/ai-native.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/industries/ai-native.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "9e141397e2ba2506e5957321462b8d698dd2622fb30d0e1a6ec53ed977997734",
+      "tracked_at_source": true,
+      "tracked_sha256": "9e141397e2ba2506e5957321462b8d698dd2622fb30d0e1a6ec53ed977997734"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/industries/content-platform.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/industries/content-platform.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "c571a9483740da3f57383f676e2eb92f084acf3e26b0b4e56d4fc53f3d688501",
+      "tracked_at_source": true,
+      "tracked_sha256": "c571a9483740da3f57383f676e2eb92f084acf3e26b0b4e56d4fc53f3d688501"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/industries/ecommerce.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/industries/ecommerce.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "ba116d3c464dccc00df3a36469d1461c6a919f0f1188043796d1f7de7e0c1a60",
+      "tracked_at_source": true,
+      "tracked_sha256": "ba116d3c464dccc00df3a36469d1461c6a919f0f1188043796d1f7de7e0c1a60"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/industries/enterprise.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/industries/enterprise.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "0ffb4554b754564955618c9369bd6cdf2680e3ada3353ae43eb54b4cc140492f",
+      "tracked_at_source": true,
+      "tracked_sha256": "0ffb4554b754564955618c9369bd6cdf2680e3ada3353ae43eb54b4cc140492f"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/industries/saas-b2b.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/industries/saas-b2b.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "bfd591cbe2bd3fc7e7fbc94aea45f5f8f3c040f0dba4962b67f55da557f2076b",
+      "tracked_at_source": true,
+      "tracked_sha256": "bfd591cbe2bd3fc7e7fbc94aea45f5f8f3c040f0dba4962b67f55da557f2076b"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/platforms/harmonyos.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/platforms/harmonyos.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "d793f9c1a91a4b3e7d2ac185ca28a7df4d326418a5e47b620ba6aa51bd679434",
+      "tracked_at_source": true,
+      "tracked_sha256": "d793f9c1a91a4b3e7d2ac185ca28a7df4d326418a5e47b620ba6aa51bd679434"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "references/platforms/wechat-miniprogram.md",
+      "reason": "content-addressed advisory knowledge source",
+      "source": {
+        "kind": "git",
+        "path": "references/platforms/wechat-miniprogram.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "dcc97439d5abcbcef89c1b46ade032adf74cc481c8a03b9959d8ad4ca3beb0bd",
+      "tracked_at_source": true,
+      "tracked_sha256": "dcc97439d5abcbcef89c1b46ade032adf74cc481c8a03b9959d8ad4ca3beb0bd"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "fixture",
+      "path": "scripts/bootstrap-core-verifier.py",
+      "reason": "key executable framework script",
+      "source": {
+        "kind": "git",
+        "path": "scripts/bootstrap-core-verifier.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "94a36a178ee8242e850ee9f23b7cafc63906eac8aac2e723ca64225751cdfb40",
+      "tracked_at_source": true,
+      "tracked_sha256": "94a36a178ee8242e850ee9f23b7cafc63906eac8aac2e723ca64225751cdfb40"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "fixture",
+      "path": "scripts/bootstrap_verifier.py",
+      "reason": "key executable framework script",
+      "source": {
+        "kind": "git",
+        "path": "scripts/bootstrap_verifier.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "9ec6ba19fb7a4c2d4e6d654be0bcda3190c38fcd0842ddf8ce17b3996a984119",
+      "tracked_at_source": true,
+      "tracked_sha256": "9ec6ba19fb7a4c2d4e6d654be0bcda3190c38fcd0842ddf8ce17b3996a984119"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "fixture",
+      "path": "scripts/bootstrap_verifier_support.py",
+      "reason": "key executable framework script",
+      "source": {
+        "kind": "git",
+        "path": "scripts/bootstrap_verifier_support.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "d4435acdc60458893c39e7722a801df1418dd634d8330469ecf3c34b8ac5749b",
+      "tracked_at_source": true,
+      "tracked_sha256": "d4435acdc60458893c39e7722a801df1418dd634d8330469ecf3c34b8ac5749b"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "scripts/build-graph.py",
+      "reason": "key executable framework script",
+      "source": {
+        "kind": "git",
+        "path": "scripts/build-graph.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "2f12b306ebf99f4416be59481e6f5fda8006c453e409d90eebd862a14fdc194d",
+      "tracked_at_source": true,
+      "tracked_sha256": "2f12b306ebf99f4416be59481e6f5fda8006c453e409d90eebd862a14fdc194d"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "scripts/distill-pitfall.sh",
+      "reason": "key executable framework script",
+      "source": {
+        "kind": "git",
+        "path": "scripts/distill-pitfall.sh",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "9dff9af75d5ff632b382283940fdef98bbd4cd344633341101211ae8c0976dfa",
+      "tracked_at_source": true,
+      "tracked_sha256": "9dff9af75d5ff632b382283940fdef98bbd4cd344633341101211ae8c0976dfa"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "scripts/pre-commit",
+      "reason": "key executable framework script",
+      "source": {
+        "kind": "git",
+        "path": "scripts/pre-commit",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "16bfb5723715a5373d6863e83d0cfc3841a58ecf972d845a906b3401a74280b4",
+      "tracked_at_source": true,
+      "tracked_sha256": "16bfb5723715a5373d6863e83d0cfc3841a58ecf972d845a906b3401a74280b4"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "testing",
+      "path": "scripts/ptg-cal-gen.py",
+      "reason": "key executable framework script",
+      "source": {
+        "kind": "git",
+        "path": "scripts/ptg-cal-gen.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "31697a52756c7104471294a46c48311ecacfdf979e65f908872d223e871ac418",
+      "tracked_at_source": true,
+      "tracked_sha256": "31697a52756c7104471294a46c48311ecacfdf979e65f908872d223e871ac418"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "knowledge",
+      "path": "scripts/query-graph.py",
+      "reason": "key executable framework script",
+      "source": {
+        "kind": "git",
+        "path": "scripts/query-graph.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "d761d7573b94ececde54f9e4ceb88fc6be2056dcec190f0e7ecbfd0c92bfb67e",
+      "tracked_at_source": true,
+      "tracked_sha256": "d761d7573b94ececde54f9e4ceb88fc6be2056dcec190f0e7ecbfd0c92bfb67e"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "testing",
+      "path": "scripts/run-ptg-cal-check.py",
+      "reason": "key executable framework script",
+      "source": {
+        "kind": "git",
+        "path": "scripts/run-ptg-cal-check.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "8829628a8b7ff0f599d1e9cd0ea7d7d795ac1c07fbfb157d6734903ad06a97de",
+      "tracked_at_source": true,
+      "tracked_sha256": "8829628a8b7ff0f599d1e9cd0ea7d7d795ac1c07fbfb157d6734903ad06a97de"
+    },
+    {
+      "decision": "exclude",
+      "path": "scripts/yuan-provenance.py",
+      "reason": "M7 author tooling; independently verified, not legacy normative input",
+      "tracked_at_source": true,
+      "tracked_sha256": "d65011f6fa2d90bb0f622a8e77a717afac3a7cc64a63a2a1ad9c7850a9bb89e4"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "scripts/yuan-shadow-migrate.py",
+      "reason": "key executable framework script",
+      "source": {
+        "kind": "git",
+        "path": "scripts/yuan-shadow-migrate.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "69f296e598a4c1944af9263ef034e115119e4d6d876a010498cfc421d9318618",
+      "tracked_at_source": true,
+      "tracked_sha256": "69f296e598a4c1944af9263ef034e115119e4d6d876a010498cfc421d9318618"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "scripts/yuan_shadow_migrate.py",
+      "reason": "key executable framework script",
+      "source": {
+        "kind": "git",
+        "path": "scripts/yuan_shadow_migrate.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "eba4bcb55518fed7de5921456a55bc915393c3d84952f1ac179ba509a9033f76",
+      "tracked_at_source": true,
+      "tracked_sha256": "eba4bcb55518fed7de5921456a55bc915393c3d84952f1ac179ba509a9033f76"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "scripts/yuan_shadow_support.py",
+      "reason": "key executable framework script",
+      "source": {
+        "kind": "git",
+        "path": "scripts/yuan_shadow_support.py",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "86e000a050dd17e33fecc9872ee7d99cf3db5f2c199d9070aebdb452938eec0e",
+      "tracked_at_source": true,
+      "tracked_sha256": "86e000a050dd17e33fecc9872ee7d99cf3db5f2c199d9070aebdb452938eec0e"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "fixture",
+      "path": "templates/anti-patterns.md",
+      "reason": "legacy reusable template or fixture",
+      "source": {
+        "kind": "git",
+        "path": "templates/anti-patterns.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "8d709cec181a3be3490728f91a99b5bd56b764c0f458e3807ffca2063212a4bb",
+      "tracked_at_source": true,
+      "tracked_sha256": "8d709cec181a3be3490728f91a99b5bd56b764c0f458e3807ffca2063212a4bb"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "templates/plan-with-dispatch.md",
+      "reason": "legacy reusable template or fixture",
+      "source": {
+        "kind": "git",
+        "path": "templates/plan-with-dispatch.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "1b16e5178cf2b448ffff312dbe66665a8b0ef49c4856a810150e9056a1821452",
+      "tracked_at_source": true,
+      "tracked_sha256": "1b16e5178cf2b448ffff312dbe66665a8b0ef49c4856a810150e9056a1821452"
+    },
+    {
+      "decision": "include",
+      "dirty_override": false,
+      "family": "software-delivery",
+      "path": "templates/role-contract.md",
+      "reason": "legacy reusable template or fixture",
+      "source": {
+        "kind": "git",
+        "path": "templates/role-contract.md",
+        "revision": "c1fd815a85395351e7ebc23e3ff72507326977f2"
+      },
+      "source_sha256": "57f5645b50ff647fac7cc605401197433a4a582c7005222b6ecf1f0e87e52b81",
+      "tracked_at_source": true,
+      "tracked_sha256": "57f5645b50ff647fac7cc605401197433a4a582c7005222b6ecf1f0e87e52b81"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/adapter_conformance/run_m6_old_root.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/adapter_conformance/test_m6_held_out.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "ddf81efffe75f21716f69083bfa6263365af1c836d7e16ed6691207241a7f39f"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/adapter_conformance/test_m6_r1_variants.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "f860b54af71e106537b4f4e0d6bbe0510f6182961d8c1e0c164e9483ff7576c9"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/__init__.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "2707be066624a068f051bc2c11ffd4768dc9d6facc246d7f0cb2583a1eebb764"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/candidates/empty/.gitkeep",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/candidates/known-bad/protocol.md",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "0a04671ee4eaef564821511ddb43f1769ae0d88cdf1024f069bb4996be6200f0"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/candidates/parse-error/protocol.md",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "dd522bb917150758f4d2cdfcc8258260e2285de003fe48404df421b7ca3e3b4f"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/candidates/valid/protocol.md",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "00360adb21b83baacdadc427bef10c683e891de77afa1a0acc904f50b5c4f82c"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/candidates/validator-error/protocol.md",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "9b3df79763917c2d2353f35ce8d517ed009bf05c249f331367dd7a16cc61a9b0"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/candidates/zero-assertions/protocol.md",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "806a374489e96700a3362492357416ac55209764052c8135e2dfd819c494421a"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/manifest.json",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "66f20b3a04050135468209e6ead66f3df258f2faff8dbeb8f76a50c635ad8e55"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/validators/error_validator.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "5f0164c876160d789b428cc38a818f3567aa2ff0a781eb58a21c578168a59ba2"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/validators/known_bad_validator.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "9d1b2ed462a35f4ba62563217c0aa727e4b1fbd8bc40bcacef0ae71e0157635e"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/validators/parse_error_validator.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "cceb43d4806bed3383d704e230c39785f89173c79dee62ca564cc36aa5e80d5d"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/validators/pass_validator.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "50329c65f97895223fc5237f5ffaf1f4932051fcc2aead65df17a83cf1c61de6"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/validators/slow_validator.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "db64904aa2c984a599f01b5ed4210db696b0cce295d58a92796f9d27292d86d0"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/fixtures/author-visible/validators/zero_validator.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "eadfce4bc0b3b58919f4716bb78791b8e53c052a57eec5bc282183802b063c3c"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/test_bootstrap_core_verifier.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "0aa75af352af696c3a9b12b928eab0ae56b824c62c50cf913235882e556e8369"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/test_bootstrap_core_verifier_held_out.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "b2d7feb3ac9a2178d6096c162fe3df288ace8aeae9680ef44c8be1b94d47916c"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/bootstrap_verifier/test_bootstrap_receipt_isolation.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "aa286fa7e7f0ea2cdcf00e5c4c65438981a179b9e270d84356dba23bc46a0755"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/core_01/held_out_validator.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "104bfdef44b77012ab69c83cd414a18269b924fefec647e816951771f97cc4a6"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/core_01/run_m3_bootstrap.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "a262ad8f57ad8581b1303980a51d91e580159fd0fa906703402b9c7dc58b4db6"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/core_01/test_core_candidate_held_out.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "4232dac9fda61dcc3c5f2e2eed83772b846751a0cc0616453bbe4d8e344e36f7"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/core_canary/canary_validator.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "9c509650b0f2a6e746849fc64978f8f630f01091eab1a2874ee4df4d98522a4c"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/core_canary/run_canary.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "74de1fae4f6f33950c035507d74933c5f78d25fc340bfde2adeaf6fcfe391088"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/core_canary/test_canary_work.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "3115354de2284e73ddfe03c147f6db289ce57e5a16e7d1b6e687aaf780445223"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/core_canary/verify_canary.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "b476d18f4ed5030d59dba76644b1840a1edfc01f18ff9279b7c6dbc031dded46"
+    },
+    {
+      "decision": "exclude",
+      "path": "tests/shadow_migration/test_shadow_migration.py",
+      "reason": "executable validation plane, not normative corpus",
+      "tracked_at_source": true,
+      "tracked_sha256": "cd60d503a5ff77ffb43b76f9d49646e6a7367c7b592871845459c7090ebf9d1c"
+    }
+  ],
+  "filesystem_exclusions": [
+    {
+      "path": ".workbuddy/**",
+      "reason": "ignored platform runtime memory"
+    },
+    {
+      "path": ".yuan-shadow/**",
+      "reason": "shadow runtime projection"
+    },
+    {
+      "path": ".yuan-run/**",
+      "reason": "target runtime projection"
+    },
+    {
+      "path": "**/__pycache__/**",
+      "reason": "generated Python cache"
+    },
+    {
+      "path": "docs/graph/index.json",
+      "reason": "generated graph cache"
+    },
+    {
+      "path": ".git/**",
+      "reason": "repository internals"
+    }
+  ],
+  "out_of_band_count": 2,
+  "required_families": {
+    "AGENTS": [
+      "AGENTS.md"
+    ],
+    "README": [
+      "README.md"
+    ],
+    "adapters": [
+      ".yuan/adapters/"
+    ],
+    "contracts": [
+      "contracts/"
+    ],
+    "doc-templates": [
+      ".yuan/docs/"
+    ],
+    "gitignore": [
+      ".gitignore"
+    ],
+    "key-scripts": [
+      "scripts/"
+    ],
+    "knowledge": [
+      "docs/knowledge/",
+      "references/"
+    ],
+    "migration": [
+      ".yuan/migration/"
+    ],
+    "platforms": [
+      ".yuan/platforms/"
+    ],
+    "policies": [
+      "docs/policies/"
+    ],
+    "protocols": [
+      "protocols/"
+    ],
+    "rules": [
+      ".yuan/rules/"
+    ],
+    "skills": [
+      ".yuan/skills/"
+    ],
+    "specs": [
+      ".yuan/specs/"
+    ],
+    "templates": [
+      "templates/"
+    ]
+  },
+  "schema_version": "yuan.provenance-inventory-lock/v1",
+  "source_revision": "c1fd815a85395351e7ebc23e3ff72507326977f2",
+  "source_revision_tracked_count": 294
+}

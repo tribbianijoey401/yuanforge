@@ -1,0 +1,4 @@
+## 用途
+
+Tester 在执行 G3（全量测试 PASS）时，用此 Skill 确保 ptg-critical 标记的模块通过物理环境测试。
+

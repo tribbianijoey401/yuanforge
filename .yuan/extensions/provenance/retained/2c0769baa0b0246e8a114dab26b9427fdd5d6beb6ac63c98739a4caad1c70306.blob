@@ -1,0 +1,35 @@
+def main():
+    parser = argparse.ArgumentParser(description="查询知识图谱")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--module", help="按模块标签查询")
+    group.add_argument("--feature", help="按 Feature ID 查询")
+    group.add_argument("--pitfall", help="按 Pitfall ID 查询")
+    parser.add_argument("--format", choices=["short", "detailed", "json"],
+                        default="short", help="输出格式（默认: short）")
+    parser.add_argument("--graph", default="docs/graph/index.json",
+                        help="图谱文件路径（默认: docs/graph/index.json）")
+    
+    args = parser.parse_args()
+    
+    # 加载图谱
+    graph = load_graph(args.graph)
+    
+    # 执行查询
+    if args.module:
+        results = query_by_module(graph, args.module)
+    elif args.feature:
+        node = query_by_feature(graph, args.feature)
+        results = [node] if node else []
+    elif args.pitfall:
+        edges = query_by_pitfall(graph, args.pitfall)
+        results = edges
+    
+    # 输出结果
+    if args.format == "short":
+        print(format_short(results))
+    elif args.format == "detailed":
+        print(format_detailed(results, graph))
+    elif args.format == "json":
+        print(format_json(results, graph))
+
+

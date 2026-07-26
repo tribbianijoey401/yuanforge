@@ -1,0 +1,7 @@
+### 5.3 Conductor 触发
+
+- Workspace Close 蒸馏后 → 自动运行 build-graph
+- Phase 4 巡检时 → 运行 build-graph → 检查一致性
+
+---
+

@@ -1,0 +1,8 @@
+#### critique — 评审
+
+独立评审产出优先级问题清单，作为 polish 的输入。
+
+- **执行步骤**：解析目标到具体文件或 URL → 双盲双 agent 评估（A 设计评审 / B detector + 浏览器证据，两者隔离直到合成）→ 合成报告（Nielsen 10 启发式 0–4 评分、AI slop 判决、认知负荷、情感旅程、Persona 红旗、P0–P3 优先问题）→ 持久化快照。
+- **检查项**：报告首行声明评估路径（双 agent 还是降级单 context）；具体到元素与交互，不是"某些组件"；每条问题配 Why it matters + Fix + Suggested command。
+- **反模式**：跳过子 agent 直接单线程跑（必须出降级横幅）；detector 与设计评审共享上下文（detector 会锚定判断）；只列问题不给修复方向；软化学术批评。
+

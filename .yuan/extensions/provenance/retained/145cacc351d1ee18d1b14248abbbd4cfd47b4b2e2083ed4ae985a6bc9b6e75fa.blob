@@ -1,0 +1,33 @@
+## 10. Minimal Port
+
+The platform boundary exposes only:
+
+- bounded, stable scoped-file enumeration plus read and atomic
+  compare-and-swap write, all with content hashes;
+- bounded, cancellable command execution without a shell and with a structured
+  receipt;
+- one LLM proposal call through an explicitly bound provider interface.
+
+An unavailable capability is `UNSUPPORTED`, not a semantic fallback. Tool
+receipts include operation id, status, timing, scope/argv, exit state, output
+digests, truncation flags, and before/after hashes where applicable.
+
+Enumeration rejects path escape, symlinks/junctions, non-regular files, and
+count/depth budget overflow. Its receipt is path-sorted and binds every file to
+its SHA-256 and byte size. An LLM call returns a `PROPOSED` receipt binding the
+canonical request, provider/model identity, provider result digest, and the
+proposal; the Port never interprets or executes the proposed action.
+
+Adapter support is declared by a JSON-compatible
+`yuan.adapter-descriptor/v1`. Each required capability is explicit. A
+`supported` adapter binds a versioned executable Port, its SHA-256, and a
+conformance entrypoint. An `unsupported` adapter names the missing executable
+binding and exposes no fallback Port. Platform documentation is not support
+evidence.
+
+Trusting an executable is insufficient: every command binds an invocation
+profile. The reference Python profile accepts only isolated `-c`, rejects
+absolute arguments outside the Port root, and installs an audit sandbox that
+denies filesystem writes, subprocesses, sockets, ctypes, and OS mutation.
+Unprofiled executables are rejected.
+

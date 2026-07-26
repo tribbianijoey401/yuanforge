@@ -1,0 +1,6 @@
+### verified_commit 规则
+
+- 蒸馏时：取当前 `git log -1 --format=%H`
+- 纠正过期知识时：取修正后的 HEAD
+- 如果无法确定 → 留空（但不推荐）
+

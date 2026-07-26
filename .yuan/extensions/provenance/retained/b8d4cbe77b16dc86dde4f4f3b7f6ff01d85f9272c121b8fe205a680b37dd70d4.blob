@@ -1,0 +1,44 @@
+KNOWN_STALE_PATHS = [
+    # 旧版踩坑文件 → knowledge/pitfalls/
+    "docs/pitfalls.md",
+    # .yuan/docs/ 下的旧文件 → 已吸收进 .yuan/specs/
+    ".yuan/docs/RUNTIME_MODEL.md",
+    ".yuan/docs/CAPABILITY.md",
+    ".yuan/docs/OBJECT_MODEL.md",
+    ".yuan/docs/PROMOTION.md",
+    # 旧版 workflows 文件 → 已吸收进 .yuan/specs/workflow-protocol.md
+    ".yuan/docs/workflows.md",
+    # 旧版 action 文件 → 已吸收进 .yuan/specs/action-protocol.md
+    ".yuan/docs/ACTION.md",
+    # 旧版 state 文件 → 已吸收进 .yuan/specs/state-protocol.md
+    ".yuan/docs/STATE.md",
+    # 旧版 object 文件 → 已吸收进 .yuan/specs/object-protocol.md
+    ".yuan/docs/OBJECT.md",
+    # 旧版 adapter 文件 → 已吸收进 .yuan/specs/adapter-protocol.md
+    ".yuan/docs/ADAPTER.md",
+    # 旧版铁律文件 → 已整合进 .yuan/rules/iron-rules.md
+    ".yuan/rules/rule-1.md",
+    ".yuan/rules/rule-2.md",
+    ".yuan/rules/rule-3.md",
+    ".yuan/rules/rule-4.md",
+    ".yuan/rules/rule-5.md",
+    ".yuan/rules/rule-6.md",
+    ".yuan/rules/rule-7.md",
+    ".yuan/rules/rule-8.md",
+    ".yuan/rules/rule-9.md",
+    ".yuan/rules/rule-10.md",
+    # 旧版协议目录 → 已整合进 .yuan/specs/
+    ".yuan/docs/PROTOCOL.md",
+    # 旧版 contracts 命名 → 已改为标准角色名
+    "contracts/lead-developer.md",
+    "contracts/tech-lead.md",
+    "contracts/dev-lead.md",
+    # 旧版 skills
+    ".yuan/skills/audit.md",
+    ".yuan/skills/checklist.md",
+    # 旧版 templates
+    "templates/task-template.md",
+    "templates/plan-template.md",
+    "templates/review-template.md",
+]
+

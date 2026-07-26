@@ -1,0 +1,21 @@
+## 2. Modern Professional 现代专业
+
+- **类别**：Sans + Sans
+- **标题字**：Poppins
+- **正文字**：Open Sans
+- **情绪关键词**：modern、professional、corporate、friendly、approachable
+- **最适用于**：SaaS、企业站、商业应用、初创公司、专业服务
+- **Google Fonts URL**：
+```
+https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap
+```
+- **CSS @import**：
+```css
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+```
+- **Tailwind config**：
+```js
+fontFamily: { heading: ['Poppins', 'sans-serif'], body: ['Open Sans', 'sans-serif'] }
+```
+- **注意事项**：几何 Poppins 配人文 Open Sans，是 B2B SaaS 的"安全牌"。
+

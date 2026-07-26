@@ -1,0 +1,12 @@
+## 与代码审查的区别
+
+| | Design Reviewer | Spec Reviewer |
+|--|-----------------|---------------|
+| **审查对象** | API 契约 + 数据模型 + 架构设计 | 实现代码 |
+| **触发时机** | Dev 编码前（Phase 2.5） | Dev 完成后（Phase 4） |
+| **关注点** | "设计对不对" | "实现对不对" |
+| **打回对象** | Architect | Frontend/Backend Dev |
+
+> **核心原则**：Design Reviewer 确保 Architect 的设计方案没有缺陷，避免 Dev 在错误的设计上浪费时间编码。
+> **跨角色划界**：Design 查"契约/数据模型是否声明了输入验证与权限要求"(spec 层)；Security 查"实现是否落实了"(impl 层)。Design 输出须注"本项将在 Security 实现层复核"。
+

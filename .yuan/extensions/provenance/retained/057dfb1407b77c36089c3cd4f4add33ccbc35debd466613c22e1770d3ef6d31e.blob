@@ -1,0 +1,13 @@
+## 14. 生产力青绿
+
+- **适用行业**：生产力工具、笔记、任务管理
+- **设计意图**：Teal 让人专注，橙 CTA 推动行动
+
+| Primary | #0D9488 | Background | #F0FDFA | Muted | #E8F1F4 |
+|---|---|---|---|---|---|
+| On Primary | #FFFFFF | Foreground | #134E4A | Muted FG | #64748B |
+| Secondary | #14B8A6 | Card | #FFFFFF | Border | #99F6E4 |
+| On Secondary | #0F172A | Card FG | #134E4A | Destructive | #DC2626 |
+| Accent | #EA580C | On Destructive | #FFFFFF | Ring | #0D9488 |
+| On Accent | #FFFFFF | | | | |
+

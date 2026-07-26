@@ -1,0 +1,19 @@
+### 1.2 字段定义
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:---:|------|
+| `id` | string | ✅ | 格式 `T{NN}`，如 T01 |
+| `priority` | enum | ✅ | P0/P1/P2/P3 |
+| `title` | string | ✅ | 人类可读描述 |
+| `role` | enum | ✅ | 12 个角色之一 |
+| `depends_on` | array | ✅ | 依赖的 Task ID 列表，无依赖填 `[]` |
+| `timeout_minutes` | int | ✅ | 超时分钟数 |
+| `output` | array | ✅ | 预期产出文件路径 |
+| `gate` | enum | ✅ | G1/G2/G3/G4 |
+| `risk` | enum | — | R0/R1/R2（Product Analyst 产出） |
+| `acceptance_criteria` | array | — | 验收标准 |
+| `context.required_knowledge` | array | — | 派发时注入的 Knowledge ID |
+| `context.input_from` | array | — | 上游 Task ID（上下文来源） |
+
+---
+

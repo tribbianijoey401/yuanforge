@@ -1,0 +1,5 @@
+## 5. 性能盲区与静默缺失
+
+- **性能**：对热点路径审查 N+1、循环内 IO、缺分页/索引、全量加载、缺超时；至少给出复杂度量级判断，深度见 `development/performance-capacity-complete`。
+- **静默缺失**：漏 import、未使用返回值、未处理 Promise/错误，靠静态检查 + 构建/lint 门拦住（见 `testing/01-standards/ci-test-gates-and-coverage`），不留到运行时。
+

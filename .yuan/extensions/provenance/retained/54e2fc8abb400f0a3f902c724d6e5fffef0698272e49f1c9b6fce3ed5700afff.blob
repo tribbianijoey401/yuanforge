@@ -1,0 +1,13 @@
+# ========== 参数解析 ==========
+if [[ $# -lt 1 ]]; then
+    echo "用法: bash scripts/distill-pitfall.sh <BUG-NNN.md> [--auto]" >&2
+    exit 1
+fi
+
+BUG_FILE="$1"
+AUTO_MODE=false
+
+if [[ "${2:-}" == "--auto" ]]; then
+    AUTO_MODE=true
+fi
+

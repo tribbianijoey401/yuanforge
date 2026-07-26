@@ -1,0 +1,5 @@
+### 字距规则
+- ALL CAPS 文字：letter-spacing ≥ 0.06em
+- 标题：负字距 letter-spacing: -0.02em ~ -0.01em
+- 正文：默认 letter-spacing: 0
+

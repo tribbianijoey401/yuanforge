@@ -1,0 +1,8 @@
+## Consequences
+
+- 文件数 -1（goal-protocol.md 消失）
+- 消除 Human Gate 跨文件定义（根因修复）
+- 质量闸 6 文件零改动
+- 统一 Gate 原语，消除 ad-hoc 闸门
+- conductor.md 保留跨会话恢复/升级路由/Human Gate 执行的角色专属段
+- AGENTS.md 保留一行压缩速览 + 指针（维持平台无关入口的自洽 orientation）

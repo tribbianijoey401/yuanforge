@@ -1,0 +1,52 @@
+## 二、管线总览
+
+```
+Workspace Close
+    │
+    ▼
+┌─────────────────┐
+│ 1. EXTRACT      │  从 Workspace 提取 Candidate
+│    Candidates   │  - FEATURE.md → feature candidate
+│                 │  - ADR-NNN.md → decision candidate
+│                 │  - BUG-NNN.md → pitfall candidate (if repeatable)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ 2. VALIDATE     │  规则验证（确定性）
+│    Candidates   │  - frontmatter 完整性检查
+│                 │  - depends 引用检查
+│                 │  - status 转换合法性
+│                 │  - verified_commit 存在性
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    ▼         ▼
+  PASS       FAIL
+    │         │
+    │         └──→ reject.log（记录原因）
+    ▼
+┌─────────────────┐
+│ 3. PROPOSE      │  自动生成 Proposal
+│    Auto-gen     │  - 从 Candidate 填充 Proposal 模板
+│                 │  - frontmatter 自动映射
+│                 │  - 正文从 Workspace 源文件精简
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ 4. MERGE        │  确定性合并规则
+│    to Knowledge  │  - 无冲突 → 直接写入 knowledge/
+│                 │  - 有冲突（同 ID 已存在）→ 按规则处理
+│                 │  - 写 KNOWLEDGE_UPDATED 事件
+└────────┬────────┘
+         │
+         ▼
+    Knowledge/
+    ├── features/FEAT-NNN.md
+    ├── decisions/ADR-NNN.md
+    └── pitfalls/PIT-NNN.md
+```
+
+---
+

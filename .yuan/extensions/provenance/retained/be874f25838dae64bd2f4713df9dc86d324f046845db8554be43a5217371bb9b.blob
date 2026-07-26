@@ -1,0 +1,5 @@
+FRAMEWORK_FILES = [
+    "AGENTS.md",
+]
+
+# 项目数据目录 — 更新时永不触碰

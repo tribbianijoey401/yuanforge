@@ -1,0 +1,4 @@
+class CASMismatch(PortError):
+    pass
+
+

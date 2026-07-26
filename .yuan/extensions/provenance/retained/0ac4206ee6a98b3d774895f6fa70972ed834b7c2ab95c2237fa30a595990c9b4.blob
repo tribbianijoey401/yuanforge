@@ -1,0 +1,18 @@
+### 3.5 Checkpoint
+
+```
+语义: 保存 Workspace 的完整状态——归档时生成。
+
+输入:
+  - workspace_id: Workspace ID
+  - task_states: 所有 Task 最终状态
+  - knowledge_outputs: 蒸馏产出的 Knowledge ID
+  - git_head: 归档时 commit hash
+
+输出:
+  - Checkpoint 对象
+  - 状态: created → archived
+
+触发: Workspace Close 蒸馏完成后
+```
+

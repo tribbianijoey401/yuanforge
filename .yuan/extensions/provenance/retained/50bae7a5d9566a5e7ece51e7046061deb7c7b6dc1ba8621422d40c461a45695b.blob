@@ -1,0 +1,24 @@
+def bounded_limits(
+    *,
+    max_files: int | None,
+    max_depth: int | None,
+    configured_files: int,
+    configured_depth: int,
+) -> tuple[int, int]:
+    files = configured_files if max_files is None else max_files
+    depth = configured_depth if max_depth is None else max_depth
+    valid_files = (
+        isinstance(files, int)
+        and not isinstance(files, bool)
+        and 0 < files <= configured_files
+    )
+    valid_depth = (
+        isinstance(depth, int)
+        and not isinstance(depth, bool)
+        and 0 <= depth <= configured_depth
+    )
+    if not valid_files or not valid_depth:
+        raise EnumerationLimitExceeded("invalid or expanded enumeration bound")
+    return files, depth
+
+

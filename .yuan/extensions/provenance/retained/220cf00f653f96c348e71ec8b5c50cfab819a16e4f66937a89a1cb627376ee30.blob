@@ -1,0 +1,9 @@
+## 八、生命周期
+
+| 阶段 | 操作 | 执行者 |
+|------|------|--------|
+| Agent 需要修改 Knowledge | 创建 Proposal（draft） | Agent |
+| 确认变更 | draft → submitted | Agent |
+| Conductor 审查 | 验证 + 合并 → merged | Conductor |
+| 不通过 | 打回 → rejected（附原因） | Conductor |
+| 超过 7 天 | submitted → expired | Conductor（自动） |
