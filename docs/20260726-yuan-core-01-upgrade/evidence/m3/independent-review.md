@@ -1,29 +1,36 @@
 # task-006 M3 Independent Core Review
 
-> 被测提交：`56281d8f9ebbb42e4375eabc03dbee1ba2014436`
+> 被测提交：`3df925011ac6d99f62b728ab4b6624d24cf2c6d0`
 > 独立角色：Tester（未参与 task-005 实现）
-> 判决：`FAIL — M3_BLOCKED`
-> held-out：29 checks，28 PASS，1 FAIL，0 skip，0 xfail
-> 旧 bootstrap：M1 regression 31/31 PASS；M3 suite 72 checks，Core case REJECT
+> 判决：`PASS — M3_APPROVED`
+> held-out：30 checks，30 PASS，0 FAIL，0 skip，0 xfail
+> 旧 bootstrap：M1 regression 31/31 PASS；M3 suite 75 checks，7/7 cases matched
 
 ```yaml
-verdict: fail
-blocking:
-  - violation: "M3-B06 — AC-05 与 Mandatory Semantics 7：rebuild 未把 self-mod trust proof 与 artifact/Port scope 纳入投影不变量"
-    evidence: "held-out-result.json 的 rebuild-selfmod-revision-and-port-scope-consistent FAIL；runtime_replay.rebuild 可把 candidate-self verifier 的自修改 revision 归约为 COMPLETE，且 _blocked 把 artifact_binding.scope 硬编码为 `.`"
-    expectation: "受保护 target 的 Attempt 必须携带并验证 previous-root / independent-root / 精确人工授权 proof；replay 缺失 proof 时 BLOCKED；任何 BLOCKED 投影仍须保留当前 Evidence/Reference Port artifact scope"
+verdict: pass
+blocking: []
 advisory: []
 evidence:
   - artifact_ref: "docs/20260726-yuan-core-01-upgrade/evidence/m3/held-out-result.json"
     line: 1
-    note: "独立 29-check 结果；原 28 项全部通过，新增纯数据组合一致性检查失败"
+    note: "独立 30-check PASS；含 16 组固定种子 protected-scope / previous-root mismatch 纯数据变体"
   - artifact_ref: "docs/20260726-yuan-core-01-upgrade/evidence/m3/bootstrap-receipt.json"
     line: 1
-    note: "冻结 M1 verifier 对新 manifest 重绑定 candidate 的 72-check FAIL receipt"
+    note: "冻结 M1 verifier 对新 manifest 重绑定 candidate 的 75-check PASS receipt"
   - artifact_ref: "tests/core_01/held_out_validator.py"
     line: 1
-    note: "未修改 Core、无网络、无外部系统副作用的 self-mod revision + scope replay 检查"
+    note: "独立 held-out；未修改 Core/M1 verifier，无网络与外部系统副作用"
 ```
+
+## r1 历史裁决（M3-B06 已由 r2 关闭）
+
+- r1 原 28 项已通过，但新增
+  `rebuild-selfmod-revision-and-port-scope-consistent` 发现：
+  replay 未强制 self-mod proof，且 BLOCKED scope 被写成 `.`。
+- r2 把 self-mod record 纳入 Attempt schema，在 replay 中核对 protected target、
+  candidate receipt hash 与 previous/independent/human proof，并按
+  Evidence → Attempt → Work 保留 artifact scope。
+- 原检查与 16 组随机变体全部通过，M3-B06 关闭。
 
 ## 首轮历史裁决（M3-B01–B05 已由 r1 关闭）
 
@@ -65,12 +72,12 @@ evidence:
 2. M1 author-visible manifest 仍为
    `66f20b3a04050135468209e6ead66f3df258f2faff8dbeb8f76a50c635ad8e55`。
 3. M1 visible + held-out regression 为 31/31 PASS，0 skip。
-4. 外层 M3 manifest 已由独立 Tester 重绑定 task-005 r1 candidate manifest
-   `659e2da5cc3732d96fb15c6a470a0ca974cc8161c6e31e165c8032cdbbdbd942`、
-   其全部 27 个声明文件、candidate manifest 自身以及独立 validator。
+4. 外层 M3 manifest 已由独立 Tester 重绑定 task-005 r2 candidate manifest
+   `c3d41ac1a056523ad5af4a430e09185f7ab1e732507097ba7546be7f512d72e3`、
+   其全部 29 个声明文件、candidate manifest 自身以及独立 validator。
 5. 旧 verifier 对正常/empty/known-bad/zero/error/parse 六个 Genesis cases
-   的期望全部匹配；仅 `yuan-core-01-candidate` 因 held-out `CHECK_FAILED`
-   被拒绝。candidate 自检没有参与最终裁决。
+   及 `yuan-core-01-candidate` 全部匹配；Core case `ACCEPT`，candidate 自检
+   没有作为独立 Gate 的唯一证据。
 
 ## 场景覆盖
 
@@ -81,11 +88,12 @@ evidence:
 | 失败关闭 | zero assertions、stale artifact、self-attestation、path escape PASS |
 | 卡死 | command timeout 在 1 秒内返回 `TIMED_OUT` receipt，PASS |
 | 副作用崩溃 | `UNKNOWN + SUCCEEDED` 已失败关闭，PASS |
-| 自修改/rebuild | 独立 enforcer 存在，但 replay 未强制调用，Blocker M3-B06 |
-| scope 投影 | BLOCKED rebuild 丢失当前 artifact/Port scope，Blocker M3-B06 |
+| 自修改/rebuild | enforcer 已接入 replay；无 proof、错误 protected kind、错误 previous root 全部 BLOCKED |
+| scope 投影 | COMPLETE/BLOCKED 均保留当前 artifact/Port scope，PASS |
+| 随机变体 | 固定种子 16 组 protected scope / previous-root mismatch 全部 BLOCKED |
 
 ## 路由
 
-- `task-005` 返回 Backend Dev r2，修复 M3-B06。
-- `task-006` 保持阻塞，修复后须原样重跑本 held-out suite 和旧 bootstrap。
-- 不修改 Core 实现，不允许删除/弱化本 held-out 断言。
+- `task-005` r2 接受；M3-B01–M3-B06 全部关闭。
+- `task-006` 完成，M3 Hard Gate PASS。
+- `task-007` 可晋升执行 M4 Shadow conversion 与回退演练。

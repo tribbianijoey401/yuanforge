@@ -175,7 +175,7 @@
       "required_files": [
         {
           "path": "attempt.schema.yaml",
-          "sha256": "c8d84f41df398fff3052e5ef70227828862266004b727fda01f476b086682714"
+          "sha256": "98bff43675cabf103b6507c6241e658ce64578e475c17847a328b22b95e19c2b"
         },
         {
           "path": "authorization_semantics.py",
@@ -203,7 +203,7 @@
         },
         {
           "path": "fixtures/invalid/attempt-invalid-journal.json",
-          "sha256": "3a14af8fd20d6aa3e4fe6c50158dc2ea057ad47f237953c922fc7a0ebcb99951"
+          "sha256": "8867bcf06374f64a7956c631f2f5c35a191bb779dcbd9a82bd371bfa7411a270"
         },
         {
           "path": "fixtures/invalid/evidence-zero-assertions.json",
@@ -219,7 +219,7 @@
         },
         {
           "path": "fixtures/valid/attempt.json",
-          "sha256": "a3ab79bfb9053dd3809ff5ad98727ea6ac55552e82b21afe8011f0385aadd71b"
+          "sha256": "66e5e372384bcca1e8ab4498c356f7179522ea8a10e313b2b794811a38edfc3b"
         },
         {
           "path": "fixtures/valid/evidence.json",
@@ -239,7 +239,7 @@
         },
         {
           "path": "protocol.md",
-          "sha256": "b2c5534616b142a63fcd45805f1f0eb53e342073c7c96f168017f09b7e89a7b6"
+          "sha256": "92678c4345d54b717deff6a30bb538eb00975d3695955395f552a691af4f24ed"
         },
         {
           "path": "reference_port.py",
@@ -250,8 +250,12 @@
           "sha256": "50fa5993ba210e34f7fa4a1b334654f264fedfa87882160e926c80ff045a9c6d"
         },
         {
+          "path": "replay_trust.py",
+          "sha256": "697a4b31fdd2238d885a922cb528062177bcd9ff16dfd271c91e06ec5dcbc3b3"
+        },
+        {
           "path": "runtime_replay.py",
-          "sha256": "052e46b5d4463eab0b91ac212e32be159f6a4108f11c8934afc199bf3914e4fe"
+          "sha256": "6d35f55bcad3ce36ddea33641f43cf488a434efc7cc0fe59a050f1de7f62901d"
         },
         {
           "path": "schema_runtime.py",
@@ -270,6 +274,10 @@
           "sha256": "a0811c0dc54bfcc5850631d981f019fc4383d98946ad69dd216de64f7d860fe9"
         },
         {
+          "path": "tests/test_replay_trust.py",
+          "sha256": "81fffd03cfe9442870d4cb0f123e0bd041bc56ccef63621b8b45ee68c5b9ff1d"
+        },
+        {
           "path": "tests/test_trust_gaps.py",
           "sha256": "891679fb6507d4c11946b17815bd76af0e61a38cd599049e9d717030f97a611c"
         },
@@ -283,7 +291,7 @@
         },
         {
           "path": "candidate-manifest.json",
-          "sha256": "659e2da5cc3732d96fb15c6a470a0ca974cc8161c6e31e165c8032cdbbdbd942"
+          "sha256": "c3d41ac1a056523ad5af4a430e09185f7ab1e732507097ba7546be7f512d72e3"
         }
       ],
       "validator": {
@@ -295,7 +303,7 @@
         "trusted_files": [
           {
             "path": "validators/m3_held_out_validator.py",
-            "sha256": "65f6c79df4e7648511da8fd4db90d191b470a4a3d81747df90993b06f54526b5"
+            "sha256": "104bfdef44b77012ab69c83cd414a18269b924fefec647e816951771f97cc4a6"
           }
         ],
         "timeout_seconds": 20

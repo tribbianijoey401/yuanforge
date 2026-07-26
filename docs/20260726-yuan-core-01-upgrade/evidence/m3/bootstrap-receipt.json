@@ -1,15 +1,13 @@
 {
   "schema_version": "yuan.bootstrap-receipt/v1",
   "verifier_revision": "yuan.bootstrap-verifier/1",
-  "created_at": "2026-07-26T15:23:17.851427+00:00",
-  "manifest_path": "C:\\Users\\guangchuan\\AppData\\Local\\Temp\\yuan-m3-bootstrap-8avxr42c\\manifest.json",
-  "manifest_sha256": "a7b5d48cb8e16954eed1a180ba58cfcbf2911bb3db271660e6d8ac66015697fe",
+  "created_at": "2026-07-26T15:38:34.197380+00:00",
+  "manifest_path": "C:\\Users\\guangchuan\\AppData\\Local\\Temp\\yuan-m3-bootstrap-gxqs8gqp\\manifest.json",
+  "manifest_sha256": "6598f2ad6630814f6ef29a279c00e5023711105db5beb66bbb80e28f7a42748c",
   "suite_id": "m3-old-root-verifies-yuan-core-01",
-  "status": "FAIL",
-  "reason_codes": [
-    "SUITE_EXPECTATION_MISMATCH"
-  ],
-  "checks_executed": 72,
+  "status": "PASS",
+  "reason_codes": [],
+  "checks_executed": 75,
   "cases": [
     {
       "id": "valid",
@@ -90,7 +88,7 @@
       "validator": {
         "exit_code": 1,
         "assertions": 0,
-        "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\guangchuan\\AppData\\Local\\Temp\\yuan-m3-bootstrap-8avxr42c\\validators\\error_validator.py\", line 1, in <module>\n    raise RuntimeError(\"author-visible validator failure\")\nRuntimeError: author-visible validator failure\n"
+        "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\guangchuan\\AppData\\Local\\Temp\\yuan-m3-bootstrap-gxqs8gqp\\validators\\error_validator.py\", line 1, in <module>\n    raise RuntimeError(\"author-visible validator failure\")\nRuntimeError: author-visible validator failure\n"
       }
     },
     {
@@ -114,16 +112,14 @@
       "id": "yuan-core-01-candidate",
       "negative_class": null,
       "expected": "ACCEPT",
-      "observed": "REJECT",
-      "matched": false,
-      "reason_codes": [
-        "CHECK_FAILED"
-      ],
-      "candidate_sha256": "bdbf05223285a67c4dc810bd4fefe73c27e15bc6c64bf99088fdd81dc5d2648a",
-      "checks_executed": 58,
+      "observed": "ACCEPT",
+      "matched": true,
+      "reason_codes": [],
+      "candidate_sha256": "bcd1abafe32f8d15bd087e789ac6a00208f44bf76aa01bdfbb48420b0f58693c",
+      "checks_executed": 61,
       "validator": {
         "exit_code": 0,
-        "assertions": 29,
+        "assertions": 30,
         "stderr": ""
       }
     }

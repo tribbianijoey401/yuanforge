@@ -1,10 +1,10 @@
 {
   "schema_version": "yuan.test-evidence/v1",
   "task_id": "task-006",
-  "subject_commit": "56281d8f9ebbb42e4375eabc03dbee1ba2014436",
-  "created_at": "2026-07-26T23:23:42.2701250+08:00",
+  "subject_commit": "3df925011ac6d99f62b728ab4b6624d24cf2c6d0",
+  "created_at": "2026-07-26T23:38:46.9504940+08:00",
   "tester_role": "independent-tester",
-  "status": "FAIL_M3_BLOCKED",
+  "status": "PASS",
   "commands": [
     {
       "command": "python -B -m unittest discover -s tests/bootstrap_verifier -p 'test_*.py' -v",
@@ -15,26 +15,26 @@
     },
     {
       "command": "python -B -m unittest discover -s .yuan/core/0.1/tests -p 'test_*.py' -v",
-      "tests_run": 25,
-      "passed": 25,
+      "tests_run": 27,
+      "passed": 27,
       "failed": 0,
       "skipped": 0
     },
     {
       "command": "python -B tests/core_01/held_out_validator.py .yuan/core/0.1",
-      "checks_run": 29,
-      "passed": 28,
-      "failed": 1,
+      "checks_run": 30,
+      "passed": 30,
+      "failed": 0,
       "skipped": 0,
       "receipt": "held-out-result.json"
     },
     {
       "command": "python -B tests/core_01/run_m3_bootstrap.py",
-      "status": "FAIL_EXPECTED_FOR_REJECTED_CANDIDATE",
-      "checks_executed": 72,
-      "genesis_cases_matched": 6,
-      "core_candidate_observed": "REJECT",
-      "reason": "CHECK_FAILED",
+      "status": "PASS",
+      "checks_executed": 75,
+      "genesis_cases_matched": 7,
+      "core_candidate_observed": "ACCEPT",
+      "reason": null,
       "receipt": "bootstrap-receipt.json"
     }
   ],
@@ -42,25 +42,24 @@
     "scripts/bootstrap-core-verifier.py": "94a36a178ee8242e850ee9f23b7cafc63906eac8aac2e723ca64225751cdfb40",
     "scripts/bootstrap_verifier.py": "9ec6ba19fb7a4c2d4e6d654be0bcda3190c38fcd0842ddf8ce17b3996a984119",
     "scripts/bootstrap_verifier_support.py": "d4435acdc60458893c39e7722a801df1418dd634d8330469ecf3c34b8ac5749b",
-    ".yuan/core/0.1/candidate-manifest.json": "659e2da5cc3732d96fb15c6a470a0ca974cc8161c6e31e165c8032cdbbdbd942",
-    "tests/core_01/held_out_validator.py": "65f6c79df4e7648511da8fd4db90d191b470a4a3d81747df90993b06f54526b5",
-    "tests/core_01/run_m3_bootstrap.py": "3ef849d9f46766497e3673aa801b0409fdf2b97548d9c8107e81dda38061efac",
-    "bootstrap-manifest.json": "a7b5d48cb8e16954eed1a180ba58cfcbf2911bb3db271660e6d8ac66015697fe",
-    "bootstrap-receipt.json": "83a199f5dfae5f1489ff23a5f5091d7715bab952b1150632eea17c730794f729",
-    "held-out-result.json": "74b93e9df5bf0c0cc89c641ac1f9db844e4eacb5bfaddd9376cfeebab0c34ab2"
+    ".yuan/core/0.1/candidate-manifest.json": "c3d41ac1a056523ad5af4a430e09185f7ab1e732507097ba7546be7f512d72e3",
+    "tests/core_01/held_out_validator.py": "104bfdef44b77012ab69c83cd414a18269b924fefec647e816951771f97cc4a6",
+    "tests/core_01/run_m3_bootstrap.py": "4fe176a9668700399b6a23dadb72a217f17dcfab50b11befff3574e921563e3b",
+    "bootstrap-manifest.json": "6598f2ad6630814f6ef29a279c00e5023711105db5beb66bbb80e28f7a42748c",
+    "bootstrap-receipt.json": "f17f168acf97d7d21c68b9aef21bd26d86d41607834b45618950c70df186b3d2",
+    "held-out-result.json": "86074b741c35c602aeb59a015b177efa4979648c3f665a994f516ce7e24f55ca"
   },
-  "blocking_groups": [
-    "M3-B06_REBUILD_SELF_MOD_AND_SCOPE_INCONSISTENT"
-  ],
+  "blocking_groups": [],
   "anti_gaming": {
     "candidate_implementation_modified": false,
     "candidate_author_tests_used_as_gate": false,
     "old_bootstrap_verifier_modified": false,
-    "task_005_r1_touched_held_out_or_gate": false,
-    "original_28_held_out_checks_passed": true,
+    "task_005_r2_touched_held_out_or_gate": false,
+    "original_29_held_out_checks_passed": true,
+    "randomized_variants": 16,
     "held_out_was_author_invisible": true,
     "assertions_weakened": false,
     "skip_or_xfail_added": false
   },
-  "gate": "M3_FAIL_RETURN_TASK_005_R2"
+  "gate": "M3_PASS_PROMOTE_TASK_007"
 }

@@ -1,7 +1,7 @@
 {
   "schema_version": "yuan.validator-result/v1",
-  "status": "FAIL",
-  "assertions": 29,
+  "status": "PASS",
+  "assertions": 30,
   "checks": [
     {
       "id": "five-primitives-and-six-results",
@@ -69,7 +69,11 @@
     },
     {
       "id": "rebuild-selfmod-revision-and-port-scope-consistent",
-      "status": "FAIL"
+      "status": "PASS"
+    },
+    {
+      "id": "randomized-protected-scope-and-previous-root-mismatch-blocked",
+      "status": "PASS"
     },
     {
       "id": "six-result-priority-is-mutually-exclusive",
@@ -203,8 +207,13 @@
     },
     {
       "id": "rebuild-selfmod-revision-and-port-scope-consistent",
-      "status": "FAIL",
-      "observation": "expected invariant was violated"
+      "status": "PASS",
+      "observation": "expected invariant held"
+    },
+    {
+      "id": "randomized-protected-scope-and-previous-root-mismatch-blocked",
+      "status": "PASS",
+      "observation": "expected invariant held"
     },
     {
       "id": "six-result-priority-is-mutually-exclusive",
@@ -268,5 +277,5 @@
     }
   ],
   "producer": "task-006-independent-held-out",
-  "created_at": "2026-07-26T15:23:17.311156+00:00"
+  "created_at": "2026-07-26T15:38:33.119582+00:00"
 }

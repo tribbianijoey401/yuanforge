@@ -14,6 +14,7 @@ import hashlib
 import importlib
 import json
 import pathlib
+import random
 import sys
 import tempfile
 from datetime import datetime, timezone
@@ -369,6 +370,123 @@ def _semantic_checks(candidate: pathlib.Path) -> list[dict[str, str]]:
         checks,
         "rebuild-selfmod-revision-and-port-scope-consistent",
         rebuild_self_modification_and_scope_are_consistent,
+    )
+
+    def randomized_protected_scope_and_previous_root_mismatches_block() -> bool:
+        protected_attempt = copy.deepcopy(baseline_attempt)
+        protected_evidence = copy.deepcopy(evidence)
+        receipt = {
+            "schema_version": "yuan.tool-receipt/v1",
+            "kind": "file-write",
+            "operation_id": "OP-randomized-self-mod",
+            "status": "REPLACED",
+            "path": ".yuan/core/0.1",
+            "before_sha256": "1" * 64,
+            "after_sha256": "2" * 64,
+        }
+        verifier = work["acceptance_criteria"][0]["verifier_binding"]
+        previous = {key: verifier[key] for key in ("id", "revision", "sha256")}
+        candidate_binding = {
+            "id": "yuan-core",
+            "revision": "0.2-randomized",
+            "sha256": receipt["after_sha256"],
+        }
+        protected_attempt["action"].update(
+            {
+                "type": "file-write",
+                "mutating": True,
+                "side_effect_class": "filesystem",
+                "authorization_grant_id": "GRANT-core-candidate",
+                "scope": receipt["path"],
+                "self_modification": {
+                    "change": {
+                        "target_kind": "core",
+                        "candidate_binding": candidate_binding,
+                        "previous_binding": previous,
+                        "risk": "R0",
+                    },
+                    "proofs": [
+                        {
+                            "kind": "previous-root",
+                            "root_binding": previous,
+                            "candidate_binding": candidate_binding,
+                            "status": "PASS",
+                            "assertions": 1,
+                        }
+                    ],
+                },
+            }
+        )
+        receipt_digest = conformance.canonical_digest(receipt)
+        protected_attempt["journal"] = [
+            {
+                "ordinal": ordinal,
+                "state": state,
+                "recorded_at": f"2026-07-26T14:5{ordinal}:00+00:00",
+                "receipt_sha256": (
+                    receipt_digest if state in {"OBSERVED", "COMMITTED"} else None
+                ),
+            }
+            for ordinal, state in enumerate(
+                ("PREPARED", "EXECUTING", "OBSERVED", "COMMITTED"), start=1
+            )
+        ]
+        protected_attempt["side_effect_state"] = "COMMITTED"
+        protected_attempt["tool_receipt"] = receipt
+        protected_attempt["postcondition"] = {
+            "scope": receipt["path"],
+            "observed_sha256": receipt["after_sha256"],
+            "satisfied": True,
+        }
+        protected_attempt["outcome"] = "SUCCEEDED"
+        kwargs = {
+            "current_artifact_sha256": protected_evidence["artifact_binding"]["sha256"],
+            "environment_id": protected_evidence["environment_binding"]["id"],
+            "environment_fingerprint": protected_evidence["environment_binding"][
+                "fingerprint"
+            ],
+            "trusted_now": datetime(2026, 7, 26, 15, 0, tzinfo=timezone.utc),
+        }
+        baseline = conformance.rebuild_run_memory(
+            work, [protected_attempt], [protected_evidence], **kwargs
+        )
+        if baseline["last_result"] != "COMPLETE":
+            return False
+        generator = random.Random(20260726)
+        protected_scopes = [
+            ".yuan/protocol/next",
+            ".yuan/harness/next",
+            ".yuan/validator/next",
+            ".yuan/authority/current",
+        ]
+        for index in range(16):
+            variant = copy.deepcopy(protected_attempt)
+            record = variant["action"]["self_modification"]
+            if index % 2 == 0:
+                scope = generator.choice(protected_scopes)
+                variant["action"]["scope"] = scope
+                variant["tool_receipt"]["path"] = scope
+                variant["postcondition"]["scope"] = scope
+                digest = conformance.canonical_digest(variant["tool_receipt"])
+                for entry in variant["journal"]:
+                    if entry["state"] in {"OBSERVED", "COMMITTED"}:
+                        entry["receipt_sha256"] = digest
+            else:
+                key = generator.choice(("id", "revision", "sha256"))
+                record["proofs"][0]["root_binding"][key] = (
+                    "0" * 64 if key == "sha256" else f"mismatch-{index}"
+                )
+            result = conformance.rebuild_run_memory(
+                work, [variant], [protected_evidence], **kwargs
+            )
+            if result["last_result"] != "BLOCKED":
+                return False
+        return True
+
+    _check(
+        checks,
+        "randomized-protected-scope-and-previous-root-mismatch-blocked",
+        randomized_protected_scope_and_previous_root_mismatches_block,
     )
 
     base_signals = {
