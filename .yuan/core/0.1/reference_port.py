@@ -14,14 +14,16 @@ from datetime import datetime, timezone
 from typing import Any, Sequence
 
 from command_sandbox import PYTHON_PROFILE, prepare_command
+from port_enumeration import bounded_limits, configured_limits, enumerate_bounded
+from port_proposal import build_proposal_receipt
 from port_types import (
     CASMismatch,
     CancellationToken,
     CommandReceipt,
     CommandRejected,
+    FileEnumerationReceipt,
     FileReadReceipt,
     FileWriteReceipt,
-    PortError,
     ProposalProvider,
     ScopeViolation,
     UnsupportedCapability,
@@ -54,12 +56,17 @@ class ReferencePort:
         max_output_bytes: int,
         proposal_provider: ProposalProvider | None = None,
         command_profiles: dict[str, str] | None = None,
+        max_enumeration_files: int = 10_000,
+        max_enumeration_depth: int = 32,
     ) -> None:
         self.root = pathlib.Path(root).resolve(strict=True)
         if not self.root.is_dir() or _is_link_or_junction(self.root):
             raise ScopeViolation("root must be a real directory")
         if max_command_seconds <= 0 or max_output_bytes <= 0:
             raise ValueError("command and output bounds must be positive")
+        enumeration_bounds = configured_limits(
+            max_enumeration_files, max_enumeration_depth
+        )
         self.allowed_executables = {
             os.path.normcase(str(pathlib.Path(item).resolve(strict=True)))
             for item in allowed_executables
@@ -74,6 +81,7 @@ class ReferencePort:
                 self.command_profiles.setdefault(executable, PYTHON_PROFILE)
         self.max_command_seconds = float(max_command_seconds)
         self.max_output_bytes = int(max_output_bytes)
+        self.max_enumeration_files, self.max_enumeration_depth = enumeration_bounds
         self.proposal_provider = proposal_provider
         self._write_lock = threading.Lock()
 
@@ -114,6 +122,26 @@ class ReferencePort:
             size_bytes=len(data),
             data=data,
             observed_at=_utc_now(),
+        )
+
+    def enumerate_files(
+        self,
+        relative: str,
+        *,
+        max_files: int | None = None,
+        max_depth: int | None = None,
+    ) -> FileEnumerationReceipt:
+        files, depth = bounded_limits(
+            max_files=max_files,
+            max_depth=max_depth,
+            configured_files=self.max_enumeration_files,
+            configured_depth=self.max_enumeration_depth,
+        )
+        return enumerate_bounded(
+            root=self.root,
+            scope=self._resolve(relative, allow_missing=False),
+            max_files=files,
+            max_depth=depth,
         )
 
     def atomic_write(
@@ -289,7 +317,4 @@ class ReferencePort:
     def propose(self, request: dict[str, Any]) -> dict[str, Any]:
         if self.proposal_provider is None:
             raise UnsupportedCapability("no LLM proposal provider is bound")
-        result = self.proposal_provider.propose(request)
-        if not isinstance(result, dict):
-            raise PortError("proposal provider returned an unstructured result")
-        return result
+        return build_proposal_receipt(self.proposal_provider, request)

@@ -27,6 +27,10 @@ class UnsupportedCapability(PortError):
     pass
 
 
+class EnumerationLimitExceeded(PortError):
+    pass
+
+
 class ProposalProvider(Protocol):
     def propose(self, request: dict[str, Any]) -> dict[str, Any]: ...
 
@@ -67,6 +71,26 @@ class FileWriteReceipt:
     after_sha256: str
     size_bytes: int
     committed_at: str
+
+
+@dataclass(frozen=True)
+class EnumeratedFile:
+    path: str
+    sha256: str
+    size_bytes: int
+
+
+@dataclass(frozen=True)
+class FileEnumerationReceipt:
+    schema_version: str
+    kind: str
+    operation_id: str
+    status: str
+    scope: str
+    entries: tuple[EnumeratedFile, ...]
+    max_files: int
+    max_depth: int
+    observed_at: str
 
 
 @dataclass(frozen=True)

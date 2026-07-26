@@ -2,7 +2,7 @@
 
 > 会话: 20260726-yuan-core-01-upgrade
 > 创建: 2026-07-26 18:30 +08:00
-> 最后更新: 2026-07-27 00:42 +08:00
+> 最后更新: 2026-07-27 00:54 +08:00
 
 ## 当前状态快照
 
@@ -10,7 +10,7 @@
 |----|-----|
 | **已验证实现 HEAD** | `b8e518ebb985a3861af269c132aa04d1f299f7ac` |
 | **原始 Git 脏文件** | 8 tracked modified + 2 untracked；已由 `evidence/m0a/` 保护 |
-| **活跃 Agent** | task-009 M6 Hard Gate 阻塞；task-005-r4 待 Backend Dev 修复；task-010 可并行 |
+| **活跃 Agent** | task-005-r4 作者回归通过；task-009 待独立复测及旧根重绑定；task-010 可并行 |
 | **当前 authority** | 旧 YuanForge 文档运行态；新 Core 尚未接管 |
 | **最后 Conductor 巡检** | 2026-07-26 18:34 +08:00 |
 
@@ -53,6 +53,7 @@
 | 00:28 | task-005-r3 | task-008-r1 | BLOCKED replay 现从合法 immutable Attempt 重建 `{attempt_id,state}` pending 指针；digest 不可信时 phase 降级 UNKNOWN | 30/30 author、52/52 self-check、M3 1/1、M5 canary 10/10、M1 31/31 PASS；新 manifest SHA-256 `d3e0f536428c7315f96b6546b4f728055c162cff16e80d00d3b5d5db378ea4fc` |
 | 00:34 | task-008-r1 | task-009 | r3 未修改 Canary Gate；原 10 项与 3 项普通数据变体全绿，旧 Genesis root 接受新 candidate | 13/13 M5、31/31 M1、30/30 Core、1/1 M3、77-check old-root、10/10 M4 PASS |
 | 00:42 | task-009 | task-005-r4 | M6 held-out 首轮 1/5 PASS；Reference Port 缺枚举/LLM receipt，manual/Hermes 缺 Core descriptor | `evidence/m6/held-out-initial.json`；M6-B01–B04 路由 backend-dev；Hermes 可诚实 unsupported |
+| 00:54 | task-005-r4 | task-009-r1 | M6-B01–B04 已封闭：有界稳定枚举与文件哈希、纯提案结构化回执、manual 可执行 descriptor、Hermes 诚实 unsupported | 35/35 author、55-check self-check、M6 5/5、M1 31/31、M3 held-out 30/30、M4 10/10、M5 1/1 PASS；manifest `20ac1cbb7f2377d5cecadf3347a40d81e14e8469c6c914701f585a49903d9768`，旧根冻结哈希待 Tester 独立重绑定 |
 
 ## 故障记录
 
@@ -70,7 +71,7 @@
 | 任务 | 次数 | 原因 | 审查人 |
 |------|------|------|--------|
 | task-003 | 2 | r1 修复三项初始 Blocker；r2 将 receipt 隔离前移到 manifest 信任之前，封闭 hash-tamper + receipt-collision 组合攻击 | Tester |
-| task-005 | 3 | r1 封闭 B01–B05；r2 强制 replay trust proof/修复 BLOCKED scope；r3 修复 UNKNOWN pending 原子指针并由 M5 独立复测通过 | Tester |
+| task-005 | 4 | r1 封闭 B01–B05；r2 强制 replay trust proof/修复 BLOCKED scope；r3 修复 UNKNOWN pending 原子指针；r4 封闭 M6 Adapter B01–B04 | Tester |
 | task-009 | 1 | M6 首轮发现 B01–B04，路由 task-005-r4；held-out 需原样复测 | Tester |
 
 ## 阻塞
@@ -115,6 +116,7 @@
 | 00:28 | task-005-r3 完成 → task-008-r1 复测 | tester | M5-B01 author 与原样 canary 均绿；由 Tester 更新独立证据与 Gate 判决 |
 | 00:34 | task-008-r1 完成 → promote task-009 | tester | M5 Hard Gate PASS；M6 Adapter conformance 可派发 |
 | 00:42 | task-009 阻塞 → return task-005-r4 | backend-dev | 保持 held-out 原样；补齐 Reference Port enumerate/LLM receipt 与 manual/Hermes Core descriptor |
+| 00:54 | task-005-r4 完成 → task-009-r1 复测 | tester | 作者与原样 M6/M1/M3/M4/M5 回归均绿；冻结 M3 runner 的 candidate-manifest 哈希须由 Tester 独立重绑定 |
 
 ## 派发日志
 
@@ -137,3 +139,4 @@
 | 00:28 | task-005-r3 | Tier 1 | backend-dev | ✅ M5-B01 修复完成；author 30/30、自检 52/52、M3/M5/M1 全绿 |
 | 00:34 | task-008-r1 | Tier 1 | tester | ✅ M5 13/13、旧根 77 checks / 7 cases、全回归与原 dirty hash 全绿 |
 | 00:42 | task-009 | Tier 1 | tester | ❌ M6 Hard Gate：5 项同轨 trace 1 PASS / 4 FAIL；M6-B01–B04 路由 backend-dev |
+| 00:54 | task-005-r4 | Tier 1 | backend-dev | ✅ M6-B01–B04 修复完成；author 35/35、自检 55/55、M6 5/5、M1/M3/M4/M5 回归全绿；待独立 Tester 复测与旧根重绑定 |
