@@ -107,3 +107,55 @@ advisory: []
 route: backend-dev
 gate: M6_BLOCKED
 ```
+
+## r1 独立复测
+
+> 被测修复：`9370d7fc992a0d8bf51ee7f898e556abec0b277a`
+>
+> 最终判定：`PASS — M6 Hard Gate`
+
+完整性 diff 证明 task-005-r4 没有修改首轮
+`test_m6_held_out.py`、M3/M4/M5 独立测试或门禁。原样 M6 五项从
+`1/5` 恢复为 `5/5 PASS`。
+
+独立 Tester 在实现完成后另加三组普通边界变体：
+
+1. enumeration 不能扩大 Port 配置的 count/depth 预算，溢出与
+   symlink/junction traversal 都失败关闭；
+2. malformed proposal 与 provider exception 不产生成功 receipt，也不
+   执行 proposal 中的动作；
+3. manual descriptor 的 hash drift 和 escaping executable path 被拒绝；
+   Hermes 显式 unsupported 且 Core candidate 不依赖它。
+
+最终回归：
+
+```text
+M6 independent:       8/8 PASS
+Core author:         35/35 PASS
+M1 bootstrap:        31/31 PASS
+M3 held-out:         30/30 PASS
+old Genesis root:    80 checks / 7 cases PASS
+M4 shadow migration: 10/10 PASS
+M5 Canary:             1/1 PASS（内部 13-check Gate）
+M0a original dirty:  10/10 SHA-256 PASS
+```
+
+manual 的 executable Port SHA-256 与实际
+`.yuan/core/0.1/reference_port.py` 相等。Hermes 没有可执行 Core Port，
+因此 `status: unsupported` 是通过 conformance 的诚实结果，而不是被
+静默降级为 manual。
+
+机器证据见 [`final-verification.json`](./final-verification.json) 与
+[`old-root-receipt.json`](./old-root-receipt.json)。
+
+```yaml
+verdict: pass
+blocking: []
+advisory: []
+resolved:
+  - M6-B01
+  - M6-B02
+  - M6-B03
+  - M6-B04
+gate: M6_PASS
+```

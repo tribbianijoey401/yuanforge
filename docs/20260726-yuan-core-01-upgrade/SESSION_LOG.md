@@ -18,7 +18,8 @@
 | task-006 | ✅ 完成 | M3 旧信任根接受 r2 candidate | 30/30 held-out、27/27 author、31/31 M1、75-check bootstrap 全部 PASS | `tests/core_01/`, `evidence/m3/` | 本提交 |
 | task-007 | ✅ 完成 | M4 Shadow conversion 与回退演练 | 单向只读 legacy→shadow；Core 重建、writer guard 与无损 rollback 全绿 | `scripts/yuan-shadow-migrate.py`, `evidence/m4/` | 本提交 |
 | task-008 | ✅ 完成 | M5 Canary Work 经 r3 修复后通过独立复测 | 原 10 项 + 3 项普通数据变体全绿；旧 Genesis root 接受新 candidate | `evidence/m5/` | 本提交 |
-| task-009–task-013 | ⏳ 等待 | M6 Adapter conformance 至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
+| task-009 | ✅ 完成 | M6 Adapter conformance | manual executable mapping + Hermes honest unsupported；旧根与独立变体通过 | `evidence/m6/` | 本提交 |
+| task-010–task-013 | ⏳ 等待 | M7 Extensions 至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
 
 ## 现场保护
 
@@ -85,6 +86,18 @@
 - 新 candidate manifest `d3e0f536...ea4fc` 经旧 Genesis root
   77 checks / 7 cases 接受；M1 31/31、Core 30/30、M3 1/1、M4 10/10
   与 M0a 原 dirty 10/10 hash 全部通过。task-009 可派发。
+- task-009 M6 首轮以同一套 filesystem/command/LLM/unsupported trace
+  检查 Reference Port 与 manual/Hermes 映射，5 项中 1 PASS / 4 FAIL；
+  建立 M6-B01–B04 并返回 task-005-r4，未用旧平台文档替代可执行证据。
+- task-005-r4 未修改首轮 held-out，补齐 bounded enumeration、proposal
+  receipt、manual executable descriptor，并将无 executable Core Port 的
+  Hermes 明确标为 unsupported。
+- task-009-r1 原样复测 5/5，加三组 enumeration budget/link、provider
+  failure、descriptor hash drift/escape 普通变体，共 8/8 PASS。
+  旧 Genesis root 重绑定新 candidate manifest
+  `20ac1cbb...d9768` 后 80 checks / 7 cases PASS；M1 31/31、Core 35/35、
+  M3 30/30、M4 10/10、M5 1/1（内部 13-check）及 M0a dirty 10/10
+  全绿。M6-B01–B04 关闭，task-009 完成。
 
 ## 决策
 
@@ -115,4 +128,7 @@
 - `evidence/m3/`
 - `evidence/m5/`
 - `tests/core_canary/`
+- `tests/adapter_conformance/`
+- `.yuan/adapters/`
+- `evidence/m6/`
 - `docs/events/20260726/events.jsonl`

@@ -2,15 +2,15 @@
 
 > 会话: 20260726-yuan-core-01-upgrade
 > 创建: 2026-07-26 18:30 +08:00
-> 最后更新: 2026-07-27 00:54 +08:00
+> 最后更新: 2026-07-27 01:03 +08:00
 
 ## 当前状态快照
 
 | 项 | 值 |
 |----|-----|
-| **已验证实现 HEAD** | `b8e518ebb985a3861af269c132aa04d1f299f7ac` |
+| **已验证实现 HEAD** | `9370d7fc992a0d8bf51ee7f898e556abec0b277a` |
 | **原始 Git 脏文件** | 8 tracked modified + 2 untracked；已由 `evidence/m0a/` 保护 |
-| **活跃 Agent** | task-005-r4 作者回归通过；task-009 待独立复测及旧根重绑定；task-010 可并行 |
+| **活跃 Agent** | task-009 已完成；task-010 可继续；task-011 仍等待 task-010 |
 | **当前 authority** | 旧 YuanForge 文档运行态；新 Core 尚未接管 |
 | **最后 Conductor 巡检** | 2026-07-26 18:34 +08:00 |
 
@@ -26,7 +26,7 @@
 | task-006 | P0 | R0 | M3 旧信任根验证新候选 | tester | task-005 | ✅ 完成 | `tests/core_01/`, `evidence/m3/` | `evidence/m3/final.json` |
 | task-007 | P0 | R0 | M4 Shadow conversion 与回退演练 | backend-dev | task-006 | ✅ 完成 | converter, rollback receipt | `evidence/m4/author-evidence.md` |
 | task-008 | P1 | R1 | M5 Canary Work | tester | task-007 | ✅ 完成 | canary Evidence + 13-check held-out Gate | `evidence/m5/final-verification.json` |
-| task-009 | P1 | R1 | M6 Adapter conformance | tester | task-008 | 🔄 返工 | `evidence/m6/` | `evidence/m6/M6-TEST-REPORT.md#修复路由与复测条件` |
+| task-009 | P1 | R1 | M6 Adapter conformance | tester | task-008 | ✅ 完成 | 8-check adapter Gate + old-root receipt | `evidence/m6/final-verification.json` |
 | task-010 | P0 | R0 | M7 Extensions 与条款 provenance | doc-engineer | task-006 | ⏳ 等待 | extensions, provenance manifest | `DESIGN.md#9-authority-与迁移不变量` |
 | task-011 | P0 | R0 | M8 原子 authority switch | backend-dev | task-009,task-010 | ⏳ 等待 | writer guard, authority receipt | `PLAN.md#里程碑-gate` |
 | task-012 | P0 | R0 | M9 自修改 dogfood | tester | task-011 | ⏳ 等待 | self-host Evidence | `FEATURE.md#clean-room-验收标准` |
@@ -54,6 +54,7 @@
 | 00:34 | task-008-r1 | task-009 | r3 未修改 Canary Gate；原 10 项与 3 项普通数据变体全绿，旧 Genesis root 接受新 candidate | 13/13 M5、31/31 M1、30/30 Core、1/1 M3、77-check old-root、10/10 M4 PASS |
 | 00:42 | task-009 | task-005-r4 | M6 held-out 首轮 1/5 PASS；Reference Port 缺枚举/LLM receipt，manual/Hermes 缺 Core descriptor | `evidence/m6/held-out-initial.json`；M6-B01–B04 路由 backend-dev；Hermes 可诚实 unsupported |
 | 00:54 | task-005-r4 | task-009-r1 | M6-B01–B04 已封闭：有界稳定枚举与文件哈希、纯提案结构化回执、manual 可执行 descriptor、Hermes 诚实 unsupported | 35/35 author、55-check self-check、M6 5/5、M1 31/31、M3 held-out 30/30、M4 10/10、M5 1/1 PASS；manifest `20ac1cbb7f2377d5cecadf3347a40d81e14e8469c6c914701f585a49903d9768`，旧根冻结哈希待 Tester 独立重绑定 |
+| 01:03 | task-009-r1 | task-011 | M6 独立 Gate PASS；manual 为可执行 Reference Port，Hermes 诚实 unsupported 且 Core 不依赖 | 原样 5/5 + 独立变体 3/3；旧 Genesis 80 checks / 7 cases；M1/M3/M4/M5 与 M0a dirty 全绿；task-011 仍等待 task-010 |
 
 ## 故障记录
 
@@ -78,7 +79,7 @@
 
 | 时间 | 任务 | 类型 | 原因 |
 |------|------|------|------|
-| 00:42 | task-009 | M6 Hard Gate | M6-B01–B04；详见 `evidence/m6/M6-TEST-REPORT.md` |
+| — | — | — | 暂无 |
 
 ## 审查结果
 
@@ -94,6 +95,7 @@
 | 2026-07-27 00:17 | task-008 | Tester Canary held-out | FAIL → task-005-r3 | 成功路径 COMPLETE；10 项独立检查 9 PASS / 1 FAIL；M5-B01 丢失 UNKNOWN reconciliation target |
 | 2026-07-27 00:34 | task-005-r3 / task-008-r1 | Tester Canary held-out | PASS | 原 10 项 10/10 + 普通数据变体 3/3；COMMITTED/read 不伪造 pending，missing Attempt fail-closed；M5-B01 关闭 |
 | 2026-07-27 00:42 | task-009 | Tester Adapter held-out | FAIL → task-005-r4 | 5 项 trace 1 PASS / 4 FAIL；M6-B01–B04，Hermes 允许诚实 unsupported |
+| 2026-07-27 01:03 | task-005-r4 / task-009-r1 | Tester Adapter held-out | PASS | M6 8/8；旧 Genesis 80 checks / 7 cases；M6-B01–B04 关闭 |
 
 ## Conductor 调度状态
 
@@ -117,6 +119,7 @@
 | 00:34 | task-008-r1 完成 → promote task-009 | tester | M5 Hard Gate PASS；M6 Adapter conformance 可派发 |
 | 00:42 | task-009 阻塞 → return task-005-r4 | backend-dev | 保持 held-out 原样；补齐 Reference Port enumerate/LLM receipt 与 manual/Hermes Core descriptor |
 | 00:54 | task-005-r4 完成 → task-009-r1 复测 | tester | 作者与原样 M6/M1/M3/M4/M5 回归均绿；冻结 M3 runner 的 candidate-manifest 哈希须由 Tester 独立重绑定 |
+| 01:03 | task-009-r1 完成 → task-011 依赖部分满足 | backend-dev | M6 Hard Gate PASS；task-011 仍须等待 task-010 M7 |
 
 ## 派发日志
 
@@ -140,3 +143,4 @@
 | 00:34 | task-008-r1 | Tier 1 | tester | ✅ M5 13/13、旧根 77 checks / 7 cases、全回归与原 dirty hash 全绿 |
 | 00:42 | task-009 | Tier 1 | tester | ❌ M6 Hard Gate：5 项同轨 trace 1 PASS / 4 FAIL；M6-B01–B04 路由 backend-dev |
 | 00:54 | task-005-r4 | Tier 1 | backend-dev | ✅ M6-B01–B04 修复完成；author 35/35、自检 55/55、M6 5/5、M1/M3/M4/M5 回归全绿；待独立 Tester 复测与旧根重绑定 |
+| 01:03 | task-009-r1 | Tier 1 | tester | ✅ M6_PASS：8/8 独立 trace，旧 Genesis 80 checks / 7 cases，全回归与 dirty hash 通过 |
