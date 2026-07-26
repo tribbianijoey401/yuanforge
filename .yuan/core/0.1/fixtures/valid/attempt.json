@@ -1,0 +1,57 @@
+{
+  "schema_version": "yuan.attempt/v1",
+  "attempt_id": "ATT-author-001",
+  "work_binding": {
+    "id": "WORK-core-author-fixture",
+    "revision": "1",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "protocol_binding": {
+    "id": "yuan-core-protocol",
+    "revision": "0.1.0-candidate",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "harness_binding": {
+    "id": "yuan-reference-harness",
+    "revision": "0.1.0-candidate",
+    "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "sequence": 1,
+  "strategy_fingerprint": "1111111111111111111111111111111111111111111111111111111111111111",
+  "relevant_inputs": [
+    {
+      "scope": ".yuan/core/0.1",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  ],
+  "hypothesis": {
+    "claim": "The candidate schemas are offline parseable.",
+    "falsification": "Parsing any schema with the Python json module fails."
+  },
+  "action": {
+    "type": "verify",
+    "mutating": false,
+    "side_effect_class": "none",
+    "scope": ".yuan/core/0.1",
+    "authorization_grant_id": null,
+    "high_impact": false
+  },
+  "budget_charge": {
+    "ticks": 1,
+    "tool_calls": 1,
+    "strategies": 1,
+    "command_seconds": 1.5
+  },
+  "journal": [],
+  "side_effect_state": "NOT_APPLICABLE",
+  "tool_receipt": {
+    "schema_version": "yuan.tool-receipt/v1",
+    "kind": "command",
+    "operation_id": "OP-author-001",
+    "status": "EXITED",
+    "exit_code": 0,
+    "receipt_sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+  },
+  "evidence_ids": ["EVD-author-001"],
+  "outcome": "SUCCEEDED"
+}

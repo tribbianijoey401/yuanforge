@@ -1,0 +1,75 @@
+{
+  "schema_version": "yuan.test-evidence/v1",
+  "task_id": "task-005",
+  "subject_base_commit": "d9beb72740caeb3d89d3286c6e9e3c69b2d257c2",
+  "created_at": "2026-07-26T22:37:25.9096718+08:00",
+  "producer_role": "backend-dev-author",
+  "status": "AUTHOR_PASS_M3_PENDING",
+  "tdd": {
+    "red": {
+      "command": "python -m unittest discover -s .yuan/core/0.1/tests -p 'test_*.py' -v",
+      "observed": "2 import errors because conformance.py and reference_port.py did not exist"
+    },
+    "green": {
+      "command": "python -m unittest discover -s .yuan/core/0.1/tests -p 'test_*.py' -v",
+      "tests_run": 17,
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "commands": [
+    {
+      "command": "python .yuan/core/0.1/conformance.py --candidate .yuan/core/0.1",
+      "status": "PASS",
+      "checks_executed": 41,
+      "receipt": "evidence/m2/author-conformance.json",
+      "receipt_sha256": "09312415cd0f1b17cee49cc2f3300d3b6cbfbd6f04c0ed1c7e46e86a8980a966"
+    },
+    {
+      "command": "python -m unittest discover -s tests/bootstrap_verifier -p 'test_*.py' -v",
+      "tests_run": 31,
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "python -m py_compile bootstrap verifier and Core Python files",
+      "status": "PASS"
+    }
+  ],
+  "hashes": {
+    ".yuan/core/0.1/candidate-manifest.json": "852016c9f710f6b53e89ec76104cff8ba10a2964a803d916427031314b216176",
+    ".yuan/core/0.1/protocol.md": "715ea87e41d83f4c271b342cacaec96c1a09ee1033b84e6af48f30fce914346d"
+  },
+  "coverage": {
+    "five_primitives": "PASS",
+    "six_result_priority": "PASS",
+    "typed_ac_and_verifier_binding": "PASS",
+    "immutable_revision_bindings": "PASS",
+    "evidence_artifact_environment_verifier_binding": "PASS",
+    "zero_assertion_fail_closed": "PASS",
+    "run_memory_rebuild_pointers": "PASS",
+    "attempt_journal_and_unknown": "PASS",
+    "scope_authorization_budget": "PASS",
+    "cas_and_hash_file_port": "PASS",
+    "bounded_timeout_cancel_command_receipt": "PASS",
+    "llm_proposal_provider_boundary": "PASS",
+    "self_modification_old_root_requirement": "PASS"
+  },
+  "anti_gaming": {
+    "author_tests_are_not_independent_gate": true,
+    "candidate_self_conformance_is_not_genesis_proof": true,
+    "m1_held_out_suite_modified": false,
+    "assertions_weakened": false,
+    "skip_or_xfail_added": false,
+    "original_user_dirty_hash_compare": "PASS",
+    "original_user_dirty_files_checked": 10
+  },
+  "next_gate": {
+    "task_id": "task-006",
+    "owner": "independent-tester",
+    "status": "PENDING",
+    "requirement": "Validate the candidate with the frozen older trust root and new held-out cases; do not accept this author receipt as proof."
+  }
+}

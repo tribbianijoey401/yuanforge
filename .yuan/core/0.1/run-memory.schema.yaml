@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuanforge.local/core/0.1/run-memory.schema.json",
+  "title": "Yuan Core 0.1 Run Memory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "run_id", "projection_sequence", "work_binding",
+    "protocol_binding", "artifact_binding", "environment_binding",
+    "remaining_budget", "ac_evidence", "active_hypotheses",
+    "pending_side_effects", "attempted_strategies", "legal_next_steps",
+    "last_result", "rebuild"
+  ],
+  "properties": {
+    "schema_version": {"const": "yuan.run-memory/v1"},
+    "run_id": {"type": "string", "pattern": "^RUN-[A-Za-z0-9._-]+$"},
+    "projection_sequence": {"type": "integer", "minimum": 0},
+    "work_binding": {"$ref": "#/$defs/binding"},
+    "protocol_binding": {"$ref": "#/$defs/binding"},
+    "artifact_binding": {"$ref": "#/$defs/artifact"},
+    "environment_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "fingerprint"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "fingerprint": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "remaining_budget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ticks", "tool_calls", "strategies", "command_seconds"],
+      "properties": {
+        "ticks": {"type": "integer", "minimum": 0},
+        "tool_calls": {"type": "integer", "minimum": 0},
+        "strategies": {"type": "integer", "minimum": 0},
+        "command_seconds": {"type": "number", "minimum": 0}
+      }
+    },
+    "ac_evidence": {
+      "type": "object",
+      "additionalProperties": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+    },
+    "active_hypotheses": {
+      "type": "array", "maxItems": 3,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "claim", "falsification"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "claim": {"type": "string", "minLength": 1},
+          "falsification": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "pending_side_effects": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["attempt_id", "state"],
+        "properties": {
+          "attempt_id": {"type": "string", "minLength": 1},
+          "state": {"enum": ["PREPARED", "EXECUTING", "OBSERVED", "UNKNOWN"]}
+        }
+      }
+    },
+    "attempted_strategies": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["fingerprint", "relevant_inputs_digest", "latest_evidence_sequence"],
+        "properties": {
+          "fingerprint": {"$ref": "#/$defs/sha256"},
+          "relevant_inputs_digest": {"$ref": "#/$defs/sha256"},
+          "latest_evidence_sequence": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "legal_next_steps": {
+      "type": "array", "maxItems": 3,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["action_type", "scope", "authorization_grant_id"],
+        "properties": {
+          "action_type": {"type": "string", "minLength": 1},
+          "scope": {"type": "string", "minLength": 1},
+          "authorization_grant_id": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "last_result": {"enum": ["CONTINUE", "CORRECT", "COMPLETE", "BLOCKED", "WAIT_AUTH", "BUDGET_EXIT"]},
+    "rebuild": {
+      "type": "object", "additionalProperties": false,
+      "required": ["attempt_ids", "evidence_ids", "attempts_digest", "evidence_digest"],
+      "properties": {
+        "attempt_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "evidence_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "attempts_digest": {"$ref": "#/$defs/sha256"},
+        "evidence_digest": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "revision", "sha256"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["scope", "sha256"],
+      "properties": {
+        "scope": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

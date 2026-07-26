@@ -14,7 +14,8 @@
 | task-002 | ✅ 完成 | 冻结 clean-room Yuan Core 0.1 Genesis baseline | 五原语、六结果、八项 mandatory semantics | `FEATURE.md`, `DESIGN.md`, `PLAN.md`, 状态文档 | 本提交 |
 | task-003 | ✅ 完成 | 独立、失败关闭的 bootstrap verifier | CLI + 冻结 manifest SHA-256 + 结构化 receipt；visible fixtures 不替代 Tester held-out | `scripts/bootstrap-core-verifier.py`, `scripts/bootstrap_verifier*.py`, `tests/bootstrap_verifier/` | 本提交 |
 | task-004 | ✅ 完成 | M1 独立 held-out、组合攻击与反作弊验证 | 两轮返工关闭 M1-B01–B04；31/31 tests 和冻结 receipt PASS | `tests/bootstrap_verifier/test_bootstrap_core_verifier_held_out.py`, `evidence/m1/` | 本提交 |
-| task-005–task-013 | ⏳ 等待 | M2 inert Core 至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
+| task-005 | ✅ 完成 | M2 inert Core candidate | 五原语协议/Schema、reference Port、17 项 author tests 与 41-check 自检；不替代 M3 | `.yuan/core/0.1/`, `evidence/m2/` | 本提交 |
+| task-006–task-013 | ⏳ 等待 | M3 独立验证至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
 
 ## 现场保护
 

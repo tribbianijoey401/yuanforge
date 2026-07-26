@@ -1,0 +1,20 @@
+{
+  "schema_version": "yuan.evidence/v1",
+  "evidence_id": "EVD-invalid-zero",
+  "work_binding": {"id": "work", "revision": "1", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+  "ac_id": "AC-ZERO",
+  "kind": "structure",
+  "created_at": "2026-07-26T14:30:00+00:00",
+  "source_attempt_id": "ATT-invalid-zero",
+  "status": "PASS",
+  "assertions": 0,
+  "checks": [],
+  "artifact_binding": {"scope": "candidate", "sha256": "2222222222222222222222222222222222222222222222222222222222222222"},
+  "environment_binding": {"id": "test", "fingerprint": "3333333333333333333333333333333333333333333333333333333333333333"},
+  "verifier_binding": {"id": "v", "revision": "1", "sha256": "4444444444444444444444444444444444444444444444444444444444444444", "trust_root_id": "old"},
+  "harness_binding": {"id": "h", "revision": "1", "sha256": "5555555555555555555555555555555555555555555555555555555555555555"},
+  "logs": {"stdout_sha256": "6666666666666666666666666666666666666666666666666666666666666666", "stderr_sha256": "7777777777777777777777777777777777777777777777777777777777777777", "receipt_sha256": "8888888888888888888888888888888888888888888888888888888888888888"},
+  "freshness": {"observed_artifact_sha256": "2222222222222222222222222222222222222222222222222222222222222222", "not_after": null},
+  "independence": {"method": "old-trust-root", "author_identity": "author", "verifier_identity": "tester", "independent": true},
+  "immutable_digest": "9999999999999999999999999999999999999999999999999999999999999999"
+}

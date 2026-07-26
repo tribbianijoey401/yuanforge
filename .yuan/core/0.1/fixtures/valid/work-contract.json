@@ -1,0 +1,71 @@
+{
+  "schema_version": "yuan.work-contract/v1",
+  "work_id": "WORK-core-author-fixture",
+  "revision": {
+    "id": "WORK-core-author-fixture",
+    "revision": "1",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "protocol_binding": {
+    "id": "yuan-core-protocol",
+    "revision": "0.1.0-candidate",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "harness_binding": {
+    "id": "yuan-reference-harness",
+    "revision": "0.1.0-candidate",
+    "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "intent": {
+    "goal": "Prove the inert candidate has the required structure.",
+    "non_goals": ["Switch runtime authority."],
+    "constraints": ["Use only standard-library parsing."]
+  },
+  "scope": {
+    "allowed_paths": [".yuan/core/0.1"],
+    "denied_paths": ["AGENTS.md", "docs/PROGRESS.md"],
+    "side_effect_classes": ["none", "filesystem", "command"]
+  },
+  "authorization": {
+    "default": "deny",
+    "grants": [
+      {
+        "id": "GRANT-core-candidate",
+        "action_types": ["file-read", "file-write", "command", "verify"],
+        "side_effect_classes": ["none", "filesystem", "command"],
+        "scopes": [".yuan/core/0.1"],
+        "high_impact": false,
+        "expires_at": null
+      }
+    ]
+  },
+  "budget": {
+    "ticks": 20,
+    "tool_calls": 50,
+    "strategies": 10,
+    "command_seconds": 120
+  },
+  "acceptance_criteria": [
+    {
+      "id": "AC-STRUCTURE",
+      "type": "structure",
+      "required": true,
+      "predicate": "The candidate contains all five primitive definitions and validates offline.",
+      "artifact_scope": ".yuan/core/0.1",
+      "verifier_binding": {
+        "id": "bootstrap-core-verifier",
+        "revision": "1",
+        "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "trust_root_id": "genesis-m1",
+        "environment_ids": ["windows-python312"],
+        "minimum_assertions": 1
+      }
+    }
+  ],
+  "safety_invariants": [
+    {
+      "id": "SAFE-01",
+      "predicate": "The inert candidate does not become runtime authority."
+    }
+  ]
+}
