@@ -2,7 +2,7 @@
 
 > 会话: 20260726-yuan-core-01-upgrade
 > 创建: 2026-07-26 18:30 +08:00
-> 最后更新: 2026-07-26 23:39 +08:00
+> 最后更新: 2026-07-26 23:58 +08:00
 
 ## 当前状态快照
 
@@ -10,7 +10,7 @@
 |----|-----|
 | **已验证实现 HEAD** | `3df925011ac6d99f62b728ab4b6624d24cf2c6d0` |
 | **原始 Git 脏文件** | 8 tracked modified + 2 untracked；已由 `evidence/m0a/` 保护 |
-| **活跃 Agent** | task-006 已完成；task-007 已就绪，等待 Conductor 派发 |
+| **活跃 Agent** | task-007 已完成；task-008 与 task-010 可由 Conductor 继续派发 |
 | **当前 authority** | 旧 YuanForge 文档运行态；新 Core 尚未接管 |
 | **最后 Conductor 巡检** | 2026-07-26 18:34 +08:00 |
 
@@ -24,8 +24,8 @@
 | task-004 | P0 | R0 | M1 负向 fixtures 与反作弊验证 | tester | task-003 | ✅ 完成 | held-out tests, `evidence/m1/receipt.json` | `evidence/m1/held-out-final.json` |
 | task-005 | P0 | R0 | M2 实现 inert Core candidate | backend-dev | task-004 | ✅ 完成 | `.yuan/core/0.1/`, `evidence/m2/` | `evidence/m3/independent-review.md` |
 | task-006 | P0 | R0 | M3 旧信任根验证新候选 | tester | task-005 | ✅ 完成 | `tests/core_01/`, `evidence/m3/` | `evidence/m3/final.json` |
-| task-007 | P0 | R0 | M4 Shadow conversion 与回退演练 | backend-dev | task-006 | 🟢 就绪 | converter, rollback receipt | `DESIGN.md#9-authority-与迁移不变量` |
-| task-008 | P1 | R1 | M5 Canary Work | tester | task-007 | ⏳ 等待 | canary Evidence | `PLAN.md#里程碑-gate` |
+| task-007 | P0 | R0 | M4 Shadow conversion 与回退演练 | backend-dev | task-006 | ✅ 完成 | converter, rollback receipt | `evidence/m4/author-evidence.md` |
+| task-008 | P1 | R1 | M5 Canary Work | tester | task-007 | 🟢 就绪 | canary Evidence | `evidence/m4/author-evidence.md` |
 | task-009 | P1 | R1 | M6 Adapter conformance | tester | task-008 | ⏳ 等待 | adapter reports | `DESIGN.md#7-最小平台-port` |
 | task-010 | P0 | R0 | M7 Extensions 与条款 provenance | doc-engineer | task-006 | ⏳ 等待 | extensions, provenance manifest | `DESIGN.md#9-authority-与迁移不变量` |
 | task-011 | P0 | R0 | M8 原子 authority switch | backend-dev | task-009,task-010 | ⏳ 等待 | writer guard, authority receipt | `PLAN.md#里程碑-gate` |
@@ -48,6 +48,7 @@
 | 23:23 | task-006-r1 | task-005-r2 | 完整性 diff 通过、原 28 项 held-out 全绿；新增纯数据组合一致性检查发现 replay 未强制 self-mod proof 且 BLOCKED 投影丢失 artifact/Port scope | M3-B06；新 hash 已重绑定，旧根 72-check suite 仅拒绝 Core case |
 | 23:35 | task-005-r2 | task-006-r2 | replay 已在 COMPLETE 前强制验证受保护变更 trust proof；BLOCKED 投影按 Evidence→Attempt→Work 保留真实 scope | 27/27 author、50/50 self-check、29/29 原样 held-out、31/31 M1 PASS；新 manifest SHA-256 `c3d41ac1a056523ad5af4a430e09185f7ab1e732507097ba7546be7f512d72e3` |
 | 23:39 | task-006-r2 | task-007 | 旧 Genesis trust root 已接受修正候选；独立 held-out 与固定种子变体全部通过 | 30/30 held-out、27/27 author、31/31 M1、75-check bootstrap（7/7 cases）PASS；M3_APPROVED |
+| 23:58 | task-007 | task-008,task-010 | 单向 shadow converter、writer guard、确定性 replay 与无损 rollback 已完成 | 3 Workspace / 9 sources / 28 records；Core rebuild 3/3 PASS；19 项歧义全部 structured unresolved/BLOCKED；legacy rollback hash 相等 |
 
 ## 故障记录
 
@@ -99,6 +100,7 @@
 | 23:23 | task-006-r1 阻塞 → return task-005-r2 | backend-dev | 将 self-mod proof 强制接入 replay，并保留 BLOCKED artifact/Port scope；不得弱化 held-out |
 | 23:35 | task-005-r2 完成 → task-006-r2 复测 | tester | M3-B06 author 与原样 held-out 均绿；冻结 M3 runner 须独立重绑定新 manifest |
 | 23:39 | task-006-r2 完成 → promote task-007 | backend-dev | M3 Gate PASS；M4 Shadow conversion 与无损回退演练可派发 |
+| 23:58 | task-007 完成 → promote task-008 | tester | M4 author gate PASS；M5 Canary 可派发，M7 仍可并行 |
 
 ## 派发日志
 
@@ -116,3 +118,4 @@
 | 23:23 | task-006-r1 | Tier 1 | tester | ❌ M3 Hard Gate：新组合一致性检查发现 M3-B06，旧根继续 REJECT |
 | 23:35 | task-005-r2 | Tier 1 | backend-dev | ✅ B06 修复完成；author 27/27、自检 50/50、原样 held-out 29/29、M1 31/31 |
 | 23:39 | task-006-r2 | Tier 1 | tester | ✅ M3_APPROVED：30/30 独立 held-out、旧根 75 checks / 7 cases 全部通过 |
+| 23:58 | task-007 | Tier 1 | backend-dev | ✅ 9/9 TDD、3/3 Core rebuild、单写 guard 与 rollback drill PASS；旧语义歧义未猜测完成 |

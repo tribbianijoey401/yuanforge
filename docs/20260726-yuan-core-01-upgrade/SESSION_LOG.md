@@ -16,8 +16,9 @@
 | task-004 | ✅ 完成 | M1 独立 held-out、组合攻击与反作弊验证 | 两轮返工关闭 M1-B01–B04；31/31 tests 和冻结 receipt PASS | `tests/bootstrap_verifier/test_bootstrap_core_verifier_held_out.py`, `evidence/m1/` | 本提交 |
 | task-005 | ✅ 完成 | M2 inert Core candidate 经两轮独立返工后通过 M3 | M3-B01–B06 全部关闭；未弱化 held-out 或旧 trust root | `.yuan/core/0.1/`, `evidence/m3/independent-review.md` | `3df9250` |
 | task-006 | ✅ 完成 | M3 旧信任根接受 r2 candidate | 30/30 held-out、27/27 author、31/31 M1、75-check bootstrap 全部 PASS | `tests/core_01/`, `evidence/m3/` | 本提交 |
-| task-007 | 🟢 就绪 | M4 Shadow conversion 与回退演练 | M3 Gate 已通过，等待 Conductor 派发 | 见 `PLAN.md` | — |
-| task-008–task-013 | ⏳ 等待 | M5 Canary Work 至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
+| task-007 | ✅ 完成 | M4 Shadow conversion 与回退演练 | 单向只读 legacy→shadow；Core 重建、writer guard 与无损 rollback 全绿 | `scripts/yuan-shadow-migrate.py`, `evidence/m4/` | 本提交 |
+| task-008 | 🟢 就绪 | M5 Canary Work | M4 author gate 已通过，等待独立 Tester | 见 `PLAN.md` | — |
+| task-009–task-013 | ⏳ 等待 | M6 Adapter conformance 至 M9 清场 | 严格按 verifier-first 依赖推进 | 见 `PLAN.md` | — |
 
 ## 现场保护
 
@@ -60,6 +61,13 @@
 - task-005 r2 未触碰独立 held-out、M1 verifier 或旧 bootstrap trust root；候选 manifest 更新为 `c3d41ac1...12d72e3`。
 - Tester 新增固定种子、纯数据的 16 组受保护 scope 与 previous-root proof 变体；所有不一致组合均 fail-closed。
 - task-006 最终 M3：30/30 独立 held-out、27/27 author、31/31 M1 与旧根 75 checks / 7 cases 全部 PASS；M3-B01–B06 全部关闭，task-007 可派发。
+- task-007 M4：扫描 3 个 Workspace、9 个 legacy source，重放 28 个
+  task/event observation；Core schema/rebuild 3/3 PASS。19 个缺失或无
+  verifier binding 的语义均保留为 structured unresolved，并将投影置为
+  `BLOCKED`，未把旧状态文本猜成 `COMPLETE`。
+- `.yuan-shadow-m4-drill` 回退前后 legacy snapshot SHA-256 均为
+  `0f4098281c0338df3cd5297cc69fa57810491020f69b8ff336e1a5bde20abc4c`；
+  shadow 已丢弃，结构化回执见 `evidence/m4/rollback-receipt.json`。
 
 ## 决策
 
