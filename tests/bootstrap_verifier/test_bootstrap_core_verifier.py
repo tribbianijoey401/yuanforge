@@ -35,8 +35,10 @@ class BootstrapCoreVerifierCliTests(unittest.TestCase):
         *,
         manifest_hash: str | None = None,
         manifest: pathlib.Path | None = None,
+        receipt: pathlib.Path | None = None,
     ) -> subprocess.CompletedProcess[str]:
         selected_manifest = manifest or self.manifest
+        selected_receipt = receipt or self.receipt
         return subprocess.run(
             [
                 sys.executable,
@@ -46,7 +48,7 @@ class BootstrapCoreVerifierCliTests(unittest.TestCase):
                 "--manifest-sha256",
                 manifest_hash or sha256(selected_manifest),
                 "--receipt",
-                str(self.receipt),
+                str(selected_receipt),
             ],
             cwd=REPOSITORY_ROOT,
             text=True,
@@ -207,6 +209,99 @@ class BootstrapCoreVerifierCliTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         receipt = json.loads(self.receipt.read_text(encoding="utf-8"))
         self.assertIn("MANIFEST_SCHEMA_ERROR", receipt["reason_codes"])
+
+    def test_unbound_command_script_outside_suite_is_rejected(self) -> None:
+        outside = pathlib.Path(self.temp_dir.name) / "outside_validator.py"
+        outside.write_text(
+            "import json\n"
+            "print(json.dumps({"
+            "'schema_version':'yuan.validator-result/v1',"
+            "'status':'PASS','assertions':1,"
+            "'checks':[{'id':'outside','status':'PASS'}]}))\n",
+            encoding="utf-8",
+        )
+        data = json.loads(self.manifest.read_text(encoding="utf-8"))
+        valid_case = next(case for case in data["cases"] if case["id"] == "valid")
+        valid_case["validator"]["command"] = [
+            "{python}",
+            "../outside_validator.py",
+            "{candidate}",
+        ]
+        self.manifest.write_text(
+            json.dumps(data, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
+        result = self.run_verifier()
+
+        self.assertNotEqual(result.returncode, 0)
+
+    def test_unbound_in_root_command_is_rejected_before_execution(self) -> None:
+        data = json.loads(self.manifest.read_text(encoding="utf-8"))
+        valid_case = next(case for case in data["cases"] if case["id"] == "valid")
+        valid_case["validator"]["command"] = [
+            "{python}",
+            "validators/slow_validator.py",
+            "{candidate}",
+        ]
+        valid_case["validator"]["timeout_seconds"] = 0.01
+        self.manifest.write_text(
+            json.dumps(data, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
+        result = self.run_verifier()
+
+        self.assertNotEqual(result.returncode, 0)
+        receipt = json.loads(self.receipt.read_text(encoding="utf-8"))
+        self.assertIn("MANIFEST_SCHEMA_ERROR", receipt["reason_codes"])
+        self.assertEqual(receipt["cases"], [])
+
+    def test_receipt_cannot_overlap_candidate_input(self) -> None:
+        candidate_file = self.suite / "candidates" / "valid" / "protocol.md"
+        original = candidate_file.read_bytes()
+
+        result = self.run_verifier(receipt=candidate_file)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(candidate_file.read_bytes(), original)
+
+    def test_duplicate_validator_check_ids_are_rejected(self) -> None:
+        validator = self.suite / "validators" / "duplicate_checks.py"
+        validator.write_text(
+            "import json\n"
+            "print(json.dumps({"
+            "'schema_version':'yuan.validator-result/v1',"
+            "'status':'PASS','assertions':2,"
+            "'checks':["
+            "{'id':'duplicate','status':'PASS'},"
+            "{'id':'duplicate','status':'PASS'}]}))\n",
+            encoding="utf-8",
+        )
+        data = json.loads(self.manifest.read_text(encoding="utf-8"))
+        valid_case = next(case for case in data["cases"] if case["id"] == "valid")
+        valid_case["validator"] = {
+            "command": [
+                "{python}",
+                "validators/duplicate_checks.py",
+                "{candidate}",
+            ],
+            "timeout_seconds": 5,
+            "trusted_files": [
+                {
+                    "path": "validators/duplicate_checks.py",
+                    "sha256": sha256(validator),
+                }
+            ],
+        }
+        self.manifest.write_text(
+            json.dumps(data, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
+        result = self.run_verifier()
+
+        self.assertNotEqual(result.returncode, 0)
 
     def test_help_is_available_without_loading_a_manifest(self) -> None:
         result = subprocess.run(

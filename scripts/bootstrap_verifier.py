@@ -17,8 +17,11 @@ from bootstrap_verifier_support import (
     SUITE_SCHEMA,
     ManifestError,
     atomic_write_json,
+    collect_protected_inputs,
+    expand_trusted_command,
     file_sha256,
     meaningful_files,
+    paths_overlap,
     receipt_base,
     resolve_within,
     tree_digest,
@@ -52,6 +55,9 @@ def validate_validator_result(stdout: str) -> tuple[list[str], int]:
             or check.get("status") not in {"PASS", "FAIL"}
         ):
             return ["RESULT_SCHEMA_ERROR"], 0
+    check_ids = [check["id"] for check in checks]
+    if len(check_ids) != len(set(check_ids)):
+        return ["RESULT_SCHEMA_ERROR"], 0
     if status == "FAIL" or any(check["status"] == "FAIL" for check in checks):
         return ["CHECK_FAILED"], assertions
     return [], assertions
@@ -93,16 +99,17 @@ def verify_case(case: dict[str, Any], root: pathlib.Path) -> dict[str, Any]:
     )
     if not trusted:
         raise ManifestError(f"case {case_id}: validator has no trusted files")
-    command = validator.get("command")
     timeout = validator.get("timeout_seconds")
-    if (
-        not isinstance(command, list)
-        or not command
-        or not all(isinstance(token, str) and token for token in command)
-    ):
-        raise ManifestError(f"case {case_id}: validator command is invalid")
     if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not 0 < timeout <= 60:
         raise ManifestError(f"case {case_id}: timeout must be within (0, 60]")
+    expanded_command = expand_trusted_command(
+        validator.get("command"),
+        root=root,
+        candidate=candidate,
+        trusted=trusted,
+        field=f"case {case_id}.validator.command",
+        python_executable=sys.executable,
+    )
 
     reasons: list[str] = []
     checks_executed = 0
@@ -138,15 +145,9 @@ def verify_case(case: dict[str, Any], root: pathlib.Path) -> dict[str, Any]:
 
     validator_receipt: dict[str, Any] = {"exit_code": None, "assertions": 0}
     if not reasons:
-        expanded = [
-            token.replace("{python}", sys.executable).replace(
-                "{candidate}", str(candidate)
-            )
-            for token in command
-        ]
         try:
             completed = subprocess.run(
-                expanded,
+                expanded_command,
                 cwd=root,
                 text=True,
                 encoding="utf-8",
@@ -239,43 +240,66 @@ def main() -> int:
         sys.stderr.reconfigure(encoding="utf-8")
     args = parse_args()
     manifest_path = args.manifest.resolve()
+    receipt_path = args.receipt.resolve()
     receipt = receipt_base(manifest_path)
     exit_code = 2
+    receipt_path_safe = not paths_overlap(receipt_path, manifest_path)
     try:
-        if not SHA256_PATTERN.fullmatch(args.manifest_sha256):
+        if not receipt_path_safe:
+            receipt["reason_codes"].append("RECEIPT_PATH_CONFLICT")
+            receipt["error"] = "receipt path overlaps the manifest"
+        elif not SHA256_PATTERN.fullmatch(args.manifest_sha256):
             raise ManifestError("manifest-sha256 is not lowercase SHA-256")
-        actual_hash = file_sha256(manifest_path)
-        receipt["manifest_sha256"] = actual_hash
-        if actual_hash != args.manifest_sha256:
-            receipt["reason_codes"].append("MANIFEST_HASH_MISMATCH")
         else:
-            try:
-                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            except (json.JSONDecodeError, UnicodeError):
-                receipt["reason_codes"].append("MANIFEST_PARSE_ERROR")
+            actual_hash = file_sha256(manifest_path)
+            receipt["manifest_sha256"] = actual_hash
+            if actual_hash != args.manifest_sha256:
+                receipt["reason_codes"].append("MANIFEST_HASH_MISMATCH")
             else:
-                if not isinstance(manifest, dict):
-                    raise ManifestError("manifest root must be an object")
-                suite = run_suite(manifest, manifest_path.parent.resolve())
-                receipt["suite_id"] = suite["suite_id"]
-                receipt["cases"] = suite["cases"]
-                receipt["checks_executed"] = suite["checks_executed"]
-                if suite["passed"] and suite["checks_executed"] > 0:
-                    receipt["status"] = "PASS"
-                    exit_code = 0
+                try:
+                    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                except (json.JSONDecodeError, UnicodeError):
+                    receipt["reason_codes"].append("MANIFEST_PARSE_ERROR")
                 else:
-                    receipt["reason_codes"].append("SUITE_EXPECTATION_MISMATCH")
-                    exit_code = 1
+                    if not isinstance(manifest, dict):
+                        raise ManifestError("manifest root must be an object")
+                    root = manifest_path.parent.resolve()
+                    protected = collect_protected_inputs(
+                        manifest,
+                        root,
+                        manifest_path,
+                    )
+                    if any(
+                        paths_overlap(receipt_path, path)
+                        for path in protected
+                    ):
+                        receipt_path_safe = False
+                        receipt["reason_codes"].append("RECEIPT_PATH_CONFLICT")
+                        receipt["error"] = "receipt path overlaps a verified input"
+                    else:
+                        suite = run_suite(manifest, root)
+                        receipt["suite_id"] = suite["suite_id"]
+                        receipt["cases"] = suite["cases"]
+                        receipt["checks_executed"] = suite["checks_executed"]
+                        if suite["passed"] and suite["checks_executed"] > 0:
+                            receipt["status"] = "PASS"
+                            exit_code = 0
+                        else:
+                            receipt["reason_codes"].append(
+                                "SUITE_EXPECTATION_MISMATCH"
+                            )
+                            exit_code = 1
     except FileNotFoundError:
         receipt["reason_codes"].append("MANIFEST_NOT_FOUND")
     except (ManifestError, OSError) as error:
         receipt["reason_codes"].append("MANIFEST_SCHEMA_ERROR")
         receipt["error"] = str(error)
-    try:
-        atomic_write_json(args.receipt.resolve(), receipt)
-    except OSError as error:
-        print(f"unable to write receipt: {error}", file=sys.stderr)
-        return 2
+    if receipt_path_safe:
+        try:
+            atomic_write_json(receipt_path, receipt)
+        except OSError as error:
+            print(f"unable to write receipt: {error}", file=sys.stderr)
+            return 2
     print(json.dumps(receipt, ensure_ascii=False))
     return exit_code
 
