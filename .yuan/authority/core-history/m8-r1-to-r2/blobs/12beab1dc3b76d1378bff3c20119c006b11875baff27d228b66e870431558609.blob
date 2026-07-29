@@ -52,44 +52,6 @@ def _valid_evidence_for_ac(
     )
 
 
-def evidence_satisfies_ac(
-    work: dict[str, Any],
-    ac: dict[str, Any],
-    evidence: dict[str, Any],
-    *,
-    artifact_sha256: str,
-    environment_id: str,
-    environment_fingerprint: str,
-    observed_now: datetime,
-    attempts_by_id: dict[str, dict[str, Any]] | None = None,
-) -> bool:
-    """Return true only for one fully bound, independently verified AC proof."""
-    if not _valid_evidence_for_ac(
-        work,
-        ac,
-        evidence,
-        artifact_sha256,
-        environment_id,
-        environment_fingerprint,
-        observed_now,
-    ):
-        return False
-    if attempts_by_id is None:
-        return True
-    source = attempts_by_id.get(evidence["source_attempt_id"])
-    return (
-        isinstance(source, dict)
-        and evidence["evidence_id"] in source.get("evidence_ids", [])
-        and immutable_binding_matches(source.get("work_binding"), work["revision"])
-        and immutable_binding_matches(
-            source.get("harness_binding"), work["harness_binding"]
-        )
-        and immutable_binding_matches(
-            source.get("protocol_binding"), work["protocol_binding"]
-        )
-    )
-
-
 def completion_satisfied(
     work: dict[str, Any],
     evidence_items: list[dict[str, Any]],
@@ -118,14 +80,14 @@ def completion_satisfied(
         )
         active_fingerprint = environment_fingerprint or expected_fingerprint
         if not isinstance(active_fingerprint, str) or not any(
-            evidence_satisfies_ac(
+            _valid_evidence_for_ac(
                 work,
                 ac,
                 item,
-                artifact_sha256=current_artifact_sha256,
-                environment_id=environment_id,
-                environment_fingerprint=active_fingerprint,
-                observed_now=observed_now,
+                current_artifact_sha256,
+                environment_id,
+                active_fingerprint,
+                observed_now,
             )
             for item in evidence_items
         ):

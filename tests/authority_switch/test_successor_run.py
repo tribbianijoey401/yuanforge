@@ -59,7 +59,7 @@ class SuccessorRunTests(unittest.TestCase):
         current = load_current(ROOT)["record"]
         runtime, _, active_sha = resolve_runtime_root(ROOT)
         activation = current["protocol_activation"]
-        self.assertEqual(5, verified["revision"])
+        self.assertEqual(6, verified["revision"])
         self.assertEqual(runtime.relative_to(ROOT).as_posix(), current["runtime_root"])
         self.assertEqual(active_sha, current["runtime_pointer_sha256"])
         self.assertEqual(

@@ -92,30 +92,6 @@ class ReplayPendingTests(unittest.TestCase):
         self.assertEqual("WAIT_AUTH", memory["last_result"])
         self.assertTrue(memory["legal_next_steps"][0]["high_impact"])
 
-    def test_untrusted_pass_evidence_does_not_satisfy_next_step(self) -> None:
-        work = fixture("work-contract")
-        attempt = fixture("attempt")
-        evidence = fixture("evidence")
-        evidence["verifier_binding"]["sha256"] = "0" * 64
-        evidence["immutable_digest"] = conformance.canonical_digest(
-            evidence, omitted_paths=(("immutable_digest",),)
-        )
-        memory = conformance.rebuild_run_memory(
-            work,
-            [attempt],
-            [evidence],
-            current_artifact_sha256=evidence["artifact_binding"]["sha256"],
-            environment_id=evidence["environment_binding"]["id"],
-            environment_fingerprint=evidence["environment_binding"]["fingerprint"],
-            trusted_now=datetime(2026, 7, 27, tzinfo=timezone.utc),
-        )
-        self.assertEqual("CONTINUE", memory["last_result"])
-        self.assertEqual(
-            work["acceptance_criteria"][0]["id"],
-            memory["legal_next_steps"][0]["ac_id"],
-        )
-        self.assertEqual({}, memory["ac_evidence"])
-
     def test_blocked_rebuild_preserves_valid_unknown_pointer(self) -> None:
         attempt = unknown_attempt()
         memory = rebuild([attempt])

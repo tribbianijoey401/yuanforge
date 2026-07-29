@@ -17,6 +17,7 @@ from yuan_authority import (
 from yuan_runtime_state import (
     ACTIVE_RUN_PATH,
     RUNS_ROOT,
+    artifact_binding_sha256,
     atomic_write,
     canonical,
     file_sha256,
@@ -24,6 +25,7 @@ from yuan_runtime_state import (
     resolve_runtime_root,
     seal_runtime,
     sha256,
+    validate_runtime_evidence,
     verify_runtime_at,
     write_immutable,
 )
@@ -81,6 +83,7 @@ def _update_journal(
 
 
 def _validate_append(
+    repo: pathlib.Path,
     runtime: pathlib.Path,
     attempt: dict[str, Any],
     evidence: dict[str, Any],
@@ -99,6 +102,7 @@ def _validate_append(
         != canonical_digest(evidence, omitted_paths=(("immutable_digest",),))
     ):
         raise AuthorityError("append records violate immutable sequence/bindings")
+    validate_runtime_evidence(repo, runtime, attempt, evidence)
 
 
 def _build_generation(
@@ -168,7 +172,15 @@ def append_runtime_transaction(
         or active_sha != expected_active_run_pointer_sha256
     ):
         raise AuthorityError("runtime transaction CAS mismatch")
-    _validate_append(runtime, attempt, evidence)
+    try:
+        _validate_append(repo, runtime, attempt, evidence)
+    except AuthorityError as error:
+        return {
+            "schema_version": "yuan.runtime-transaction-rejection/v1",
+            "state": "REJECTED",
+            "reason": "EVIDENCE_TRUST_VALIDATION_FAILED",
+            "detail": str(error),
+        }
     transaction_id = sha256(
         canonical(
             {
@@ -322,3 +334,54 @@ def activate_runtime_generation(
     }
     journal_sha = _update_journal(journal_path, journal, None)
     return _finish_transaction(repo, journal_path, journal, journal_sha)
+
+
+def replace_runtime_generation(
+    repo_root: pathlib.Path,
+    runtime_root: pathlib.Path,
+    *,
+    expected_authority_pointer_sha256: str,
+    expected_active_run_pointer_sha256: str,
+    protocol_activation: dict[str, Any],
+    failure_after: str | None = None,
+) -> dict[str, Any]:
+    """CAS-switch to a sealed successor Work and advance Core authority once."""
+    repo = pathlib.Path(repo_root).resolve()
+    current = load_current(repo)
+    _, active_pointer, active_sha = resolve_runtime_root(repo)
+    if (
+        current["pointer_sha256"] != expected_authority_pointer_sha256
+        or current["record"].get("authority") != "core"
+        or active_pointer is None
+        or active_sha != expected_active_run_pointer_sha256
+    ):
+        raise AuthorityError("successor replacement CAS mismatch")
+    runtime = pathlib.Path(runtime_root).resolve()
+    verify_runtime_at(repo, runtime)
+    manifest_sha = file_sha256(runtime / "runtime-manifest.json")
+    transaction_id = sha256(
+        canonical(
+            {
+                "authority": expected_authority_pointer_sha256,
+                "active_run": expected_active_run_pointer_sha256,
+                "runtime_root": runtime.relative_to(repo).as_posix(),
+                "manifest": manifest_sha,
+                "activation": protocol_activation,
+            }
+        )
+    )
+    journal_path = _journal_path(repo, transaction_id)
+    journal = {
+        "schema_version": "yuan.runtime-transaction/v1",
+        "transaction_id": transaction_id,
+        "state": "GENERATION_READY",
+        "authority_pointer_before_sha256": expected_authority_pointer_sha256,
+        "active_run_before_sha256": expected_active_run_pointer_sha256,
+        "runtime_root": runtime.relative_to(repo).as_posix(),
+        "manifest_sha256": manifest_sha,
+        "protocol_activation": protocol_activation,
+    }
+    journal_sha = _update_journal(journal_path, journal, None)
+    return _finish_transaction(
+        repo, journal_path, journal, journal_sha, failure_after
+    )

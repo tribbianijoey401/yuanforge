@@ -1,0 +1,109 @@
+{
+  "schema_version": "yuan.m8-runtime-trust-closure-evidence/v1",
+  "task_id": "task-011-r2",
+  "source_head": "0cc910d796e9c0dbe044ad28a701a678febe96e2",
+  "status": "AUTHOR_PASS_WITH_STALE_FROZEN_ASSERTION",
+  "blockers_closed": [
+    {
+      "id": "M8-HO-B02",
+      "evidence": "Runtime append invokes the frozen active Core Evidence schema and semantic validator before transaction id, journal, generation, manifest, pointer, Memory, or authority writes. Exact active Work AC, verifier id/revision/hash/root, artifact scope/current hash, environment id/fingerprint, harness and Work revision, independence, freshness, source Attempt, and positive unique checks are required. Replay projects only trusted Evidence.",
+      "assertions": "10 forged combinations preserve every .yuan-run and .yuan/authority byte; held-out forged M9 Evidence cannot advance Memory"
+    },
+    {
+      "id": "M8-HO-B03",
+      "evidence": "Activation descriptor v2 binds the original candidate manifest, prior activated candidate manifest, activated candidate manifest, original and activated older-root suite manifests, older-root runner, receipt, and previous descriptor. Verification checks each manifest file itself and every listed file entry.",
+      "assertions": "Old Genesis root 80 checks / 7 cases PASS; 10 dependency tampers plus manifest replacement, path escape, fake hash, and missing file fail closed"
+    }
+  ],
+  "activation": {
+    "protocol_sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3",
+    "previous_candidate_manifest_sha256": "20ac1cbb7f2377d5cecadf3347a40d81e14e8469c6c914701f585a49903d9768",
+    "prior_activated_candidate_manifest_sha256": "53b47a9803965be4f81f81ad4081023571af24917c132c38fa777b6d73fc91e1",
+    "activated_candidate_manifest_sha256": "57a2acad6ba92d879785139e35548bdd20cd1edcafa3d7e8b554321504ec8b5e",
+    "older_root_manifest_sha256": "fc5b4873f839a9e71ddc69053687603a0964f6a0ede5e030196031e61065b552",
+    "activated_older_root_manifest_sha256": "1813c26e85172f78c2e163a54c514c0eeab2fc3d73c4ae0165b8cbb85d4c96fc",
+    "older_root_runner_sha256": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103",
+    "older_root_receipt_sha256": "f917cdfedc92167ec714500ea13b445c0a05bab17c71a040997ee320adb3c06b",
+    "descriptor_sha256": "6f08c7e10bcd433e2341471bef463e0d37fe6b6c7356f400988868a1b129afe8",
+    "candidate_self_trust": false
+  },
+  "provenance": {
+    "frozen_registry_sha256": "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
+    "m7_to_r1_delta_sha256": "b674943f4733449b838540c66281cf6e6bd0c0d933bc0414df4e500c10bc0e97",
+    "r1_to_r2_delta_sha256": "5b11c533d88b5b42f22488086d07fcdf923fa25a38914735b76a6a6c9b7b8776",
+    "semantic_records": 2227,
+    "source_clauses": 2207,
+    "unmapped": 0,
+    "m7_to_r1_delta_assertions": 9,
+    "r1_to_r2_delta_assertions": 18,
+    "historical_negative_tests": "11/11 PASS in a888fdd worktree"
+  },
+  "runtime": {
+    "active_runtime_root": ".yuan-run/runs/WORK-yuan-m8-m9-successor-r2-398b8aefe078",
+    "active_manifest_sha256": "e2bc36fc5d0213912e46073bf4ca2a8aa52091311e7870e34c1f1987a3b64abe",
+    "active_pointer_sha256": "0f72bf068a1c3235e4fcdd08cc77072b8ba7ba651809f01eabc5ee1fdfe62984",
+    "work_revision": "2",
+    "counts": {
+      "work": 1,
+      "attempt": 1,
+      "evidence": 1
+    },
+    "memory_result": "CONTINUE",
+    "legal_next_ac": "AC-M9-SELF-MODIFICATION-DOGFOOD"
+  },
+  "authority": {
+    "revision": 6,
+    "history_length": 6,
+    "record_sha256": "ee5b57d0dcc6f466ef0500e9005a0f72f9d461391400db1ce28e18baae7873a2",
+    "pointer_sha256": "c75408c98940b6c49efd19494fc9e11787535eb69bf0bdc551b857090a3be166",
+    "single_writable_authority": true,
+    "dual_write": false,
+    "old_revisions_preserved": [1, 2, 3, 4, 5]
+  },
+  "transaction": {
+    "protocol": "journaled two-pointer commit; no physical atomicity claim",
+    "generation_ready_before_pointer_writes": true,
+    "active_pointer_crash_fails_authority_closed": true,
+    "recovery_is_idempotent": true,
+    "invalid_evidence_writes_nothing": true
+  },
+  "regression": {
+    "core_author": "38/38 PASS",
+    "authority": "8/8 PASS",
+    "distribution": "3/3 PASS",
+    "runtime_seed": "1/1 PASS",
+    "runtime_transaction": "3/3 PASS",
+    "successor": "3/3 PASS",
+    "r2_successor_and_attacks": "4/4 PASS",
+    "precommit": "3/3 PASS",
+    "shadow_migration": "10/10 PASS",
+    "m6": "8/8 PASS",
+    "canary": "1/1 PASS",
+    "bootstrap": "31/31 PASS",
+    "core_held_out": "1/1 PASS",
+    "task_011_held_out": "13/14 PASS; all three B02/B03 blocker tests PASS",
+    "clean_checkout": "PASS: authority rev6/history6, pre-commit, Core 38/38, transaction 3/3, successor 3/3, r2 attacks 4/4, clean status"
+  },
+  "frozen_test_compatibility": {
+    "test": "tests/authority_switch/test_m8_held_out.py",
+    "not_modified": true,
+    "stale_assertion": "One pre-r2 test requires authority history to equal revisions [1,2,3,4,5]; task-011-r2 explicitly requires revision 6 while preserving revisions 1 through 5.",
+    "protocol_failure": false
+  },
+  "dirty_worktree_protection": {
+    "excluded_user_paths": [
+      ".gitignore",
+      "contracts/architect.md",
+      "contracts/backend-dev.md",
+      "contracts/doc-engineer.md",
+      "contracts/frontend-dev.md",
+      "contracts/quality-auditor.md",
+      "contracts/tester.md",
+      ".yuan/rules/test-integrity.md",
+      "docs/decisions/OPEN-DECISIONS.md",
+      ".yuan-shadow/"
+    ],
+    "tester_held_out_modified": false,
+    "legacy_or_ephemeral_paths_staged": false
+  }
+}

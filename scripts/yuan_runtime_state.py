@@ -167,6 +167,95 @@ def runtime_documents(
     return work, attempts, evidence
 
 
+def artifact_binding_sha256(repo_root: pathlib.Path, scope: str) -> str:
+    """Resolve the exact current artifact represented by an AC scope."""
+    repo = pathlib.Path(repo_root).resolve()
+    target = (repo / scope).resolve()
+    if not inside(target, repo) or not target.exists():
+        raise AuthorityError("Evidence artifact scope is missing or unsafe")
+    if target.is_file():
+        return file_sha256(target)
+    candidate = target / "candidate-manifest.json"
+    if candidate.is_file():
+        return file_sha256(candidate)
+    entries = []
+    for path in sorted(target.rglob("*")):
+        if path.is_symlink():
+            raise AuthorityError("Evidence artifact scope contains a link")
+        if path.is_file():
+            entries.append(
+                {
+                    "path": path.relative_to(target).as_posix(),
+                    "sha256": file_sha256(path),
+                }
+            )
+    if not entries:
+        raise AuthorityError("Evidence artifact scope is empty")
+    return sha256(canonical(entries))
+
+
+def validate_runtime_evidence(
+    repo_root: pathlib.Path,
+    runtime_root: pathlib.Path,
+    attempt: dict[str, Any],
+    evidence: dict[str, Any],
+) -> None:
+    """Apply the frozen Core schema and AC trust predicate before any append."""
+    repo = pathlib.Path(repo_root).resolve()
+    work, attempts, _ = runtime_documents(repo, runtime_root)
+    criteria = [
+        item
+        for item in work.get("acceptance_criteria", [])
+        if item.get("id") == evidence.get("ac_id")
+    ]
+    if len(criteria) != 1:
+        raise AuthorityError("Evidence does not name one active Work AC")
+    ac = criteria[0]
+    core = repo / ".yuan/core/0.1"
+    core_text = str(core)
+    sys.path.insert(0, core_text)
+    for module_name in (
+        "completion_semantics",
+        "document_validation",
+        "schema_runtime",
+        "trust_semantics",
+    ):
+        sys.modules.pop(module_name, None)
+    try:
+        from completion_semantics import evidence_satisfies_ac  # type: ignore
+        from document_validation import validate_document  # type: ignore
+
+        attempts_by_id = {
+            item.get("attempt_id"): item
+            for item in [*attempts, attempt]
+            if isinstance(item.get("attempt_id"), str)
+        }
+        artifact_sha = artifact_binding_sha256(repo, ac["artifact_scope"])
+        environment = evidence.get("environment_binding", {})
+        valid = (
+            not validate_document("attempt", attempt).errors
+            and not validate_document("evidence", evidence).errors
+            and attempt.get("action", {}).get("scope") == ac["artifact_scope"]
+            and evidence_satisfies_ac(
+                work,
+                ac,
+                evidence,
+                artifact_sha256=artifact_sha,
+                environment_id=environment.get("id", ""),
+                environment_fingerprint=environment.get("fingerprint", ""),
+                observed_now=datetime.now(timezone.utc),
+                attempts_by_id=attempts_by_id,
+            )
+        )
+    except (ImportError, OSError, KeyError, TypeError, ValueError) as error:
+        raise AuthorityError("Core Evidence validator is unavailable") from error
+    finally:
+        if sys.path and sys.path[0] == core_text:
+            sys.path.pop(0)
+    if not valid:
+        raise AuthorityError("Evidence failed frozen Core trust validation")
+
+
 def rebuild_runtime_memory(
     repo_root: pathlib.Path,
     runtime_root: pathlib.Path | None = None,
@@ -214,7 +303,7 @@ def rebuild_runtime_memory(
             environment_fingerprint=environment_binding["fingerprint"],
             trusted_now=datetime(2100, 1, 1, tzinfo=timezone.utc),
         )
-    except (ImportError, OSError) as error:
+    except Exception as error:
         raise AuthorityError("Core replay implementation is unavailable") from error
     finally:
         if sys.path[0] == core_text:

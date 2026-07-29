@@ -1,0 +1,62 @@
+{
+  "action": {
+    "authorization_grant_id": "GRANT-CORE-M8-M9",
+    "high_impact": false,
+    "mutating": false,
+    "scope": ".yuan/authority",
+    "self_modification": null,
+    "side_effect_class": "none",
+    "type": "verify"
+  },
+  "attempt_id": "ATT-M8-R2-ACTIVATION-0001",
+  "budget_charge": {
+    "command_seconds": 3,
+    "strategies": 1,
+    "ticks": 1,
+    "tool_calls": 1
+  },
+  "evidence_ids": [
+    "EVD-M8-R2-ACTIVATION-0001"
+  ],
+  "harness_binding": {
+    "id": "yuan.runtime-transaction",
+    "revision": "1",
+    "sha256": "fc666ebcd63c3c29241b02ddcb2f5d3ce2ae37fe4416d8482d4e4c51743d4e68"
+  },
+  "hypothesis": {
+    "claim": "The older root activation and archived runtime close M8 without candidate self-trust.",
+    "falsification": "Any hash, positive-check, archive, CAS, or writer-exclusion mismatch blocks activation."
+  },
+  "journal": [],
+  "outcome": "SUCCEEDED",
+  "postcondition": null,
+  "protocol_binding": {
+    "id": "yuan.core.protocol",
+    "revision": "0.1.0-candidate-activated",
+    "sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3"
+  },
+  "relevant_inputs": [
+    {
+      "scope": ".yuan/authority/activation/yuan-core-0.1.json",
+      "sha256": "6f08c7e10bcd433e2341471bef463e0d37fe6b6c7356f400988868a1b129afe8"
+    }
+  ],
+  "schema_version": "yuan.attempt/v1",
+  "sequence": 1,
+  "side_effect_state": "NOT_APPLICABLE",
+  "strategy_fingerprint": "a1c1e43b66bea18382fb7e0166580c1ecc0827d201b4f7e371a5e9d614e808d9",
+  "tool_receipt": {
+    "exit_code": 0,
+    "kind": "command",
+    "operation_id": "OP-M8-OLD-ROOT-ACTIVATION",
+    "schema_version": "yuan.tool-receipt/v1",
+    "status": "EXITED",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f917cdfedc92167ec714500ea13b445c0a05bab17c71a040997ee320adb3c06b"
+  },
+  "work_binding": {
+    "id": "WORK-yuan-m8-m9-successor",
+    "revision": "2",
+    "sha256": "398b8aefe0782a04f27c0e84c6ebeb2f89ad672373883ee75b688781c19325e5"
+  }
+}
