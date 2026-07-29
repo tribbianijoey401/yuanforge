@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import importlib.util
 import json
@@ -32,6 +33,13 @@ def load_module(name: str, path: pathlib.Path):
 
 authority = load_module("m8_held_out_authority", SCRIPTS / "yuan_authority.py")
 precommit = load_module("m8_held_out_precommit", SCRIPTS / "yuan_precommit.py")
+runtime_state = load_module("m8_held_out_runtime", SCRIPTS / "yuan_runtime_state.py")
+transaction = load_module(
+    "m8_held_out_transaction", SCRIPTS / "yuan_runtime_transaction.py"
+)
+provenance_history = load_module(
+    "m8_held_out_provenance_history", SCRIPTS / "yuan_provenance_history.py"
+)
 
 
 def digest_bytes(payload: bytes) -> str:
@@ -62,18 +70,35 @@ class IndependentAuthorityEvidenceTests(unittest.TestCase):
             record_sha = record["previous_record_sha256"]
 
         history.reverse()
-        self.assertEqual([1, 2, 3, 4], [item["revision"] for item in history])
+        self.assertEqual([1, 2, 3, 4, 5], [item["revision"] for item in history])
         self.assertEqual(
-            ["legacy", "core", "legacy", "core"],
+            ["legacy", "core", "legacy", "core", "core"],
             [item["authority"] for item in history],
         )
         self.assertEqual(
-            [None, "legacy", "core", "legacy"],
+            [None, "legacy", "core", "legacy", "core"],
             [item["receipt"]["from"] for item in history],
         )
         self.assertEqual(
-            ["legacy", "core", "legacy", "core"],
+            ["legacy", "core", "legacy", "core", "core"],
             [item["receipt"]["to"] for item in history],
+        )
+        self.assertEqual(
+            [
+                "41013c2695358479daf8e9756af2654dc867cbf407980f9bc4ff45a84dccf147",
+                "55c5a0134ccafd73895619cb0278f618129e2fd81f2e79a5a2ed66c2534953a4",
+                "6cceb906f2770460aabe66a83857d79173ec996bd7efe81e8a1d91a30193aa83",
+                "9f5b3de9f561fe1ecc16405a7c21dcd24824e1b4735572928cc47aff468b8183",
+            ],
+            [digest_bytes(authority.canonical(item)) for item in history[:4]],
+        )
+        self.assertEqual(
+            history[3]["previous_record_sha256"],
+            "6cceb906f2770460aabe66a83857d79173ec996bd7efe81e8a1d91a30193aa83",
+        )
+        self.assertEqual(
+            history[4]["previous_record_sha256"],
+            "9f5b3de9f561fe1ecc16405a7c21dcd24824e1b4735572928cc47aff468b8183",
         )
         self.assertTrue(all(item["receipt"]["single_writable_authority"] for item in history))
         self.assertTrue(all(not item["receipt"]["dual_write"] for item in history))
@@ -95,7 +120,8 @@ class IndependentAuthorityEvidenceTests(unittest.TestCase):
             (repo / "docs/PROGRESS.md").write_text("legacy-state\n", encoding="utf-8")
 
             legacy_before = digest(repo / "docs/PROGRESS.md")
-            runtime_before = digest(repo / ".yuan-run/runtime-manifest.json")
+            runtime, _, _ = runtime_state.resolve_runtime_root(repo)
+            runtime_before = digest(runtime / "runtime-manifest.json")
             pointer_before = digest(repo / ".yuan/authority/current")
             rolled = authority.switch_authority(
                 repo,
@@ -128,7 +154,8 @@ class IndependentAuthorityEvidenceTests(unittest.TestCase):
             )
             self.assertEqual("core", authority.verify_authority(repo)["authority"])
             self.assertEqual(legacy_before, digest(repo / "docs/PROGRESS.md"))
-            self.assertEqual(runtime_before, digest(repo / ".yuan-run/runtime-manifest.json"))
+            runtime, _, _ = runtime_state.resolve_runtime_root(repo)
+            self.assertEqual(runtime_before, digest(runtime / "runtime-manifest.json"))
             self.assertEqual("core", final["to"])
 
     def test_m0_dirty_files_and_m7_agents_binding_are_byte_recoverable(self) -> None:
@@ -172,12 +199,49 @@ class IndependentAuthorityEvidenceTests(unittest.TestCase):
         )
 
     def test_one_work_and_37_histories_rebuild_memory_byte_for_byte(self) -> None:
-        contracts = list((ROOT / ".yuan-run/contracts").glob("*.json"))
-        attempts = list((ROOT / ".yuan-run/attempts").glob("*.json"))
-        evidence = list((ROOT / ".yuan-run/evidence").glob("*.json"))
+        legacy_runtime = ROOT / ".yuan-run"
+        contracts = list((legacy_runtime / "contracts").glob("*.json"))
+        attempts = list((legacy_runtime / "attempts").glob("*.json"))
+        evidence = list((legacy_runtime / "evidence").glob("*.json"))
         self.assertEqual((1, 37, 37), (len(contracts), len(attempts), len(evidence)))
-        rebuilt = authority.canonical(authority.rebuild_runtime_memory(ROOT))
-        self.assertEqual((ROOT / ".yuan-run/run-memory.json").read_bytes(), rebuilt)
+        archive = json_file(
+            ROOT
+            / ".yuan/authority/runtime-archive"
+            / "a803caf92d9db6b74b67ac8ebd7e4cb76b773a46b267d07406a8298d37891fc4"
+            / "index.json"
+        )
+        expected_paths = {
+            path.relative_to(legacy_runtime).as_posix()
+            for area in ("contracts", "attempts", "evidence")
+            for path in (legacy_runtime / area).glob("*.json")
+        } | {"run-memory.json", "runtime-manifest.json"}
+        self.assertEqual(expected_paths, {item["path"] for item in archive["files"]})
+        for item in archive["files"]:
+            self.assertEqual(item["sha256"], digest(legacy_runtime / item["path"]))
+        with tempfile.TemporaryDirectory(prefix="yuan-r1-legacy-rebuild-") as name:
+            historical = pathlib.Path(name)
+            shutil.copytree(ROOT / ".yuan/core", historical / ".yuan/core")
+            for area in ("contracts", "attempts", "evidence"):
+                shutil.copytree(legacy_runtime / area, historical / ".yuan-run" / area)
+            shutil.copyfile(
+                legacy_runtime / "run-memory.json",
+                historical / ".yuan-run/run-memory.json",
+            )
+            delta = json_file(
+                ROOT / ".yuan/authority/core-history/m7-to-m8/index.json"
+            )
+            for item in delta["entries"]:
+                shutil.copyfile(ROOT / item["retained_blob"], historical / item["path"])
+            rebuilt = authority.canonical(
+                authority.rebuild_runtime_memory(
+                    historical, historical / ".yuan-run"
+                )
+            )
+            self.assertEqual(
+                (legacy_runtime / "run-memory.json").read_bytes(),
+                rebuilt,
+                "legacy Memory must rebuild with its retained Core revision",
+            )
 
     def test_clean_checkout_bootstraps_and_verifies_authority(self) -> None:
         with tempfile.TemporaryDirectory(prefix="yuan-m8-clean-") as name:
@@ -204,10 +268,25 @@ class IndependentAuthorityEvidenceTests(unittest.TestCase):
                 )
                 self.assertEqual(0, result.returncode, result.stderr)
 
+    def test_frozen_m7_registry_and_nine_delta_assertions_replay(self) -> None:
+        receipt = provenance_history.verify_frozen_and_delta(ROOT)
+        self.assertEqual("PASS", receipt["status"])
+        self.assertEqual((2227, 2207, 0), (
+            receipt["semantic_records"],
+            receipt["source_clauses"],
+            receipt["unmapped"],
+        ))
+        self.assertEqual(9, receipt["delta_assertions"])
+        self.assertEqual(
+            "a888fdd3eb35d06fdc6ca926b37bc8dfbccddc39",
+            receipt["baseline_commit"],
+        )
+
 
 class FailClosedAuthorityBlockerTests(unittest.TestCase):
     def test_active_work_authorizes_and_scopes_remaining_m8_m9_work(self) -> None:
-        work = json_file(next((ROOT / ".yuan-run/contracts").glob("*.json")))
+        runtime, _, _ = runtime_state.resolve_runtime_root(ROOT)
+        work = json_file(next((runtime / "contracts").glob("*.json")))
         criteria = json.dumps(work["acceptance_criteria"], ensure_ascii=False).lower()
         allowed = work["scope"]["allowed_paths"]
         requirements = (
@@ -228,14 +307,55 @@ class FailClosedAuthorityBlockerTests(unittest.TestCase):
         for requirement, present in requirements:
             with self.subTest(requirement=requirement):
                 self.assertTrue(present, f"active Work lacks {requirement}")
+        for criterion in work["acceptance_criteria"]:
+            binding = criterion["verifier_binding"]
+            with self.subTest(ac_id=criterion["id"], property="verifier-binding"):
+                self.assertEqual(
+                    {"id", "revision", "sha256", "trust_root_id"},
+                    {"id", "revision", "sha256", "trust_root_id"} & set(binding),
+                )
+                self.assertRegex(binding["sha256"], r"^[0-9a-f]{64}$")
+                self.assertGreater(binding["minimum_assertions"], 0)
+                self.assertTrue(binding["environment_ids"])
+                self.assertEqual(
+                    set(binding["environment_ids"]),
+                    set(binding["environment_fingerprints"]),
+                )
+        self.assertTrue(all(value > 0 for value in work["budget"].values()))
+        self.assertFalse(
+            any(
+                "docs" in grant["scopes"]
+                for grant in work["authorization"]["grants"]
+            ),
+            "tombstone scope must not be pre-authorized",
+        )
 
     def test_continue_result_has_a_legal_next_step(self) -> None:
-        memory = json_file(ROOT / ".yuan-run/run-memory.json")
+        runtime, _, _ = runtime_state.resolve_runtime_root(ROOT)
+        memory = json_file(runtime / "run-memory.json")
         if memory["last_result"] == "CONTINUE":
             self.assertTrue(
                 memory["legal_next_steps"],
                 "Core protocol permits CONTINUE only when a legal next step exists",
             )
+            self.assertEqual(
+                "AC-M9-SELF-MODIFICATION-DOGFOOD",
+                memory["legal_next_steps"][0]["ac_id"],
+            )
+        work = json_file(next((runtime / "contracts").glob("*.json")))
+        tombstone = next(
+            item
+            for item in work["acceptance_criteria"]
+            if "TOMBSTONE" in item["id"]
+        )
+        self.assertEqual("human-judgment", tombstone["type"])
+        self.assertFalse(
+            any(
+                tombstone["artifact_scope"] in grant["scopes"]
+                for grant in work["authorization"]["grants"]
+            ),
+            "tombstone must remain WAIT_AUTH without a human grant",
+        )
 
     def test_core_activation_is_not_self_contradictory(self) -> None:
         protocol_path = ROOT / ".yuan/core/0.1/protocol.md"
@@ -253,6 +373,36 @@ class FailClosedAuthorityBlockerTests(unittest.TestCase):
             "active Core still declares itself inert and the authority record "
             "does not bind an older-root independent activation proof",
         )
+        descriptor = json_file(
+            ROOT / ".yuan/authority/activation/yuan-core-0.1.json"
+        )
+        old_root_manifest = (
+            ROOT / ".yuan/authority/activation/evidence/old-root-manifest.json"
+        )
+        required_bindings = (
+            (
+                "previous candidate manifest",
+                descriptor.get("previous_candidate_manifest_sha256")
+                == "20ac1cbb7f2377d5cecadf3347a40d81e14e8469c6c914701f585a49903d9768",
+            ),
+            (
+                "activated candidate manifest",
+                descriptor.get("candidate_manifest_sha256")
+                == digest(ROOT / ".yuan/core/0.1/candidate-manifest.json"),
+            ),
+            (
+                "old-root suite manifest",
+                descriptor.get("older_root_manifest_sha256")
+                == digest(old_root_manifest),
+            ),
+            (
+                "protocol",
+                descriptor.get("protocol_sha256") == digest(protocol_path),
+            ),
+        )
+        for binding, present in required_bindings:
+            with self.subTest(binding=binding):
+                self.assertTrue(present, f"activation descriptor does not bind {binding}")
 
     def test_core_precommit_rejects_every_legacy_state_and_spec_root(self) -> None:
         paths = (
@@ -263,6 +413,11 @@ class FailClosedAuthorityBlockerTests(unittest.TestCase):
             "contracts/tester.md",
             ".yuan/rules/iron-rules.md",
             ".yuan/specs/object-protocol.md",
+            ".yuan/docs/TASK_BOARD.schema.md",
+            ".yuan/platforms/codex.md",
+            ".yuan/skills/role-switch/SKILL.md",
+            "protocols/state-machine.md",
+            "templates/role-contract.md",
         )
         for path in paths:
             with self.subTest(path=path):
@@ -287,17 +442,105 @@ class FailClosedAuthorityBlockerTests(unittest.TestCase):
                 precommit._verify_provenance(ROOT)
 
     def test_core_has_a_legal_cas_path_to_reseal_after_new_evidence(self) -> None:
-        manifest = ROOT / ".yuan-run/runtime-manifest.json"
-        try:
-            target = authority.assert_write_allowed(
+        runtime, pointer, active_sha = runtime_state.resolve_runtime_root(ROOT)
+        self.assertIsNotNone(pointer)
+        self.assertIsNotNone(active_sha)
+        with self.assertRaisesRegex(authority.AuthorityError, "transaction"):
+            authority.assert_write_allowed(
                 ROOT,
                 "core",
-                ".yuan-run/runtime-manifest.json",
-                digest(manifest),
+                (runtime / "evidence/0002.json").relative_to(ROOT),
+                None,
             )
-        except authority.AuthorityError as error:
-            self.fail(f"new immutable Evidence cannot be legally resealed: {error}")
-        self.assertEqual(manifest, target)
+        self.assertTrue(callable(transaction.append_runtime_transaction))
+        self.assertTrue(callable(transaction.recover_runtime_transaction))
+
+
+class R1AdversarialBindingTests(unittest.TestCase):
+    def copy_runtime_repo(self, target: pathlib.Path) -> None:
+        for relative in (".yuan", ".yuan-run", "scripts"):
+            shutil.copytree(ROOT / relative, target / relative)
+
+    def test_authority_rejects_tampered_activated_core_and_old_root_manifest(self) -> None:
+        targets = (
+            ".yuan/core/0.1/runtime_replay.py",
+            ".yuan/authority/activation/evidence/old-root-manifest.json",
+        )
+        for relative in targets:
+            with self.subTest(relative=relative):
+                with tempfile.TemporaryDirectory(prefix="yuan-r1-activation-") as name:
+                    repo = pathlib.Path(name)
+                    self.copy_runtime_repo(repo)
+                    path = repo / relative
+                    path.write_bytes(path.read_bytes() + b"\n")
+                    with self.assertRaises(authority.AuthorityError):
+                        authority.verify_authority(repo)
+
+    def test_untrusted_m9_evidence_cannot_advance_to_tombstone(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="yuan-r1-untrusted-") as name:
+            repo = pathlib.Path(name)
+            self.copy_runtime_repo(repo)
+            runtime, _, active_before = runtime_state.resolve_runtime_root(repo)
+            work = json_file(next((runtime / "contracts").glob("*.json")))
+            previous_attempt = json_file(next((runtime / "attempts").glob("*.json")))
+            previous_evidence = json_file(next((runtime / "evidence").glob("*.json")))
+            attempt = copy.deepcopy(previous_attempt)
+            attempt.update(
+                {
+                    "attempt_id": "ATT-UNTRUSTED-M9-0002",
+                    "sequence": 2,
+                    "evidence_ids": ["EVD-UNTRUSTED-M9-0002"],
+                }
+            )
+            attempt["action"].update(
+                {
+                    "type": "verify",
+                    "mutating": False,
+                    "side_effect_class": "none",
+                    "scope": ".yuan/core/0.1",
+                    "authorization_grant_id": "GRANT-CORE-M8-M9",
+                }
+            )
+            evidence = copy.deepcopy(previous_evidence)
+            evidence.update(
+                {
+                    "evidence_id": "EVD-UNTRUSTED-M9-0002",
+                    "sequence": 2,
+                    "source_attempt_id": attempt["attempt_id"],
+                    "ac_id": "AC-M9-SELF-MODIFICATION-DOGFOOD",
+                    "kind": "integration",
+                }
+            )
+            self.assertNotEqual(
+                evidence["verifier_binding"],
+                next(
+                    item["verifier_binding"]
+                    for item in work["acceptance_criteria"]
+                    if item["id"] == evidence["ac_id"]
+                ),
+            )
+            evidence["immutable_digest"] = transaction.canonical_digest(
+                evidence, omitted_paths=(("immutable_digest",),)
+            )
+            authority_before = digest(repo / ".yuan/authority/current")
+            transaction.append_runtime_transaction(
+                repo,
+                attempt,
+                evidence,
+                expected_authority_pointer_sha256=authority_before,
+                expected_active_run_pointer_sha256=active_before,
+            )
+            active_runtime, _, _ = runtime_state.resolve_runtime_root(repo)
+            memory = json_file(active_runtime / "run-memory.json")
+            self.assertEqual(
+                "CONTINUE",
+                memory["last_result"],
+                "untrusted Evidence must not advance the M9 AC",
+            )
+            self.assertEqual(
+                "AC-M9-SELF-MODIFICATION-DOGFOOD",
+                memory["legal_next_steps"][0]["ac_id"],
+            )
 
 
 if __name__ == "__main__":
