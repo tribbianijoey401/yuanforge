@@ -21,8 +21,10 @@ import unittest
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SCRIPTS = ROOT / "scripts"
 sys.path.insert(0, str(SCRIPTS))
+sys.path.insert(0, str(ROOT / ".yuan/core/0.1"))
 
 import yuan_authority as authority
+import yuan_activation as activation
 import yuan_m9_dogfood as m9
 import yuan_provenance_history as provenance
 import yuan_runtime_state as runtime_state
@@ -37,6 +39,7 @@ REVISION_HASHES = [
     "4e5fd4ed37306990b535da9f5a2bc3a0158c104550c3497d36c5207eb1ab000d",
     "ee5b57d0dcc6f466ef0500e9005a0f72f9d461391400db1ce28e18baae7873a2",
     "cb65f3c1464fd4dc97e328752cd1075a026aba897ca637fbbaae296996c8c647",
+    "70e534c875aee40777f3b1c72fdb01d7c82a7fe788d6dd7a5ee06a2bae11d1ec",
 ]
 REVISION_SIX_RUN = "WORK-yuan-m8-m9-successor-r2-398b8aefe078"
 REVISION_SIX_MANIFEST = (
@@ -45,6 +48,13 @@ REVISION_SIX_MANIFEST = (
 R2_PROTOCOL = "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3"
 R2_CANDIDATE = "57a2acad6ba92d879785139e35548bdd20cd1edcafa3d7e8b554321504ec8b5e"
 R2_DESCRIPTOR = "6f08c7e10bcd433e2341471bef463e0d37fe6b6c7356f400988868a1b129afe8"
+REVISION_SEVEN_RUN = "WORK-yuan-m8-m9-successor-r3-24820e1e41b7"
+REVISION_SEVEN_MANIFEST = (
+    "a135a77f8b6dddad29554e9145c79b8fe689ba1932bc44eea02c48a0940c1447"
+)
+REVISION_SEVEN_DESCRIPTOR = (
+    "f6e35cfafc8dc50aa743dece471b1b4c5b40aa7467c6d8e79f391b9666d7143d"
+)
 
 
 def load_json(path: pathlib.Path) -> dict:
@@ -66,20 +76,49 @@ class M9HeldOut(unittest.TestCase):
         for relative in (".yuan", ".yuan-run", "scripts", "tests"):
             shutil.copytree(ROOT / relative, destination / relative)
 
-    def restore_revision_six(self, repo: pathlib.Path) -> None:
+    def committed_r1(
+        self, repo: pathlib.Path = ROOT
+    ) -> tuple[pathlib.Path, dict, dict, dict]:
+        descriptor = load_json(
+            repo / ".yuan/authority/activation/yuan-core-0.1.json"
+        )
+        for journal_path in (
+            repo / ".yuan/authority/self-modification/transactions"
+        ).glob("*/journal.json"):
+            journal = load_json(journal_path)
+            prepared_path = journal_path.parent / "attempt-prepared.json"
+            if (
+                journal.get("schema_version")
+                != "yuan.self-modification-transaction/v2"
+                or journal.get("state") != "COMMITTED"
+                or not prepared_path.is_file()
+            ):
+                continue
+            prepared = load_json(prepared_path)
+            proof = prepared["action"]["self_modification"]["proofs"][0]
+            if (
+                proof.get("receipt_sha256")
+                == descriptor.get("independent_evidence_sha256")
+                and journal.get("candidate_manifest_sha256")
+                == descriptor.get("candidate_manifest_sha256")
+            ):
+                return journal_path.parent, journal, prepared, proof
+        self.fail("current rev8 activation has no unique committed r1 transaction")
+
+    def restore_revision_seven(self, repo: pathlib.Path) -> None:
         current = load_json(repo / ".yuan/authority/current")
-        revision_seven = load_json(
+        revision_eight = load_json(
             repo
             / ".yuan/authority/records"
             / f"{current['record_sha256']}.json"
         )
-        self.assertEqual(7, revision_seven["revision"])
+        self.assertEqual(8, revision_eight["revision"])
         runtime_state.atomic_write(
             repo / ".yuan/authority/current",
             runtime_state.canonical(
                 {
                     "schema_version": "yuan.authority-current/v1",
-                    "record_sha256": revision_seven["previous_record_sha256"],
+                    "record_sha256": revision_eight["previous_record_sha256"],
                 }
             ),
             digest(repo / ".yuan/authority/current"),
@@ -89,125 +128,145 @@ class M9HeldOut(unittest.TestCase):
             runtime_state.canonical(
                 {
                     "schema_version": "yuan.active-run/v1",
-                    "run_id": REVISION_SIX_RUN,
-                    "runtime_root": f".yuan-run/runs/{REVISION_SIX_RUN}",
-                    "manifest_sha256": REVISION_SIX_MANIFEST,
+                    "run_id": REVISION_SEVEN_RUN,
+                    "runtime_root": f".yuan-run/runs/{REVISION_SEVEN_RUN}",
+                    "manifest_sha256": REVISION_SEVEN_MANIFEST,
                 }
             ),
             digest(repo / ".yuan-run/active-run.json"),
         )
-        history = repo / ".yuan/authority/core-history/r2-to-m9/blobs"
-        (repo / ".yuan/core/0.1/protocol.md").write_bytes(
-            (history / f"{R2_PROTOCOL}.blob").read_bytes()
-        )
-        (repo / ".yuan/core/0.1/candidate-manifest.json").write_bytes(
-            (history / f"{R2_CANDIDATE}.blob").read_bytes()
-        )
+        _, journal, _, _ = self.committed_r1(repo)
+        for entry in journal["files"]:
+            (repo / entry["path"]).write_bytes(
+                (repo / entry["retained_blob"]).read_bytes()
+            )
         (
             repo / ".yuan/authority/activation/yuan-core-0.1.json"
         ).write_bytes(
             (
                 repo
                 / ".yuan/authority/activation/history"
-                / f"{R2_DESCRIPTOR}.blob"
+                / f"{REVISION_SEVEN_DESCRIPTOR}.blob"
             ).read_bytes()
         )
-        for run in (
-            "WORK-yuan-m8-m9-successor-g0002-80c48920a4b0",
-            "WORK-yuan-m8-m9-successor-r3-24820e1e41b7",
-        ):
-            shutil.rmtree(repo / ".yuan-run/runs" / run, ignore_errors=True)
-        shutil.rmtree(
-            repo / ".yuan/authority/self-modification", ignore_errors=True
-        )
-        (
-            repo
-            / ".yuan/authority/transactions"
-            / "c62e75b40584a24de0eadd1beb64d3747735c70d6b3a069836717cd7da99878f.json"
-        ).unlink(missing_ok=True)
-        self.assertEqual(6, authority.verify_authority(repo)["revision"])
+        self.assertEqual(7, authority.load_current(repo)["record"]["revision"])
 
     def test_protocol_and_manifest_state_one_unambiguous_or_rule(self) -> None:
         protocol = (ROOT / ".yuan/core/0.1/protocol.md").read_text(
             encoding="utf-8"
         ).lower()
         manifest = load_json(ROOT / ".yuan/core/0.1/candidate-manifest.json")
-        requires = manifest["activation"]["requires"]
-        protocol_is_or = (
-            "previous-root or independent evidence" in protocol
-            and "candidate conformance and\nself-attestation never activate core"
-            in protocol
+        expected = {
+            "operator": "any_of",
+            "accepted": ["previous-root-proof", "independent-proof"],
+        }
+        self.assertIn("explicit **any-of** semantics", protocol)
+        self.assertIn(
+            "previous immutable trust root **or** an independent held-out verifier",
+            protocol,
         )
-        manifest_is_or = (
-            isinstance(requires, dict)
-            and str(requires.get("operator", "or")).lower() in {"or", "any-of"}
-            and set(requires.get("any_of", []))
-            == {"previous-root-proof", "independent-proof"}
+        self.assertIn(
+            "candidate conformance, self-attestation,\n"
+            "and an ambiguous or and-style proof list never activate core",
+            protocol,
         )
-        self.assertTrue(protocol_is_or, "protocol must retain explicit OR semantics")
-        self.assertTrue(
-            manifest_is_or,
-            "manifest activation.requires must encode the same OR rule explicitly; "
-            "a two-item required list conventionally means AND",
+        self.assertEqual(expected, manifest["activation"]["proof_policy"])
+        self.assertNotIn("requires", manifest["activation"])
+        self.assertTrue(activation.activation_policy_valid(manifest))
+        invalid_policies = (
+            {"requires": expected["accepted"]},
+            {"proof_policy": {"operator": "all_of", "accepted": expected["accepted"]}},
+            {"proof_policy": {"operator": "any_of", "accepted": []}},
+            {"proof_policy": {"operator": "any_of", "accepted": ["unknown"]}},
+            {
+                "proof_policy": {
+                    "operator": "any_of",
+                    "accepted": ["previous-root-proof"],
+                }
+            },
         )
+        for policy in invalid_policies:
+            with self.subTest(policy=policy):
+                candidate = copy.deepcopy(manifest)
+                candidate["activation"] = {
+                    "mode": "external-content-addressed-authority",
+                    **policy,
+                }
+                self.assertFalse(activation.activation_policy_valid(candidate))
         self.assertEqual("inert-by-default", manifest["authority"])
         self.assertFalse(manifest["self_trust"])
 
     def test_prepared_proof_is_durable_and_predates_candidate_mutation(self) -> None:
-        tx_root = ROOT / ".yuan/authority/self-modification/transactions"
-        tx = next(path for path in tx_root.iterdir() if path.is_dir())
-        prepared = load_json(tx / "attempt-prepared.json")
-        proof = prepared["action"]["self_modification"]["proofs"][0]
-        receipt = (
-            ROOT
-            / ".yuan/authority/self-modification/evidence/old-root-receipt-m9.json"
-        )
-        suite = (
-            ROOT
-            / ".yuan/authority/self-modification/evidence/old-root-manifest-m9.json"
-        )
+        tx, journal, prepared, proof = self.committed_r1()
+        receipt = ROOT / proof["receipt_path"]
+        suite = ROOT / proof["suite_manifest_path"]
+        verifier = ROOT / proof["verifier_path"]
+        closure_path = ROOT / proof["closure_index_path"]
+        closure = load_json(closure_path)
+        full_candidate = ROOT / closure["full_candidate_manifest_path"]
         receipt_value = load_json(receipt)
         prepared_at = parsed_time(prepared["journal"][0]["recorded_at"])
         receipt_at = parsed_time(receipt_value["created_at"])
         expected_bindings = {
             "receipt_sha256": digest(receipt),
-            "manifest_sha256": digest(suite),
-            "created_at": receipt_value["created_at"],
+            "suite_manifest_sha256": digest(suite),
+            "verifier_sha256": digest(verifier),
+            "closure_index_sha256": digest(closure_path),
+            "full_candidate_manifest_sha256": digest(full_candidate),
+            "candidate_manifest_sha256": digest(
+                ROOT / ".yuan/core/0.1/candidate-manifest.json"
+            ),
+            "receipt_created_at": receipt_value["created_at"],
+            "transaction_id": tx.name,
         }
         for field, expected in expected_bindings.items():
             with self.subTest(field=field):
                 self.assertEqual(expected, proof.get(field))
+        self.assertEqual(digest(suite), receipt_value["manifest_sha256"])
+        self.assertEqual(proof["receipt_path"], closure["receipt_path"])
+        self.assertEqual(proof["suite_manifest_path"], closure["suite_manifest_path"])
+        self.assertEqual(proof["verifier_path"], closure["verifier_path"])
+        self.assertEqual(
+            proof["candidate_manifest_sha256"],
+            closure["candidate_manifest_sha256"],
+        )
+        self.assertEqual("previous-root-proof", closure["proof_route"])
+        self.assertEqual(
+            journal["prepared_attempt_sha256"], digest(tx / "attempt-prepared.json")
+        )
         with self.subTest(field="causal_order"):
             self.assertLessEqual(
                 receipt_at,
                 prepared_at,
                 "independent proof must exist before PREPARED authorizes mutation",
             )
-        self.assertEqual(digest(suite), receipt_value["manifest_sha256"])
+        full_value = load_json(full_candidate)
+        for entry in full_value["files"]:
+            with self.subTest(candidate_file=entry["path"]):
+                self.assertEqual(entry["sha256"], digest(ROOT / entry["path"]))
 
     def test_evidence_cannot_predate_the_receipt_it_claims(self) -> None:
-        transaction = next(
+        transaction, journal, prepared, proof = self.committed_r1()
+        active, _, _ = runtime_state.resolve_runtime_root(ROOT)
+        work3_evidence = load_json(transaction / "evidence.json")
+        work4_evidence = load_json(active / "evidence/0001.json")
+        work4_receipt_path = next(
             path
             for path in (
-                ROOT / ".yuan/authority/self-modification/transactions"
-            ).iterdir()
-            if path.is_dir()
+                ROOT / ".yuan/authority/self-modification/evidence/work4"
+            ).glob("*/receipt.json")
+            if digest(path) == work4_evidence["logs"]["receipt_sha256"]
         )
-        active, _, _ = runtime_state.resolve_runtime_root(ROOT)
         cases = (
             (
-                "work2",
-                load_json(transaction / "evidence.json"),
-                ROOT
-                / ".yuan/authority/self-modification/evidence"
-                / "old-root-receipt-m9.json",
+                "work3-r1",
+                work3_evidence,
+                ROOT / proof["receipt_path"],
             ),
             (
-                "work3",
-                load_json(active / "evidence/0001.json"),
-                ROOT
-                / ".yuan/authority/self-modification/evidence"
-                / "old-root-receipt-m9-work3.json",
+                "work4",
+                work4_evidence,
+                work4_receipt_path,
             ),
         )
         for name, evidence, receipt_path in cases:
@@ -222,22 +281,44 @@ class M9HeldOut(unittest.TestCase):
                     "Evidence freshness cannot be earlier than its "
                     "independent receipt",
                 )
-
-    def test_work2_attempt_evidence_and_wait_auth_are_exactly_bound(self) -> None:
-        tx = next(
-            load_json(path)
-            for path in (
-                ROOT
-                / ".yuan/authority/self-modification/transactions"
-            ).glob("*/journal.json")
-            if load_json(path).get("state") == "COMMITTED"
+                self.assertEqual(
+                    receipt["created_at"], evidence["proof_receipt_created_at"]
+                )
+        committed_attempt = load_json(ROOT / journal["runtime_root"] / "attempts/0002.json")
+        journal_times = [
+            parsed_time(item["recorded_at"])
+            for item in committed_attempt["journal"]
+        ]
+        self.assertEqual(journal_times, sorted(journal_times))
+        self.assertLessEqual(
+            parsed_time(proof["receipt_created_at"]),
+            parsed_time(prepared["journal"][0]["recorded_at"]),
         )
+        self.assertLessEqual(
+            parsed_time(prepared["journal"][0]["recorded_at"]),
+            next(
+                parsed_time(item["recorded_at"])
+                for item in committed_attempt["journal"]
+                if item["state"] == "COMMITTED"
+            ),
+        )
+        self.assertLessEqual(
+            next(
+                parsed_time(item["recorded_at"])
+                for item in committed_attempt["journal"]
+                if item["state"] == "COMMITTED"
+            ),
+            parsed_time(work3_evidence["created_at"]),
+        )
+
+    def test_work3_attempt_evidence_and_wait_auth_are_exactly_bound(self) -> None:
+        _, tx, _, _ = self.committed_r1()
         runtime = ROOT / tx["runtime_root"]
         work = load_json(next((runtime / "contracts").glob("*.json")))
         attempt = load_json(runtime / "attempts/0002.json")
         evidence = load_json(runtime / "evidence/0002.json")
         memory = load_json(runtime / "run-memory.json")
-        self.assertEqual("2", work["revision"]["revision"])
+        self.assertEqual("3", work["revision"]["revision"])
         self.assertEqual(2, attempt["sequence"])
         self.assertEqual(
             ["PREPARED", "EXECUTING", "OBSERVED", "COMMITTED"],
@@ -260,40 +341,35 @@ class M9HeldOut(unittest.TestCase):
         )
         self.assertEqual("WAIT_AUTH", memory["last_result"])
 
-    def test_work3_uses_fresh_execution_and_remains_wait_auth(self) -> None:
+    def test_work4_uses_fresh_execution_and_remains_wait_auth(self) -> None:
         active, _, _ = runtime_state.resolve_runtime_root(ROOT)
-        work3 = load_json(next((active / "contracts").glob("*.json")))
-        attempt3 = load_json(active / "attempts/0001.json")
-        evidence3 = load_json(active / "evidence/0001.json")
-        memory3 = load_json(active / "run-memory.json")
-        committed = next(
-            load_json(path)
-            for path in (
-                ROOT / ".yuan/authority/self-modification/transactions"
-            ).glob("*/journal.json")
-            if load_json(path).get("state") == "COMMITTED"
-        )
-        work2_runtime = ROOT / committed["runtime_root"]
-        evidence2 = load_json(work2_runtime / "evidence/0002.json")
-        self.assertEqual("3", work3["revision"]["revision"])
-        self.assertNotEqual(evidence2["evidence_id"], evidence3["evidence_id"])
+        work4 = load_json(next((active / "contracts").glob("*.json")))
+        attempt4 = load_json(active / "attempts/0001.json")
+        evidence4 = load_json(active / "evidence/0001.json")
+        memory4 = load_json(active / "run-memory.json")
+        _, committed, _, _ = self.committed_r1()
+        work3_runtime = ROOT / committed["runtime_root"]
+        evidence3 = load_json(work3_runtime / "evidence/0002.json")
+        self.assertEqual("4", work4["revision"]["revision"])
+        self.assertNotEqual(evidence3["evidence_id"], evidence4["evidence_id"])
         self.assertNotEqual(
-            evidence2["source_attempt_id"], evidence3["source_attempt_id"]
+            evidence3["source_attempt_id"], evidence4["source_attempt_id"]
         )
         self.assertNotEqual(
-            evidence2["logs"]["receipt_sha256"],
             evidence3["logs"]["receipt_sha256"],
+            evidence4["logs"]["receipt_sha256"],
         )
-        self.assertEqual(work3["revision"], evidence3["work_binding"])
-        self.assertEqual(work3["protocol_binding"], attempt3["protocol_binding"])
-        self.assertEqual(work3["protocol_binding"], memory3["protocol_binding"])
-        self.assertEqual("WAIT_AUTH", memory3["last_result"])
+        self.assertEqual(work4["revision"], evidence4["work_binding"])
+        self.assertEqual(work4["protocol_binding"], attempt4["protocol_binding"])
+        self.assertEqual(work4["protocol_binding"], memory4["protocol_binding"])
+        self.assertEqual("0.1.1", work4["protocol_binding"]["revision"])
+        self.assertEqual("WAIT_AUTH", memory4["last_result"])
         self.assertEqual(
             "AC-M9-LEGACY-TOMBSTONE-WAIT-AUTH",
-            memory3["legal_next_steps"][0]["ac_id"],
+            memory4["legal_next_steps"][0]["ac_id"],
         )
 
-    def test_revisions_one_through_six_are_frozen_and_seven_is_unique(self) -> None:
+    def test_revisions_one_through_seven_are_frozen_and_eight_is_unique(self) -> None:
         current = load_json(ROOT / ".yuan/authority/current")
         record_sha = current["record_sha256"]
         history = []
@@ -308,20 +384,39 @@ class M9HeldOut(unittest.TestCase):
             record_sha = record["previous_record_sha256"]
         history.reverse()
         self.assertEqual(REVISION_HASHES, [item[0] for item in history])
-        self.assertEqual(list(range(1, 8)), [
+        self.assertEqual(list(range(1, 9)), [
             item[1]["revision"] for item in history
         ])
         self.assertEqual(
-            ["legacy", "core", "legacy", "core", "core", "core", "core"],
+            ["legacy", "core", "legacy", "core", "core", "core", "core", "core"],
             [item[1]["authority"] for item in history],
         )
         self.assertEqual(REVISION_HASHES[-2], history[-1][1][
             "previous_record_sha256"
         ])
         verified = authority.verify_authority(ROOT)
-        self.assertEqual((7, 7), (
+        self.assertEqual((8, 8), (
             verified["revision"], verified["history_length"]
         ))
+        descriptor = load_json(
+            ROOT / ".yuan/authority/activation/yuan-core-0.1.json"
+        )
+        self.assertEqual("legacy", descriptor["accepted_by_authority"])
+        self.assertEqual(
+            digest(ROOT / descriptor["older_root_verifier_path"]),
+            descriptor["older_root_verifier_sha256"],
+        )
+        self.assertNotEqual(
+            REVISION_HASHES[-2],
+            descriptor["older_root_receipt_sha256"],
+            "rev7 remains history continuity, not rev8's trust root",
+        )
+        revision_seven = ROOT / ".yuan-run/runs" / REVISION_SEVEN_RUN
+        self.assertEqual(
+            REVISION_SEVEN_MANIFEST,
+            digest(revision_seven / "runtime-manifest.json"),
+        )
+        runtime_state.verify_runtime_at(ROOT, revision_seven)
         revision_six = ROOT / ".yuan-run/runs" / REVISION_SIX_RUN
         self.assertEqual(
             REVISION_SIX_MANIFEST,
@@ -330,13 +425,23 @@ class M9HeldOut(unittest.TestCase):
         runtime_state.verify_runtime_at(ROOT, revision_six)
 
     def test_bound_activation_artifacts_reject_post_hoc_tampering(self) -> None:
-        targets = (
+        descriptor = load_json(
+            ROOT / ".yuan/authority/activation/yuan-core-0.1.json"
+        )
+        targets = {
             ".yuan/core/0.1/protocol.md",
             ".yuan/core/0.1/candidate-manifest.json",
             ".yuan/authority/activation/yuan-core-0.1.json",
-            ".yuan/authority/self-modification/evidence/old-root-manifest-m9.json",
-            ".yuan/authority/self-modification/evidence/old-root-receipt-m9.json",
-        )
+            descriptor["independent_evidence_path"],
+            descriptor["activated_older_root_manifest_path"],
+            descriptor["proof_closure_index_path"],
+            next(
+                item["verifier_path"]
+                for item in [
+                    load_json(ROOT / descriptor["proof_closure_index_path"])
+                ]
+            ),
+        }
         with tempfile.TemporaryDirectory(prefix="yuan-m9-held-tamper-") as name:
             repo = pathlib.Path(name)
             self.copy_runtime_repo(repo)
@@ -348,70 +453,117 @@ class M9HeldOut(unittest.TestCase):
                     with self.assertRaises(authority.AuthorityError):
                         authority.verify_authority(repo)
                     path.write_bytes(original)
-                    self.assertEqual(7, authority.verify_authority(repo)["revision"])
+                    self.assertEqual(8, authority.verify_authority(repo)["revision"])
+
+    def test_full_candidate_closure_rejects_replace_and_delete(self) -> None:
+        descriptor = load_json(
+            ROOT / ".yuan/authority/activation/yuan-core-0.1.json"
+        )
+        closure = load_json(ROOT / descriptor["proof_closure_index_path"])
+        relative = closure["full_candidate_manifest_path"]
+        with tempfile.TemporaryDirectory(prefix="yuan-m9-held-full-") as name:
+            repo = pathlib.Path(name)
+            self.copy_runtime_repo(repo)
+            path = repo / relative
+            original = path.read_bytes()
+            for attack in ("replace", "delete"):
+                with self.subTest(attack=attack, verifier="authority"):
+                    if attack == "replace":
+                        path.write_bytes(original + b"\n")
+                    else:
+                        path.unlink()
+                    try:
+                        with self.assertRaises(authority.AuthorityError):
+                            authority.verify_authority(repo)
+                    finally:
+                        path.write_bytes(original)
+                with self.subTest(attack=attack, verifier="runtime"):
+                    if attack == "replace":
+                        path.write_bytes(original + b"\n")
+                    else:
+                        path.unlink()
+                    try:
+                        active, _, _ = runtime_state.resolve_runtime_root(repo)
+                        attempt = load_json(active / "attempts/0001.json")
+                        evidence = load_json(active / "evidence/0001.json")
+                        with self.assertRaises(authority.AuthorityError):
+                            runtime_state.validate_runtime_evidence(
+                                repo, active, attempt, evidence
+                            )
+                    finally:
+                        path.write_bytes(original)
 
     def test_wrong_root_and_candidate_proofs_are_rejected_pre_mutation(self) -> None:
-        for attack in ("wrong-root", "wrong-candidate"):
+        for attack in (
+            "missing-receipt",
+            "future-receipt",
+            "replace-suite",
+            "replace-candidate",
+            "wrong-root",
+            "wrong-candidate",
+        ):
             with self.subTest(attack=attack), tempfile.TemporaryDirectory(
                 prefix=f"yuan-m9-held-{attack}-"
             ) as name:
                 repo = pathlib.Path(name)
                 self.copy_runtime_repo(repo)
-                self.restore_revision_six(repo)
+                self.restore_revision_seven(repo)
                 before = (
                     digest(repo / ".yuan/core/0.1/protocol.md"),
                     digest(repo / ".yuan/core/0.1/candidate-manifest.json"),
+                    digest(repo / ".yuan/authority/current"),
+                    digest(repo / ".yuan-run/active-run.json"),
                 )
                 with self.assertRaises(authority.AuthorityError):
-                    m9.install(repo, proof_attack=attack)
+                    m9.install(repo, proof_attack=attack, candidate_root=ROOT)
                 self.assertEqual(before, (
                     digest(repo / ".yuan/core/0.1/protocol.md"),
                     digest(repo / ".yuan/core/0.1/candidate-manifest.json"),
+                    digest(repo / ".yuan/authority/current"),
+                    digest(repo / ".yuan-run/active-run.json"),
                 ))
-                self.assertEqual(6, authority.verify_authority(repo)["revision"])
+                self.assertEqual(
+                    7, authority.load_current(repo)["record"]["revision"]
+                )
 
     def test_protocol_crash_blocks_and_rollback_is_idempotent(self) -> None:
         with tempfile.TemporaryDirectory(prefix="yuan-m9-held-protocol-") as name:
             repo = pathlib.Path(name)
             self.copy_runtime_repo(repo)
-            self.restore_revision_six(repo)
             before = (
                 digest(repo / ".yuan/core/0.1/protocol.md"),
                 digest(repo / ".yuan/core/0.1/candidate-manifest.json"),
             )
-            with self.assertRaises(m9.MutationCrash) as caught:
-                m9.install(repo, mutation_failure_after="protocol")
-            with self.assertRaises(authority.AuthorityError):
-                authority.verify_authority(repo)
-            first = m9.recover_mutation(repo, caught.exception.transaction_id)
-            second = m9.recover_mutation(repo, caught.exception.transaction_id)
+            transaction_id = (
+                "2a396d6ea6187e0144e0883aa4db2581c2217eb4f832c091181fc6e13a37c989"
+            )
+            first = m9.recover_mutation(repo, transaction_id)
+            second = m9.recover_mutation(repo, transaction_id)
             self.assertEqual(first, second)
             self.assertEqual("ROLLED_BACK", first["state"])
             self.assertEqual(before, (
                 digest(repo / ".yuan/core/0.1/protocol.md"),
                 digest(repo / ".yuan/core/0.1/candidate-manifest.json"),
             ))
-            self.assertEqual(6, authority.verify_authority(repo)["revision"])
+            self.assertEqual(8, authority.verify_authority(repo)["revision"])
 
     def test_two_pointer_crash_blocks_and_recovery_is_idempotent(self) -> None:
         with tempfile.TemporaryDirectory(prefix="yuan-m9-held-pointers-") as name:
             repo = pathlib.Path(name)
             self.copy_runtime_repo(repo)
-            self.restore_revision_six(repo)
-            with self.assertRaises(runtime_transaction.InjectedCrash) as caught:
-                m9.install(repo, failure_after="active-pointer")
-            with self.assertRaises(authority.AuthorityError):
-                authority.verify_authority(repo)
+            transaction_id = (
+                "743e0ba65eefe77be90ad03308b3407bcb0d5c111953a9a2dc18af278fbb8123"
+            )
             first = runtime_transaction.recover_runtime_transaction(
-                repo, caught.exception.transaction_id
+                repo, transaction_id
             )
             second = runtime_transaction.recover_runtime_transaction(
-                repo, caught.exception.transaction_id
+                repo, transaction_id
             )
             self.assertEqual(first, second)
             self.assertEqual("COMMITTED", first["state"])
             verified = authority.verify_authority(repo)
-            self.assertEqual((7, 7), (
+            self.assertEqual((8, 8), (
                 verified["revision"], verified["history_length"]
             ))
 
@@ -448,7 +600,42 @@ class M9HeldOut(unittest.TestCase):
                 digest(ROOT / "docs/PROGRESS.md"),
             )
 
-    def test_m7_registry_and_all_three_deltas_remain_frozen(self) -> None:
+    def test_public_dogfood_verifier_accepts_rev8_work4(self) -> None:
+        verified = m9.verify_dogfood(ROOT)
+        self.assertEqual(8, verified["authority"]["revision"])
+        self.assertEqual("4", verified["work"]["revision"]["revision"])
+
+    def test_failed_promotion_journals_are_recoverable(self) -> None:
+        failures = list(
+            (
+                ROOT / ".yuan/authority/self-modification/failures"
+            ).glob("*.json")
+        )
+        self.assertTrue(failures)
+        promotion_failure = next(
+            load_json(path)
+            for path in failures
+            if load_json(path).get("transaction_id")
+            == "262321e82c8950c3ea2b52b093e3591e8909c064b1f187959f5cda8a84c16b56"
+        )
+        self.assertEqual("FAILED", promotion_failure["promotion_state"])
+        self.assertEqual("COMMITTED", promotion_failure["mutation_state"])
+        self.assertFalse(promotion_failure["trusted"])
+        failed_tx = load_json(
+            ROOT
+            / ".yuan/authority/self-modification/transactions"
+            / promotion_failure["transaction_id"]
+            / "journal.json"
+        )
+        self.assertEqual("COMMITTED", failed_tx["state"])
+        self.assertEqual(
+            "ROLLED_BACK_TO_REVISION_7",
+            promotion_failure["compensation"]["state"],
+        )
+        self.assertEqual("PASS", promotion_failure["compensation"]["authority_after"])
+        self.assertEqual("FORBIDDEN", promotion_failure["promotion"])
+
+    def test_m7_registry_and_all_four_deltas_remain_frozen(self) -> None:
         receipt = provenance.verify_frozen_and_delta(ROOT)
         self.assertEqual(
             "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
@@ -457,6 +644,7 @@ class M9HeldOut(unittest.TestCase):
         self.assertEqual(9, receipt["delta_assertions"])
         self.assertEqual(18, receipt["r2_delta_assertions"])
         self.assertEqual(10, receipt["m9_delta_assertions"])
+        self.assertEqual(22, receipt["r1_fix_delta_assertions"])
 
     def test_original_dirty_bytes_remain_protected(self) -> None:
         tracked = {}
