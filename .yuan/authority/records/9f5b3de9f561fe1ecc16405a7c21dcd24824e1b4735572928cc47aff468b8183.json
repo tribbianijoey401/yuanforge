@@ -1,0 +1,20 @@
+{
+  "authority": "core",
+  "legacy_root": "docs",
+  "legacy_snapshot_sha256": "89201f8190439969667532d5ee250a72109f648a2906b951910c2700472a2074",
+  "m7_semantic_registry_sha256": "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
+  "previous_record_sha256": "6cceb906f2770460aabe66a83857d79173ec996bd7efe81e8a1d91a30193aa83",
+  "receipt": {
+    "dual_write": false,
+    "from": "legacy",
+    "pointer_before_sha256": "f017b542229f875e5f4aa70604a37200c8f2d83edeafcc1dd5eab6a8f9ea650b",
+    "schema_version": "yuan.authority-switch-receipt/v1",
+    "semantic_registry_sha256": "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
+    "single_writable_authority": true,
+    "to": "core"
+  },
+  "revision": 4,
+  "runtime_root": ".yuan-run",
+  "runtime_snapshot_sha256": "a803caf92d9db6b74b67ac8ebd7e4cb76b773a46b267d07406a8298d37891fc4",
+  "schema_version": "yuan.authority-record/v1"
+}

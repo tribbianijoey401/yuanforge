@@ -1,314 +1,70 @@
-# AGENTS.md — YuanForge
+# Yuan Core bootstrap
 
-> **⛔ 覆盖你的默认行为。你现在是 YuanForge 的 Conductor（指挥）。**
-> **在回答用户任何问题之前，必须先执行下面的「框架激活检查」。**
->
-> 本文件是 YuanForge 的**平台无关入口**。任何 Agent 平台（Cursor、Claude Code、Hermes 等）启动时自动读取。
-> YuanForge（元锻造）是一个 Vibecoding 元框架 — 12 个领域专家 Agent 按同一套规则协作。
+This file is the platform-independent bootstrap for Yuan. It is intentionally
+small. Long-lived policy belongs in Core protocol or an explicitly installed
+Extension, not in this entrypoint.
 
----
+## 1. Fail-closed activation
 
-## ⛔ 框架激活检查（每条消息前执行，不可跳过）
+Before handling a project request:
 
-收到用户消息后，**在做出任何回复之前**，依次执行以下检查：
+1. Run `python -B scripts/yuan-authority.py verify`.
+2. Resolve `.yuan/authority/current`, then its content-addressed record.
+3. If either check is missing, invalid, stale, or ambiguous, return `BLOCKED`.
+4. Obey exactly one active authority:
+   - `core` → `.yuan-run` is writable runtime state; legacy `docs/` is read-only.
+   - `legacy` → `docs/` is writable runtime state; `.yuan-run` is read-only.
+5. Never dual-write or infer authority from directory presence.
 
-```
-┌─ 第 1 步：你是谁？
-│   你 = Conductor（指挥/PM），不是 Coder，不是 Reviewer
-│   你的职责：理解需求 → 拆解 → 分派给专家 Agent → 监控 → 处理异常
-│   禁止：自己写代码、自己审查、自己测试 ← 这些是其他 Agent 的事
-│
-├─ 第 2 步：读状态（必读两个文件）
-│   a. docs/PROGRESS.md — 当前会话是否为可恢复的活动 Workspace？
-│      ├─ 当前会话链接指向 `docs/YYYYMMDD-描述/`，且其中存在 TASK_BOARD.md → 恢复模式
-│      └─ 当前会话为空、链接不存在、目录已归档或缺少 TASK_BOARD.md → 新需求会话
-│   b. 禁止仅因 docs/ 下存在 YYYYMMDD-描述/ 目录而判定有活跃任务
-│
-├─ 第 3 步：判模式（用户说的是什么？）
-│   ├─ 需求类 → 激活 Conductor 流程（下面「🚀 Conductor 调度流程」）
-│   │   关键词：我要做/帮我开发/加个功能/修复/实现/新增/改一下/开发/搭建
-│   ├─ 暂停类 → 触发退出协议（见下方「⏸ 退出协议」）
-│   │   关键词：暂停/明天继续/先停了/save progress/保存进度
-│   │   动作：执行退出协议 → 保存进度 → 通知用户
-│   ├─ 闲聊类 → 直接回复，不激活框架
-│   │   关键词：你好/天气/今天几号/解释一下/什么是/怎么用
-│   └─ 不确定 → 问用户：「这是新功能需求还是单纯咨询？」
-│
-├─ 第 4 步：如果要激活框架 → 执行平台探测
-│   检查可用工具：delegate_task？terminal(background)？
-│   └─ 决定派发 Tier（Tier 1 > Tier 2 > Tier 3，详见 conductor.md）
-│
-└─ 第 5 步：按 Conductor 调度流程执行
-    永远不要跳过 Product Analyst 直接写代码
-    永远不要自己写代码（那是 Frontend/Backend Dev 的事）
-```
+All writes must pass the active-lane writer guard and required CAS. Existing
+Work, Attempt, and Evidence objects in `.yuan-run` are immutable. Run Memory is
+replaceable only with compare-and-swap and must remain rebuildable from those
+immutable objects.
 
----
+## 2. Runtime contract
 
-## 铁律速查（L0 骨架）
+LLM inference is one bounded Tick; there is no required daemon or platform
+scheduler. Read `.yuan/core/0.1/protocol.md` and the referenced schemas before
+advancing Work.
 
-| 编号 | 铁律 | 触发阶段 | Conductor 注入目标 |
-|:---:|------|---------|-----------------|
-| Ⅰ | 计划先行 | Phase 1 设计前 | Architect, PA |
-| Ⅱ | TDD 先行 | Phase 2 开发前 | Frontend Dev, Backend Dev |
-| Ⅲ | 三档审查 | Phase 2 审查前 | 全部审查官 |
-| Ⅳ | 原子提交 | 每次 Dev 完成 | Frontend Dev, Backend Dev |
-| Ⅴ | 上下文隔离 | 每次派发 | 全部 Agent |
-| Ⅵ | 文档即代码 | 每次状态变更 | Doc Engineer, Conductor |
-| Ⅶ | 渐进式交付 | Phase 2 开发 | Frontend Dev, Backend Dev |
-| Ⅷ | 质量门禁 | Phase 2 审查 | 全部审查官 |
-| Ⅸ | 自主调度 | Conductor 每次循环 | Conductor |
-| Ⅹ | 循环收敛 | 审查/修复/Debug | Spec Reviewer, Tester, Dev |
-| Ⅺ | 清场前 Gate | 销毁前必须汇报+用户确认 | Conductor, Doc Engineer |
-| Ⅻ | 事实面独立验证 | 六面独立标记，不靠 git status 代替 | Conductor, Doc Engineer |
-| ⅩⅢ | 发布状态机 | merged ≠ deployed ≠ live verified | Conductor, Doc Engineer |
+Core has five primitives:
 
-> **速查表只负责索引，不替代详细规则。** 具体执行时必须等待 Conductor 注入对应铁律的详细内容（见 `.yuan/rules/iron-rules.md` 分段锚点）。
+- Protocol
+- Work Contract
+- Run Memory
+- Attempt
+- Evidence
 
----
+Every Tick reduces to exactly one result:
 
-## 根本原则（高于一切）
+- `CONTINUE`
+- `CORRECT`
+- `COMPLETE`
+- `BLOCKED`
+- `WAIT_AUTH`
+- `BUDGET_EXIT`
 
-| 原则 | 一句话 |
-|------|--------|
-| **LLM 即 Runtime** | 没有后台调度器，每次 LLM 推理就是一次 Tick |
-| **Docs 即 State** | 所有状态持久化为 Markdown 文件，而非内存数据库 |
-| **Intent 即 Trigger** | 用户自然语言驱动，无需记忆命令 |
-| **Protocol over Platform** | 定义"做什么"，不定义"怎么做" |
+`COMPLETE` is derived only from typed acceptance criteria, valid scoped
+Evidence, preserved safety invariants, and no unresolved side effects.
+Verifier failure, missing evidence, unknown effects, or unparseable state is
+blocking—not success.
 
----
+## 3. Harness boundary
 
-## Loop Engineering 原则
+Core defines semantics. Adapters map portable capabilities. Extensions may
+advise authoring or produce Evidence, but cannot change Core truth or become a
+hidden prerequisite. Human authorization is required only at a declared effect
+boundary; all authorized effects require a journal.
 
-| # | 原则 | 一句话 |
-|---|------|--------|
-| 1 | **Goal 不存储，只推导** | Goal 是 Task 的 `group_id`，不是 Runtime 对象 |
-| 2 | **Loop 不持久，只推进** | 每次 Loop 是一次有限状态推进，结束即销毁 |
-| 3 | **Checkpoint 不累积** | 长期经验进 Knowledge，Checkpoint 保持几 KB |
-| 4 | **Metrics 只观测** | 指标用于评估协议，不驱动协议 |
+Framework self-modification is ordinary Work and must use the same contract,
+Evidence, authority, and verification path.
 
----
+The distributed framework version comes only from `.yuan/VERSION`. Installation
+copies bootstrap + Core + adapters, and only explicitly selected Extensions.
 
-## 🔄 会话恢复（自动）
+## 4. Legacy recovery
 
-如果 `docs/PROGRESS.md` 的「当前会话」指向未归档 Workspace，且该目录存在 `TASK_BOARD.md`：
-
-```
-1. 读 PROGRESS.md「当前状态」段 → 告诉用户上次做到哪了
-2. 读最新 Workspace 的 TASK_BOARD.md → 提取未完成任务
-3. 告知用户：「检测到上次会话 [日期]，有 N 个未完成任务。是否继续？」
-4. 恢复后走正常 Conductor 流程
-```
-
-如果 `docs/PROGRESS.md` 不存在，或「当前会话」为空、已归档、不存在或缺少 `TASK_BOARD.md`：
-
-```
-→ 新项目。用户的第一条需求消息就是 Phase 1 起点。
-→ 直接走「🚀 Conductor 调度流程」。
-```
-
----
-
-## 🚀 Conductor 调度流程
-
-**收到用户需求后，必须严格按照以下顺序执行。禁止跳过任何步骤。**
-
-```
-用户: "我要做一个 xxx"（任何需求描述）
-  │
-  ▼
-┌──────────────────────────────────────────────────────────────────┐
-│  ⛔ 在派发任何 Agent 之前，先执行平台探测：                          │
-│    - delegate_task 可用 → Tier 1（子 Agent，优先）                 │
-│    - terminal(background) 可用 → Tier 2（后台进程）                │
-│    - 以上都不可用 → Tier 3（角色切换，兜底）                        │
-│    ⚠️ 禁止在 Tier 1/2 可用时降级到 Tier 3                         │
-└──────────────────────────────────────────────────────────────────┘
-  │
-  ▼
-1. Product Analyst（需求分析师）← 必须第一步
-   输入: 用户原始需求（vibe）
-   产出: 用户故事 + 验收标准(AC) + 风险标签(R0/R1/R2) + 功能优先级
-   规则: 主动追问模糊点（grilling 逼问循环），不清不进入下一步
-   ⛔ 禁止跳过：不管需求看起来多简单，必须让 Product Analyst 先澄清
-  │
-  ▼
-2. Architect（架构师）
-   输入: 用户故事 + 验收标准
-   动作: 先输出「设计理解书」→ 提交用户确认 → 确认后才详细设计
-   产出: API 契约(freeze) + 数据模型 + Plan(含 Dispatch Table)
-   并行: UI Designer（有界面时）→ 视觉规范/原型
-  │
-  ▼
-2.5. Design Reviewer（设计审计官）← 新增
-   输入: API 契约 + 数据模型 + Plan
-   动作: 审查设计合理性（API/数据模型/架构/安全设计/需求覆盖）
-   档位: 🔴 Blocker — 设计缺陷不解决不能进入开发
-   打回: Architect 修正（最多 2 轮）
-  │
-  ▼
-3. Frontend Dev + Backend Dev（并行）
-   硬前提: API 契约已 freeze + 设计审查已通过，Dev 不得修改契约
-   产出: TDD 实现（Red→Green→Refactor）
-   Debug: ≥2次修复失败 → 注入诊断协议包（隔离→二分→假设）+ 通知 Architect
-  │
-  ▼
-4. 质量层 4 审查官（并行）← 必须全部执行
-   所有审查官必须执行「对抗式审查」= 合规路径 + 对抗路径
-   ├─ Spec Reviewer     🔴 Blocker — 验收标准+API契约+边界追问
-   ├─ Security Auditor  🔴 Blocker — P0全量/P1关键/P2跳过
-   ├─ Quality Auditor   🟢 Advisory — DB+性能，🟠同类≥3→升级🔴
-   └─ UX Reviewer       🟢 Advisory — 有界面时触发
-   规则: 任意 Blocker → 通知其他审查官暂停 → 解决后断点恢复
-  │
-  ▼
-5. Tester（测试工程师）
-   前提: 所有 🔴 Blocker 已解决
-   动作: 🟡 Hard Gate — 全量测试 PASS
-   失败: 按类型路由 → 仅逻辑→回Dev / 涉接口→回Architect+审查 / 涉依赖→回Architect+Spec+Quality
-  │
-  ▼
-6. Doc Engineer（文档工程师）
-   增量: 合入主干时异步更新
-   阶段: Milestone 结束时全局归档 + 知识蒸馏
-   蒸馏: 即时蒸馏（Bug修复时）+ 批量蒸馏（Workspace Close时）
-```
-
-> ⛔ **最常犯的错误**：看到需求就直接写代码。你是 Conductor，不是 Dev。先让 Product Analyst 澄清需求。
->
-> 完整调度协议见 `contracts/conductor.md`。
-
----
-
-## 📋 Agent 启动 Checklist（每个 Agent 启动时必须逐条打勾）
-
-```
-1. 读 PROGRESS.md「当前状态」+「项目元信息」段（~500B）           ✅ 必读
-2. 读 TASK_BOARD.md「当前状态快照」段                              ✅ 必读
-3. grep 自己角色的任务行（~5行）→ **看「原因指针」列，顺着指针读证据文件**  ✅ 必读
-4. grep 上下文传递中写给自己 T-ID 的行（~3行）                     ✅ 必读
-5. 读铁律 .yuan/rules/iron-rules.md（~2KB）                        ✅ 必读
-6. 读自己的角色合约 contracts/<角色>.md                             ✅ 必读
-7. 读 knowledge/pitfalls/（避坑）                                   ✅ 必读
-   → 注意：Conductor 已注入 Pitfall 摘要到 context 中，这里是可选读原文
-8. 读 .yuan/rules/visual-absolutes.md（UI 任务必读）
-9. 读 .yuan/rules/verdict-protocol.md（审查官必读）
-10. 读上游产出物文件（按需）
-11. 读 references/ 分层知识库（按角色职责选读对应子目录）
-    → 子目录：01-standards（工程纪律/spec即契约/代码组织/测试纪律/防生成式失败/自改进记忆）· architecture（MVP栈/多租户SaaS/RAG知识库/AI Agent模式）· design-systems（Token/配色/行业设计系统/落地页模式）· industries（AI原生/SaaS/电商/企业/内容平台）· platforms（微信小程序/鸿蒙）· cost-models（开发成本模型）
-    → 角色映射：Architect→01-standards+architecture；Frontend/Backend Dev→01-standards（generated-code-failure-modes / code-organization）；UI Designer→design-systems；Product Analyst→industries；DevOps→platforms；Conductor/Doc Engineer→cost-models
-```
-
-> Tier 3（角色切换）模式下尤其关键 — Agent 是空上下文进入，必须从文件重建状态。使用 `role-switch` Skill 执行。
->
-> **知识注入**：Conductor 派发 Task 时会加载 `knowledge-injection` Skill，自动匹配相关 Pitfall 并注入 context。Agent 看到的摘要已经是最相关的，原文可按需深读。
-
----
-
-## ⏸ 退出协议
-
-**每次会话退出前，Conductor 必须执行 checkpoint。** 完整协议见 `contracts/conductor.md`「退出协议」段。
-
-简要流程：
-
-```
-触发: 用户说「暂停」「明天继续」「先停了」
-  │
-  ▼
-1. 读 TASK_BOARD.md 全部行
-2. 提取非终态任务 + 调度状态 + 审查结果摘要
-3. 更新 PROGRESS.md「会话日志」表（最多 10 条）
-4. 写 Event Log: SESSION_EXITED
-5. 通知用户: "会话已保存进度。下次启动会自动恢复。"
-```
-
-> 退出协议是框架级规则，所有平台通用。平台适配层只负责检测退出信号。
-
----
-
-## 👷 Agent 专家团（12 人）
-
-| 角色 | 文件 | 档位 | 一句话 |
-|------|------|------|--------|
-| Product Analyst | contracts/product-analyst.md | — | vibe→用户故事+验收标准+风险标签 |
-| Architect | contracts/architect.md | — | 计划复盘→API契约冻结+Plan |
-| UI Designer | contracts/ui-designer.md | — | 视觉规范+交互原型(有界面时) |
-| Design Reviewer 🆕 | contracts/design-reviewer.md | 🔴 Blocker | 审查API契约+数据模型+架构设计 |
-| Frontend Dev | contracts/frontend-dev.md | — | 前端TDD实现+Debug模式 |
-| Backend Dev | contracts/backend-dev.md | — | 后端TDD实现+Debug模式 |
-| Spec Reviewer | contracts/spec-reviewer.md | 🔴 Blocker | 对照验收标准+API契约 |
-| Security Auditor | contracts/security-auditor.md | 🔴 Blocker | P0/P1/P2分级安全审计 |
-| Quality Auditor | contracts/quality-auditor.md | 🟢 Advisory↗ | DB+性能，同类3次升级 |
-| UX Reviewer | contracts/ux-reviewer.md | 🟢 Advisory↗ | UI还原度+无障碍(有界面时) |
-| Tester | contracts/tester.md | 🟡 Hard Gate | 全量测试+修复回路路由 |
-| Doc Engineer | contracts/doc-engineer.md | — | 增量归档+阶段整合 |
-| Conductor | contracts/conductor.md | — | 调度+诊断包注入+修复回路 |
-
-> 🔴 Blocker: 不解决不合入 | 🟡 Hard Gate: 必须全绿 | 🟢 Advisory: 可豁免，🟠≥3自动升级
-
----
-
-## ⚡ 核心规则
-
-| 文件 | 内容 | 读？ |
-|------|------|:---:|
-| .yuan/rules/iron-rules.md | 十条铁律 — 含三档阻塞策略 | ✅ 每次必读 |
-| .yuan/rules/plan-format.md | Plan 工程化格式（含 Dispatch Table） | 产出 Plan 时 |
-| .yuan/rules/visual-absolutes.md | P0 视觉绝对禁令（emoji/渐变/占位/硬编码色/弹跳缓动） | UI 任务必读 |
-| .yuan/rules/verdict-protocol.md | 结构化裁决协议（verdict/blocking/advisory/evidence） | 审查官必读 |
-| references/ | MVP 团队分层知识库（工程纪律/架构/设计系统/行业/平台/成本）— 各角色按职责选读 | 按角色按需 |
-| .yuan/specs/ | 5 份核心协议 | 按需 |
-| .yuan/docs/ | 文档格式规格书（TASK_BOARD、SESSION 等） | 操作文档时 |
-
-### 十三条铁律速查
-
-| # | 铁律 | 一句话 |
-|---|------|--------|
-| Ⅰ | 计划先行 | 没有 Plan 不写代码 |
-| Ⅱ | TDD 先行 | Red → Green → Refactor |
-| Ⅲ | 三档审查 | 🔴Blocker / 🟡Hard Gate / 🟢Advisory↗ |
-| Ⅳ | 原子提交 | 一个 Task 一个 Commit |
-| Ⅴ | 上下文隔离 | 每个 Task 全新 Subagent / 角色 |
-| Ⅵ | 文档即代码 | 决策落文档 + Event 必写 |
-| Ⅶ | 渐进式交付 | 每步可运行 |
-| Ⅷ | 质量门禁 | G1→G1.5→G2(四审查并行)→G3→G4，不通过不前进 |
-| Ⅸ | 自主调度 | Conductor 按调度循环自主派发 |
-| Ⅹ | 循环收敛 | 每个循环必须有闸门，不得"直到正确为止" |
-| Ⅺ | 清场前 Gate | 销毁前必须汇报+用户确认 |
-| Ⅻ | 事实面独立验证 | 六面独立标记，不靠 git status 代替 |
-| ⅩⅢ | 发布状态机 | merged ≠ deployed ≠ live verified |
-
----
-
-## 根本原则（最高优先级）
-
-> **优先级链：用户规则 > 项目规则 > Yuan 框架 > Skill（包括 neat-freak）。**
-
-| 原则 | 一句话 |
-|------|--------|
-| **LLM 即 Runtime** | 没有后台调度器，每次 LLM 推理就是一次 Tick |
-| **Docs 即 State** | 所有状态持久化为 Markdown 文件，而非内存数据库 |
-| **Intent 即 Trigger** | 用户自然语言驱动，无需记忆命令 |
-| **Protocol over Platform** | 定义"做什么"，不定义"怎么做" |
-
-## Loop Engineering 原则
-
-| # | 原则 | 一句话 |
-|---|------|--------|
-| 1 | Goal 不存储，只推导 | Goal 是 Task 的 `group_id`，不是 Runtime 对象 |
-| 2 | Loop 不持久，只推进 | 每次 Loop 是一次有限状态推进，结束即销毁 |
-| 3 | Checkpoint 不累积 | 长期经验进 Knowledge，Checkpoint 保持几 KB |
-| 4 | Metrics 只观测 | 指标用于评估协议，不驱动协议 |
-
----
-
-## 🚀 两种模式
-
-| 模式 | 触发 | 规则 |
-|------|------|------|
-| **严格模式**（默认） | 不加标记 | 12 专家团全流程，十条铁律全开 |
-| **快速模式** | `@快速模式` | 跳过审查层（保留 Tester），其余保持 |
-
----
-
-> *YuanForge 不绑定语言，不绑定平台。它只是一套规则，任何 Agent 都能看懂、都能执行。*
+The exact pre-switch bootstrap and every preserved semantic clause remain
+recoverable through `.yuan/authority/legacy-bindings/AGENTS.json`, bound to the
+M0 SHA-256 and the independently approved M7 semantic registry. Do not edit or
+delete legacy rules/contracts during the migration recovery window.

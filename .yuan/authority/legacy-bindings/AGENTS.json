@@ -1,0 +1,29 @@
+{
+  "schema_version": "yuan.legacy-binding/v1",
+  "source_path": "AGENTS.md",
+  "source_sha256": "d282f61862b19ab42fe4933584fa4dd5b893650c38776ba2e9a3c97fb8d45d7a",
+  "recovery": {
+    "base_commit_path": "docs/20260726-yuan-core-01-upgrade/evidence/m0a/base-commit.txt",
+    "binary_patch_path": "docs/20260726-yuan-core-01-upgrade/evidence/m0a/git-diff.binary.patch",
+    "snapshot_manifest_path": "docs/20260726-yuan-core-01-upgrade/evidence/m0a/tracked-dirty.tsv"
+  },
+  "semantic_registry_path": ".yuan/extensions/provenance/semantic-registry.json",
+  "semantic_registry_sha256": "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
+  "semantic_record_keys": [
+    "9662a66d2a900d0ad19e727de70bb11c3a3a9d71f72e4ba4bff1abd493fab5de",
+    "00f16e2875dfbd98b8ab47d978d2c5db78eb37afbc0f77bc0c94d4c6976d653d",
+    "cc0f51c44c092563d6ae088579ac77e09aa62df7e59bee3bdd817510d1835135",
+    "cb5f70973fa182139ed464834f1f4493112db9b01ba7ff6ce6489fcd940cc89b",
+    "9b540e164ac7416642b0939991d4a237f721d07cf11fd0c1c83414caf4741c65",
+    "43567ae612d6a5e140399b5c4938d78c111b9b6129564ddeb233b724c7309a79",
+    "befc07bb2e8e09f05992da073f79d251e63de1642b5fd25d6ea5966e7fef4d91",
+    "b917193d0c1a0febae9bae2c6c4e771dc50e5d294c8fdf826073a7665ef2ff28",
+    "a83783921518b8c0ceac2438c91a46e2804828c23af3e48ff6a22c38ec48617b",
+    "b931afa0e08396b3c0675134adcc4db2aae91bf49fb7fca54402cb5e4b58e3a9",
+    "ff9fe50dab11b0e708ddb84dd8dba82697b75b68ce1f6d0c54466a0e7c9b14f2",
+    "d0e21fda9cbe117c60639cfedc664bd06f4c0d782f30b0f19bb7052905f2bf6c",
+    "3a64a17308ba702c6ffc4d84ce0d038a84f463d1ad8ee6e2486b3e41f751f5a7",
+    "70595435047ef97534a1de71be074457018fcb3f676c5daa42f3177c51c58837",
+    "0d3a8befb34323cce8dfcbe34c60e6af4adaa443801deb85e899302ad295e78c"
+  ]
+}

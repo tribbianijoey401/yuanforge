@@ -1,0 +1,352 @@
+{
+  "ac_evidence": {
+    "AC-SEMANTIC-MAPPING": [
+      "EVD-legacy-20260726-384477235ab3-0037"
+    ],
+    "AC-SOURCE-INTEGRITY": [
+      "EVD-legacy-20260726-384477235ab3-0001",
+      "EVD-legacy-20260726-384477235ab3-0002",
+      "EVD-legacy-20260726-384477235ab3-0003",
+      "EVD-legacy-20260726-384477235ab3-0004",
+      "EVD-legacy-20260726-384477235ab3-0005",
+      "EVD-legacy-20260726-384477235ab3-0006",
+      "EVD-legacy-20260726-384477235ab3-0007",
+      "EVD-legacy-20260726-384477235ab3-0008",
+      "EVD-legacy-20260726-384477235ab3-0009",
+      "EVD-legacy-20260726-384477235ab3-0010",
+      "EVD-legacy-20260726-384477235ab3-0011",
+      "EVD-legacy-20260726-384477235ab3-0012",
+      "EVD-legacy-20260726-384477235ab3-0013",
+      "EVD-legacy-20260726-384477235ab3-0014",
+      "EVD-legacy-20260726-384477235ab3-0015",
+      "EVD-legacy-20260726-384477235ab3-0016",
+      "EVD-legacy-20260726-384477235ab3-0017",
+      "EVD-legacy-20260726-384477235ab3-0018",
+      "EVD-legacy-20260726-384477235ab3-0019",
+      "EVD-legacy-20260726-384477235ab3-0020",
+      "EVD-legacy-20260726-384477235ab3-0021",
+      "EVD-legacy-20260726-384477235ab3-0022",
+      "EVD-legacy-20260726-384477235ab3-0023",
+      "EVD-legacy-20260726-384477235ab3-0024",
+      "EVD-legacy-20260726-384477235ab3-0025",
+      "EVD-legacy-20260726-384477235ab3-0026",
+      "EVD-legacy-20260726-384477235ab3-0027",
+      "EVD-legacy-20260726-384477235ab3-0028",
+      "EVD-legacy-20260726-384477235ab3-0029",
+      "EVD-legacy-20260726-384477235ab3-0030",
+      "EVD-legacy-20260726-384477235ab3-0031",
+      "EVD-legacy-20260726-384477235ab3-0032",
+      "EVD-legacy-20260726-384477235ab3-0033",
+      "EVD-legacy-20260726-384477235ab3-0034",
+      "EVD-legacy-20260726-384477235ab3-0035",
+      "EVD-legacy-20260726-384477235ab3-0036"
+    ]
+  },
+  "active_hypotheses": [
+    {
+      "claim": "Legacy semantics can be represented without inference.",
+      "falsification": "Any missing typed verifier or source document makes mapping unresolved.",
+      "id": "HYP-ATT-legacy-20260726-384477235ab3-0037"
+    }
+  ],
+  "artifact_binding": {
+    "scope": "docs/20260726-yuan-core-01-upgrade",
+    "sha256": "eebbbc392f4183610f53110124e16f455183e33e67e46c1a80334c285a1fad4f"
+  },
+  "attempted_strategies": [
+    {
+      "fingerprint": "016b24df2205653c728b645bc60b637d1e605ce56c5f9bb0a831fde622571b9b",
+      "latest_evidence_sequence": 1,
+      "relevant_inputs_digest": "37700258b95472470d9394a26dff72868c0959ed2c10d74055f4ef2a85f9af71"
+    },
+    {
+      "fingerprint": "2565f6dde9f4600ceb24a96ab054c8ee620bb90f28c804efe6cdfbe275002372",
+      "latest_evidence_sequence": 2,
+      "relevant_inputs_digest": "422d429d4e3818e6239e148db301078dfd155a3b5b256b7cbd35e1d7299aabce"
+    },
+    {
+      "fingerprint": "e291b4369528cb842ade9b6849e4816c34891aad74b1244706dc23e8aa49490e",
+      "latest_evidence_sequence": 3,
+      "relevant_inputs_digest": "ae9ae8cd932e66119a07277efcfb3280ca4aa7981a72ff5bc8cb763b8f792d0e"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 4,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 5,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 6,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 7,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 8,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 9,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 10,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 11,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 12,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 13,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 14,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 15,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 16,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 17,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "dc4e1c8d7a0022d615139de9e974bad42634ad5012dd1dd4296fc6fc4f8159d3",
+      "latest_evidence_sequence": 18,
+      "relevant_inputs_digest": "3489a225b1b56f3b87c58492090de088f8c9a166e2de8d2dbdf67900129a4688"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 19,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 20,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 21,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 22,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 23,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 24,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 25,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 26,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 27,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 28,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 29,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 30,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 31,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 32,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 33,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 34,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 35,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "57391f510cf14af36febb6b520b1a3f2bf823f80287a4fbc3a63dc1ce96a9c0f",
+      "latest_evidence_sequence": 36,
+      "relevant_inputs_digest": "b2c3a6f2991ecdb4c1f9fc65e5bab858e1cd063be201176b2fd0841e65266da6"
+    },
+    {
+      "fingerprint": "3fd086bd296f990789ef10e59bf0e435ab6748093e49db10afb9f0c9d9f60719",
+      "latest_evidence_sequence": 37,
+      "relevant_inputs_digest": "e02df1af960a85d742d9eeb30909c57724fec66fe54d05e72a5e496edc6c3374"
+    }
+  ],
+  "environment_binding": {
+    "fingerprint": "fc885f23e202177dae1d27957bc6e211d5b136a57b863b920b6a43ee866b4be1",
+    "id": "shadow-filesystem-v1"
+  },
+  "last_result": "CONTINUE",
+  "legal_next_steps": [],
+  "pending_side_effects": [],
+  "projection_sequence": 74,
+  "protocol_binding": {
+    "id": "yuan.core.protocol",
+    "revision": "0.1.0-candidate",
+    "sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3"
+  },
+  "rebuild": {
+    "attempt_ids": [
+      "ATT-legacy-20260726-384477235ab3-0001",
+      "ATT-legacy-20260726-384477235ab3-0002",
+      "ATT-legacy-20260726-384477235ab3-0003",
+      "ATT-legacy-20260726-384477235ab3-0004",
+      "ATT-legacy-20260726-384477235ab3-0005",
+      "ATT-legacy-20260726-384477235ab3-0006",
+      "ATT-legacy-20260726-384477235ab3-0007",
+      "ATT-legacy-20260726-384477235ab3-0008",
+      "ATT-legacy-20260726-384477235ab3-0009",
+      "ATT-legacy-20260726-384477235ab3-0010",
+      "ATT-legacy-20260726-384477235ab3-0011",
+      "ATT-legacy-20260726-384477235ab3-0012",
+      "ATT-legacy-20260726-384477235ab3-0013",
+      "ATT-legacy-20260726-384477235ab3-0014",
+      "ATT-legacy-20260726-384477235ab3-0015",
+      "ATT-legacy-20260726-384477235ab3-0016",
+      "ATT-legacy-20260726-384477235ab3-0017",
+      "ATT-legacy-20260726-384477235ab3-0018",
+      "ATT-legacy-20260726-384477235ab3-0019",
+      "ATT-legacy-20260726-384477235ab3-0020",
+      "ATT-legacy-20260726-384477235ab3-0021",
+      "ATT-legacy-20260726-384477235ab3-0022",
+      "ATT-legacy-20260726-384477235ab3-0023",
+      "ATT-legacy-20260726-384477235ab3-0024",
+      "ATT-legacy-20260726-384477235ab3-0025",
+      "ATT-legacy-20260726-384477235ab3-0026",
+      "ATT-legacy-20260726-384477235ab3-0027",
+      "ATT-legacy-20260726-384477235ab3-0028",
+      "ATT-legacy-20260726-384477235ab3-0029",
+      "ATT-legacy-20260726-384477235ab3-0030",
+      "ATT-legacy-20260726-384477235ab3-0031",
+      "ATT-legacy-20260726-384477235ab3-0032",
+      "ATT-legacy-20260726-384477235ab3-0033",
+      "ATT-legacy-20260726-384477235ab3-0034",
+      "ATT-legacy-20260726-384477235ab3-0035",
+      "ATT-legacy-20260726-384477235ab3-0036",
+      "ATT-legacy-20260726-384477235ab3-0037"
+    ],
+    "attempts_digest": "8f4e4ab737fe09dbf64f71c3c8adc48d175be14f6236969e297438105b72fd7d",
+    "errors": [],
+    "evidence_digest": "45e6f0f5241ad16eb4f66e2bd81b0f237ba70153ab2a87966f3d9397070808f6",
+    "evidence_ids": [
+      "EVD-legacy-20260726-384477235ab3-0001",
+      "EVD-legacy-20260726-384477235ab3-0002",
+      "EVD-legacy-20260726-384477235ab3-0003",
+      "EVD-legacy-20260726-384477235ab3-0004",
+      "EVD-legacy-20260726-384477235ab3-0005",
+      "EVD-legacy-20260726-384477235ab3-0006",
+      "EVD-legacy-20260726-384477235ab3-0007",
+      "EVD-legacy-20260726-384477235ab3-0008",
+      "EVD-legacy-20260726-384477235ab3-0009",
+      "EVD-legacy-20260726-384477235ab3-0010",
+      "EVD-legacy-20260726-384477235ab3-0011",
+      "EVD-legacy-20260726-384477235ab3-0012",
+      "EVD-legacy-20260726-384477235ab3-0013",
+      "EVD-legacy-20260726-384477235ab3-0014",
+      "EVD-legacy-20260726-384477235ab3-0015",
+      "EVD-legacy-20260726-384477235ab3-0016",
+      "EVD-legacy-20260726-384477235ab3-0017",
+      "EVD-legacy-20260726-384477235ab3-0018",
+      "EVD-legacy-20260726-384477235ab3-0019",
+      "EVD-legacy-20260726-384477235ab3-0020",
+      "EVD-legacy-20260726-384477235ab3-0021",
+      "EVD-legacy-20260726-384477235ab3-0022",
+      "EVD-legacy-20260726-384477235ab3-0023",
+      "EVD-legacy-20260726-384477235ab3-0024",
+      "EVD-legacy-20260726-384477235ab3-0025",
+      "EVD-legacy-20260726-384477235ab3-0026",
+      "EVD-legacy-20260726-384477235ab3-0027",
+      "EVD-legacy-20260726-384477235ab3-0028",
+      "EVD-legacy-20260726-384477235ab3-0029",
+      "EVD-legacy-20260726-384477235ab3-0030",
+      "EVD-legacy-20260726-384477235ab3-0031",
+      "EVD-legacy-20260726-384477235ab3-0032",
+      "EVD-legacy-20260726-384477235ab3-0033",
+      "EVD-legacy-20260726-384477235ab3-0034",
+      "EVD-legacy-20260726-384477235ab3-0035",
+      "EVD-legacy-20260726-384477235ab3-0036",
+      "EVD-legacy-20260726-384477235ab3-0037"
+    ]
+  },
+  "remaining_budget": {
+    "command_seconds": 1.0,
+    "strategies": 1,
+    "ticks": 1,
+    "tool_calls": 1
+  },
+  "run_id": "RUN-legacy-20260726-384477235ab3",
+  "schema_version": "yuan.run-memory/v1",
+  "work_binding": {
+    "id": "legacy-20260726-384477235ab3",
+    "revision": "shadow-1",
+    "sha256": "9056a309a4e74bd659aa7b0176c42def17d86acb4aef0d1dc61df819bf26149d"
+  }
+}

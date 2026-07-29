@@ -1,677 +1,155 @@
 #!/usr/bin/env python3
-"""YuanForge 项目初始化 / 框架同步脚本
+"""Install only Yuan Core, adapters, and explicitly selected extensions."""
 
-用法:
-  yuanforge-init /path/to/new-project                     # 从零开始
-  yuanforge-init /path/to/new-project --name "我的项目"     # 指定项目名
-  yuanforge-init /path/to/existing --mode existing         # 嫁接已有项目
-  yuanforge-init /path/to/existing --mode existing --clean # 嫁接 + 清理孤文件
-  yuanforge-init /path/to/project --mode existing --update # 仅同步框架文件
-  yuanforge-init /path/to/project --sync                  # 智能增量同步（推荐日常使用）
-  yuanforge-init /path/to/new-project --dry-run            # 预览不执行
-
-模式说明:
-  从零开始 (--mode new):        目标目录必须不存在或为空
-  嫁接已有 (--mode existing):   目标目录已存在。框架文件覆盖，docs/ 补缺不覆盖
-  框架更新 (--mode existing --update): 仅覆盖框架文件，不操作 docs/ 和 git
-  增量同步 (--sync):            智能 diff — 新增/更新/删除，内容不变跳过
-"""
+from __future__ import annotations
 
 import argparse
-import hashlib
 import os
+import pathlib
+import re
 import shutil
-import subprocess
 import sys
-import textwrap
-from pathlib import Path
+import tempfile
 
-# ═══════════════════════════════════════════════════════════
-# 配置
-# ═══════════════════════════════════════════════════════════
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-SOURCE_ROOT = SCRIPT_DIR.parent
-
-FRAMEWORK_VERSION = "3.0.0"
-
-# ── 框架子目录（粒度化，区分框架数据 vs 项目数据）──
-# 框架数据 — 从源完全同步（增/改/删）
-FRAMEWORK_SUBDIRS = [
-    ".yuan/specs",
-    ".yuan/docs",
-    ".yuan/rules",
-    ".yuan/skills",
-    ".yuan/platforms",
-]
-
-# 框架顶层目录 — 改为增量同步（不再 rmtree+copytree，保护用户自定义文件）
-FRAMEWORK_TOP_DIRS = [
-    "contracts",
-    "protocols",
-    "templates",
-    "scripts",
-]
-
-# 框架单文件
-FRAMEWORK_FILES = [
-    "AGENTS.md",
-]
-
-# 项目数据目录 — 更新时永不触碰
-PROTECTED_DIRS = [
-    ".yuan/skills/user-",  # 用户自定义 skill（目录名前缀）
-    "docs/knowledge/features/",  # 用户自定义知识
-    "docs/knowledge/modules/",
-]
-
-# 所有框架同步项（用于验证源完整性）
-ALL_FRAMEWORK_ITEMS = (
-    FRAMEWORK_SUBDIRS + FRAMEWORK_TOP_DIRS + FRAMEWORK_FILES
+SOURCE_ROOT = pathlib.Path(__file__).resolve().parents[1]
+VERSION_PATH = pathlib.PurePosixPath(".yuan/VERSION")
+CORE_INPUTS = (
+    pathlib.PurePosixPath("AGENTS.md"),
+    VERSION_PATH,
 )
-
-# ── docs/ 骨架 ──
-DOCS_SKELETON_DIRS = [
-    "knowledge/features",
-    "knowledge/decisions",
-    "knowledge/pitfalls",
-    "knowledge/modules",
-    "workspace",
-    "policies",
-    "events",
-    "proposals/architect",
-    "proposals/backend-dev",
-    "proposals/frontend-dev",
-    "proposals/closed",
-    "graph",
-    "archive",
-]
-
-DOCS_SKELETON_FILES = {
-    "object-model.yaml":  "# 知识对象 Schema — 从 yuanforge 框架模板复制\n",
-    "INDEX.md":           "# 文档索引\n",
-    "PROGRESS.md":        "# 项目进度\n\n> 当前 Phase: 初始化\n\n## 会话日志\n\n> 每次会话退出时自动追加。最多保留最近 10 条，超出删除最旧。\n\n| 日期 | 会话ID | 最后Phase | 完成Task | 遗留Task | 备注 |\n|------|--------|-----------|----------|----------|------|\n",
-    "ARCHITECTURE.md":    "# 系统架构\n",
-    "SETUP.md":           "# 环境搭建\n",
-    "CONVENTIONS.md":     "# 编码规范\n",
-    "glossary.md":        "# 术语表\n",
-    "workspace/backlog.md": "# 待办事项\n\n> 蒸馏时 Workspace 未完成任务自动追加到此文件\n",
-    "workspace/roadmap.md": "# 路线图\n",
-    "ptg-critical.md": "# PTG Critical Modules\n\n> 标记必须通过物理测试门控（PTG）的模块。\n> Tester 在 G3 审查时读取此清单，确保这些模块在真实环境中通过集成测试。\n>\n> 格式: 每行一个模块/路径，可加注释。空文件 = 无 PTG-critical 模块。\n",
-    "anti-patterns.md": "{{ anti-patterns_template }}",
-    "policies/write-policy.md":         "# Knowledge 写入规则\n\n> 框架模板 — 见 yuanforge 母体的 policies/\n",
-    "policies/merge-policy.md":         "# Proposal 合并规则\n",
-    "policies/archive-policy.md":       "# Workspace 归档规则\n",
-    "policies/verification-policy.md":  "# 知识验证规则\n",
-}
-
-# ── 已知的旧文件/目录（迁移时清理）──
-KNOWN_STALE_PATHS = [
-    # 旧版踩坑文件 → knowledge/pitfalls/
-    "docs/pitfalls.md",
-    # .yuan/docs/ 下的旧文件 → 已吸收进 .yuan/specs/
-    ".yuan/docs/RUNTIME_MODEL.md",
-    ".yuan/docs/CAPABILITY.md",
-    ".yuan/docs/OBJECT_MODEL.md",
-    ".yuan/docs/PROMOTION.md",
-    # 旧版 workflows 文件 → 已吸收进 .yuan/specs/workflow-protocol.md
-    ".yuan/docs/workflows.md",
-    # 旧版 action 文件 → 已吸收进 .yuan/specs/action-protocol.md
-    ".yuan/docs/ACTION.md",
-    # 旧版 state 文件 → 已吸收进 .yuan/specs/state-protocol.md
-    ".yuan/docs/STATE.md",
-    # 旧版 object 文件 → 已吸收进 .yuan/specs/object-protocol.md
-    ".yuan/docs/OBJECT.md",
-    # 旧版 adapter 文件 → 已吸收进 .yuan/specs/adapter-protocol.md
-    ".yuan/docs/ADAPTER.md",
-    # 旧版铁律文件 → 已整合进 .yuan/rules/iron-rules.md
-    ".yuan/rules/rule-1.md",
-    ".yuan/rules/rule-2.md",
-    ".yuan/rules/rule-3.md",
-    ".yuan/rules/rule-4.md",
-    ".yuan/rules/rule-5.md",
-    ".yuan/rules/rule-6.md",
-    ".yuan/rules/rule-7.md",
-    ".yuan/rules/rule-8.md",
-    ".yuan/rules/rule-9.md",
-    ".yuan/rules/rule-10.md",
-    # 旧版协议目录 → 已整合进 .yuan/specs/
-    ".yuan/docs/PROTOCOL.md",
-    # 旧版 contracts 命名 → 已改为标准角色名
-    "contracts/lead-developer.md",
-    "contracts/tech-lead.md",
-    "contracts/dev-lead.md",
-    # 旧版 skills
-    ".yuan/skills/audit.md",
-    ".yuan/skills/checklist.md",
-    # 旧版 templates
-    "templates/task-template.md",
-    "templates/plan-template.md",
-    "templates/review-template.md",
-]
-
-GITIGNORE_CONTENT = """\
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-dist/
-.venv/
-venv/
-
-# Node.js
-node_modules/
-
-# 环境变量
-.env
-.env.local
-
-# IDE
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# 构建产物
-build/
-*.log
-
-# DocsOS — Graph 是 Build Artifact
-docs/graph/index.json
-"""
-
-
-# ═══════════════════════════════════════════════════════════
-# 辅助函数
-# ═══════════════════════════════════════════════════════════
-
-def color(text: str, code: str) -> str:
-    colors = {"red": "31", "green": "32", "yellow": "33", "cyan": "36", "bold": "1"}
-    c = colors.get(code, "0")
-    return f"\033[{c}m{text}\033[0m"
-
-
-def file_sha256(path: Path) -> str:
-    """返回文件的 SHA256 摘要。用于内容对比。"""
-    if not path.is_file():
-        return ""
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def sync_directory(
-    src_dir: Path,
-    dst_dir: Path,
-    dry_run: bool = False,
-    clean_orphans: bool = False,
-) -> dict:
-    """增量同步目录：新增/更新/不变/孤文件。
-
-    返回: {relpath: action} 其中 action ∈ {added, updated, skipped, orphaned}
-    """
-    results = {}
-    src_root = src_dir
-    dst_root = dst_dir
-
-    if not dry_run:
-        dst_root.mkdir(parents=True, exist_ok=True)
-
-    # ── 收集源文件 ──
-    src_files: dict[str, Path] = {}
-    for f in src_root.rglob("*"):
-        if f.is_file():
-            rel = str(f.relative_to(src_root))
-            src_files[rel] = f
-
-    # ── 收集目标文件 ──
-    dst_files: dict[str, Path] = {}
-    if dst_root.exists():
-        for f in dst_root.rglob("*"):
-            if f.is_file():
-                rel = str(f.relative_to(dst_root))
-                dst_files[rel] = f
-
-    # ── 对比并同步 ──
-    for rel, src_path in sorted(src_files.items()):
-        dst_path = dst_root / rel
-
-        if rel not in dst_files:
-            # 新增
-            if not dry_run:
-                dst_path.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(src_path, dst_path)
-            results[rel] = "added"
-
-        elif file_sha256(src_path) != file_sha256(dst_path):
-            # 内容变更 → 覆盖
-            if not dry_run:
-                shutil.copy2(src_path, dst_path)
-            results[rel] = "updated"
-
-        else:
-            # 内容未变
-            results[rel] = "skipped"
-
-    # ── 检查孤文件（目标有但源没有）──
-    orphans = []
-    for rel in sorted(dst_files.keys()):
-        if rel not in src_files:
-            # 跳过 .gitkeep
-            if Path(rel).name == ".gitkeep":
-                continue
-            orphans.append(rel)
-
-    if orphans and clean_orphans and not dry_run:
-        for rel in orphans:
-            (dst_root / rel).unlink(missing_ok=True)
-        results["__orphans_cleaned__"] = orphans
-
-    elif orphans:
-        results["__orphans__"] = orphans
-
-    return results
-
-
-def sync_framework_item(
-    item: str,
-    src_root: Path,
-    dst_root: Path,
-    dry_run: bool = False,
-    clean_orphans: bool = False,
-) -> dict:
-    """同步一个框架项（文件或目录）。"""
-    src = src_root / item
-    dst = dst_root / item
-
-    if src.is_dir():
-        return sync_directory(src, dst, dry_run, clean_orphans)
-    else:
-        # 单文件
-        if not dst.exists():
-            if not dry_run:
-                dst.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(src, dst)
-            return {item: "added"}
-        elif file_sha256(src) != file_sha256(dst):
-            if not dry_run:
-                shutil.copy2(src, dst)
-            return {item: "updated"}
-        else:
-            return {item: "skipped"}
-
-
-def create_docs_skeleton(target: Path, mode: str, dry_run: bool = False) -> dict:
-    """创建 docs/ 目录骨架。返回 {路径: 动作}"""
-    docs_dir = target / "docs"
-    results = {}
-
-    if not dry_run:
-        docs_dir.mkdir(parents=True, exist_ok=True)
-
-    for subdir in DOCS_SKELETON_DIRS:
-        dirpath = docs_dir / subdir
-        if dirpath.exists():
-            results[subdir + "/"] = "skipped"
-            continue
-        if not dry_run:
-            dirpath.mkdir(parents=True, exist_ok=True)
-            (dirpath / ".gitkeep").touch()
-        results[subdir + "/"] = "created"
-
-    for relpath, content in DOCS_SKELETON_FILES.items():
-        filepath = docs_dir / relpath
-        if filepath.exists() and mode == "existing":
-            results[relpath] = "skipped"
-            continue
-        if dry_run:
-            results[relpath] = "created" if not filepath.exists() else "skipped"
-        else:
-            filepath.parent.mkdir(parents=True, exist_ok=True)
-            # 处理模板替换：{{ anti-patterns_template }} → 从 templates/ 读取
-            file_content = content
-            if "{{ anti-patterns_template }}" in content:
-                template_path = SOURCE_ROOT / "templates" / "anti-patterns.md"
-                if template_path.exists():
-                    file_content = template_path.read_text(encoding="utf-8")
-                else:
-                    file_content = "# 反模式清单（空白）\n"
-            filepath.write_text(file_content, encoding="utf-8")
-            results[relpath] = "created"
-
-    return results
-
-
-def cleanup_known_stale(target: Path, dry_run: bool = False) -> list:
-    """删除已知的旧文件/目录。"""
-    removed = []
-    for relpath in KNOWN_STALE_PATHS:
-        filepath = target / relpath
-        if not filepath.exists():
-            continue
-        if not dry_run:
-            if filepath.is_dir():
-                shutil.rmtree(filepath)
-            else:
-                filepath.unlink()
-        removed.append(relpath)
-    return removed
-
-
-def generate_gitignore(target: Path, dry_run: bool = False) -> str:
-    """生成 .gitignore。已有则跳过。"""
-    filepath = target / ".gitignore"
-    if filepath.exists():
-        return "skipped"
-    if not dry_run:
-        filepath.write_text(GITIGNORE_CONTENT, encoding="utf-8")
-    return "created"
-
-
-def read_target_version(target: Path) -> str:
-    """读取目标项目的框架版本。"""
-    ver_file = target / ".yuan" / "VERSION"
-    if ver_file.exists():
-        return ver_file.read_text().strip()
-    return "none"
-
-
-def write_target_version(target: Path, dry_run: bool = False):
-    """写入当前框架版本到目标。"""
-    if dry_run:
-        return
-    ver_file = target / ".yuan" / "VERSION"
-    ver_file.parent.mkdir(parents=True, exist_ok=True)
-    ver_file.write_text(FRAMEWORK_VERSION + "\n")
-
-
-# ═══════════════════════════════════════════════════════════
-# 输出
-# ═══════════════════════════════════════════════════════════
-
-def print_sync_summary(results: dict, label: str):
-    """打印同步摘要。"""
-    added = [k for k, v in results.items() if v == "added" and not k.startswith("__")]
-    updated = [k for k, v in results.items() if v == "updated" and not k.startswith("__")]
-    skipped = [k for k, v in results.items() if v == "skipped" and not k.startswith("__")]
-    orphans = results.get("__orphans__", [])
-    cleaned = results.get("__orphans_cleaned__", [])
-
-    print(f"\n{color(label, 'bold')}")
-
-    if added:
-        print(color(f"  + {len(added)} new:", "green"))
-        for f in added[:10]:
-            print(f"      {f}")
-        if len(added) > 10:
-            print(f"      ... and {len(added) - 10} more")
-
-    if updated:
-        print(color(f"  ~ {len(updated)} updated:", "yellow"))
-        for f in updated[:10]:
-            print(f"      {f}")
-        if len(updated) > 10:
-            print(f"      ... and {len(updated) - 10} more")
-
-    if skipped:
-        print(f"  · {len(skipped)} unchanged (skipped)")
-
-    if cleaned:
-        print(color(f"  - {len(cleaned)} orphaned files cleaned:", "red"))
-        for f in cleaned[:10]:
-            print(f"      {f}")
-        if len(cleaned) > 10:
-            print(f"      ... and {len(cleaned) - 10} more")
-
-    if orphans:
-        print(color(f"  ! {len(orphans)} orphaned files (not in source):", "yellow"))
-        for f in orphans[:10]:
-            print(f"      {f}")
-        if len(orphans) > 10:
-            print(f"      ... and {len(orphans) - 10} more")
-        print(color("    Use --clean to remove them", "yellow"))
-
-
-def print_help_new(target: str):
-    print()
-    print(color("✅ YuanForge 初始化完成", "green"))
-    print(f"📂 {target}")
-    print()
-    print(color("╔══════════════════════════════════════════╗", "cyan"))
-    print(color("║  🚀 下一步                                ║", "cyan"))
-    print(color("╠══════════════════════════════════════════╣", "cyan"))
-    print(color("║  向 Conductor 描述你的需求:               ║", "cyan"))
-    print(color('║  "我要做一个 xxx"                        ║', "cyan"))
-    print(color("║  Conductor 启动 12 人专家团               ║", "cyan"))
-    print(color("╚══════════════════════════════════════════╝", "cyan"))
-    print()
-
-
-def print_help_existing(target: str, stale_cleaned: list):
-    print()
-    print(color("✅ YuanForge 嫁接 / 同步完成", "green"))
-    print(f"📂 {target}")
-    if stale_cleaned:
-        print()
-        print(color("🧹 已清理已知旧文件:", "yellow"))
-        for item in stale_cleaned:
-            print(f"  🗑 {item}")
-    print()
-    print(color("╔══════════════════════════════════════════╗", "cyan"))
-    print(color("║  🚀 下一步                                ║", "cyan"))
-    print(color("╠══════════════════════════════════════════╣", "cyan"))
-    print(color("║  1. 先补全项目文档:                       ║", "cyan"))
-    print(color("║     「请审计当前项目，生成 docs/ 文档」    ║", "cyan"))
-    print(color("║  2. 再描述新需求:                         ║", "cyan"))
-    print(color("║     「在现有项目基础上，我要增加 xxx」      ║", "cyan"))
-    print(color("╚══════════════════════════════════════════╝", "cyan"))
-    print()
-
-
-def print_help_sync(target: str, from_ver: str):
-    print()
-    print(color("✅ YuanForge 增量同步完成", "green"))
-    print(f"📂 {target}")
-    if from_ver and from_ver != "none":
-        print(f"   {from_ver} → {FRAMEWORK_VERSION}")
-    print()
-    print(color("  运行 git diff --stat 查看变更", "cyan"))
-    print()
-
-
-# ═══════════════════════════════════════════════════════════
-# 主逻辑
-# ═══════════════════════════════════════════════════════════
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="YuanForge 项目初始化 / 框架同步",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=textwrap.dedent("""\
-            示例:
-              yuanforge-init ./my-app                          从零开始
-              yuanforge-init ./my-app --name "用户认证系统"      指定项目名
-              yuanforge-init ./existing --mode existing         嫁接已有项目
-              yuanforge-init ./existing --mode existing --clean 嫁接 + 清理孤文件
-              yuanforge-init ./project --mode existing --update 仅更新框架文件
-              yuanforge-init ./project --sync                  智能增量同步
-              yuanforge-init ./my-app --dry-run                 预览
-        """),
-    )
-    parser.add_argument("target", help="目标项目目录")
-    parser.add_argument("--name", default=None, help="项目名称")
-    parser.add_argument(
-        "--mode", choices=["new", "existing"], default="new",
-        help="new=从零开始(默认), existing=嫁接/更新已有项目",
-    )
-    parser.add_argument("--sync", action="store_true",
-                        help="智能增量同步：对比源和目标，新增/更新/检测孤文件")
-    parser.add_argument("--update", action="store_true",
-                        help="仅更新框架文件，不操作 docs/（需配合 --mode existing）")
-    parser.add_argument("--clean", action="store_true",
-                        help="清理已知旧文件 + 孤文件（需配合 --mode existing 或 --sync）")
-    parser.add_argument("--dry-run", action="store_true", help="只显示会做什么，不执行")
-    parser.add_argument("--force", action="store_true", help="跳过确认")
-
-    args = parser.parse_args()
-    target = Path(args.target).resolve()
-
-    # ── 验证源目录 ──
-    for item in ALL_FRAMEWORK_ITEMS:
-        src = SOURCE_ROOT / item
-        if not src.exists():
-            print(color(f"✗ 框架文件缺失: {src}", "red"))
-            print("  请确保从 yuanforge 仓库根目录运行此脚本")
-            sys.exit(1)
-
-    # ── 如果指定 --sync，自动使用 existing + update 模式 ──
-    if args.sync:
-        args.mode = "existing"
-        args.update = True
-
-    # ── 模式验证 ──
-    if args.mode == "new":
-        if target.exists() and any(target.iterdir()):
-            print(color(f"✗ 目标目录已有文件: {target}", "red"))
-            print("  --mode new 要求目标目录不存在或为空")
-            print("  如果是已有项目，请使用 --mode existing 或 --sync")
-            sys.exit(1)
-    elif args.mode == "existing":
-        if not target.exists():
-            print(color(f"✗ 目标目录不存在: {target}", "red"))
-            print("  --mode existing 要求目标目录已存在")
-            sys.exit(1)
-
-    # ── 版本信息（仅展示，不阻止同步）──
-    from_version = ""
-    if args.mode == "existing":
-        from_version = read_target_version(target)
-        if from_version and from_version != "none":
-            print(color(f"  当前框架版本: {from_version} → {FRAMEWORK_VERSION}", "yellow"))
-
-    # ── 确认 ──
-    if not args.force and not args.dry_run:
-        print()
-        print(f"  目标: {target}")
-        if args.mode == "new":
-            print("  模式: 从零开始")
-        elif args.sync:
-            print("  模式: 智能增量同步")
-        elif args.update:
-            print("  模式: 仅更新框架文件")
-        else:
-            print("  模式: 嫁接已有项目")
-        if args.clean:
-            print("  清理: 是（已知旧文件 + 孤文件）")
-        print()
-        confirm = input("  确认? [Y/n] ").strip().lower()
-        if confirm and confirm != "y":
-            print("  已取消")
-            sys.exit(0)
-
-    # ═══ 执行 ═══
-    if args.dry_run:
-        print(color("\n🔍 预览模式 — 不会实际修改文件\n", "yellow"))
-
-    if not args.dry_run:
-        target.mkdir(parents=True, exist_ok=True)
-
-    # ── 1. 清理已知旧文件 ──
-    stale_cleaned = []
-    if args.clean:
-        print(color("🧹 清理已知旧文件:", "bold"))
-        stale_cleaned = cleanup_known_stale(target, args.dry_run)
-        if stale_cleaned:
-            for item in stale_cleaned:
-                print(f"  🗑 {item}")
-        else:
-            print("  · 没有需要清理的已知旧文件")
-
-    # ── 2. 同步框架子目录（粒度化 diff）──
-    print(color("\n📋 同步框架 (.yuan/ subdirs):", "bold"))
-    for subdir in FRAMEWORK_SUBDIRS:
-        src = SOURCE_ROOT / subdir
-        results = sync_framework_item(subdir, SOURCE_ROOT, target, args.dry_run, args.clean)
-        added = sum(1 for v in results.values() if v == "added")
-        updated = sum(1 for v in results.values() if v == "updated")
-        orphans = results.get("__orphans__", [])
-        cleaned = results.get("__orphans_cleaned__", [])
-        parts = []
-        if added: parts.append(f"+{added}")
-        if updated: parts.append(f"~{updated}")
-        if cleaned: parts.append(color(f"-{len(cleaned)}", "red"))
-        elif orphans: parts.append(color(f"!{len(orphans)} orphaned", "yellow"))
-        if parts:
-            print(f"  {subdir}: {' '.join(parts)}")
-            if orphans:
-                for f in orphans[:5]:
-                    print(f"      ! {f}")
-                if len(orphans) > 5:
-                    print(f"      ... and {len(orphans) - 5} more (use --clean to remove)")
-
-    # ── 3. 同步框架顶层目录（增量同步，不清理孤儿保护用户自定义文件）──
-    print(color("\n📋 同步框架 (contracts/protocols/templates/scripts):", "bold"))
-    for topdir in FRAMEWORK_TOP_DIRS:
-        src = SOURCE_ROOT / topdir
-        results = sync_framework_item(topdir, SOURCE_ROOT, target, args.dry_run, clean_orphans=False)
-        added = sum(1 for v in results.values() if v == "added")
-        updated = sum(1 for v in results.values() if v == "updated")
-        skipped = sum(1 for v in results.values() if v == "skipped")
-        if added or updated or skipped:
-            print(f"  {topdir}/: +{added} ~{updated} ·{skipped}")
-
-    # ── 4. 同步框架单文件 ──
-    print(color("\n📋 同步框架文件:", "bold"))
-    for f in FRAMEWORK_FILES:
-        results = sync_framework_item(f, SOURCE_ROOT, target, args.dry_run, args.clean)
-        for rel, action in results.items():
-            if action == "added":
-                print(f"  + {rel}")
-            elif action == "updated":
-                print(f"  ~ {rel}")
-
-    # ── 5. 写入版本 ──
-    if not args.dry_run:
-        write_target_version(target)
-
-    # ── 6. 生成 docs/ ──
-    if not args.update:
-        print(color("\n📄 生成 docs/ 骨架:", "bold"))
-        doc_results = create_docs_skeleton(target, args.mode, args.dry_run)
-        created = sum(1 for v in doc_results.values() if v == "created")
-        skipped = sum(1 for v in doc_results.values() if v == "skipped")
-        print(f"  +{created} created, ·{skipped} skipped")
-    else:
-        print(color("\n📄 docs/ → 跳过（--update 模式）", "bold"))
-
-    # ── 7. .gitignore ──
-    print(color("\n📄 .gitignore:", "bold"))
-    git_status = generate_gitignore(target, args.dry_run)
-    if git_status == "created":
-        print("  ✓ .gitignore")
-    else:
-        print("  · .gitignore → 跳过（已存在）")
-
-    # ── 8. git init (仅 new 模式) ──
-    if args.mode == "new" and not args.dry_run:
-        print(color("\n📦 git init:", "bold"))
-        result = subprocess.run(
-            ["git", "init"], cwd=target, capture_output=True, text=True
+CORE_TREES = (
+    pathlib.PurePosixPath(".yuan/core"),
+    pathlib.PurePosixPath(".yuan/adapters"),
+)
+EXTENSION_NAME = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+
+
+class InstallError(RuntimeError):
+    """Unsafe or ambiguous initializer operation."""
+
+
+def version() -> str:
+    try:
+        value = (SOURCE_ROOT / VERSION_PATH).read_text(encoding="utf-8").strip()
+    except (OSError, UnicodeError) as error:
+        raise InstallError(".yuan/VERSION is missing or unreadable") from error
+    if not re.fullmatch(r"\d+\.\d+\.\d+", value):
+        raise InstallError(".yuan/VERSION is not a semantic version")
+    return value
+
+
+def source_files(extensions: list[str]) -> list[pathlib.PurePosixPath]:
+    files = list(CORE_INPUTS)
+    for tree in CORE_TREES:
+        source = SOURCE_ROOT / tree
+        if not source.is_dir():
+            raise InstallError(f"required distribution tree is missing: {tree}")
+        files.extend(
+            pathlib.PurePosixPath(path.relative_to(SOURCE_ROOT).as_posix())
+            for path in sorted(source.rglob("*"))
+            if path.is_file()
         )
-        print(f"  {result.stdout.strip()}")
+    for name in extensions:
+        if not EXTENSION_NAME.fullmatch(name):
+            raise InstallError(f"invalid extension name: {name}")
+        relative = pathlib.PurePosixPath(f".yuan/extensions/{name}.md")
+        if not (SOURCE_ROOT / relative).is_file():
+            raise InstallError(f"unknown extension: {name}")
+        files.append(relative)
+    return sorted(set(files), key=str)
 
-    # ═══ 完成 ═══
-    if args.dry_run:
-        print(color("\n🔍 预览完成 — 以上操作不会实际执行", "yellow"))
-        return
 
-    if args.mode == "new":
-        print_help_new(str(target))
-    elif args.sync:
-        print_help_sync(str(target), from_version)
-    else:
-        print_help_existing(str(target), stale_cleaned)
+def atomic_copy(source: pathlib.Path, destination: pathlib.Path) -> None:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{destination.name}.", dir=destination.parent
+    )
+    os.close(descriptor)
+    temporary = pathlib.Path(temporary_name)
+    try:
+        shutil.copyfile(source, temporary)
+        os.replace(temporary, destination)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+
+
+def install(
+    target: pathlib.Path,
+    *,
+    extensions: list[str],
+    update: bool,
+    dry_run: bool,
+) -> dict[str, int | str]:
+    release = version()
+    plan = source_files(extensions)
+    target = target.absolute()
+    blocked: list[str] = []
+    for relative in plan:
+        source = SOURCE_ROOT / relative
+        destination = target / relative
+        if destination.exists() and (
+            not destination.is_file() or destination.read_bytes() != source.read_bytes()
+        ):
+            blocked.append(relative.as_posix())
+    if blocked and not update:
+        raise InstallError(
+            "existing files differ; rerun with --update: " + ", ".join(blocked)
+        )
+    changed = 0
+    unchanged = 0
+    for relative in plan:
+        source = SOURCE_ROOT / relative
+        destination = target / relative
+        if destination.is_file() and destination.read_bytes() == source.read_bytes():
+            unchanged += 1
+            continue
+        changed += 1
+        if not dry_run:
+            atomic_copy(source, destination)
+    return {
+        "version": release,
+        "files": len(plan),
+        "changed": changed,
+        "unchanged": unchanged,
+    }
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Install the minimal Yuan Core distribution."
+    )
+    parser.add_argument("target", type=pathlib.Path)
+    parser.add_argument(
+        "--extension",
+        action="append",
+        default=[],
+        help="copy one named extension (repeatable)",
+    )
+    parser.add_argument(
+        "--update",
+        action="store_true",
+        help="CAS-replace differing distribution files",
+    )
+    parser.add_argument("--dry-run", action="store_true")
+    args = parser.parse_args(argv)
+    try:
+        result = install(
+            args.target,
+            extensions=args.extension,
+            update=args.update,
+            dry_run=args.dry_run,
+        )
+    except (InstallError, OSError, UnicodeError) as error:
+        print(f"BLOCKED {error}", file=sys.stderr)
+        return 2
+    print(
+        f"Yuan Core {result['version']}: "
+        f"{result['changed']} changed, {result['unchanged']} unchanged"
+    )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
