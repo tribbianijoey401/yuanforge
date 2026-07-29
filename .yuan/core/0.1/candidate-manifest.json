@@ -1,10 +1,13 @@
 {
   "activation": {
     "mode": "external-content-addressed-authority",
-    "requires": [
-      "previous-root-proof",
-      "independent-proof"
-    ]
+    "proof_policy": {
+      "accepted": [
+        "previous-root-proof",
+        "independent-proof"
+      ],
+      "operator": "any_of"
+    }
   },
   "author_suite": {
     "command": [
@@ -23,7 +26,7 @@
     "required_skips": 0
   },
   "authority": "inert-by-default",
-  "candidate_revision": "yuan.core/0.1.0",
+  "candidate_revision": "yuan.core/0.1.1",
   "files": [
     {
       "path": "attempt.schema.yaml",
@@ -39,7 +42,7 @@
     },
     {
       "path": "completion_semantics.py",
-      "sha256": "facdf0105f6cd29ee9f7d126c740ab9f8317b69265a8412b9bfe50fcae1905f2"
+      "sha256": "47bdea847dcc11e148317aff3f041e4bcf29e2bcce152275cb061d2ac0de18d1"
     },
     {
       "path": "conformance.py",
@@ -51,7 +54,7 @@
     },
     {
       "path": "evidence.schema.yaml",
-      "sha256": "9211e878074c31e27d8e34003de5f92072192c503e2d3d07c3eb68a796088f1b"
+      "sha256": "116eac482bb52a15c28f055fc0e305ae8fef70df702d4140bdaf939952ad96eb"
     },
     {
       "path": "fixtures/invalid/attempt-invalid-journal.json",
@@ -99,7 +102,7 @@
     },
     {
       "path": "protocol.md",
-      "sha256": "87e44ce5969f1d46b980684ad8b89d1268df1933ab4263c497f7f5e6eea98806"
+      "sha256": "6a21d0d8d6e220a640ec8f049d1560ffc0c6ac4e3c7c2fe3a693211adf32a75a"
     },
     {
       "path": "reference_port.py",
@@ -115,7 +118,7 @@
     },
     {
       "path": "replay_trust.py",
-      "sha256": "697a4b31fdd2238d885a922cb528062177bcd9ff16dfd271c91e06ec5dcbc3b3"
+      "sha256": "9ba57131c91071f942fbc52ae4da3bab41412fe81c74c85a6eaa3f336009ba4e"
     },
     {
       "path": "runtime_replay.py",
@@ -155,7 +158,7 @@
     },
     {
       "path": "trust_semantics.py",
-      "sha256": "c1eca06f3044d2cb655189f1dcb684d9e9842759947a4d534f5a3e399b97e445"
+      "sha256": "f13df00e33beece4d0e5ac8caaa63538bb1d341eb12a973a88298d0101d6ffb7"
     },
     {
       "path": "work-contract.schema.yaml",
@@ -192,7 +195,7 @@
     "fixtures/invalid/run-memory-unknown-complete.json": "COMPLETE_WITH_PENDING_SIDE_EFFECT",
     "fixtures/invalid/work-contract-duplicate-ac.json": "DUPLICATE_AC_ID"
   },
-  "protocol_revision": "yuan.core.protocol/0.1.0",
+  "protocol_revision": "yuan.core.protocol/0.1.1",
   "schema_version": "yuan.core-candidate-manifest/v1",
   "self_trust": false
 }

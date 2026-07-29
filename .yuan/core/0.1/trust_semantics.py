@@ -10,6 +10,7 @@ from typing import Any, Iterable
 
 
 PROTECTED_SELF_MOD_TARGETS = {"protocol", "core", "harness", "validator", "authority"}
+SHA256_LENGTH = 64
 
 
 def canonical_digest(
@@ -60,11 +61,53 @@ def immutable_binding_matches(left: Any, right: Any) -> bool:
     )
 
 
+def _proof_closure_valid(
+    proof: dict[str, Any],
+    candidate: dict[str, Any],
+    *,
+    observed_now: datetime,
+    prepared_at: str | None,
+) -> bool:
+    """Validate the content-addressed proof that existed before mutation."""
+    # Compatibility is confined to replay of pre-0.1.1 frozen Work.  The
+    # 0.1.1 replay path always supplies ``prepared_at`` and therefore always
+    # requires the complete closure below.
+    if prepared_at is None:
+        return True
+    required_hashes = (
+        "receipt_sha256",
+        "suite_manifest_sha256",
+        "candidate_manifest_sha256",
+        "verifier_sha256",
+    )
+    if any(
+        not isinstance(proof.get(field), str)
+        or len(proof[field]) != SHA256_LENGTH
+        or any(token not in "0123456789abcdef" for token in proof[field])
+        for field in required_hashes
+    ):
+        return False
+    if proof["candidate_manifest_sha256"] != candidate.get("sha256"):
+        return False
+    try:
+        receipt_at = parse_trusted_time(proof["receipt_created_at"])
+        prepared = parse_trusted_time(prepared_at) if prepared_at else None
+    except (KeyError, TypeError, ValueError):
+        return False
+    return (
+        receipt_at <= observed_now
+        and prepared is not None
+        and receipt_at <= prepared
+        and prepared <= observed_now
+    )
+
+
 def self_modification_authorized(
     change: dict[str, Any],
     proofs: list[dict[str, Any]],
     *,
     now: datetime | None = None,
+    prepared_at: str | None = None,
 ) -> bool:
     if change.get("target_kind") not in PROTECTED_SELF_MOD_TARGETS:
         return False
@@ -91,6 +134,12 @@ def self_modification_authorized(
             and isinstance(proof.get("assertions"), int)
             and not isinstance(proof.get("assertions"), bool)
             and proof["assertions"] > 0
+            and _proof_closure_valid(
+                proof,
+                candidate,
+                observed_now=observed_now,
+                prepared_at=prepared_at,
+            )
         ):
             return True
         if (
@@ -102,6 +151,12 @@ def self_modification_authorized(
             and isinstance(proof.get("assertions"), int)
             and not isinstance(proof.get("assertions"), bool)
             and proof["assertions"] > 0
+            and _proof_closure_valid(
+                proof,
+                candidate,
+                observed_now=observed_now,
+                prepared_at=prepared_at,
+            )
         ):
             return True
         if kind == "human-grant":

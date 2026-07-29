@@ -1,0 +1,16 @@
+{
+  "schema_version": "yuan.work-contract/v1",
+  "work_id": "WORK-invalid-duplicate-ac",
+  "revision": {"id": "WORK-invalid-duplicate-ac", "revision": "1", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+  "protocol_binding": {"id": "protocol", "revision": "1", "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+  "harness_binding": {"id": "harness", "revision": "1", "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+  "intent": {"goal": "Reject duplicate AC ids.", "non_goals": [], "constraints": []},
+  "scope": {"allowed_paths": [".yuan/core/0.1"], "denied_paths": [], "side_effect_classes": ["none"]},
+  "authorization": {"default": "deny", "grants": []},
+  "budget": {"ticks": 1, "tool_calls": 1, "strategies": 1, "command_seconds": 1},
+  "acceptance_criteria": [
+    {"id": "AC-DUP", "type": "structure", "required": true, "predicate": "first", "artifact_scope": ".yuan/core/0.1", "verifier_binding": {"id": "v", "revision": "1", "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "trust_root_id": "old", "environment_ids": ["test"], "environment_fingerprints": {"test": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}, "minimum_assertions": 1}},
+    {"id": "AC-DUP", "type": "structure", "required": true, "predicate": "second", "artifact_scope": ".yuan/core/0.1", "verifier_binding": {"id": "v", "revision": "1", "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "trust_root_id": "old", "environment_ids": ["test"], "environment_fingerprints": {"test": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}, "minimum_assertions": 1}}
+  ],
+  "safety_invariants": [{"id": "SAFE-01", "predicate": "Remain inert."}]
+}

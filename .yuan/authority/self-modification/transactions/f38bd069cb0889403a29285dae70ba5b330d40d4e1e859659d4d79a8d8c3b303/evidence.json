@@ -1,0 +1,211 @@
+{
+  "ac_id": "AC-M9-SELF-MODIFICATION-DOGFOOD",
+  "artifact_binding": {
+    "scope": ".yuan/core/0.1",
+    "sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a"
+  },
+  "assertions": 30,
+  "checks": [
+    {
+      "id": "M9-INDEPENDENT-001",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-002",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-003",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-004",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-005",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-006",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-007",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-008",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-009",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-010",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-011",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-012",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-013",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-014",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-015",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-016",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-017",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-018",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-019",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-020",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-021",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-022",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-023",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-024",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-025",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-026",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-027",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-028",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-029",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    },
+    {
+      "id": "M9-INDEPENDENT-030",
+      "observation": "Frozen held-out old root accepted the exact externally activated Core.",
+      "status": "PASS"
+    }
+  ],
+  "created_at": "2026-07-29T10:19:23.167285+00:00",
+  "environment_binding": {
+    "fingerprint": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103",
+    "id": "yuan-genesis-old-root"
+  },
+  "evidence_id": "EVD-M9-R1-LIVE-SELF-MOD-0002",
+  "freshness": {
+    "not_after": null,
+    "observed_artifact_sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a"
+  },
+  "harness_binding": {
+    "id": "yuan.runtime-transaction",
+    "revision": "1",
+    "sha256": "fc666ebcd63c3c29241b02ddcb2f5d3ce2ae37fe4416d8482d4e4c51743d4e68"
+  },
+  "immutable_digest": "b9600fba8c138339be4cb4af37819f9f6752bd54c1005c156b9a9b7bed26fc77",
+  "independence": {
+    "author_identity": "backend-dev-task-012",
+    "independent": true,
+    "method": "old-trust-root",
+    "verifier_identity": "frozen-genesis-held-out"
+  },
+  "kind": "integration",
+  "logs": {
+    "receipt_sha256": "6b1f382ae72c8a2ac5b6ece4aa9db6e964f8ce93aa126bd138f7fd0c9056548e",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "proof_receipt_created_at": "2026-07-29T10:19:03.943747+00:00",
+  "schema_version": "yuan.evidence/v1",
+  "sequence": 2,
+  "source_attempt_id": "ATT-M9-R1-LIVE-SELF-MOD-0002",
+  "status": "PASS",
+  "verifier_binding": {
+    "environment_fingerprints": {
+      "yuan-genesis-old-root": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103"
+    },
+    "environment_ids": [
+      "yuan-genesis-old-root"
+    ],
+    "id": "yuan.m9-independent-held-out",
+    "minimum_assertions": 30,
+    "revision": "1",
+    "sha256": "104bfdef44b77012ab69c83cd414a18269b924fefec647e816951771f97cc4a6",
+    "trust_root_id": "yuan-genesis-legacy-independent"
+  },
+  "work_binding": {
+    "id": "WORK-yuan-m8-m9-successor",
+    "revision": "3",
+    "sha256": "24820e1e41b7d9d016cc61465e869f227a3a4ed52b2bfeec3289b062449097e1"
+  }
+}

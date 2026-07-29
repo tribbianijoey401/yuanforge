@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+from datetime import datetime, timezone
 from typing import Any
 
 from yuan_runtime_state import AuthorityError, file_sha256
@@ -12,6 +13,28 @@ from yuan_runtime_state import AuthorityError, file_sha256
 DESCRIPTOR_PATH = pathlib.PurePosixPath(
     ".yuan/authority/activation/yuan-core-0.1.json"
 )
+ACCEPTED_PROOF_POLICIES = {
+    "previous-root-proof",
+    "independent-proof",
+}
+
+
+def activation_policy_valid(candidate: dict[str, Any]) -> bool:
+    """Accept exactly one explicit, non-empty ANY-OF proof policy."""
+    activation = candidate.get("activation")
+    if not isinstance(activation, dict) or "requires" in activation:
+        return False
+    policy = activation.get("proof_policy")
+    return (
+        activation.get("mode") == "external-content-addressed-authority"
+        and isinstance(policy, dict)
+        and set(policy) == {"operator", "accepted"}
+        and policy.get("operator") == "any_of"
+        and isinstance(policy.get("accepted"), list)
+        and len(policy["accepted"]) == len(set(policy["accepted"]))
+        and bool(policy["accepted"])
+        and set(policy["accepted"]) == ACCEPTED_PROOF_POLICIES
+    )
 
 
 def _inside(repo: pathlib.Path, relative: str) -> pathlib.Path:
@@ -44,6 +67,9 @@ def _verify_candidate_manifest(
     entries = manifest.get("files")
     if (
         manifest.get("schema_version") != "yuan.core-candidate-manifest/v1"
+        or not activation_policy_valid(manifest)
+        or manifest.get("authority") != "inert-by-default"
+        or manifest.get("self_trust") is not False
         or not isinstance(entries, list)
         or not entries
     ):
@@ -99,6 +125,38 @@ def _verify_suite_manifest(
         raise AuthorityError("older-root suite does not bind activated Core files")
 
 
+def _verify_proof_closure(
+    repo: pathlib.Path,
+    descriptor: dict[str, Any],
+    *,
+    candidate_sha256: str,
+    verifier_sha256: str,
+    receipt_path: pathlib.Path,
+    suite_path: pathlib.Path,
+) -> dict[str, Any]:
+    index_path = _inside(repo, descriptor.get("proof_closure_index_path", ""))
+    index = _json(index_path, "activation proof closure")
+    receipt = _json(receipt_path, "activation proof receipt")
+    try:
+        receipt_at = datetime.fromisoformat(
+            receipt["created_at"].replace("Z", "+00:00")
+        ).astimezone(timezone.utc)
+    except (KeyError, TypeError, ValueError) as error:
+        raise AuthorityError("activation receipt time is invalid") from error
+    if (
+        descriptor.get("proof_closure_index_sha256") != file_sha256(index_path)
+        or index.get("schema_version") != "yuan.preflight-proof-closure/v1"
+        or index.get("receipt_sha256") != file_sha256(receipt_path)
+        or index.get("suite_manifest_sha256") != file_sha256(suite_path)
+        or index.get("candidate_manifest_sha256") != candidate_sha256
+        or index.get("verifier_sha256") != verifier_sha256
+        or index.get("receipt_created_at") != receipt.get("created_at")
+        or receipt_at > datetime.now(timezone.utc)
+    ):
+        raise AuthorityError("activation proof closure mismatch")
+    return index
+
+
 def verify_activation_descriptor(
     repo_root: pathlib.Path,
     descriptor_path: pathlib.Path | None = None,
@@ -138,6 +196,14 @@ def verify_activation_descriptor(
     activated_sha = descriptor.get("activated_candidate_manifest_sha256", "")
     candidate = _verify_candidate_manifest(repo, candidate_path, activated_sha)
     _verify_suite_manifest(active_suite, candidate, activated_sha)
+    closure = _verify_proof_closure(
+        repo,
+        descriptor,
+        candidate_sha256=activated_sha,
+        verifier_sha256=expected_verifier,
+        receipt_path=evidence,
+        suite_path=active_suite_path,
+    )
     previous_sha = descriptor.get("previous_candidate_manifest_sha256", "")
     prior_sha = descriptor.get("prior_activated_candidate_manifest_sha256", "")
     previous_blob = (
@@ -209,5 +275,10 @@ def verify_activation_descriptor(
             "older_root_verifier_sha256"
         ],
         "descriptor_sha256": file_sha256(path),
+        "proof_closure_index_sha256": descriptor[
+            "proof_closure_index_sha256"
+        ],
+        "proof_policy": candidate["activation"]["proof_policy"],
+        "proof_route": closure["proof_route"],
         "assertions": receipt["checks_executed"],
     }

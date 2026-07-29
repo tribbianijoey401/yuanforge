@@ -18,6 +18,7 @@
     "ac_id": {"type": "string", "pattern": "^AC-[A-Za-z0-9._-]+$"},
     "kind": {"enum": ["logic", "integration", "contract", "structure", "review", "human-judgment", "tool-receipt"]},
     "created_at": {"type": "string", "format": "date-time"},
+    "proof_receipt_created_at": {"type": "string", "format": "date-time"},
     "source_attempt_id": {"type": "string", "pattern": "^ATT-[A-Za-z0-9._-]+$"},
     "status": {"enum": ["PASS", "FAIL", "ERROR"]},
     "assertions": {"type": "integer", "minimum": 0},

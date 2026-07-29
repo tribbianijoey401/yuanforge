@@ -58,7 +58,9 @@ class SuccessorRunTests(unittest.TestCase):
         current = load_current(ROOT)["record"]
         runtime, _, active_sha = resolve_runtime_root(ROOT)
         activation = current["protocol_activation"]
-        self.assertEqual(7, verified["revision"])
+        self.assertEqual(8, verified["revision"])
+        self.assertEqual(verified["revision"], current["revision"])
+        self.assertEqual(verified["revision"], verified["history_length"])
         self.assertEqual(runtime.relative_to(ROOT).as_posix(), current["runtime_root"])
         self.assertEqual(active_sha, current["runtime_pointer_sha256"])
         self.assertEqual(
@@ -67,6 +69,14 @@ class SuccessorRunTests(unittest.TestCase):
         )
         self.assertEqual("legacy", activation["accepted_by_authority"])
         self.assertEqual(80, activation["assertions"])
+        self.assertEqual("previous-root-proof", activation["proof_route"])
+        self.assertEqual(
+            {
+                "operator": "any_of",
+                "accepted": ["previous-root-proof", "independent-proof"],
+            },
+            activation["proof_policy"],
+        )
 
 
 if __name__ == "__main__":

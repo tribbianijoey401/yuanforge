@@ -1,0 +1,140 @@
+{
+  "action": {
+    "authorization_grant_id": "GRANT-CORE-M8-M9",
+    "high_impact": false,
+    "mutating": true,
+    "scope": ".yuan/core/0.1",
+    "self_modification": {
+      "change": {
+        "candidate_binding": {
+          "id": "yuan.core.protocol",
+          "revision": "0.1.1",
+          "sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a"
+        },
+        "previous_binding": {
+          "id": "yuan.m9-independent-held-out",
+          "revision": "1",
+          "sha256": "104bfdef44b77012ab69c83cd414a18269b924fefec647e816951771f97cc4a6"
+        },
+        "risk": "R0",
+        "target_kind": "core"
+      },
+      "proofs": [
+        {
+          "assertions": 30,
+          "candidate_binding": {
+            "id": "yuan.core.protocol",
+            "revision": "0.1.1",
+            "sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a"
+          },
+          "candidate_manifest_sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a",
+          "closure_index_path": ".yuan/authority/self-modification/evidence/preflight/e299d23a16668cceac0310adb0ee3bbd92222a00f39718a9072f1494831b7e71/cc236b27c43b1eac5bc16d4880f14b603af866469b776958610e597347ad01da.index.json",
+          "closure_index_sha256": "cc236b27c43b1eac5bc16d4880f14b603af866469b776958610e597347ad01da",
+          "full_candidate_manifest_sha256": "4ae7f150092d0e0e6d64bcc0cee72944738e47658e50e51ad80ab1fdc118c1b9",
+          "kind": "previous-root",
+          "prepared_attempt_path": ".yuan/authority/self-modification/transactions/2a396d6ea6187e0144e0883aa4db2581c2217eb4f832c091181fc6e13a37c989/attempt-prepared.json",
+          "receipt_created_at": "2026-07-29T10:14:16.985952+00:00",
+          "receipt_path": ".yuan/authority/self-modification/evidence/preflight/e299d23a16668cceac0310adb0ee3bbd92222a00f39718a9072f1494831b7e71/receipt.json",
+          "receipt_sha256": "e299d23a16668cceac0310adb0ee3bbd92222a00f39718a9072f1494831b7e71",
+          "root_binding": {
+            "id": "yuan.m9-independent-held-out",
+            "revision": "1",
+            "sha256": "104bfdef44b77012ab69c83cd414a18269b924fefec647e816951771f97cc4a6"
+          },
+          "status": "PASS",
+          "suite_manifest_path": ".yuan/authority/self-modification/evidence/preflight/e299d23a16668cceac0310adb0ee3bbd92222a00f39718a9072f1494831b7e71/suite-manifest.json",
+          "suite_manifest_sha256": "856ea8001e6031ae1d8cff98eb82966a4b20fbeee5dd017c5832160890583f6f",
+          "transaction_id": "2a396d6ea6187e0144e0883aa4db2581c2217eb4f832c091181fc6e13a37c989",
+          "verifier_path": ".yuan/authority/self-modification/evidence/preflight/e299d23a16668cceac0310adb0ee3bbd92222a00f39718a9072f1494831b7e71/7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103.blob",
+          "verifier_sha256": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103"
+        }
+      ]
+    },
+    "side_effect_class": "filesystem",
+    "type": "file-write"
+  },
+  "attempt_id": "ATT-M9-R1-LIVE-SELF-MOD-0002",
+  "budget_charge": {
+    "command_seconds": 30,
+    "strategies": 1,
+    "ticks": 1,
+    "tool_calls": 2
+  },
+  "evidence_ids": [
+    "EVD-M9-R1-LIVE-SELF-MOD-0002"
+  ],
+  "harness_binding": {
+    "id": "yuan.runtime-transaction",
+    "revision": "1",
+    "sha256": "fc666ebcd63c3c29241b02ddcb2f5d3ce2ae37fe4416d8482d4e4c51743d4e68"
+  },
+  "hypothesis": {
+    "claim": "Frozen old-root proof closure predates and authorizes the complete 0.1.1 candidate mutation.",
+    "falsification": "Any closure, time, byte, journal, or Work mismatch blocks before mutation."
+  },
+  "journal": [
+    {
+      "ordinal": 1,
+      "receipt_sha256": null,
+      "recorded_at": "2026-07-29T10:14:19.834161+00:00",
+      "state": "PREPARED"
+    },
+    {
+      "ordinal": 2,
+      "receipt_sha256": null,
+      "recorded_at": "2026-07-29T10:14:53.854579+00:00",
+      "state": "EXECUTING"
+    },
+    {
+      "ordinal": 3,
+      "receipt_sha256": "f652163b70040b364c87a2ed04c225a807e512b45dd9c1c7e13accb5c02bff7c",
+      "recorded_at": "2026-07-29T10:14:53.854579+00:00",
+      "state": "OBSERVED"
+    },
+    {
+      "ordinal": 4,
+      "receipt_sha256": "f652163b70040b364c87a2ed04c225a807e512b45dd9c1c7e13accb5c02bff7c",
+      "recorded_at": "2026-07-29T10:14:53.854579+00:00",
+      "state": "COMMITTED"
+    }
+  ],
+  "outcome": "SUCCEEDED",
+  "postcondition": {
+    "observed_sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a",
+    "satisfied": true,
+    "scope": ".yuan/core/0.1"
+  },
+  "protocol_binding": {
+    "id": "yuan.core.protocol",
+    "revision": "0.1.0",
+    "sha256": "87e44ce5969f1d46b980684ad8b89d1268df1933ab4263c497f7f5e6eea98806"
+  },
+  "relevant_inputs": [
+    {
+      "scope": ".yuan/core/0.1",
+      "sha256": "33d72ceb9252f3dbd672beb270d4af43b0d6c26a4936920a72ae4752599dfa70"
+    },
+    {
+      "scope": ".yuan/authority/self-modification/evidence/preflight/e299d23a16668cceac0310adb0ee3bbd92222a00f39718a9072f1494831b7e71/cc236b27c43b1eac5bc16d4880f14b603af866469b776958610e597347ad01da.index.json",
+      "sha256": "cc236b27c43b1eac5bc16d4880f14b603af866469b776958610e597347ad01da"
+    }
+  ],
+  "schema_version": "yuan.attempt/v1",
+  "sequence": 2,
+  "side_effect_state": "COMMITTED",
+  "strategy_fingerprint": "a51be6fa488ab093229bd99052ee39682d2226374833c6d6d059daa429da4709",
+  "tool_receipt": {
+    "after_sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a",
+    "before_sha256": "33d72ceb9252f3dbd672beb270d4af43b0d6c26a4936920a72ae4752599dfa70",
+    "kind": "file-write",
+    "operation_id": "OP-M9-R1-LIVE-CORE-REPLACE",
+    "path": ".yuan/core/0.1",
+    "schema_version": "yuan.tool-receipt/v1",
+    "status": "REPLACED"
+  },
+  "work_binding": {
+    "id": "WORK-yuan-m8-m9-successor",
+    "revision": "3",
+    "sha256": "24820e1e41b7d9d016cc61465e869f227a3a4ed52b2bfeec3289b062449097e1"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "authority": "core",
+  "legacy_root": "docs",
+  "legacy_snapshot_sha256": "89201f8190439969667532d5ee250a72109f648a2906b951910c2700472a2074",
+  "m7_semantic_registry_sha256": "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
+  "previous_record_sha256": "cb65f3c1464fd4dc97e328752cd1075a026aba897ca637fbbaae296996c8c647",
+  "protocol_activation": {
+    "accepted_by_authority": "legacy",
+    "activated_candidate_manifest_sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a",
+    "activated_older_root_manifest_sha256": "856ea8001e6031ae1d8cff98eb82966a4b20fbeee5dd017c5832160890583f6f",
+    "assertions": 80,
+    "candidate_manifest_sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a",
+    "descriptor_sha256": "820a46336335869dab796102e75fa5031905461f5157b66eea6c8a072550814b",
+    "independent_evidence_sha256": "6b1f382ae72c8a2ac5b6ece4aa9db6e964f8ce93aa126bd138f7fd0c9056548e",
+    "older_root_manifest_sha256": "fc5b4873f839a9e71ddc69053687603a0964f6a0ede5e030196031e61065b552",
+    "older_root_verifier_sha256": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103",
+    "previous_candidate_manifest_sha256": "20ac1cbb7f2377d5cecadf3347a40d81e14e8469c6c914701f585a49903d9768",
+    "prior_activated_candidate_manifest_sha256": "57a2acad6ba92d879785139e35548bdd20cd1edcafa3d7e8b554321504ec8b5e",
+    "proof_closure_index_sha256": "6da8a656f163e143a465f99c98429a94ca2afe1d752d50e1b75b1178162586f7",
+    "proof_policy": {
+      "accepted": [
+        "previous-root-proof",
+        "independent-proof"
+      ],
+      "operator": "any_of"
+    },
+    "proof_route": "previous-root-proof",
+    "protocol_sha256": "6a21d0d8d6e220a640ec8f049d1560ffc0c6ac4e3c7c2fe3a693211adf32a75a",
+    "schema_version": "yuan.protocol-activation-binding/v1"
+  },
+  "receipt": {
+    "dual_write": false,
+    "from": "core",
+    "pointer_before_sha256": "d9ed9ccbdffc917555d6c56c966235f8418896ed4717217510b49749cc18ba59",
+    "schema_version": "yuan.authority-switch-receipt/v1",
+    "semantic_registry_sha256": "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
+    "single_writable_authority": true,
+    "to": "core"
+  },
+  "revision": 8,
+  "runtime_pointer_sha256": "19c00cee476cdc82214cb1d3a3a6966bc567cbe577c251f299e058258766fad9",
+  "runtime_root": ".yuan-run/runs/WORK-yuan-m8-m9-successor-r4-19a6f622bb8d",
+  "runtime_snapshot_sha256": "5c931201afe745763f08a4f4b327daa8028234cb29ae9256f8beb579f19c5fa2",
+  "schema_version": "yuan.authority-record/v1"
+}

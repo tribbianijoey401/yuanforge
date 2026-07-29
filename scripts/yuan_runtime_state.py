@@ -203,6 +203,114 @@ def validate_runtime_evidence(
     """Apply the frozen Core schema and AC trust predicate before any append."""
     repo = pathlib.Path(repo_root).resolve()
     work, attempts, _ = runtime_documents(repo, runtime_root)
+    self_modification = attempt.get("action", {}).get("self_modification")
+    if isinstance(self_modification, dict):
+        proofs = self_modification.get("proofs", [])
+        journal = attempt.get("journal", [])
+        if (
+            len(proofs) != 1
+            or not isinstance(proofs[0], dict)
+            or [item.get("state") for item in journal]
+            != ["PREPARED", "EXECUTING", "OBSERVED", "COMMITTED"]
+        ):
+            raise AuthorityError("self-modification proof/journal is ambiguous")
+        proof = proofs[0]
+        try:
+            proof_receipt = (repo / proof["receipt_path"]).resolve()
+            proof_suite = (repo / proof["suite_manifest_path"]).resolve()
+            proof_verifier = (repo / proof["verifier_path"]).resolve()
+            proof_index = (repo / proof["closure_index_path"]).resolve()
+            prepared_snapshot = (
+                repo / proof["prepared_attempt_path"]
+            ).resolve()
+            mutation_journal = (
+                repo
+                / ".yuan/authority/self-modification/transactions"
+                / proof["transaction_id"]
+                / "journal.json"
+            ).resolve()
+            for target in (
+                proof_receipt,
+                proof_suite,
+                proof_verifier,
+                proof_index,
+                prepared_snapshot,
+                mutation_journal,
+            ):
+                target.relative_to(repo)
+            receipt = json.loads(proof_receipt.read_text(encoding="utf-8"))
+            closure = json.loads(proof_index.read_text(encoding="utf-8"))
+            prepared = json.loads(
+                prepared_snapshot.read_text(encoding="utf-8")
+            )
+            mutation = json.loads(
+                mutation_journal.read_text(encoding="utf-8")
+            )
+            receipt_at = datetime.fromisoformat(
+                receipt["created_at"].replace("Z", "+00:00")
+            ).astimezone(timezone.utc)
+            journal_times = [
+                datetime.fromisoformat(
+                    item["recorded_at"].replace("Z", "+00:00")
+                ).astimezone(timezone.utc)
+                for item in journal
+            ]
+            evidence_at = datetime.fromisoformat(
+                evidence["created_at"].replace("Z", "+00:00")
+            ).astimezone(timezone.utc)
+        except (
+            KeyError,
+            OSError,
+            UnicodeError,
+            json.JSONDecodeError,
+            TypeError,
+            ValueError,
+        ) as error:
+            raise AuthorityError(
+                "self-modification proof closure is unavailable"
+            ) from error
+        candidate_sha = self_modification["change"]["candidate_binding"][
+            "sha256"
+        ]
+        if (
+            file_sha256(proof_receipt) != proof.get("receipt_sha256")
+            or file_sha256(proof_suite)
+            != proof.get("suite_manifest_sha256")
+            or file_sha256(proof_verifier) != proof.get("verifier_sha256")
+            or file_sha256(proof_index)
+            != proof.get("closure_index_sha256")
+            or file_sha256(prepared_snapshot)
+            != mutation.get("prepared_attempt_sha256")
+            or mutation.get("transaction_id") != proof.get("transaction_id")
+            or proof.get("candidate_manifest_sha256") != candidate_sha
+            or receipt.get("manifest_sha256")
+            != proof.get("suite_manifest_sha256")
+            or receipt.get("created_at") != proof.get("receipt_created_at")
+            or closure.get("receipt_sha256")
+            != proof.get("receipt_sha256")
+            or closure.get("suite_manifest_sha256")
+            != proof.get("suite_manifest_sha256")
+            or closure.get("candidate_manifest_sha256") != candidate_sha
+            or closure.get("verifier_sha256")
+            != proof.get("verifier_sha256")
+            or prepared.get("journal", [None])[0] != journal[0]
+            or prepared.get("action", {}).get("self_modification", {}).get(
+                "proofs"
+            )
+            != proofs
+            or journal_times != sorted(journal_times)
+            or receipt_at > journal_times[0]
+            or journal_times[-1] > evidence_at
+            or receipt_at > evidence_at
+            or evidence.get("proof_receipt_created_at")
+            != receipt.get("created_at")
+            or evidence.get("logs", {}).get("receipt_sha256")
+            != proof.get("receipt_sha256")
+            or evidence_at > datetime.now(timezone.utc)
+        ):
+            raise AuthorityError(
+                "self-modification proof causality/binding mismatch"
+            )
     criteria = [
         item
         for item in work.get("acceptance_criteria", [])

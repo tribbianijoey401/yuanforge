@@ -1,0 +1,63 @@
+{
+  "schema_version": "yuan.evidence/v1",
+  "evidence_id": "EVD-author-001",
+  "sequence": 1,
+  "work_binding": {
+    "id": "WORK-core-author-fixture",
+    "revision": "1",
+    "sha256": "1dcdab79925246025bd4cc62b98fefe807a937d95b43aac9c84788b828233d6f"
+  },
+  "ac_id": "AC-STRUCTURE",
+  "kind": "structure",
+  "created_at": "2026-07-26T14:30:00+00:00",
+  "source_attempt_id": "ATT-author-001",
+  "status": "PASS",
+  "assertions": 2,
+  "checks": [
+    {
+      "id": "schemas-parse",
+      "status": "PASS",
+      "observation": "Four schemas parsed with the Python standard library."
+    },
+    {
+      "id": "SAFE-01",
+      "status": "PASS",
+      "observation": "The candidate remains inert and has not changed runtime authority."
+    }
+  ],
+  "artifact_binding": {
+    "scope": ".yuan/core/0.1",
+    "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "environment_binding": {
+    "id": "windows-python312",
+    "fingerprint": "4444444444444444444444444444444444444444444444444444444444444444"
+  },
+  "verifier_binding": {
+    "id": "bootstrap-core-verifier",
+    "revision": "1",
+    "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "trust_root_id": "genesis-m1"
+  },
+  "harness_binding": {
+    "id": "yuan-reference-harness",
+    "revision": "0.1.0-candidate",
+    "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "logs": {
+    "stdout_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+    "stderr_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+    "receipt_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+  },
+  "freshness": {
+    "observed_artifact_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "not_after": null
+  },
+  "independence": {
+    "method": "old-trust-root",
+    "author_identity": "backend-dev-task-005",
+    "verifier_identity": "bootstrap-verifier-task-004",
+    "independent": true
+  },
+  "immutable_digest": "c0520ea5b8bc31d7970b80097865a0b2e38915a20145b85af1b2427775f37bc0"
+}

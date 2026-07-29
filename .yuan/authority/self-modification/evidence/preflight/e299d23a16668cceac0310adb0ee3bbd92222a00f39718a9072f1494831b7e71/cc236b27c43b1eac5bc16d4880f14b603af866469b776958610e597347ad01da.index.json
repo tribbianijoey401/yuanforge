@@ -1,0 +1,14 @@
+{
+  "candidate_manifest_sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a",
+  "full_candidate_manifest_path": ".yuan/authority/self-modification/evidence/preflight/e299d23a16668cceac0310adb0ee3bbd92222a00f39718a9072f1494831b7e71/full-candidate-manifest.json",
+  "full_candidate_manifest_sha256": "4ae7f150092d0e0e6d64bcc0cee72944738e47658e50e51ad80ab1fdc118c1b9",
+  "proof_route": "previous-root-proof",
+  "receipt_created_at": "2026-07-29T10:14:16.985952+00:00",
+  "receipt_path": ".yuan/authority/self-modification/evidence/preflight/e299d23a16668cceac0310adb0ee3bbd92222a00f39718a9072f1494831b7e71/receipt.json",
+  "receipt_sha256": "e299d23a16668cceac0310adb0ee3bbd92222a00f39718a9072f1494831b7e71",
+  "schema_version": "yuan.preflight-proof-closure/v1",
+  "suite_manifest_path": ".yuan/authority/self-modification/evidence/preflight/e299d23a16668cceac0310adb0ee3bbd92222a00f39718a9072f1494831b7e71/suite-manifest.json",
+  "suite_manifest_sha256": "856ea8001e6031ae1d8cff98eb82966a4b20fbeee5dd017c5832160890583f6f",
+  "verifier_path": ".yuan/authority/self-modification/evidence/preflight/e299d23a16668cceac0310adb0ee3bbd92222a00f39718a9072f1494831b7e71/7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103.blob",
+  "verifier_sha256": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103"
+}

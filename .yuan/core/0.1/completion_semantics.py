@@ -77,7 +77,7 @@ def evidence_satisfies_ac(
     if attempts_by_id is None:
         return True
     source = attempts_by_id.get(evidence["source_attempt_id"])
-    return (
+    if not (
         isinstance(source, dict)
         and evidence["evidence_id"] in source.get("evidence_ids", [])
         and immutable_binding_matches(source.get("work_binding"), work["revision"])
@@ -87,7 +87,35 @@ def evidence_satisfies_ac(
         and immutable_binding_matches(
             source.get("protocol_binding"), work["protocol_binding"]
         )
-    )
+    ):
+        return False
+    if work.get("protocol_binding", {}).get("revision") != "0.1.1":
+        return True
+    try:
+        created_at = parse_trusted_time(evidence["created_at"])
+        proof_receipt_at = parse_trusted_time(
+            evidence["proof_receipt_created_at"]
+        )
+    except (KeyError, TypeError, ValueError):
+        return False
+    if not (proof_receipt_at <= created_at <= observed_now):
+        return False
+    journal = source.get("journal", [])
+    if journal:
+        try:
+            states = [item["state"] for item in journal]
+            times = [parse_trusted_time(item["recorded_at"]) for item in journal]
+        except (KeyError, TypeError, ValueError):
+            return False
+        if (
+            states != ["PREPARED", "EXECUTING", "OBSERVED", "COMMITTED"]
+            or times != sorted(times)
+            or proof_receipt_at > times[0]
+            or times[-1] > created_at
+            or times[-1] > observed_now
+        ):
+            return False
+    return True
 
 
 def completion_satisfied(

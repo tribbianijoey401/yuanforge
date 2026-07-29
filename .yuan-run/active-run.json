@@ -1,6 +1,6 @@
 {
-  "manifest_sha256": "a135a77f8b6dddad29554e9145c79b8fe689ba1932bc44eea02c48a0940c1447",
-  "run_id": "WORK-yuan-m8-m9-successor-r3-24820e1e41b7",
-  "runtime_root": ".yuan-run/runs/WORK-yuan-m8-m9-successor-r3-24820e1e41b7",
+  "manifest_sha256": "5c931201afe745763f08a4f4b327daa8028234cb29ae9256f8beb579f19c5fa2",
+  "run_id": "WORK-yuan-m8-m9-successor-r4-19a6f622bb8d",
+  "runtime_root": ".yuan-run/runs/WORK-yuan-m8-m9-successor-r4-19a6f622bb8d",
   "schema_version": "yuan.active-run/v1"
 }

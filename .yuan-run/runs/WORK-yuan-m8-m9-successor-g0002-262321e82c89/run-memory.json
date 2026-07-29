@@ -1,0 +1,72 @@
+{
+  "ac_evidence": {
+    "AC-M9-SELF-MODIFICATION-DOGFOOD": [
+      "EVD-M9-WORK3-INDEPENDENT-0001",
+      "EVD-M9-R1-LIVE-SELF-MOD-0002"
+    ]
+  },
+  "active_hypotheses": [],
+  "artifact_binding": {
+    "scope": ".yuan/core/0.1",
+    "sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a"
+  },
+  "attempted_strategies": [
+    {
+      "fingerprint": "03d7a25943d3647bbec4697a21536f6e7d7030c559eafaf6517616333d268dca",
+      "latest_evidence_sequence": 1,
+      "relevant_inputs_digest": "5ae4eabac0e46145075fdc14b807a5ccfd820f5ece7610145ac8c7cf69fd39a3"
+    },
+    {
+      "fingerprint": "8c070b42f7d6976d2b8426b1b94fbb14413060197290faab7f071f839199c9a7",
+      "latest_evidence_sequence": 2,
+      "relevant_inputs_digest": "7965726cfa1f124da6ccfa5a275a643b4500619fcaf6b0b84ab9c4c439250885"
+    }
+  ],
+  "environment_binding": {
+    "fingerprint": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103",
+    "id": "yuan-genesis-old-root"
+  },
+  "last_result": "WAIT_AUTH",
+  "legal_next_steps": [
+    {
+      "ac_id": "AC-M9-LEGACY-TOMBSTONE-WAIT-AUTH",
+      "action_type": "file-write",
+      "authorization_grant_id": null,
+      "high_impact": true,
+      "scope": "docs"
+    }
+  ],
+  "pending_side_effects": [],
+  "projection_sequence": 4,
+  "protocol_binding": {
+    "id": "yuan.core.protocol",
+    "revision": "0.1.0",
+    "sha256": "87e44ce5969f1d46b980684ad8b89d1268df1933ab4263c497f7f5e6eea98806"
+  },
+  "rebuild": {
+    "attempt_ids": [
+      "ATT-M9-WORK3-INDEPENDENT-0001",
+      "ATT-M9-R1-LIVE-SELF-MOD-0002"
+    ],
+    "attempts_digest": "d3b46ab72da8fe0bdd774e79f643a32071d7859b690092d2826cf4679028060d",
+    "errors": [],
+    "evidence_digest": "412d633b278be97b5e06daad6101fb7c2e832da23406eb669a44c9c6082b44d0",
+    "evidence_ids": [
+      "EVD-M9-WORK3-INDEPENDENT-0001",
+      "EVD-M9-R1-LIVE-SELF-MOD-0002"
+    ]
+  },
+  "remaining_budget": {
+    "command_seconds": 560,
+    "strategies": 18,
+    "ticks": 18,
+    "tool_calls": 37
+  },
+  "run_id": "RUN-WORK-yuan-m8-m9-successor",
+  "schema_version": "yuan.run-memory/v1",
+  "work_binding": {
+    "id": "WORK-yuan-m8-m9-successor",
+    "revision": "3",
+    "sha256": "24820e1e41b7d9d016cc61465e869f227a3a4ed52b2bfeec3289b062449097e1"
+  }
+}

@@ -1,6 +1,6 @@
 # Yuan Core Protocol 0.1
 
-> Revision: `yuan.core.protocol/0.1.0`
+> Revision: `yuan.core.protocol/0.1.1`
 >
 > Status: stable protocol; default inert. Runtime activation requires an external,
 > content-addressed authority record bound to previous or independent proof.
@@ -239,11 +239,10 @@ Unprofiled executables are rejected.
 ## 11. Self-modification
 
 A candidate must not establish its own trust. Core, Harness, schema, validator,
-or authority changes require acceptance by at least one of:
-
-1. the previous immutable trust root;
-2. an independent held-out verifier rooted outside the candidate;
-3. explicit human authorization that names the revision and risk.
+or authority changes use explicit **ANY-OF** semantics: one positive proof from
+the previous immutable trust root **or** an independent held-out verifier rooted
+outside the candidate is sufficient. Candidate conformance, self-attestation,
+and an ambiguous or AND-style proof list never activate Core.
 
 Candidate conformance and author tests are development evidence only. Validator
 failure, empty validation, or missing independent root blocks authority switch.
@@ -268,8 +267,11 @@ the active Reference Port scope with a synthetic repository-wide scope.
 
 ## 12. External-activation rule
 
-Files in this directory are inert by default. They become active only when an
-external content-addressed authority record binds their exact revision and hash
-to positive previous-root or independent Evidence. Candidate conformance and
-self-attestation never activate Core. Initializer, user work, and unrelated
-repository state remain outside that activation.
+Files in this directory are inert by default. Before PREPARED and before any
+candidate byte changes, a complete candidate copy must pass one accepted ANY-OF
+proof route. The receipt, suite-manifest snapshot, candidate manifest, verifier,
+and receipt time form a content-addressed proof closure. PREPARED durably binds
+that closure; later mutation, journal states, and Evidence must be causally
+monotonic. Missing, substituted, future, or time-reversed proof material blocks
+with no candidate mutation. Candidate conformance and self-attestation never
+activate Core.

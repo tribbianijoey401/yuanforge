@@ -54,7 +54,8 @@ class PrecommitGateTests(unittest.TestCase):
         receipt = self.module.verify_gate(ROOT, staged_paths=[])
         self.assertEqual("PASS", receipt["status"])
         self.assertEqual("core", receipt["authority"])
-        self.assertEqual(7, receipt["revision"])
+        self.assertEqual(8, receipt["revision"])
+        self.assertEqual(receipt["revision"], receipt["history_length"])
 
 
 if __name__ == "__main__":

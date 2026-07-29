@@ -110,4 +110,20 @@ def replay_self_modification_authorized(
             if isinstance(item, dict)
         }:
             return False
-    return self_modification_authorized(change, proofs, now=trusted_now)
+    journal = attempt.get("journal", [])
+    prepared_at = (
+        journal[0].get("recorded_at")
+        if isinstance(journal, list)
+        and journal
+        and isinstance(journal[0], dict)
+        and journal[0].get("state") == "PREPARED"
+        else None
+    )
+    if work.get("protocol_binding", {}).get("revision") != "0.1.1":
+        prepared_at = None
+    return self_modification_authorized(
+        change,
+        proofs,
+        now=trusted_now,
+        prepared_at=prepared_at,
+    )

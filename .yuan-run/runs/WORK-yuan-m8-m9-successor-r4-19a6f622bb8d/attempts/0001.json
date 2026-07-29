@@ -1,0 +1,62 @@
+{
+  "action": {
+    "authorization_grant_id": "GRANT-CORE-M8-M9",
+    "high_impact": false,
+    "mutating": false,
+    "scope": ".yuan/core/0.1",
+    "self_modification": null,
+    "side_effect_class": "none",
+    "type": "verify"
+  },
+  "attempt_id": "ATT-M9-WORK4-INDEPENDENT-0001",
+  "budget_charge": {
+    "command_seconds": 10,
+    "strategies": 1,
+    "ticks": 1,
+    "tool_calls": 1
+  },
+  "evidence_ids": [
+    "EVD-M9-WORK4-INDEPENDENT-0001"
+  ],
+  "harness_binding": {
+    "id": "yuan.runtime-transaction",
+    "revision": "1",
+    "sha256": "fc666ebcd63c3c29241b02ddcb2f5d3ce2ae37fe4416d8482d4e4c51743d4e68"
+  },
+  "hypothesis": {
+    "claim": "The frozen root independently reissues M9 Evidence under Work revision 3.",
+    "falsification": "A binding or positive-check mismatch blocks the successor."
+  },
+  "journal": [],
+  "outcome": "SUCCEEDED",
+  "postcondition": null,
+  "protocol_binding": {
+    "id": "yuan.core.protocol",
+    "revision": "0.1.1",
+    "sha256": "6a21d0d8d6e220a640ec8f049d1560ffc0c6ac4e3c7c2fe3a693211adf32a75a"
+  },
+  "relevant_inputs": [
+    {
+      "scope": ".yuan/core/0.1",
+      "sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a"
+    }
+  ],
+  "schema_version": "yuan.attempt/v1",
+  "sequence": 1,
+  "side_effect_state": "NOT_APPLICABLE",
+  "strategy_fingerprint": "b39dcb13b845f7ef69c78f50794c70aac0dec839e16241b6da708e6bcae552c2",
+  "tool_receipt": {
+    "exit_code": 0,
+    "kind": "command",
+    "operation_id": "OP-M9-WORK3-OLD-ROOT",
+    "schema_version": "yuan.tool-receipt/v1",
+    "status": "EXITED",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "work_binding": {
+    "id": "WORK-yuan-m8-m9-successor",
+    "revision": "4",
+    "sha256": "19a6f622bb8df16e0d5d8c3edb475aad13437587b1d440e043d76c465740aa28"
+  }
+}

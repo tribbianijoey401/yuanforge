@@ -41,6 +41,21 @@ M9_PATHS = (
 M9_INDEX_PATH = pathlib.PurePosixPath(
     ".yuan/authority/core-history/r2-to-m9/index.json"
 )
+R1_FIX_BASELINE = "546f5c3"
+R1_FIX_PATHS = (
+    ".yuan/core/0.1/candidate-manifest.json",
+    ".yuan/core/0.1/protocol.md",
+    ".yuan/core/0.1/completion_semantics.py",
+    ".yuan/core/0.1/evidence.schema.yaml",
+    ".yuan/core/0.1/replay_trust.py",
+    ".yuan/core/0.1/trust_semantics.py",
+)
+R1_FIX_INDEX_PATH = pathlib.PurePosixPath(
+    ".yuan/authority/core-history/m9-to-r1/index.json"
+)
+M9_DESCRIPTOR_SHA256 = (
+    "f6e35cfafc8dc50aa743dece471b1b4c5b40aa7467c6d8e79f391b9666d7143d"
+)
 R1_DESCRIPTOR_SHA256 = (
     "b590944715e515b6533371e461bfb4afdd87d6d89ba4a75e196336d4d1cb36dd"
 )
@@ -111,6 +126,46 @@ def create_history_delta(repo_root: pathlib.Path) -> dict[str, Any]:
     return index
 
 
+def create_r1_history_delta(repo_root: pathlib.Path) -> dict[str, Any]:
+    repo = pathlib.Path(repo_root).resolve()
+    commit = _git(repo, "rev-parse", R1_FIX_BASELINE).decode("ascii").strip()
+    tree = _git(repo, "rev-parse", f"{commit}^{{tree}}").decode("ascii").strip()
+    root = repo / R1_FIX_INDEX_PATH.parent
+    entries = []
+    for relative in R1_FIX_PATHS:
+        old_bytes = _git(repo, "show", f"{commit}:{relative}")
+        old_sha = sha256(old_bytes)
+        blob = root / "blobs" / f"{old_sha}.blob"
+        write_immutable(blob, old_bytes)
+        entries.append(
+            {
+                "path": relative,
+                "old_sha256": old_sha,
+                "new_sha256": file_sha256(repo / relative),
+                "retained_blob": blob.relative_to(repo).as_posix(),
+            }
+        )
+    descriptor = repo / ".yuan/authority/activation/yuan-core-0.1.json"
+    index = {
+        "schema_version": "yuan.core-provenance-delta/v1",
+        "baseline_commit": commit,
+        "baseline_tree": tree,
+        "frozen_registry_sha256": M7_SHA256,
+        "previous_delta_index": M9_INDEX_PATH.as_posix(),
+        "previous_delta_index_sha256": file_sha256(repo / M9_INDEX_PATH),
+        "previous_activation_descriptor": (
+            ".yuan/authority/activation/history/"
+            f"{M9_DESCRIPTOR_SHA256}.blob"
+        ),
+        "previous_activation_descriptor_sha256": M9_DESCRIPTOR_SHA256,
+        "activation_descriptor": descriptor.relative_to(repo).as_posix(),
+        "activation_descriptor_sha256": file_sha256(descriptor),
+        "entries": entries,
+    }
+    write_immutable(repo / R1_FIX_INDEX_PATH, canonical(index))
+    return index
+
+
 def _load_index(repo: pathlib.Path, path: pathlib.PurePosixPath) -> dict[str, Any]:
     try:
         value = json.loads((repo / path).read_text(encoding="utf-8"))
@@ -144,9 +199,11 @@ def verify_history_delta(repo_root: pathlib.Path) -> dict[str, Any]:
     r1 = _load_index(repo, R1_INDEX_PATH)
     r2 = _load_index(repo, R2_INDEX_PATH)
     m9 = _load_index(repo, M9_INDEX_PATH)
+    r1_fix = _load_index(repo, R1_FIX_INDEX_PATH)
     r1_entries = _verify_index_shape(r1, paths=R1_PATHS)
     r2_entries = _verify_index_shape(r2, paths=R2_PATHS)
     m9_entries = _verify_index_shape(m9, paths=M9_PATHS)
+    r1_fix_entries = _verify_index_shape(r1_fix, paths=R1_FIX_PATHS)
     if (
         r2.get("previous_delta_index") != R1_INDEX_PATH.as_posix()
         or r2.get("previous_delta_index_sha256")
@@ -177,13 +234,31 @@ def verify_history_delta(repo_root: pathlib.Path) -> dict[str, Any]:
         or file_sha256(repo / R2_DESCRIPTOR_BLOB) != R2_DESCRIPTOR_SHA256
     ):
         raise ProvenanceHistoryError("M9 provenance chain binding mismatch")
-    descriptor = repo / m9.get("activation_descriptor", "")
+    if (
+        r1_fix.get("previous_delta_index") != M9_INDEX_PATH.as_posix()
+        or r1_fix.get("previous_delta_index_sha256")
+        != file_sha256(repo / M9_INDEX_PATH)
+        or r1_fix.get("previous_activation_descriptor_sha256")
+        != M9_DESCRIPTOR_SHA256
+        or m9.get("activation_descriptor_sha256") != M9_DESCRIPTOR_SHA256
+    ):
+        raise ProvenanceHistoryError("M9-to-r1 provenance chain mismatch")
+    previous_m9_descriptor = repo / r1_fix.get(
+        "previous_activation_descriptor", ""
+    )
+    if (
+        not previous_m9_descriptor.is_file()
+        or file_sha256(previous_m9_descriptor) != M9_DESCRIPTOR_SHA256
+    ):
+        raise ProvenanceHistoryError("M9 activation descriptor is unavailable")
+    descriptor = repo / r1_fix.get("activation_descriptor", "")
     if (
         not descriptor.is_file()
-        or file_sha256(descriptor) != m9.get("activation_descriptor_sha256")
+        or file_sha256(descriptor)
+        != r1_fix.get("activation_descriptor_sha256")
     ):
         raise ProvenanceHistoryError("Core delta activation binding mismatch")
-    for item in (*r1_entries, *r2_entries, *m9_entries):
+    for item in (*r1_entries, *r2_entries, *m9_entries, *r1_fix_entries):
         blob = repo / item["retained_blob"]
         if (
             not blob.is_file()
@@ -201,14 +276,24 @@ def verify_history_delta(repo_root: pathlib.Path) -> dict[str, Any]:
         ".yuan/core/0.1/candidate-manifest.json"
     ]:
         raise ProvenanceHistoryError("M9 candidate provenance is discontinuous")
+    r1_fix_old = {
+        item["path"]: item["old_sha256"] for item in r1_fix_entries
+    }
     for item in m9_entries:
+        if item["path"] not in r1_fix_old or (
+            item["new_sha256"] != r1_fix_old[item["path"]]
+        ):
+            raise ProvenanceHistoryError(
+                "M9-to-r1 Core provenance is discontinuous"
+            )
+    for item in r1_fix_entries:
         current = repo / item["path"]
         if (
             not current.is_file()
             or file_sha256(current) != item.get("new_sha256")
         ):
             raise ProvenanceHistoryError("current Core delta byte binding mismatch")
-    return {"r1": r1, "r2": r2, "m9": m9}
+    return {"r1": r1, "r2": r2, "m9": m9, "r1_fix": r1_fix}
 
 
 def verify_frozen_and_delta(repo_root: pathlib.Path) -> dict[str, Any]:
@@ -217,6 +302,7 @@ def verify_frozen_and_delta(repo_root: pathlib.Path) -> dict[str, Any]:
     r1 = chain["r1"]
     r2 = chain["r2"]
     m9 = chain["m9"]
+    r1_fix = chain["r1_fix"]
     commit = r1["baseline_commit"]
     if (
         _git(repo, "rev-parse", commit).decode("ascii").strip() != commit
@@ -244,6 +330,26 @@ def verify_frozen_and_delta(repo_root: pathlib.Path) -> dict[str, Any]:
     for item in m9["entries"]:
         if sha256(_git(repo, "show", f"{m9_commit}:{item['path']}")) != item["old_sha256"]:
             raise ProvenanceHistoryError("M9 retained bytes differ from baseline")
+    r1_fix_commit = r1_fix["baseline_commit"]
+    if (
+        _git(repo, "rev-parse", r1_fix_commit).decode("ascii").strip()
+        != r1_fix_commit
+        or _git(
+            repo, "rev-parse", f"{r1_fix_commit}^{{tree}}"
+        ).decode("ascii").strip()
+        != r1_fix["baseline_tree"]
+    ):
+        raise ProvenanceHistoryError("r1 fix baseline object mismatch")
+    for item in r1_fix["entries"]:
+        if (
+            sha256(
+                _git(repo, "show", f"{r1_fix_commit}:{item['path']}")
+            )
+            != item["old_sha256"]
+        ):
+            raise ProvenanceHistoryError(
+                "r1 fix retained bytes differ from baseline"
+            )
     with tempfile.TemporaryDirectory(prefix="yuan-m7-history-") as temp_name:
         historical = pathlib.Path(temp_name) / "checkout"
         _git(repo, "worktree", "add", "--detach", str(historical), commit)
@@ -299,6 +405,12 @@ def verify_frozen_and_delta(repo_root: pathlib.Path) -> dict[str, Any]:
             "m9_baseline_tree": m9["baseline_tree"],
             "m9_delta_assertions": len(m9["entries"]) * 3 + 4,
             "m9_delta_index_sha256": file_sha256(repo / M9_INDEX_PATH),
+            "r1_fix_baseline_commit": r1_fix_commit,
+            "r1_fix_baseline_tree": r1_fix["baseline_tree"],
+            "r1_fix_delta_assertions": len(r1_fix["entries"]) * 3 + 4,
+            "r1_fix_delta_index_sha256": file_sha256(
+                repo / R1_FIX_INDEX_PATH
+            ),
         }
     )
     return receipt
@@ -308,13 +420,17 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo", type=pathlib.Path, default=pathlib.Path.cwd())
     parser.add_argument("--create", action="store_true")
+    parser.add_argument("--create-r1", action="store_true")
     args = parser.parse_args()
     try:
-        result = (
-            create_history_delta(args.repo)
-            if args.create
-            else verify_frozen_and_delta(args.repo)
-        )
+        if args.create and args.create_r1:
+            raise ProvenanceHistoryError("choose one create mode")
+        if args.create:
+            result = create_history_delta(args.repo)
+        elif args.create_r1:
+            result = create_r1_history_delta(args.repo)
+        else:
+            result = verify_frozen_and_delta(args.repo)
     except (ProvenanceHistoryError, OSError, UnicodeError, json.JSONDecodeError) as error:
         print(f"FAIL {error}", file=sys.stderr)
         return 1

@@ -1,0 +1,15 @@
+{
+  "schema_version": "yuan.self-modification-failure/v1",
+  "transaction_id": "262321e82c8950c3ea2b52b093e3591e8909c064b1f187959f5cda8a84c16b56",
+  "mutation_state": "COMMITTED",
+  "promotion_state": "FAILED",
+  "trusted": false,
+  "reason": "Fresh Work4 Evidence construction dereferenced a null self_modification record. No authority record or active-run pointer was advanced.",
+  "compensation": {
+    "state": "ROLLED_BACK_TO_REVISION_7",
+    "source": "content-addressed retained blobs",
+    "authority_after": "PASS",
+    "active_work": "WORK-yuan-m8-m9-successor revision 3"
+  },
+  "promotion": "FORBIDDEN"
+}

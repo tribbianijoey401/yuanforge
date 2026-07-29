@@ -1,0 +1,123 @@
+{
+  "schema_version": "yuan.m9-r1-causality-author-evidence/v1",
+  "task_id": "task-012-r1",
+  "source_head": "546f5c3f3d9110d9a250bc593d2fae642da6f0c1",
+  "status": "AUTHOR_PASS_PENDING_INDEPENDENT_REFRESH",
+  "trust_policy": {
+    "operator": "any_of",
+    "accepted": [
+      "previous-root-proof",
+      "independent-proof"
+    ],
+    "selected_route": "previous-root-proof",
+    "legacy_requires_rejected": true,
+    "and_policy_rejected": true,
+    "empty_policy_rejected": true,
+    "unknown_route_rejected": true
+  },
+  "preflight": {
+    "candidate_manifest_sha256": "a4f07ac965e61c0de91b8535ecf14e1b95c1dcc95f58ad489603dfe0458a4f7a",
+    "full_candidate_manifest_sha256": "b6e65c71def6e20c7741ae4f6f716df2d88a893e2045fe291670d920ddd52040",
+    "proof_closure_index_sha256": "6da8a656f163e143a465f99c98429a94ca2afe1d752d50e1b75b1178162586f7",
+    "receipt_sha256": "6b1f382ae72c8a2ac5b6ece4aa9db6e964f8ce93aa126bd138f7fd0c9056548e",
+    "receipt_created_at": "2026-07-29T10:19:03.943747+00:00",
+    "prepared_attempt_sha256": "929bef25b9d2831e9aabeff9d1072d607e62436e8953baf680a32841add0e645",
+    "prepared_at": "2026-07-29T10:19:07.716253+00:00",
+    "suite_manifest_sha256": "856ea8001e6031ae1d8cff98eb82966a4b20fbeee5dd017c5832160890583f6f",
+    "frozen_verifier_sha256": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103",
+    "assertions": 30,
+    "checks_executed": 80,
+    "receipt_precedes_prepared": true,
+    "complete_candidate_verified_before_live_mutation": true,
+    "staging_is_ephemeral": true,
+    "required_bytes_retained_by_content_address": true
+  },
+  "live_transaction": {
+    "transaction_id": "f38bd069cb0889403a29285dae70ba5b330d40d4e1e859659d4d79a8d8c3b303",
+    "state": "COMMITTED",
+    "journal_states": [
+      "PREPARED",
+      "EXECUTING",
+      "OBSERVED",
+      "COMMITTED"
+    ],
+    "attempt_id": "ATT-M9-R1-LIVE-SELF-MOD-0002",
+    "evidence_id": "EVD-M9-R1-LIVE-SELF-MOD-0002",
+    "protocol_revision": "yuan.core.protocol/0.1.1",
+    "protocol_sha256": "6a21d0d8d6e220a640ec8f049d1560ffc0c6ac4e3c7c2fe3a693211adf32a75a",
+    "candidate_self_trust": false,
+    "version_file_changed": false,
+    "legacy_tombstone_executed": false
+  },
+  "authority": {
+    "switch_transaction_id": "743e0ba65eefe77be90ad03308b3407bcb0d5c111953a9a2dc18af278fbb8123",
+    "revision": 8,
+    "history_length": 8,
+    "record_sha256": "70e534c875aee40777f3b1c72fdb01d7c82a7fe788d6dd7a5ee06a2bae11d1ec",
+    "pointer_sha256": "da59b4388c913dbc2efdd1124553479d7f59682f70aed4434c1d061e610fa2e7",
+    "revisions_1_through_7_preserved": true,
+    "single_writable_authority": true,
+    "dual_write": false
+  },
+  "runtime": {
+    "dogfood_generation": ".yuan-run/runs/WORK-yuan-m8-m9-successor-g0002-f38bd069cb08",
+    "active_successor": ".yuan-run/runs/WORK-yuan-m8-m9-successor-r4-19a6f622bb8d",
+    "active_manifest_sha256": "5c931201afe745763f08a4f4b327daa8028234cb29ae9256f8beb579f19c5fa2",
+    "active_pointer_sha256": "19c00cee476cdc82214cb1d3a3a6966bc567cbe577c251f299e058258766fad9",
+    "active_work_revision": "4",
+    "active_memory_result": "WAIT_AUTH",
+    "work4_attempt_id": "ATT-M9-WORK4-INDEPENDENT-0001",
+    "work4_evidence_id": "EVD-M9-WORK4-INDEPENDENT-0001",
+    "work4_fresh_evidence": true
+  },
+  "recovery": {
+    "early_live_pollution_restored_to_revision_7": true,
+    "observed_driver_failure_rolled_back": true,
+    "work4_promotion_failure_rolled_back": true,
+    "failed_transaction_ids": [
+      "2a396d6ea6187e0144e0883aa4db2581c2217eb4f832c091181fc6e13a37c989",
+      "262321e82c8950c3ea2b52b093e3591e8909c064b1f187959f5cda8a84c16b56"
+    ],
+    "old_revision_7_bytes_recoverable": true,
+    "rollback_idempotent": true
+  },
+  "provenance": {
+    "m7_semantic_registry_sha256_unchanged": "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
+    "m9_to_r1_assertions": 22,
+    "m9_to_r1_index_sha256": "be61afbc06a2cd44620fabf3f13c5a797fea4ecf7e08aff4a61ec849e106ee12",
+    "semantic_records": 2227,
+    "source_clauses": 2207,
+    "unmapped": 0
+  },
+  "regression": {
+    "authority": "8/8 PASS",
+    "distribution": "3/3 PASS",
+    "runtime_seed": "1/1 PASS",
+    "runtime_transaction": "3/3 PASS",
+    "successor_current": "3/3 PASS",
+    "precommit": "3/3 PASS",
+    "m6": "8/8 PASS",
+    "bootstrap": "31/31 PASS",
+    "canary": "1/1 PASS",
+    "shadow_migration": "10/10 PASS",
+    "core_author": "38/38 PASS",
+    "core_m3_held_out": "30/30 PASS",
+    "m9_r1_author_and_attacks": "4/4 PASS",
+    "authority_cli": "PASS revision 8 / history 8",
+    "precommit_cli": "PASS revision 8 / history 8",
+    "provenance_cli": "PASS 2227 records / 2207 clauses / 0 unmapped"
+  },
+  "frozen_historical_suites": {
+    "task_012_independent_sha256": "876ea0f3ee3a33f0b1fb6de04d48b943aaa88d5c",
+    "task_012_independent_modified": false,
+    "current_tree_result": "13 methods; 8 failures and 10 errors",
+    "reason": "The frozen suite binds revision 7, Work revisions 2/3, pre-r1 field names and the prior policy shape; Windows Temp copies also exceed legacy path limits.",
+    "other_frozen_suites": [
+      "test_m8_held_out.py binds revision 6 and the former active Work",
+      "test_m9_dogfood.py installs only from revision 6",
+      "test_r2_successor.py binds revision 6 activation dependencies",
+      "test_m7_held_out.py was invalidated by Temp disk exhaustion while copying its historical provenance fixture"
+    ],
+    "next_gate": "Independent Tester must refresh task-012-r1 attacks against revision 8 without editing the frozen task-012 artifact."
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "yuan.self-modification-failure/v1",
+  "attempt_id": "ATT-M9-R1-EARLY-LIVE-POLLUTION",
+  "candidate_base_commit": "546f5c3f3d9110d9a250bc593d2fae642da6f0c1",
+  "detected_at": "2026-07-29T09:59:27.3486348Z",
+  "state": "FAILED_BEFORE_PREFLIGHT",
+  "trusted": false,
+  "authority_revision": 7,
+  "reason": "Uncommitted candidate Core and verifier bytes were placed in the active repository before a durable frozen-root preflight and PREPARED snapshot existed.",
+  "recovery": {
+    "candidate_staging": "G:/yuanforge-r1-candidate-staging-early-failure",
+    "active_bytes_restored_from": "HEAD",
+    "authority_after_restore": "PASS",
+    "history_length_after_restore": 7
+  },
+  "held_out": {
+    "path": "tests/authority_switch/test_m9_held_out.py",
+    "sha256": "876ea0f3ee3a33f0b1fb6de04d48b943aaa88d5c"
+  },
+  "promotion": "FORBIDDEN"
+}

@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuanforge.local/core/0.1/work-contract.schema.json",
+  "title": "Yuan Core 0.1 Work Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "work_id", "revision", "protocol_binding",
+    "harness_binding", "intent", "scope", "authorization", "budget",
+    "acceptance_criteria", "safety_invariants"
+  ],
+  "properties": {
+    "schema_version": {"const": "yuan.work-contract/v1"},
+    "work_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "revision": {"$ref": "#/$defs/immutableBinding"},
+    "protocol_binding": {"$ref": "#/$defs/immutableBinding"},
+    "harness_binding": {"$ref": "#/$defs/immutableBinding"},
+    "intent": {
+      "type": "object", "additionalProperties": false,
+      "required": ["goal", "non_goals", "constraints"],
+      "properties": {
+        "goal": {"type": "string", "minLength": 1},
+        "non_goals": {"type": "array", "items": {"type": "string"}},
+        "constraints": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["allowed_paths", "denied_paths", "side_effect_classes"],
+      "properties": {
+        "allowed_paths": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/relativePath"}},
+        "denied_paths": {"type": "array", "items": {"$ref": "#/$defs/relativePath"}},
+        "side_effect_classes": {
+          "type": "array", "uniqueItems": true,
+          "items": {"enum": ["none", "filesystem", "command", "network", "external-write", "deploy", "billing", "privilege"]}
+        }
+      }
+    },
+    "authorization": {
+      "type": "object", "additionalProperties": false,
+      "required": ["default", "grants"],
+      "properties": {
+        "default": {"const": "deny"},
+        "grants": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "action_types", "side_effect_classes", "scopes", "high_impact", "max_uses"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "action_types": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+              "side_effect_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+              "scopes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/relativePath"}},
+              "high_impact": {"type": "boolean"},
+              "expires_at": {"type": ["string", "null"], "format": "date-time"},
+              "max_uses": {"type": ["integer", "null"], "minimum": 1}
+            }
+          }
+        }
+      }
+    },
+    "budget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ticks", "tool_calls", "strategies", "command_seconds"],
+      "properties": {
+        "ticks": {"type": "integer", "minimum": 1},
+        "tool_calls": {"type": "integer", "minimum": 1},
+        "strategies": {"type": "integer", "minimum": 1},
+        "command_seconds": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "acceptance_criteria": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "type", "required", "predicate", "artifact_scope", "verifier_binding"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^AC-[A-Za-z0-9._-]+$"},
+          "type": {"enum": ["logic", "integration", "contract", "structure", "review", "human-judgment"]},
+          "required": {"type": "boolean"},
+          "predicate": {"type": "string", "minLength": 1},
+          "artifact_scope": {"$ref": "#/$defs/relativePath"},
+          "verifier_binding": {
+            "allOf": [
+              {"$ref": "#/$defs/immutableBinding"},
+              {
+                "type": "object",
+                "required": ["trust_root_id", "environment_ids", "environment_fingerprints", "minimum_assertions"],
+                "properties": {
+                  "trust_root_id": {"type": "string", "minLength": 1},
+                  "environment_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+                  "environment_fingerprints": {
+                    "type": "object",
+                    "additionalProperties": {"$ref": "#/$defs/sha256"}
+                  },
+                  "minimum_assertions": {"type": "integer", "minimum": 1}
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "safety_invariants": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "predicate"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^SAFE-[A-Za-z0-9._-]+$"},
+          "predicate": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "relativePath": {"type": "string", "minLength": 1, "pattern": "^(?![A-Za-z]:)(?![/\\\\])(?!.*(?:^|[/\\\\])\\.\\.(?:[/\\\\]|$)).+$"},
+    "immutableBinding": {
+      "type": "object",
+      "required": ["id", "revision", "sha256"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}
