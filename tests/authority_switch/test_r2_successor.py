@@ -30,9 +30,70 @@ class R2SuccessorTests(unittest.TestCase):
         self.repo = pathlib.Path(self.temp.name)
         for relative in (".yuan", ".yuan-run", "scripts"):
             shutil.copytree(ROOT / relative, self.repo / relative)
+        current = json.loads(
+            (self.repo / ".yuan/authority/current").read_text(encoding="utf-8")
+        )
+        record = json.loads(
+            (
+                self.repo
+                / ".yuan/authority/records"
+                / f"{current['record_sha256']}.json"
+            ).read_text(encoding="utf-8")
+        )
+        if record["revision"] == 7:
+            self._restore_revision_six(record)
 
     def tearDown(self) -> None:
         self.temp.cleanup()
+
+    def _restore_revision_six(self, revision_seven: dict) -> None:
+        atomic_write(
+            self.repo / ".yuan/authority/current",
+            canonical(
+                {
+                    "schema_version": "yuan.authority-current/v1",
+                    "record_sha256": revision_seven["previous_record_sha256"],
+                }
+            ),
+            file_sha256(self.repo / ".yuan/authority/current"),
+        )
+        run_id = "WORK-yuan-m8-m9-successor-r2-398b8aefe078"
+        atomic_write(
+            self.repo / ".yuan-run/active-run.json",
+            canonical(
+                {
+                    "schema_version": "yuan.active-run/v1",
+                    "run_id": run_id,
+                    "runtime_root": f".yuan-run/runs/{run_id}",
+                    "manifest_sha256": (
+                        "e2bc36fc5d0213912e46073bf4ca2a8aa52091311e7870e34c1f1987a3b64abe"
+                    ),
+                }
+            ),
+            file_sha256(self.repo / ".yuan-run/active-run.json"),
+        )
+        history = self.repo / ".yuan/authority/core-history/r2-to-m9/blobs"
+        (self.repo / ".yuan/core/0.1/protocol.md").write_bytes(
+            (
+                history
+                / "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3.blob"
+            ).read_bytes()
+        )
+        (self.repo / ".yuan/core/0.1/candidate-manifest.json").write_bytes(
+            (
+                history
+                / "57a2acad6ba92d879785139e35548bdd20cd1edcafa3d7e8b554321504ec8b5e.blob"
+            ).read_bytes()
+        )
+        (
+            self.repo / ".yuan/authority/activation/yuan-core-0.1.json"
+        ).write_bytes(
+            (
+                self.repo
+                / ".yuan/authority/activation/history"
+                / "6f08c7e10bcd433e2341471bef463e0d37fe6b6c7356f400988868a1b129afe8.blob"
+            ).read_bytes()
+        )
 
     def _restore_r1_activation_point(self) -> None:
         current = json.loads(

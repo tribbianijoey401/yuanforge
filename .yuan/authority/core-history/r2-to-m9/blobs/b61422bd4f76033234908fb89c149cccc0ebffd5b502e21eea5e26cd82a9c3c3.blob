@@ -1,9 +1,9 @@
 # Yuan Core Protocol 0.1
 
-> Revision: `yuan.core.protocol/0.1.0`
+> Revision: `yuan.core.protocol/0.1.0-candidate`
 >
-> Status: stable protocol; default inert. Runtime activation requires an external,
-> content-addressed authority record bound to previous or independent proof.
+> Status: inert candidate. This document and its sibling schemas do not become
+> runtime authority until an older trust root independently accepts them.
 
 ## 1. Boundary
 
@@ -266,10 +266,9 @@ Every replay projection, including early `BLOCKED` projections, derives its
 artifact scope from current Evidence, Attempt, or Work data. It never replaces
 the active Reference Port scope with a synthetic repository-wide scope.
 
-## 12. External-activation rule
+## 12. Inert-candidate rule
 
-Files in this directory are inert by default. They become active only when an
-external content-addressed authority record binds their exact revision and hash
-to positive previous-root or independent Evidence. Candidate conformance and
-self-attestation never activate Core. Initializer, user work, and unrelated
-repository state remain outside that activation.
+Files in this directory define a candidate only. They must not modify the
+repository entrypoint, current runtime authority, initializer, pre-commit
+configuration, or existing user work. Authority changes require later migration
+milestones and independent Evidence.

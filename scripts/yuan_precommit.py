@@ -157,6 +157,7 @@ def _verify_provenance(repo: pathlib.Path) -> None:
         or assertions != 2227
         or receipt.get("delta_assertions") != 9
         or receipt.get("r2_delta_assertions") != 18
+        or receipt.get("m9_delta_assertions") != 10
     ):
         raise GateError("pinned provenance receipt did not PASS")
 

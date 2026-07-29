@@ -1,0 +1,14 @@
+{
+  "attempt_id": "ATT-M9-LIVE-SELF-MOD-0002",
+  "candidate_sha256": "33d72ceb9252f3dbd672beb270d4af43b0d6c26a4936920a72ae4752599dfa70",
+  "old_root_receipt_sha256": "4fbbe8bf290959cbaad75bff4985d2285c4002f68535d9508a79f8ca4f4cbe8f",
+  "previous_candidate_sha256": "57a2acad6ba92d879785139e35548bdd20cd1edcafa3d7e8b554321504ec8b5e",
+  "previous_protocol_sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3",
+  "protocol_sha256": "87e44ce5969f1d46b980684ad8b89d1268df1933ab4263c497f7f5e6eea98806",
+  "runtime_manifest_sha256": "efe886de137c24951e7c1669d3ecb99160db3a3c839d8c92b567e196ac426b14",
+  "runtime_root": ".yuan-run/runs/WORK-yuan-m8-m9-successor-g0002-80c48920a4b0",
+  "schema_version": "yuan.self-modification-transaction/v1",
+  "state": "COMMITTED",
+  "tool_receipt_sha256": "048fdb593151ead77feb089336b89ef91ec2752958bb49a2ce64305ca6913b0f",
+  "transaction_id": "80c48920a4b00c64f724024fc1b432cc274d017fd0b8529687c213a83a324719"
+}

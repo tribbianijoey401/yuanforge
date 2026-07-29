@@ -1,0 +1,93 @@
+{
+  "action": {
+    "authorization_grant_id": "GRANT-CORE-M8-M9",
+    "high_impact": false,
+    "mutating": true,
+    "scope": ".yuan/core/0.1",
+    "self_modification": {
+      "change": {
+        "candidate_binding": {
+          "id": "yuan.core.protocol",
+          "revision": "0.1.0",
+          "sha256": "33d72ceb9252f3dbd672beb270d4af43b0d6c26a4936920a72ae4752599dfa70"
+        },
+        "previous_binding": {
+          "id": "yuan.m9-independent-held-out",
+          "revision": "1",
+          "sha256": "104bfdef44b77012ab69c83cd414a18269b924fefec647e816951771f97cc4a6"
+        },
+        "risk": "R0",
+        "target_kind": "core"
+      },
+      "proofs": [
+        {
+          "assertions": 30,
+          "candidate_binding": {
+            "id": "yuan.core.protocol",
+            "revision": "0.1.0",
+            "sha256": "33d72ceb9252f3dbd672beb270d4af43b0d6c26a4936920a72ae4752599dfa70"
+          },
+          "kind": "previous-root",
+          "root_binding": {
+            "id": "yuan.m9-independent-held-out",
+            "revision": "1",
+            "sha256": "104bfdef44b77012ab69c83cd414a18269b924fefec647e816951771f97cc4a6"
+          },
+          "status": "PASS"
+        }
+      ]
+    },
+    "side_effect_class": "filesystem",
+    "type": "file-write"
+  },
+  "attempt_id": "ATT-M9-LIVE-SELF-MOD-0002",
+  "budget_charge": {
+    "command_seconds": 20,
+    "strategies": 1,
+    "ticks": 1,
+    "tool_calls": 2
+  },
+  "evidence_ids": [
+    "EVD-M9-LIVE-SELF-MOD-0002"
+  ],
+  "harness_binding": {
+    "id": "yuan.runtime-transaction",
+    "revision": "1",
+    "sha256": "fc666ebcd63c3c29241b02ddcb2f5d3ce2ae37fe4416d8482d4e4c51743d4e68"
+  },
+  "hypothesis": {
+    "claim": "The live Core can clarify its activation status under its own Work and an older independent root.",
+    "falsification": "Any scope, journal, previous-root, artifact, or held-out binding mismatch blocks promotion."
+  },
+  "journal": [
+    {
+      "ordinal": 1,
+      "receipt_sha256": null,
+      "recorded_at": "2026-07-29T08:00:00+00:00",
+      "state": "PREPARED"
+    }
+  ],
+  "outcome": "PENDING",
+  "postcondition": null,
+  "protocol_binding": {
+    "id": "yuan.core.protocol",
+    "revision": "0.1.0-candidate-activated",
+    "sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3"
+  },
+  "relevant_inputs": [
+    {
+      "scope": ".yuan/core/0.1",
+      "sha256": "57a2acad6ba92d879785139e35548bdd20cd1edcafa3d7e8b554321504ec8b5e"
+    }
+  ],
+  "schema_version": "yuan.attempt/v1",
+  "sequence": 2,
+  "side_effect_state": "PREPARED",
+  "strategy_fingerprint": "77debadfbe227e6006e4d4c3271c927be8b547688ea37027c68a0547e101bc62",
+  "tool_receipt": null,
+  "work_binding": {
+    "id": "WORK-yuan-m8-m9-successor",
+    "revision": "2",
+    "sha256": "398b8aefe0782a04f27c0e84c6ebeb2f89ad672373883ee75b688781c19325e5"
+  }
+}

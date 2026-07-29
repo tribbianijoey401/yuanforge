@@ -1,0 +1,14 @@
+{
+  "immutable_files": {
+    "attempts/0001.json": "2bd5729477af6b43f9044030a03c46fd03e549fe0fcd8939e4cf5b2486288bb2",
+    "attempts/0002.json": "aa3814103c724b9f40a3a904ce5880c9d7bbcd27a16cb76a0e22eec91b954a24",
+    "contracts/WORK-yuan-m8-m9-successor.json": "6367a23a5ceddf4887c425e72f21f1e101e45b171e8216f4adebe4c8679df5cc",
+    "evidence/0001.json": "643510fb576d1c75b051a8dfafd7019edaf19228567c74db328115e5c5d559c2",
+    "evidence/0002.json": "46720e1a9ad19a2840ebb8b60c0f705a42f3e77814964b05be6180859854ff30"
+  },
+  "legacy_snapshot_sha256": "89201f8190439969667532d5ee250a72109f648a2906b951910c2700472a2074",
+  "memory_path": "run-memory.json",
+  "memory_rebuildable": true,
+  "schema_version": "yuan.runtime-seal/v1",
+  "source_projection_sha256": "e2bc36fc5d0213912e46073bf4ca2a8aa52091311e7870e34c1f1987a3b64abe"
+}

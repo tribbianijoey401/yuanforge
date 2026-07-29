@@ -1,0 +1,115 @@
+{
+  "schema_version": "yuan.m9-self-modification-author-evidence/v1",
+  "task_id": "task-012",
+  "source_head": "aed15956251b2bbe4de21671ec559b5570cae070",
+  "status": "AUTHOR_PASS_PENDING_INDEPENDENT_GATE",
+  "live_execution": {
+    "writer": "Core",
+    "legacy_fallback": false,
+    "source_work_revision": "2",
+    "source_ac": "AC-M9-SELF-MODIFICATION-DOGFOOD",
+    "mutation_transaction_id": "80c48920a4b00c64f724024fc1b432cc274d017fd0b8529687c213a83a324719",
+    "journal_states": ["PREPARED", "EXECUTING", "OBSERVED", "COMMITTED"],
+    "attempt_id": "ATT-M9-LIVE-SELF-MOD-0002",
+    "evidence_id": "EVD-M9-LIVE-SELF-MOD-0002",
+    "independent_assertions": 30,
+    "unknown_side_effects": 0
+  },
+  "core_change": {
+    "previous_protocol_sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3",
+    "protocol_sha256": "87e44ce5969f1d46b980684ad8b89d1268df1933ab4263c497f7f5e6eea98806",
+    "previous_candidate_manifest_sha256": "57a2acad6ba92d879785139e35548bdd20cd1edcafa3d7e8b554321504ec8b5e",
+    "candidate_manifest_sha256": "33d72ceb9252f3dbd672beb270d4af43b0d6c26a4936920a72ae4752599dfa70",
+    "protocol_revision": "yuan.core.protocol/0.1.0",
+    "candidate_revision": "yuan.core/0.1.0",
+    "default_inert": true,
+    "activation": "external-content-addressed-authority",
+    "self_trust": false,
+    "version_file_changed": false
+  },
+  "independent_proof": {
+    "runner_sha256": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103",
+    "held_out_sha256": "104bfdef44b77012ab69c83cd414a18269b924fefec647e816951771f97cc4a6",
+    "rev2_receipt_sha256": "4fbbe8bf290959cbaad75bff4985d2285c4002f68535d9508a79f8ca4f4cbe8f",
+    "work3_reissued_receipt_sha256": "605df81379a482f29fa208a171fc0adcec5e79f58e929c8dd2ec404a53a001a8",
+    "old_root_suite": "80 checks / 7 cases",
+    "candidate_assertions": 30,
+    "candidate_self_trust": false
+  },
+  "runtime": {
+    "dogfood_generation": ".yuan-run/runs/WORK-yuan-m8-m9-successor-g0002-80c48920a4b0",
+    "dogfood_manifest_sha256": "efe886de137c24951e7c1669d3ecb99160db3a3c839d8c92b567e196ac426b14",
+    "dogfood_counts": {"work": 1, "attempt": 2, "evidence": 2},
+    "dogfood_memory_result": "WAIT_AUTH",
+    "active_successor": ".yuan-run/runs/WORK-yuan-m8-m9-successor-r3-24820e1e41b7",
+    "active_manifest_sha256": "a135a77f8b6dddad29554e9145c79b8fe689ba1932bc44eea02c48a0940c1447",
+    "active_pointer_sha256": "ebff6108576537a02559ff80771e305449f000b69f884dc76537bbcfe3f28245",
+    "active_work_revision": "3",
+    "active_memory_result": "WAIT_AUTH",
+    "legal_next_ac": "AC-M9-LEGACY-TOMBSTONE-WAIT-AUTH",
+    "tombstone_executed": false,
+    "tombstone_authorized": false
+  },
+  "successor_evidence_policy": {
+    "rev2_evidence_copied_or_rebound": false,
+    "work3_independent_verifier_rerun": true,
+    "work3_attempt_id": "ATT-M9-WORK3-INDEPENDENT-0001",
+    "work3_evidence_id": "EVD-M9-WORK3-INDEPENDENT-0001",
+    "work3_exact_work_and_protocol_binding": true
+  },
+  "authority": {
+    "revision": 7,
+    "history_length": 7,
+    "record_sha256": "cb65f3c1464fd4dc97e328752cd1075a026aba897ca637fbbaae296996c8c647",
+    "pointer_sha256": "d9ed9ccbdffc917555d6c56c966235f8418896ed4717217510b49749cc18ba59",
+    "previous_record_sha256": "ee5b57d0dcc6f466ef0500e9005a0f72f9d461391400db1ce28e18baae7873a2",
+    "activation_descriptor_sha256": "f6e35cfafc8dc50aa743dece471b1b4c5b40aa7467c6d8e79f391b9666d7143d",
+    "revisions_1_through_6_preserved": true,
+    "single_writable_authority": true,
+    "dual_write": false
+  },
+  "recovery": {
+    "mutation_protocol_only_interruption": "authority BLOCKED then old bytes restored",
+    "mutation_rollback_idempotent": true,
+    "mutation_recovery_does_not_load_candidate_trust": true,
+    "active_pointer_interruption": "authority BLOCKED",
+    "two_pointer_recovery_idempotent": true,
+    "wrong_previous_root_rejected_before_mutation": true,
+    "wrong_candidate_proof_rejected_before_mutation": true
+  },
+  "provenance": {
+    "registry_sha256_unchanged": "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
+    "m7_to_r1_assertions": 9,
+    "r1_to_r2_assertions": 18,
+    "r2_to_m9_assertions": 10,
+    "r2_to_m9_index_sha256": "7dd785ea9bbccce7f64972b103e4dc8352356c7898388a459f48482dbe238880",
+    "old_core_content_addressed": true,
+    "semantic_records": 2227,
+    "source_clauses": 2207,
+    "unmapped": 0
+  },
+  "regression": {
+    "core_author": "38/38 PASS",
+    "m9_author_and_attacks": "5/5 PASS",
+    "authority": "8/8 PASS",
+    "distribution": "3/3 PASS",
+    "runtime_seed": "1/1 PASS",
+    "runtime_transaction": "3/3 PASS",
+    "successor_current": "3/3 PASS",
+    "r2_historical_successor_and_attacks": "4/4 PASS",
+    "precommit": "3/3 PASS",
+    "shadow_migration": "10/10 PASS",
+    "m6": "8/8 PASS",
+    "canary": "1/1 PASS",
+    "bootstrap": "31/31 PASS",
+    "core_held_out": "1/1 PASS",
+    "task_011_frozen_held_out": "9/15 PASS; six assertions freeze the prior rev6/Work2 terminal state",
+    "clean_checkout": "PASS: authority rev7/history7, pre-commit, Core 38/38, M9 author 5/5, clean status"
+  },
+  "independence_boundary": {
+    "author_result_is_final_gate": false,
+    "task_011_held_out_modified": false,
+    "task_011_held_out_evidence_modified": false,
+    "next_gate": "Independent Tester must design task-012 held-out attacks"
+  }
+}

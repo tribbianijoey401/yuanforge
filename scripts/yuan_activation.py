@@ -145,10 +145,15 @@ def verify_activation_descriptor(
         / ".yuan/authority/core-history/m7-to-m8/blobs"
         / f"{previous_sha}.blob"
     )
+    prior_path = descriptor.get("prior_activated_candidate_manifest_path")
     prior_blob = (
-        repo
-        / ".yuan/authority/core-history/m8-r1-to-r2/blobs"
-        / f"{prior_sha}.blob"
+        _inside(repo, prior_path)
+        if isinstance(prior_path, str) and prior_path
+        else (
+            repo
+            / ".yuan/authority/core-history/m8-r1-to-r2/blobs"
+            / f"{prior_sha}.blob"
+        )
     )
     candidate_cases = [
         item

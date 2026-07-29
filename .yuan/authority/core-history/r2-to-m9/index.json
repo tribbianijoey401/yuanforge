@@ -1,0 +1,26 @@
+{
+  "activation_descriptor": ".yuan/authority/activation/yuan-core-0.1.json",
+  "activation_descriptor_sha256": "f6e35cfafc8dc50aa743dece471b1b4c5b40aa7467c6d8e79f391b9666d7143d",
+  "baseline_commit": "aed15956251b2bbe4de21671ec559b5570cae070",
+  "baseline_tree": "faa51c32a9b7b53485f3d9cc24a9f5b1c2ec09ce",
+  "entries": [
+    {
+      "new_sha256": "33d72ceb9252f3dbd672beb270d4af43b0d6c26a4936920a72ae4752599dfa70",
+      "old_sha256": "57a2acad6ba92d879785139e35548bdd20cd1edcafa3d7e8b554321504ec8b5e",
+      "path": ".yuan/core/0.1/candidate-manifest.json",
+      "retained_blob": ".yuan/authority/core-history/r2-to-m9/blobs/57a2acad6ba92d879785139e35548bdd20cd1edcafa3d7e8b554321504ec8b5e.blob"
+    },
+    {
+      "new_sha256": "87e44ce5969f1d46b980684ad8b89d1268df1933ab4263c497f7f5e6eea98806",
+      "old_sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3",
+      "path": ".yuan/core/0.1/protocol.md",
+      "retained_blob": ".yuan/authority/core-history/r2-to-m9/blobs/b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3.blob"
+    }
+  ],
+  "frozen_registry_sha256": "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
+  "previous_activation_descriptor": ".yuan/authority/activation/history/6f08c7e10bcd433e2341471bef463e0d37fe6b6c7356f400988868a1b129afe8.blob",
+  "previous_activation_descriptor_sha256": "6f08c7e10bcd433e2341471bef463e0d37fe6b6c7356f400988868a1b129afe8",
+  "previous_delta_index": ".yuan/authority/core-history/m8-r1-to-r2/index.json",
+  "previous_delta_index_sha256": "5b11c533d88b5b42f22488086d07fcdf923fa25a38914735b76a6a6c9b7b8776",
+  "schema_version": "yuan.core-provenance-delta/v1"
+}

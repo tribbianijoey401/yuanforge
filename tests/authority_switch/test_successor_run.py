@@ -35,7 +35,6 @@ class SuccessorRunTests(unittest.TestCase):
         criteria = {item["id"]: item for item in work["acceptance_criteria"]}
         self.assertEqual(
             {
-                "AC-M8-AUTHORITY-SWITCH",
                 "AC-M9-SELF-MODIFICATION-DOGFOOD",
                 "AC-M9-LEGACY-TOMBSTONE-WAIT-AUTH",
             },
@@ -48,9 +47,9 @@ class SuccessorRunTests(unittest.TestCase):
         self.assertIn(".yuan-run", work["scope"]["allowed_paths"])
         self.assertNotIn("docs", work["authorization"]["grants"][0]["scopes"])
         self.assertTrue(all(value > 0 for value in work["budget"].values()))
-        self.assertEqual("CONTINUE", memory["last_result"])
+        self.assertEqual("WAIT_AUTH", memory["last_result"])
         self.assertEqual(
-            "AC-M9-SELF-MODIFICATION-DOGFOOD",
+            "AC-M9-LEGACY-TOMBSTONE-WAIT-AUTH",
             memory["legal_next_steps"][0]["ac_id"],
         )
 
@@ -59,7 +58,7 @@ class SuccessorRunTests(unittest.TestCase):
         current = load_current(ROOT)["record"]
         runtime, _, active_sha = resolve_runtime_root(ROOT)
         activation = current["protocol_activation"]
-        self.assertEqual(6, verified["revision"])
+        self.assertEqual(7, verified["revision"])
         self.assertEqual(runtime.relative_to(ROOT).as_posix(), current["runtime_root"])
         self.assertEqual(active_sha, current["runtime_pointer_sha256"])
         self.assertEqual(

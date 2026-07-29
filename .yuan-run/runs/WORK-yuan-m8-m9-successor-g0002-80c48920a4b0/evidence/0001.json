@@ -1,0 +1,78 @@
+{
+  "ac_id": "AC-M8-AUTHORITY-SWITCH",
+  "artifact_binding": {
+    "scope": ".yuan/authority",
+    "sha256": "6f08c7e10bcd433e2341471bef463e0d37fe6b6c7356f400988868a1b129afe8"
+  },
+  "assertions": 5,
+  "checks": [
+    {
+      "id": "M8-OLD-ROOT-80-CHECKS",
+      "observation": "Older Genesis root accepted the exact activated candidate with 80 checks.",
+      "status": "PASS"
+    },
+    {
+      "id": "M8-ACTIVE-RUN-CAS",
+      "observation": "Successor installation uses active-run and authority pointer CAS.",
+      "status": "PASS"
+    },
+    {
+      "id": "M8-TRANSACTIONAL-APPEND",
+      "observation": "New runtime history is generation-sealed before pointer commit.",
+      "status": "PASS"
+    },
+    {
+      "id": "SAFE-SINGLE-AUTHORITY",
+      "observation": "Only the Core writer lane is active.",
+      "status": "PASS"
+    },
+    {
+      "id": "SAFE-LEGACY-RECOVERABLE",
+      "observation": "The exact old 1/37/37 runtime has a verified content-addressed archive.",
+      "status": "PASS"
+    }
+  ],
+  "created_at": "2026-07-29T06:37:48+00:00",
+  "environment_binding": {
+    "fingerprint": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103",
+    "id": "yuan-genesis-old-root"
+  },
+  "evidence_id": "EVD-M8-R2-ACTIVATION-0001",
+  "freshness": {
+    "not_after": null,
+    "observed_artifact_sha256": "6f08c7e10bcd433e2341471bef463e0d37fe6b6c7356f400988868a1b129afe8"
+  },
+  "harness_binding": {
+    "id": "yuan.runtime-transaction",
+    "revision": "1",
+    "sha256": "fc666ebcd63c3c29241b02ddcb2f5d3ce2ae37fe4416d8482d4e4c51743d4e68"
+  },
+  "immutable_digest": "b2f3be8b13669af3657d49567673051170145d46be306ddba432e604c3f16974",
+  "independence": {
+    "author_identity": "backend-dev-task-011-r1",
+    "independent": true,
+    "method": "old-trust-root",
+    "verifier_identity": "frozen-genesis-root-task-009"
+  },
+  "kind": "structure",
+  "logs": {
+    "receipt_sha256": "f917cdfedc92167ec714500ea13b445c0a05bab17c71a040997ee320adb3c06b",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "schema_version": "yuan.evidence/v1",
+  "sequence": 1,
+  "source_attempt_id": "ATT-M8-R2-ACTIVATION-0001",
+  "status": "PASS",
+  "verifier_binding": {
+    "id": "yuan.m8-old-root-activation",
+    "revision": "1",
+    "sha256": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103",
+    "trust_root_id": "yuan-genesis-legacy-independent"
+  },
+  "work_binding": {
+    "id": "WORK-yuan-m8-m9-successor",
+    "revision": "2",
+    "sha256": "398b8aefe0782a04f27c0e84c6ebeb2f89ad672373883ee75b688781c19325e5"
+  }
+}

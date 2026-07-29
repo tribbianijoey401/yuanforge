@@ -1,67 +1,198 @@
 {
-  "schema_version": "yuan.core-candidate-manifest/v1",
-  "candidate_revision": "yuan.core/0.1.0-candidate",
-  "protocol_revision": "yuan.core.protocol/0.1.0-candidate",
-  "authority": "inert",
-  "self_trust": false,
-  "manifest_binding": "The M3 trust-root manifest binds this file; self-hashing is intentionally forbidden.",
-  "files": [
-    {"path": "attempt.schema.yaml", "sha256": "98bff43675cabf103b6507c6241e658ce64578e475c17847a328b22b95e19c2b"},
-    {"path": "authorization_semantics.py", "sha256": "0b17df23a4ebd56832add261430df73be9e66bd666b931163c2d4c711246b7fd"},
-    {"path": "command_sandbox.py", "sha256": "bc2d87b4a3f30fdae46d3ab5f908f91d038f6e372ba9bcd6d667ef35c0302cc5"},
-    {"path": "completion_semantics.py", "sha256": "facdf0105f6cd29ee9f7d126c740ab9f8317b69265a8412b9bfe50fcae1905f2"},
-    {"path": "conformance.py", "sha256": "66351b4de21ba12f3db03a1e9683ad1b109911ccc23d1336f4d7f4d3c51c6366"},
-    {"path": "document_validation.py", "sha256": "26041e7c0f78d226dde7a23b8086d6780f89e2712f03d20665d754828b8999ec"},
-    {"path": "evidence.schema.yaml", "sha256": "9211e878074c31e27d8e34003de5f92072192c503e2d3d07c3eb68a796088f1b"},
-    {"path": "fixtures/invalid/attempt-invalid-journal.json", "sha256": "8867bcf06374f64a7956c631f2f5c35a191bb779dcbd9a82bd371bfa7411a270"},
-    {"path": "fixtures/invalid/evidence-zero-assertions.json", "sha256": "efe17107e4a038a7cb3c44c26bb8b60a3558cb41e12ab88e7cd116a3d18e4d58"},
-    {"path": "fixtures/invalid/run-memory-unknown-complete.json", "sha256": "cf20071e8631e160fe65a3c65420f797532171838342629ddda3501fc7c6fae0"},
-    {"path": "fixtures/invalid/work-contract-duplicate-ac.json", "sha256": "349c99a3f7b796fb0ee30254ab59794781f616b8e4097822cacffcb7b31da443"},
-    {"path": "fixtures/valid/attempt.json", "sha256": "66e5e372384bcca1e8ab4498c356f7179522ea8a10e313b2b794811a38edfc3b"},
-    {"path": "fixtures/valid/evidence.json", "sha256": "b8bcb58bfdb3cba38c5eb86880991bfa618d78c8e16c5f8dd53f9aef53a60a18"},
-    {"path": "fixtures/valid/run-memory.json", "sha256": "ff7eb8e470ffeebd4a98458b3327c39360361116a7cbf25cbf9f90f8426797da"},
-    {"path": "fixtures/valid/work-contract.json", "sha256": "2600bfbb735028c5970f03f955a930ca707cf6d86fbfe311e8d516d0448254cb"},
-    {"path": "port_enumeration.py", "sha256": "726597c6362e1bd2fd0748e23d531221deaa9d39e292b4b3a830fac4eaa24459"},
-    {"path": "port_proposal.py", "sha256": "b7ebf15c79628484aa460cc981282d8ab07324d7cfd4e3add131a19d771628ec"},
-    {"path": "port_types.py", "sha256": "6f6eabd205308b4af8f14dfdefbb5ebaf7567381acccca67dc4e17bcf470a3de"},
-    {"path": "protocol.md", "sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3"},
-    {"path": "reference_port.py", "sha256": "6c78e412a565644a3b9dda7452f4bc957e2c474a8b5271ff0e2f265d5075b182"},
-    {"path": "run-memory.schema.yaml", "sha256": "50fa5993ba210e34f7fa4a1b334654f264fedfa87882160e926c80ff045a9c6d"},
-    {"path": "replay_pending.py", "sha256": "216b0fbda5928ec83233f39d2ff2d88fcc4d54fea62d648886d109fdbf8dac9f"},
-    {"path": "replay_trust.py", "sha256": "697a4b31fdd2238d885a922cb528062177bcd9ff16dfd271c91e06ec5dcbc3b3"},
-    {"path": "runtime_replay.py", "sha256": "672b7a58a2364c7c4a73ee692fe27c5d53115b30fa57a87dd3adad32a983ac33"},
-    {"path": "schema_runtime.py", "sha256": "b419619e68d952a5fa0b25366de607d8c1c378becb5a79bc88eebbefefaf568e"},
-    {"path": "tests/_load.py", "sha256": "a3daec2c5b24f688415904ccb1c94ce5fdb9afbf5adb8117c1433c366d09741d"},
-    {"path": "tests/test_adapter_port.py", "sha256": "74abe6544a1755264de4317dbf822d38a78f0f422a92a586e5e778fca96c73b2"},
-    {"path": "tests/test_conformance.py", "sha256": "bfb2b59f1e9c4c6e40d951ce627de81d350b71c1ab1ca960b98a45dc74ce06b6"},
-    {"path": "tests/test_reference_port.py", "sha256": "a0811c0dc54bfcc5850631d981f019fc4383d98946ad69dd216de64f7d860fe9"},
-    {"path": "tests/test_replay_pending.py", "sha256": "b0b51177a6db44d22b633fc18d5e162b0e76877952db2984b0a84ec632a84c4f"},
-    {"path": "tests/test_replay_trust.py", "sha256": "81fffd03cfe9442870d4cb0f123e0bd041bc56ccef63621b8b45ee68c5b9ff1d"},
-    {"path": "tests/test_trust_gaps.py", "sha256": "891679fb6507d4c11946b17815bd76af0e61a38cd599049e9d717030f97a611c"},
-    {"path": "trust_semantics.py", "sha256": "c1eca06f3044d2cb655189f1dcb684d9e9842759947a4d534f5a3e399b97e445"},
-    {"path": "work-contract.schema.yaml", "sha256": "a2c3344331e7083ea4bdced30e221d27c5d52f7cd9f0e03f5205765144aff660"}
-  ],
-  "genesis_inputs": [
-    {"path": "docs/20260726-yuan-core-01-upgrade/FEATURE.md", "sha256": "93005ba3516cf81df41ba485ec8fc2ec33aa21d236cb5eae0dcf21d3a4f3eba8"},
-    {"path": "docs/20260726-yuan-core-01-upgrade/DESIGN.md", "sha256": "2df44b233cff79874a06c2ebe1b8c5876518b8b1fe9cca7e0ea1e4932835b827"},
-    {"path": "docs/20260726-yuan-core-01-upgrade/evidence/m1/held-out-final.json", "sha256": "4e46d9eed583e64b3c96ab5d0a421fe3bd1062e84d46b1d8f9beb39222fb115b"},
-    {"path": "docs/20260726-yuan-core-01-upgrade/evidence/m1/receipt.json", "sha256": "13a592ca3455d6d4f2a937fc117c9aa15bca694ec011ad2dd2367f0b0557028f"}
-  ],
+  "activation": {
+    "mode": "external-content-addressed-authority",
+    "requires": [
+      "previous-root-proof",
+      "independent-proof"
+    ]
+  },
   "author_suite": {
-    "command": ["python", "-m", "unittest", "discover", "-s", ".yuan/core/0.1/tests", "-p", "test_*.py", "-v"],
+    "command": [
+      "python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      ".yuan/core/0.1/tests",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
     "expected_tests": 38,
     "required_failures": 0,
     "required_skips": 0
   },
+  "authority": "inert-by-default",
+  "candidate_revision": "yuan.core/0.1.0",
+  "files": [
+    {
+      "path": "attempt.schema.yaml",
+      "sha256": "98bff43675cabf103b6507c6241e658ce64578e475c17847a328b22b95e19c2b"
+    },
+    {
+      "path": "authorization_semantics.py",
+      "sha256": "0b17df23a4ebd56832add261430df73be9e66bd666b931163c2d4c711246b7fd"
+    },
+    {
+      "path": "command_sandbox.py",
+      "sha256": "bc2d87b4a3f30fdae46d3ab5f908f91d038f6e372ba9bcd6d667ef35c0302cc5"
+    },
+    {
+      "path": "completion_semantics.py",
+      "sha256": "facdf0105f6cd29ee9f7d126c740ab9f8317b69265a8412b9bfe50fcae1905f2"
+    },
+    {
+      "path": "conformance.py",
+      "sha256": "66351b4de21ba12f3db03a1e9683ad1b109911ccc23d1336f4d7f4d3c51c6366"
+    },
+    {
+      "path": "document_validation.py",
+      "sha256": "26041e7c0f78d226dde7a23b8086d6780f89e2712f03d20665d754828b8999ec"
+    },
+    {
+      "path": "evidence.schema.yaml",
+      "sha256": "9211e878074c31e27d8e34003de5f92072192c503e2d3d07c3eb68a796088f1b"
+    },
+    {
+      "path": "fixtures/invalid/attempt-invalid-journal.json",
+      "sha256": "8867bcf06374f64a7956c631f2f5c35a191bb779dcbd9a82bd371bfa7411a270"
+    },
+    {
+      "path": "fixtures/invalid/evidence-zero-assertions.json",
+      "sha256": "efe17107e4a038a7cb3c44c26bb8b60a3558cb41e12ab88e7cd116a3d18e4d58"
+    },
+    {
+      "path": "fixtures/invalid/run-memory-unknown-complete.json",
+      "sha256": "cf20071e8631e160fe65a3c65420f797532171838342629ddda3501fc7c6fae0"
+    },
+    {
+      "path": "fixtures/invalid/work-contract-duplicate-ac.json",
+      "sha256": "349c99a3f7b796fb0ee30254ab59794781f616b8e4097822cacffcb7b31da443"
+    },
+    {
+      "path": "fixtures/valid/attempt.json",
+      "sha256": "66e5e372384bcca1e8ab4498c356f7179522ea8a10e313b2b794811a38edfc3b"
+    },
+    {
+      "path": "fixtures/valid/evidence.json",
+      "sha256": "b8bcb58bfdb3cba38c5eb86880991bfa618d78c8e16c5f8dd53f9aef53a60a18"
+    },
+    {
+      "path": "fixtures/valid/run-memory.json",
+      "sha256": "ff7eb8e470ffeebd4a98458b3327c39360361116a7cbf25cbf9f90f8426797da"
+    },
+    {
+      "path": "fixtures/valid/work-contract.json",
+      "sha256": "2600bfbb735028c5970f03f955a930ca707cf6d86fbfe311e8d516d0448254cb"
+    },
+    {
+      "path": "port_enumeration.py",
+      "sha256": "726597c6362e1bd2fd0748e23d531221deaa9d39e292b4b3a830fac4eaa24459"
+    },
+    {
+      "path": "port_proposal.py",
+      "sha256": "b7ebf15c79628484aa460cc981282d8ab07324d7cfd4e3add131a19d771628ec"
+    },
+    {
+      "path": "port_types.py",
+      "sha256": "6f6eabd205308b4af8f14dfdefbb5ebaf7567381acccca67dc4e17bcf470a3de"
+    },
+    {
+      "path": "protocol.md",
+      "sha256": "87e44ce5969f1d46b980684ad8b89d1268df1933ab4263c497f7f5e6eea98806"
+    },
+    {
+      "path": "reference_port.py",
+      "sha256": "6c78e412a565644a3b9dda7452f4bc957e2c474a8b5271ff0e2f265d5075b182"
+    },
+    {
+      "path": "run-memory.schema.yaml",
+      "sha256": "50fa5993ba210e34f7fa4a1b334654f264fedfa87882160e926c80ff045a9c6d"
+    },
+    {
+      "path": "replay_pending.py",
+      "sha256": "216b0fbda5928ec83233f39d2ff2d88fcc4d54fea62d648886d109fdbf8dac9f"
+    },
+    {
+      "path": "replay_trust.py",
+      "sha256": "697a4b31fdd2238d885a922cb528062177bcd9ff16dfd271c91e06ec5dcbc3b3"
+    },
+    {
+      "path": "runtime_replay.py",
+      "sha256": "672b7a58a2364c7c4a73ee692fe27c5d53115b30fa57a87dd3adad32a983ac33"
+    },
+    {
+      "path": "schema_runtime.py",
+      "sha256": "b419619e68d952a5fa0b25366de607d8c1c378becb5a79bc88eebbefefaf568e"
+    },
+    {
+      "path": "tests/_load.py",
+      "sha256": "a3daec2c5b24f688415904ccb1c94ce5fdb9afbf5adb8117c1433c366d09741d"
+    },
+    {
+      "path": "tests/test_adapter_port.py",
+      "sha256": "74abe6544a1755264de4317dbf822d38a78f0f422a92a586e5e778fca96c73b2"
+    },
+    {
+      "path": "tests/test_conformance.py",
+      "sha256": "bfb2b59f1e9c4c6e40d951ce627de81d350b71c1ab1ca960b98a45dc74ce06b6"
+    },
+    {
+      "path": "tests/test_reference_port.py",
+      "sha256": "a0811c0dc54bfcc5850631d981f019fc4383d98946ad69dd216de64f7d860fe9"
+    },
+    {
+      "path": "tests/test_replay_pending.py",
+      "sha256": "b0b51177a6db44d22b633fc18d5e162b0e76877952db2984b0a84ec632a84c4f"
+    },
+    {
+      "path": "tests/test_replay_trust.py",
+      "sha256": "81fffd03cfe9442870d4cb0f123e0bd041bc56ccef63621b8b45ee68c5b9ff1d"
+    },
+    {
+      "path": "tests/test_trust_gaps.py",
+      "sha256": "891679fb6507d4c11946b17815bd76af0e61a38cd599049e9d717030f97a611c"
+    },
+    {
+      "path": "trust_semantics.py",
+      "sha256": "c1eca06f3044d2cb655189f1dcb684d9e9842759947a4d534f5a3e399b97e445"
+    },
+    {
+      "path": "work-contract.schema.yaml",
+      "sha256": "a2c3344331e7083ea4bdced30e221d27c5d52f7cd9f0e03f5205765144aff660"
+    }
+  ],
+  "genesis_inputs": [
+    {
+      "path": "docs/20260726-yuan-core-01-upgrade/FEATURE.md",
+      "sha256": "93005ba3516cf81df41ba485ec8fc2ec33aa21d236cb5eae0dcf21d3a4f3eba8"
+    },
+    {
+      "path": "docs/20260726-yuan-core-01-upgrade/DESIGN.md",
+      "sha256": "2df44b233cff79874a06c2ebe1b8c5876518b8b1fe9cca7e0ea1e4932835b827"
+    },
+    {
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m1/held-out-final.json",
+      "sha256": "4e46d9eed583e64b3c96ab5d0a421fe3bd1062e84d46b1d8f9beb39222fb115b"
+    },
+    {
+      "path": "docs/20260726-yuan-core-01-upgrade/evidence/m1/receipt.json",
+      "sha256": "13a592ca3455d6d4f2a937fc117c9aa15bca694ec011ad2dd2367f0b0557028f"
+    }
+  ],
+  "independent_gate": {
+    "candidate_conformance_is_sufficient": false,
+    "milestone": "M3",
+    "required": true
+  },
+  "manifest_binding": "External authority binds this manifest by SHA-256; self-hashing and self-activation are forbidden.",
   "negative_fixtures": {
     "fixtures/invalid/attempt-invalid-journal.json": "INVALID_JOURNAL_TRANSITION",
     "fixtures/invalid/evidence-zero-assertions.json": "ZERO_ASSERTIONS",
     "fixtures/invalid/run-memory-unknown-complete.json": "COMPLETE_WITH_PENDING_SIDE_EFFECT",
     "fixtures/invalid/work-contract-duplicate-ac.json": "DUPLICATE_AC_ID"
   },
-  "independent_gate": {
-    "milestone": "M3",
-    "required": true,
-    "candidate_conformance_is_sufficient": false
-  }
+  "protocol_revision": "yuan.core.protocol/0.1.0",
+  "schema_version": "yuan.core-candidate-manifest/v1",
+  "self_trust": false
 }
