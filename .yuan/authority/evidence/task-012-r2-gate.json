@@ -1,0 +1,119 @@
+{
+  "schema_version": "yuan.task-012-r2-revision-aware-gate/v1",
+  "task_id": "task-012-r2",
+  "verdict": "PASS",
+  "hard_gate": "PASS_FOR_CANDIDATE_FREEZE",
+  "promotion_authorized": false,
+  "summary": "The independent M9 gate now separates immutable rev8 history from the staged r2 candidate without weakening either boundary. Active mode validates rev8 directly. Candidate mode replays the three replaced rev8 validator bytes only from the content-addressed rev8 bundle, requires the other 39 historical closure bytes from the candidate, and binds all 55 current candidate files plus the new validator bundle.",
+  "frozen_history": {
+    "authority_revision": 8,
+    "authority_record_sha256": "70e534c875aee40777f3b1c72fdb01d7c82a7fe788d6dd7a5ee06a2bae11d1ec",
+    "validator_bundle_before_sha256": "6ecf461025b36d854d745fbc60bae085f9b631dff1bf531719200d814a0f4a29",
+    "rev8_full_candidate_entries": 42,
+    "active_mode_current_entries": 42,
+    "candidate_mode_current_entries": 39,
+    "candidate_mode_archived_entries": 3,
+    "archived_paths": [
+      "scripts/yuan_activation.py",
+      "scripts/yuan_m9_dogfood.py",
+      "scripts/yuan_runtime_state.py"
+    ]
+  },
+  "candidate": {
+    "root": ".yuan/authority/self-modification/staging/task-012-r2/candidate",
+    "full_candidate_entries": 55,
+    "full_candidate_manifest_sha256": "2641414ac5e4cd421ffcd291c05070d8c1fcd018d203ea8c1492b05f2abbe1e9",
+    "validator_bundle_after_sha256": "734d05945ff7e0e949187a0250debfca427f0fe7072ef49ff0a62a9724066674",
+    "replacement_sha256": {
+      "scripts/yuan_activation.py": "604085e1d46dd4ded8ad4638fd3eaa55805c8c0e88ca212db47db021ef443cec",
+      "scripts/yuan_m9_dogfood.py": "ef659a6ed6147f0137f84a745956228791ef2a013affabbf4969d3baaab68e2c",
+      "scripts/yuan_runtime_state.py": "27d81c62177e8548393fe5c81fda2dadf9b6b69badcda4c13c79e7e1e62a89ef"
+    },
+    "prepared_binding": {
+      "before": "6ecf461025b36d854d745fbc60bae085f9b631dff1bf531719200d814a0f4a29",
+      "after": "734d05945ff7e0e949187a0250debfca427f0fe7072ef49ff0a62a9724066674",
+      "receipt_requires_explicit_candidate_and_verifier": true,
+      "archive_path_and_hash_are_paired": true
+    }
+  },
+  "independent_gate": {
+    "held_out_path": "tests/authority_switch/test_m9_held_out.py",
+    "held_out_sha256": "3239987935a69be74bb79c25793031bf8f8c8c24a7379464f209163f09d377de",
+    "verifier_path": "tests/authority_switch/m9_revision_gate.py",
+    "verifier_sha256": "34eaf6ab4c89a8174e2d4882ff653a4a83b37878f69d71dff25f9131359f531a",
+    "methods": 19,
+    "standard_library_only": true,
+    "mode_semantics": {
+      "active": "No candidate root is permitted; all 42 rev8 closure entries must match current rev8 bytes.",
+      "candidate": "A distinct complete candidate root is mandatory; rev8 history permits archive replay for exactly three replaced validators, while the v2 candidate closure permits no archive fallback for its 55 current files."
+    }
+  },
+  "runs": {
+    "active_rev8": {
+      "command": "$env:YUAN_M9_GATE_MODE='active'; Remove-Item Env:YUAN_R2_CANDIDATE -ErrorAction SilentlyContinue; python tests/authority_switch/test_m9_held_out.py -v",
+      "result": "PASS",
+      "methods": 19,
+      "failures": 0,
+      "errors": 0,
+      "duration_seconds": 163.129
+    },
+    "candidate_overlay_clone": {
+      "root": "G:/t12/r2c1",
+      "command": "$env:YUAN_M9_GATE_MODE='candidate'; $env:YUAN_R2_CANDIDATE=(Resolve-Path '.yuan/authority/self-modification/staging/task-012-r2/candidate').Path; python tests/authority_switch/test_m9_held_out.py -v",
+      "result": "PASS",
+      "methods": 19,
+      "failures": 0,
+      "errors": 0,
+      "duration_seconds": 128.995,
+      "overlay": "Only the three frozen staged replacement scripts were copied to the disposable clone's active scripts directory."
+    }
+  },
+  "causal_blockers": {
+    "M9-R1-HO-B04": {
+      "status": "RESOLVED_IN_CANDIDATE",
+      "evidence": "The candidate product seam rehashes every v2 closure member and all 55 current candidate files; the independent gate separately binds the new validator bundle to those same bytes."
+    },
+    "M9-R1-HO-B05": {
+      "status": "RESOLVED_IN_CANDIDATE",
+      "evidence": "The candidate public dogfood verifier accepts authority rev8, active Work4, and the WAIT_AUTH terminal state in the independent overlay clone."
+    }
+  },
+  "negative_attacks": {
+    "rev8_archive": [
+      "Replace or delete the rev8 bundle manifest.",
+      "Replace or delete each rev8 bundle blob."
+    ],
+    "candidate_v2_closure": [
+      "Replace or delete index, receipt, suite, frozen verifier, full manifest, or PREPARED snapshot.",
+      "Replace or delete the new candidate bundle manifest or any of its blobs.",
+      "Delete an old archive blob.",
+      "Mutate a candidate replacement after closure creation.",
+      "Remove either member of the archive path/hash pair."
+    ],
+    "mode_confusion": [
+      "Pass a candidate root in active mode.",
+      "Omit or alias the candidate root in candidate mode.",
+      "Use an unknown mode."
+    ],
+    "result": "ALL_REJECTED_FAIL_CLOSED"
+  },
+  "test_integrity": {
+    "new_skip_or_xfail": false,
+    "gate_threshold_lowered": false,
+    "product_rev8_modified": false,
+    "developer_candidate_modified": false,
+    "developer_author_test_modified": false,
+    "split_byte_or_partial_validation_allowed": false,
+    "scope": [
+      "tests/authority_switch/test_m9_held_out.py",
+      "tests/authority_switch/m9_revision_gate.py",
+      ".yuan/authority/evidence/task-012-r2-gate.json"
+    ]
+  },
+  "terminal_state": {
+    "task_012_r2": "PASS_FOR_CANDIDATE_FREEZE",
+    "task_013": "BLOCKED_REPORT_ONLY",
+    "tombstone": "WAIT_AUTH",
+    "next_gate": "The developer may freeze these exact candidate bytes. Promotion, cleanup, and completion remain separate authority actions."
+  }
+}

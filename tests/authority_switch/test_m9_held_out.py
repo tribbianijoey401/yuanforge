@@ -11,6 +11,7 @@ import copy
 import datetime as dt
 import hashlib
 import json
+import os
 import pathlib
 import shutil
 import sys
@@ -19,9 +20,25 @@ import unittest
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-SCRIPTS = ROOT / "scripts"
+GATE_MODE = os.environ.get("YUAN_M9_GATE_MODE", "active")
+CANDIDATE_ROOT = (
+    pathlib.Path(os.environ["YUAN_R2_CANDIDATE"]).resolve()
+    if "YUAN_R2_CANDIDATE" in os.environ
+    else None
+)
+TESTS = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(TESTS))
+
+import m9_revision_gate as revision_gate
+
+ROOT, VALIDATION_ROOT = revision_gate.gate_configuration(
+    ROOT,
+    mode=GATE_MODE,
+    candidate_root=CANDIDATE_ROOT,
+)
+SCRIPTS = VALIDATION_ROOT / "scripts"
 sys.path.insert(0, str(SCRIPTS))
-sys.path.insert(0, str(ROOT / ".yuan/core/0.1"))
+sys.path.insert(0, str(VALIDATION_ROOT / ".yuan/core/0.1"))
 
 import yuan_authority as authority
 import yuan_activation as activation
@@ -75,6 +92,18 @@ class M9HeldOut(unittest.TestCase):
     def copy_runtime_repo(self, destination: pathlib.Path) -> None:
         for relative in (".yuan", ".yuan-run", "scripts", "tests"):
             shutil.copytree(ROOT / relative, destination / relative)
+
+    def validation_root_in(self, repo: pathlib.Path) -> pathlib.Path:
+        if GATE_MODE == "active":
+            return repo
+        assert CANDIDATE_ROOT is not None
+        try:
+            relative = CANDIDATE_ROOT.relative_to(ROOT)
+        except ValueError as error:
+            raise revision_gate.GateError(
+                "candidate-mode clones require the candidate under the repo"
+            ) from error
+        return repo / relative
 
     def committed_r1(
         self, repo: pathlib.Path = ROOT
@@ -240,10 +269,20 @@ class M9HeldOut(unittest.TestCase):
                 prepared_at,
                 "independent proof must exist before PREPARED authorizes mutation",
             )
-        full_value = load_json(full_candidate)
-        for entry in full_value["files"]:
-            with self.subTest(candidate_file=entry["path"]):
-                self.assertEqual(entry["sha256"], digest(ROOT / entry["path"]))
+        historical = revision_gate.verify_rev8_history(
+            ROOT,
+            mode=GATE_MODE,
+            candidate_root=CANDIDATE_ROOT,
+        )
+        self.assertEqual(42, historical["full_candidate_entries"])
+        self.assertEqual(
+            (
+                sorted(revision_gate.R2_REPLACED_PATHS)
+                if GATE_MODE == "candidate"
+                else []
+            ),
+            historical["candidate_differences"],
+        )
 
     def test_evidence_cannot_predate_the_receipt_it_claims(self) -> None:
         transaction, journal, prepared, proof = self.committed_r1()
@@ -450,10 +489,27 @@ class M9HeldOut(unittest.TestCase):
                     path = repo / relative
                     original = path.read_bytes()
                     path.write_bytes(original + b"\n")
-                    with self.assertRaises(authority.AuthorityError):
-                        authority.verify_authority(repo)
+                    with self.assertRaises(
+                        (authority.AuthorityError, revision_gate.GateError)
+                    ):
+                        if GATE_MODE == "candidate":
+                            authority.verify_authority(repo)
+                        else:
+                            revision_gate.verify_rev8_history(
+                                repo, mode="active"
+                            )
                     path.write_bytes(original)
-                    self.assertEqual(8, authority.verify_authority(repo)["revision"])
+                    if GATE_MODE == "candidate":
+                        self.assertEqual(
+                            8, authority.verify_authority(repo)["revision"]
+                        )
+                    else:
+                        self.assertEqual(
+                            revision_gate.REV8_RECORD_SHA256,
+                            revision_gate.verify_rev8_history(
+                                repo, mode="active"
+                            )["record_sha256"],
+                        )
 
     def test_full_candidate_closure_rejects_replace_and_delete(self) -> None:
         descriptor = load_json(
@@ -473,8 +529,15 @@ class M9HeldOut(unittest.TestCase):
                     else:
                         path.unlink()
                     try:
-                        with self.assertRaises(authority.AuthorityError):
-                            authority.verify_authority(repo)
+                        with self.assertRaises(
+                            (authority.AuthorityError, revision_gate.GateError)
+                        ):
+                            if GATE_MODE == "candidate":
+                                authority.verify_authority(repo)
+                            else:
+                                revision_gate.verify_rev8_history(
+                                    repo, mode="active"
+                                )
                     finally:
                         path.write_bytes(original)
                 with self.subTest(attack=attack, verifier="runtime"):
@@ -486,10 +549,17 @@ class M9HeldOut(unittest.TestCase):
                         active, _, _ = runtime_state.resolve_runtime_root(repo)
                         attempt = load_json(active / "attempts/0001.json")
                         evidence = load_json(active / "evidence/0001.json")
-                        with self.assertRaises(authority.AuthorityError):
-                            runtime_state.validate_runtime_evidence(
-                                repo, active, attempt, evidence
-                            )
+                        with self.assertRaises(
+                            (authority.AuthorityError, revision_gate.GateError)
+                        ):
+                            if GATE_MODE == "candidate":
+                                runtime_state.validate_runtime_evidence(
+                                    repo, active, attempt, evidence
+                                )
+                            else:
+                                revision_gate.verify_rev8_history(
+                                    repo, mode="active"
+                                )
                     finally:
                         path.write_bytes(original)
 
@@ -601,9 +671,14 @@ class M9HeldOut(unittest.TestCase):
             )
 
     def test_public_dogfood_verifier_accepts_rev8_work4(self) -> None:
-        verified = m9.verify_dogfood(ROOT)
-        self.assertEqual(8, verified["authority"]["revision"])
-        self.assertEqual("4", verified["work"]["revision"]["revision"])
+        if GATE_MODE == "candidate":
+            verified = m9.verify_dogfood(ROOT)
+            self.assertEqual(8, verified["authority"]["revision"])
+            self.assertEqual("4", verified["work"]["revision"]["revision"])
+        else:
+            verified = revision_gate.verify_pointer_driven_rev8(ROOT)
+            self.assertEqual(8, verified["authority_revision"])
+            self.assertEqual("4", verified["work_revision"])
 
     def test_failed_promotion_journals_are_recoverable(self) -> None:
         failures = list(
@@ -634,6 +709,184 @@ class M9HeldOut(unittest.TestCase):
         )
         self.assertEqual("PASS", promotion_failure["compensation"]["authority_after"])
         self.assertEqual("FORBIDDEN", promotion_failure["promotion"])
+
+    def test_revision_gate_modes_are_explicit_and_confusion_fails(self) -> None:
+        staging = (
+            ROOT
+            / ".yuan/authority/self-modification/staging"
+            / "task-012-r2/candidate"
+        )
+        with self.assertRaises(revision_gate.GateError):
+            revision_gate.gate_configuration(
+                ROOT, mode="active", candidate_root=staging
+            )
+        with self.assertRaises(revision_gate.GateError):
+            revision_gate.gate_configuration(
+                ROOT, mode="candidate", candidate_root=None
+            )
+        with self.assertRaises(revision_gate.GateError):
+            revision_gate.gate_configuration(
+                ROOT, mode="candidate", candidate_root=ROOT
+            )
+        with self.assertRaises(revision_gate.GateError):
+            revision_gate.gate_configuration(
+                ROOT, mode="unknown", candidate_root=None
+            )
+
+    def test_rev8_archive_manifest_and_blobs_fail_closed(self) -> None:
+        bundle_root = (
+            ".yuan/authority/validator-bundles/"
+            f"{revision_gate.REV8_VALIDATOR_BUNDLE_SHA256}"
+        )
+        manifest = (
+            f"{bundle_root}/"
+            f"{revision_gate.REV8_VALIDATOR_BUNDLE_SHA256}.manifest.json"
+        )
+        bundle = revision_gate.verify_validator_bundle(ROOT)
+        targets = [manifest, *(path.relative_to(ROOT).as_posix() for path in bundle.values())]
+        with tempfile.TemporaryDirectory(prefix="yuan-m9-held-archive-") as name:
+            repo = pathlib.Path(name)
+            self.copy_runtime_repo(repo)
+            candidate = self.validation_root_in(repo)
+            for relative in targets:
+                for attack in ("replace", "delete"):
+                    with self.subTest(relative=relative, attack=attack):
+                        path = repo / relative
+                        original = path.read_bytes()
+                        if attack == "replace":
+                            path.write_bytes(original + b"\n")
+                        else:
+                            path.unlink()
+                        try:
+                            with self.assertRaises(revision_gate.GateError):
+                                revision_gate.verify_rev8_history(
+                                    repo,
+                                    mode=GATE_MODE,
+                                    candidate_root=(
+                                        candidate
+                                        if GATE_MODE == "candidate"
+                                        else None
+                                    ),
+                                )
+                        finally:
+                            path.write_bytes(original)
+
+    def test_mode_specific_candidate_closure_is_complete_and_fail_closed(
+        self,
+    ) -> None:
+        if GATE_MODE == "active":
+            result = revision_gate.verify_rev8_history(ROOT, mode="active")
+            self.assertEqual([], result["candidate_differences"])
+            self.assertEqual(42, result["full_candidate_entries"])
+            return
+        with tempfile.TemporaryDirectory(prefix="yuan-m9-held-r2-") as name:
+            repo = pathlib.Path(name)
+            self.copy_runtime_repo(repo)
+            candidate = self.validation_root_in(repo)
+            arguments, artifacts = revision_gate.build_candidate_closure(
+                repo,
+                candidate,
+                repo / "tests/authority_switch/test_m9_held_out.py",
+            )
+            revision_gate.assert_candidate_matches_full_manifest(
+                candidate, artifacts["full"]
+            )
+            revision_gate.verify_candidate_validator_bundle(
+                repo,
+                candidate,
+                artifacts["full"],
+                arguments["candidate_manifest_sha256"],
+            )
+            verified = activation.verify_preflight_closure(repo, **arguments)
+            self.assertEqual(
+                "yuan.preflight-proof-closure/v2",
+                verified["schema_version"],
+            )
+            self.assertEqual(55, len(artifacts["full"]["files"]))
+            for label in (
+                "index_path",
+                "receipt_path",
+                "suite_path",
+                "verifier_path",
+                "full_path",
+                "prepared_path",
+            ):
+                path = artifacts[label]
+                original = path.read_bytes()
+                for attack in ("replace", "delete"):
+                    with self.subTest(label=label, attack=attack):
+                        if attack == "replace":
+                            path.write_bytes(original + b"\n")
+                        else:
+                            path.unlink()
+                        try:
+                            with self.assertRaises(authority.AuthorityError):
+                                activation.verify_preflight_closure(
+                                    repo, **arguments
+                                )
+                        finally:
+                            path.write_bytes(original)
+            candidate_bundle_targets = [
+                artifacts["bundle_path"],
+                *(
+                    artifacts["bundle_path"].parent
+                    / f"{entry['sha256']}.blob"
+                    for entry in artifacts["bundle"]["files"]
+                ),
+            ]
+            for path in candidate_bundle_targets:
+                original = path.read_bytes()
+                for attack in ("replace", "delete"):
+                    with self.subTest(
+                        label="candidate-bundle",
+                        path=path.name,
+                        attack=attack,
+                    ):
+                        if attack == "replace":
+                            path.write_bytes(original + b"\n")
+                        else:
+                            path.unlink()
+                        try:
+                            with self.assertRaises(revision_gate.GateError):
+                                revision_gate.verify_candidate_validator_bundle(
+                                    repo,
+                                    candidate,
+                                    artifacts["full"],
+                                    arguments["candidate_manifest_sha256"],
+                                )
+                        finally:
+                            path.write_bytes(original)
+            for missing in (
+                "archived_bundle_manifest_path",
+                "archived_bundle_manifest_sha256",
+            ):
+                confused = dict(arguments)
+                confused[missing] = None
+                with self.subTest(label="archive-binding-pair", missing=missing):
+                    with self.assertRaises(authority.AuthorityError):
+                        activation.verify_preflight_closure(repo, **confused)
+            archived_blob = next(
+                iter(revision_gate.verify_validator_bundle(repo).values())
+            )
+            original_blob = archived_blob.read_bytes()
+            archived_blob.unlink()
+            try:
+                with self.assertRaises(authority.AuthorityError):
+                    activation.verify_preflight_closure(repo, **arguments)
+            finally:
+                archived_blob.write_bytes(original_blob)
+            changed = candidate / "scripts/yuan_activation.py"
+            original_candidate = changed.read_bytes()
+            changed.write_bytes(original_candidate + b"\n")
+            try:
+                with self.assertRaises(revision_gate.GateError):
+                    revision_gate.assert_candidate_matches_full_manifest(
+                        candidate, artifacts["full"]
+                    )
+                with self.assertRaises(authority.AuthorityError):
+                    activation.verify_preflight_closure(repo, **arguments)
+            finally:
+                changed.write_bytes(original_candidate)
 
     def test_m7_registry_and_all_four_deltas_remain_frozen(self) -> None:
         receipt = provenance.verify_frozen_and_delta(ROOT)
