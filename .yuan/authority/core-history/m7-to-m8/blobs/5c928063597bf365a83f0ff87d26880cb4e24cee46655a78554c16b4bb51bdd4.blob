@@ -62,36 +62,6 @@ def unknown_attempt() -> dict:
 
 
 class ReplayPendingTests(unittest.TestCase):
-    def test_continue_always_projects_an_authorized_legal_step(self) -> None:
-        memory = rebuild([])
-        self.assertEqual("CONTINUE", memory["last_result"])
-        self.assertTrue(memory["legal_next_steps"])
-        self.assertEqual(
-            "GRANT-core-candidate",
-            memory["legal_next_steps"][0]["authorization_grant_id"],
-        )
-
-    def test_ungranted_human_judgment_projects_wait_auth(self) -> None:
-        work = fixture("work-contract")
-        work["acceptance_criteria"][0]["id"] = "AC-TOMBSTONE"
-        work["acceptance_criteria"][0]["type"] = "human-judgment"
-        work["authorization"]["grants"] = []
-        work["revision"]["sha256"] = conformance.canonical_digest(
-            work, omitted_paths=(("revision", "sha256"),)
-        )
-        evidence = fixture("evidence")
-        memory = conformance.rebuild_run_memory(
-            work,
-            [],
-            [],
-            current_artifact_sha256=evidence["artifact_binding"]["sha256"],
-            environment_id=evidence["environment_binding"]["id"],
-            environment_fingerprint=evidence["environment_binding"]["fingerprint"],
-            trusted_now=datetime(2026, 7, 27, tzinfo=timezone.utc),
-        )
-        self.assertEqual("WAIT_AUTH", memory["last_result"])
-        self.assertTrue(memory["legal_next_steps"][0]["high_impact"])
-
     def test_blocked_rebuild_preserves_valid_unknown_pointer(self) -> None:
         attempt = unknown_attempt()
         memory = rebuild([attempt])

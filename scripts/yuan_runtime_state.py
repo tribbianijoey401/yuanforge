@@ -14,6 +14,8 @@ from typing import Any
 
 
 RUNTIME_ROOT = pathlib.PurePosixPath(".yuan-run")
+ACTIVE_RUN_PATH = RUNTIME_ROOT / "active-run.json"
+RUNS_ROOT = RUNTIME_ROOT / "runs"
 IMMUTABLE_RUNTIME_AREAS = ("contracts", "attempts", "evidence")
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
@@ -102,10 +104,45 @@ def immutable_runtime_files(runtime_root: pathlib.Path) -> dict[str, str]:
     return result
 
 
+def resolve_runtime_root(
+    repo_root: pathlib.Path,
+) -> tuple[pathlib.Path, dict[str, Any] | None, str | None]:
+    repo = pathlib.Path(repo_root).resolve()
+    pointer_path = repo / ACTIVE_RUN_PATH
+    if not pointer_path.exists():
+        return repo / RUNTIME_ROOT, None, None
+    try:
+        pointer_bytes = pointer_path.read_bytes()
+        pointer = json.loads(pointer_bytes.decode("utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise AuthorityError("active-run pointer is missing or invalid") from error
+    if (
+        pointer.get("schema_version") != "yuan.active-run/v1"
+        or not isinstance(pointer.get("run_id"), str)
+        or pointer.get("runtime_root")
+        != f"{RUNS_ROOT.as_posix()}/{pointer.get('run_id')}"
+        or not SHA256.fullmatch(pointer.get("manifest_sha256", ""))
+    ):
+        raise AuthorityError("active-run pointer fields are invalid")
+    runtime = (repo / pointer["runtime_root"]).resolve()
+    if not inside(runtime, (repo / RUNS_ROOT).resolve()):
+        raise AuthorityError("active-run pointer escapes runs root")
+    manifest = runtime / "runtime-manifest.json"
+    if not manifest.is_file() or file_sha256(manifest) != pointer["manifest_sha256"]:
+        raise AuthorityError("active-run manifest binding mismatch")
+    return runtime, pointer, sha256(pointer_bytes)
+
+
 def runtime_documents(
     repo_root: pathlib.Path,
+    runtime_root: pathlib.Path | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
-    runtime = pathlib.Path(repo_root).resolve() / RUNTIME_ROOT
+    repo = pathlib.Path(repo_root).resolve()
+    runtime = (
+        pathlib.Path(runtime_root).resolve()
+        if runtime_root is not None
+        else resolve_runtime_root(repo)[0]
+    )
     contracts = sorted((runtime / "contracts").glob("*.json"))
     if len(contracts) != 1:
         raise AuthorityError("runtime must contain exactly one active Work")
@@ -130,28 +167,23 @@ def runtime_documents(
     return work, attempts, evidence
 
 
-def rebuild_runtime_memory(repo_root: pathlib.Path) -> dict[str, Any]:
+def rebuild_runtime_memory(
+    repo_root: pathlib.Path,
+    runtime_root: pathlib.Path | None = None,
+) -> dict[str, Any]:
     repo = pathlib.Path(repo_root).resolve()
-    work, attempts, evidence = runtime_documents(repo)
-    artifact_bindings = {
-        (
-            item.get("artifact_binding", {}).get("scope"),
-            item.get("artifact_binding", {}).get("sha256"),
+    work, attempts, evidence = runtime_documents(repo, runtime_root)
+    latest = evidence[-1]
+    artifact_binding = latest.get("artifact_binding", {})
+    environment_binding = latest.get("environment_binding", {})
+    if any(
+        not isinstance(value, str) or not value
+        for value in (
+            artifact_binding.get("scope"),
+            artifact_binding.get("sha256"),
+            environment_binding.get("id"),
+            environment_binding.get("fingerprint"),
         )
-        for item in evidence
-    }
-    environment_bindings = {
-        (
-            item.get("environment_binding", {}).get("id"),
-            item.get("environment_binding", {}).get("fingerprint"),
-        )
-        for item in evidence
-    }
-    if (
-        len(artifact_bindings) != 1
-        or None in next(iter(artifact_bindings), ())
-        or len(environment_bindings) != 1
-        or None in next(iter(environment_bindings), ())
     ):
         raise AuthorityError("runtime rebuild inputs are ambiguous")
     core = repo / ".yuan/core/0.1"
@@ -173,15 +205,13 @@ def rebuild_runtime_memory(repo_root: pathlib.Path) -> dict[str, Any]:
         sys.modules.pop(module_name, None)
     try:
         import conformance  # type: ignore
-        artifact_scope, artifact_sha256 = next(iter(artifact_bindings))
-        environment_id, environment_fingerprint = next(iter(environment_bindings))
         return conformance.rebuild_run_memory(
             work,
             attempts,
             evidence,
-            current_artifact_sha256=artifact_sha256,
-            environment_id=environment_id,
-            environment_fingerprint=environment_fingerprint,
+            current_artifact_sha256=artifact_binding["sha256"],
+            environment_id=environment_binding["id"],
+            environment_fingerprint=environment_binding["fingerprint"],
             trusted_now=datetime(2100, 1, 1, tzinfo=timezone.utc),
         )
     except (ImportError, OSError) as error:
@@ -200,8 +230,17 @@ def seal_runtime(
 ) -> dict[str, Any]:
     repo = pathlib.Path(repo_root).resolve()
     runtime = pathlib.Path(runtime_root).resolve()
-    if not inside(runtime, repo) or runtime != (repo / RUNTIME_ROOT).resolve():
-        raise AuthorityError("runtime root must be repository .yuan-run")
+    legacy_root = (repo / RUNTIME_ROOT).resolve()
+    runs_root = (repo / RUNS_ROOT).resolve()
+    if not inside(runtime, repo) or not (
+        runtime == legacy_root
+        or (
+            inside(runtime, runs_root)
+            and runtime.parent == runs_root
+            and runtime.name not in {"", ".", ".."}
+        )
+    ):
+        raise AuthorityError("runtime root must be .yuan-run or one declared run")
     if not SHA256.fullmatch(legacy_snapshot_sha256):
         raise AuthorityError("legacy snapshot SHA-256 is invalid")
     if not SHA256.fullmatch(source_projection_sha256):
@@ -213,7 +252,7 @@ def seal_runtime(
         stored_memory = json.loads(memory.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
         raise AuthorityError("run-memory.json is invalid") from error
-    if stored_memory != rebuild_runtime_memory(repo):
+    if stored_memory != rebuild_runtime_memory(repo, runtime):
         raise AuthorityError("run-memory.json is not a deterministic rebuild")
     manifest = {
         "schema_version": "yuan.runtime-seal/v1",
@@ -230,9 +269,14 @@ def seal_runtime(
     return manifest
 
 
-def verify_runtime(repo_root: pathlib.Path) -> dict[str, Any]:
+def verify_runtime_at(
+    repo_root: pathlib.Path,
+    runtime_root: pathlib.Path,
+) -> dict[str, Any]:
     repo = pathlib.Path(repo_root).resolve()
-    runtime = repo / RUNTIME_ROOT
+    runtime = pathlib.Path(runtime_root).resolve()
+    if not inside(runtime, repo):
+        raise AuthorityError("runtime verification target escapes repository")
     manifest_path = runtime / "runtime-manifest.json"
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -247,6 +291,18 @@ def verify_runtime(repo_root: pathlib.Path) -> dict[str, Any]:
         stored_memory = json.loads(memory.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
         raise AuthorityError("runtime memory is not rebuildable JSON") from error
-    if stored_memory != rebuild_runtime_memory(repo):
+    if stored_memory != rebuild_runtime_memory(repo, runtime):
         raise AuthorityError("runtime memory does not match immutable history")
     return manifest
+
+
+def verify_runtime(repo_root: pathlib.Path) -> dict[str, Any]:
+    repo = pathlib.Path(repo_root).resolve()
+    runtime, pointer, pointer_sha256 = resolve_runtime_root(repo)
+    manifest = verify_runtime_at(repo, runtime)
+    return {
+        **manifest,
+        "runtime_root": runtime.relative_to(repo).as_posix(),
+        "active_run_pointer": pointer,
+        "active_run_pointer_sha256": pointer_sha256,
+    }

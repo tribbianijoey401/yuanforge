@@ -1,0 +1,31 @@
+{
+  "authority": "core",
+  "legacy_root": "docs",
+  "legacy_snapshot_sha256": "89201f8190439969667532d5ee250a72109f648a2906b951910c2700472a2074",
+  "m7_semantic_registry_sha256": "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
+  "previous_record_sha256": "9f5b3de9f561fe1ecc16405a7c21dcd24824e1b4735572928cc47aff468b8183",
+  "protocol_activation": {
+    "accepted_by_authority": "legacy",
+    "assertions": 80,
+    "candidate_manifest_sha256": "53b47a9803965be4f81f81ad4081023571af24917c132c38fa777b6d73fc91e1",
+    "descriptor_sha256": "b590944715e515b6533371e461bfb4afdd87d6d89ba4a75e196336d4d1cb36dd",
+    "independent_evidence_sha256": "6b474c3073f34cc745be4fd05be8d614517622f274bc190c0385855ab6601bf4",
+    "older_root_verifier_sha256": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103",
+    "protocol_sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3",
+    "schema_version": "yuan.protocol-activation-binding/v1"
+  },
+  "receipt": {
+    "dual_write": false,
+    "from": "core",
+    "pointer_before_sha256": "d406f316965b3101b7e3c7dc63f5621642628a7c2fb9372de40c965e567476dc",
+    "schema_version": "yuan.authority-switch-receipt/v1",
+    "semantic_registry_sha256": "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
+    "single_writable_authority": true,
+    "to": "core"
+  },
+  "revision": 5,
+  "runtime_pointer_sha256": "52e53f00c1854736447737562708a10c58cef772346e78095c6a5dd1121025d7",
+  "runtime_root": ".yuan-run/runs/WORK-yuan-m8-m9-successor-g0001-867cca673431",
+  "runtime_snapshot_sha256": "14481ac160b7d42440ab52fa5c533159f683d598fa9025dc824043dee4fff4de",
+  "schema_version": "yuan.authority-record/v1"
+}

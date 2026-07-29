@@ -1,0 +1,64 @@
+{
+  "ac_evidence": {
+    "AC-M8-AUTHORITY-SWITCH": [
+      "EVD-M8-ACTIVATION-0001"
+    ]
+  },
+  "active_hypotheses": [],
+  "artifact_binding": {
+    "scope": ".yuan/authority",
+    "sha256": "b590944715e515b6533371e461bfb4afdd87d6d89ba4a75e196336d4d1cb36dd"
+  },
+  "attempted_strategies": [
+    {
+      "fingerprint": "5e137e756f82ce9cf077ea2952112d2e955569989b26c2da4af13a1fa46d80af",
+      "latest_evidence_sequence": 1,
+      "relevant_inputs_digest": "d59cbc31f505036f9c1663305fd6cbb848730ac0a9dc7ac89bfc0f9c126743e7"
+    }
+  ],
+  "environment_binding": {
+    "fingerprint": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103",
+    "id": "yuan-genesis-old-root"
+  },
+  "last_result": "CONTINUE",
+  "legal_next_steps": [
+    {
+      "ac_id": "AC-M9-SELF-MODIFICATION-DOGFOOD",
+      "action_type": "verify",
+      "authorization_grant_id": "GRANT-CORE-M8-M9",
+      "high_impact": false,
+      "scope": ".yuan/core/0.1"
+    }
+  ],
+  "pending_side_effects": [],
+  "projection_sequence": 2,
+  "protocol_binding": {
+    "id": "yuan.core.protocol",
+    "revision": "0.1.0-candidate-activated",
+    "sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3"
+  },
+  "rebuild": {
+    "attempt_ids": [
+      "ATT-M8-ACTIVATION-0001"
+    ],
+    "attempts_digest": "5ecf237643e3b61293678bd943f2fe1de0baea7e3c9b66fac602fd6be251c279",
+    "errors": [],
+    "evidence_digest": "888694934ec2cad84aa643d8ccebd2ddbfb79988481f6e2bf5e3a2c499081f00",
+    "evidence_ids": [
+      "EVD-M8-ACTIVATION-0001"
+    ]
+  },
+  "remaining_budget": {
+    "command_seconds": 597,
+    "strategies": 19,
+    "ticks": 19,
+    "tool_calls": 39
+  },
+  "run_id": "RUN-WORK-yuan-m8-m9-successor",
+  "schema_version": "yuan.run-memory/v1",
+  "work_binding": {
+    "id": "WORK-yuan-m8-m9-successor",
+    "revision": "1",
+    "sha256": "867cca673431cd6c6f357d8676e493b003f428b8c2fc1adeb9775d39c60d43dd"
+  }
+}

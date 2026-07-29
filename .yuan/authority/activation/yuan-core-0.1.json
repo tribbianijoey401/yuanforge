@@ -1,0 +1,15 @@
+{
+  "schema_version": "yuan.core-activation/v1",
+  "protocol_path": ".yuan/core/0.1/protocol.md",
+  "protocol_sha256": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3",
+  "candidate_manifest_path": ".yuan/core/0.1/candidate-manifest.json",
+  "candidate_manifest_sha256": "53b47a9803965be4f81f81ad4081023571af24917c132c38fa777b6d73fc91e1",
+  "accepted_by_authority": "legacy",
+  "independent_evidence_path": ".yuan/authority/activation/evidence/old-root-receipt.json",
+  "independent_evidence_sha256": "6b474c3073f34cc745be4fd05be8d614517622f274bc190c0385855ab6601bf4",
+  "older_root_verifier_path": "tests/adapter_conformance/run_m6_old_root.py",
+  "older_root_verifier_sha256": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103",
+  "minimum_checks": 80,
+  "candidate_self_trust": false,
+  "activation_rule": "The candidate remains textually inert; this descriptor records the older legacy trust root's independent acceptance and is bound by the Core authority record."
+}

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from authorization_semantics import authorization_status
 from replay_pending import rebuild_pending_side_effects
 from replay_trust import (
     artifact_scope,
@@ -15,89 +14,6 @@ from trust_semantics import canonical_digest, immutable_binding_matches
 
 def _collection_digest(items: list[dict[str, Any]]) -> str:
     return canonical_digest(items)
-
-
-def _project_next_step(
-    work: dict[str, Any],
-    attempts: list[dict[str, Any]],
-    evidence_items: list[dict[str, Any]],
-    remaining: dict[str, Any],
-    trusted_now: Any,
-) -> tuple[str, list[dict[str, Any]]]:
-    observed = {
-        item.get("ac_id")
-        for item in evidence_items
-        if item.get("status") == "PASS" and item.get("assertions", 0) > 0
-    }
-    unmet = [
-        item
-        for item in work["acceptance_criteria"]
-        if item["required"] and item["id"] not in observed
-    ]
-    if not unmet:
-        return "BLOCKED", []
-    ac = unmet[0]
-    human_gate = (
-        ac["type"] == "human-judgment"
-        or "TOMBSTONE" in ac["id"].upper()
-        or "CLEANUP" in ac["id"].upper()
-    )
-    action = {
-        "type": "file-write" if human_gate else "verify",
-        "mutating": human_gate,
-        "side_effect_class": "filesystem" if human_gate else "none",
-        "scope": ac["artifact_scope"],
-        "authorization_grant_id": None,
-        "high_impact": human_gate,
-        "self_modification": None,
-    }
-    charge = {
-        "ticks": 1,
-        "tool_calls": 1,
-        "strategies": 1,
-        "command_seconds": 0,
-    }
-    grant_usage: dict[str, int] = {}
-    for attempt in attempts:
-        grant_id = attempt["action"].get("authorization_grant_id")
-        if grant_id:
-            grant_usage[grant_id] = grant_usage.get(grant_id, 0) + 1
-    if not human_gate:
-        for grant in work["authorization"]["grants"]:
-            action["authorization_grant_id"] = grant["id"]
-            if authorization_status(
-                work,
-                action,
-                charge,
-                remaining,
-                trusted_now=trusted_now,
-                grant_usage=grant_usage,
-            ) == "AUTHORIZED":
-                break
-        else:
-            action["authorization_grant_id"] = None
-    status = authorization_status(
-        work,
-        action,
-        charge,
-        remaining,
-        trusted_now=trusted_now,
-        grant_usage=grant_usage,
-    )
-    step = {
-        "ac_id": ac["id"],
-        "action_type": action["type"],
-        "scope": action["scope"],
-        "authorization_grant_id": action["authorization_grant_id"],
-        "high_impact": action["high_impact"],
-    }
-    if status == "AUTHORIZED":
-        return "CONTINUE", [step]
-    if status == "WAIT_AUTH":
-        return "WAIT_AUTH", [step]
-    if status == "BUDGET_EXIT":
-        return "BUDGET_EXIT", []
-    return "BLOCKED", []
 
 
 def _blocked(
@@ -276,14 +192,9 @@ def rebuild(
         safety_invariants=safety,
         trusted_now=trusted_now,
     )
-    if completed:
-        result, legal_next_steps = "COMPLETE", []
-    elif any(value == 0 for value in remaining.values()):
-        result, legal_next_steps = "BUDGET_EXIT", []
-    else:
-        result, legal_next_steps = _project_next_step(
-            work, attempts, evidence_items, remaining, trusted_now
-        )
+    result = "COMPLETE" if completed else "CONTINUE"
+    if any(value == 0 for value in remaining.values()) and not completed:
+        result = "BUDGET_EXIT"
     hypotheses = [
         {
             "id": f"HYP-{item['attempt_id']}",
@@ -326,7 +237,7 @@ def rebuild(
             }
             for item in attempts
         ],
-        "legal_next_steps": legal_next_steps[:3],
+        "legal_next_steps": [],
         "last_result": result,
         "rebuild": {
             "attempt_ids": attempt_ids,

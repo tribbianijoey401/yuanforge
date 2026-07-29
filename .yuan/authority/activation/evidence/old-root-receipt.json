@@ -1,0 +1,127 @@
+{
+  "schema_version": "yuan.bootstrap-receipt/v1",
+  "verifier_revision": "yuan.bootstrap-verifier/1",
+  "created_at": "2026-07-29T06:37:48.346272+00:00",
+  "manifest_path": "C:\\Users\\guangchuan\\AppData\\Local\\Temp\\yuan-m3-bootstrap-2bam4ns3\\manifest.json",
+  "manifest_sha256": "fc5b4873f839a9e71ddc69053687603a0964f6a0ede5e030196031e61065b552",
+  "suite_id": "m3-old-root-verifies-yuan-core-01",
+  "status": "PASS",
+  "reason_codes": [],
+  "checks_executed": 80,
+  "cases": [
+    {
+      "id": "valid",
+      "negative_class": null,
+      "expected": "ACCEPT",
+      "observed": "ACCEPT",
+      "matched": true,
+      "reason_codes": [],
+      "candidate_sha256": "6e3d34845ac768cee0111ede069aeb156ebb672b737872032ec529021bbc91c7",
+      "checks_executed": 4,
+      "validator": {
+        "exit_code": 0,
+        "assertions": 2,
+        "stderr": ""
+      }
+    },
+    {
+      "id": "empty",
+      "negative_class": "empty_candidate",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "matched": true,
+      "reason_codes": [
+        "EMPTY_CANDIDATE"
+      ],
+      "candidate_sha256": null,
+      "checks_executed": 1,
+      "validator": {
+        "exit_code": null,
+        "assertions": 0
+      }
+    },
+    {
+      "id": "known-bad",
+      "negative_class": "known_bad",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "matched": true,
+      "reason_codes": [
+        "CHECK_FAILED"
+      ],
+      "candidate_sha256": "37a73f4346b24cd92f7114dca18e113c8c266bf442fd9923e395ed5920f1ab80",
+      "checks_executed": 3,
+      "validator": {
+        "exit_code": 0,
+        "assertions": 1,
+        "stderr": ""
+      }
+    },
+    {
+      "id": "zero-assertions",
+      "negative_class": "zero_assertions",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "matched": true,
+      "reason_codes": [
+        "ZERO_ASSERTIONS"
+      ],
+      "candidate_sha256": "97c1a8cf53899d2077f7d25ec918f04b47803395c092528c1988dd1df3a712b3",
+      "checks_executed": 2,
+      "validator": {
+        "exit_code": 0,
+        "assertions": 0,
+        "stderr": ""
+      }
+    },
+    {
+      "id": "validator-error",
+      "negative_class": "validator_error",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "matched": true,
+      "reason_codes": [
+        "VALIDATOR_ERROR"
+      ],
+      "candidate_sha256": "75a81cb195f759b0a6fc256a29db8f9471ce966da14a75a214cc8cad7834c3b3",
+      "checks_executed": 2,
+      "validator": {
+        "exit_code": 1,
+        "assertions": 0,
+        "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\guangchuan\\AppData\\Local\\Temp\\yuan-m3-bootstrap-2bam4ns3\\validators\\error_validator.py\", line 1, in <module>\n    raise RuntimeError(\"author-visible validator failure\")\nRuntimeError: author-visible validator failure\n"
+      }
+    },
+    {
+      "id": "parse-error",
+      "negative_class": "parse_error",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "matched": true,
+      "reason_codes": [
+        "RESULT_PARSE_ERROR"
+      ],
+      "candidate_sha256": "03e3afb672b5f209b938d6caf12c33ed272fc968ae7cf7605df61656f8c988a3",
+      "checks_executed": 2,
+      "validator": {
+        "exit_code": 0,
+        "assertions": 0,
+        "stderr": ""
+      }
+    },
+    {
+      "id": "yuan-core-01-candidate",
+      "negative_class": null,
+      "expected": "ACCEPT",
+      "observed": "ACCEPT",
+      "matched": true,
+      "reason_codes": [],
+      "candidate_sha256": "146b0ed2807ff42c0c58040a7b3d27c3ab42528be33860792beed5594fb60171",
+      "checks_executed": 66,
+      "validator": {
+        "exit_code": 0,
+        "assertions": 30,
+        "stderr": ""
+      }
+    }
+  ]
+}

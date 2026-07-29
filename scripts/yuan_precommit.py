@@ -17,11 +17,22 @@ M7_SHA256 = "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4"
 LEGACY_PREFIXES = (
     "docs/",
     "contracts/",
+    "protocols/",
+    "templates/",
+    ".yuan/docs/",
+    ".yuan/platforms/",
     ".yuan/rules/",
+    ".yuan/skills/",
+    ".yuan/specs/",
 )
 EPHEMERAL_PREFIXES = (
     ".yuan-shadow/",
     ".yuan-m8-projection/",
+)
+ACTIVE_RUNTIME_PATH = re.compile(
+    r"^\.yuan-run/runs/[A-Za-z0-9._-]+/"
+    r"(?:run-memory\.json|runtime-manifest\.json|"
+    r"(?:contracts|attempts|evidence)/[A-Za-z0-9._-]+\.json)$"
 )
 
 
@@ -63,11 +74,8 @@ def check_staged_paths(authority: str, paths: list[str]) -> None:
         if authority == "core" and path.startswith(LEGACY_PREFIXES):
             raise GateError(f"legacy state/specification is read-only: {path}")
         if path.startswith(".yuan-run/") and not (
-            path == ".yuan-run/run-memory.json"
-            or path == ".yuan-run/runtime-manifest.json"
-            or path.startswith(".yuan-run/contracts/")
-            or path.startswith(".yuan-run/attempts/")
-            or path.startswith(".yuan-run/evidence/")
+            path == ".yuan-run/active-run.json"
+            or ACTIVE_RUNTIME_PATH.fullmatch(path)
         ):
             raise GateError(f"undeclared runtime path: {path}")
 
@@ -118,9 +126,9 @@ def _verify_provenance(repo: pathlib.Path) -> None:
         [
             sys.executable,
             "-B",
-            str(repo / "scripts/verify-yuan-provenance.py"),
-            "--semantic-registry-sha256",
-            M7_SHA256,
+            str(repo / "scripts/yuan_provenance_history.py"),
+            "--repo",
+            str(repo),
         ],
         cwd=repo,
         text=True,
@@ -135,7 +143,20 @@ def _verify_provenance(repo: pathlib.Path) -> None:
         receipt = json.loads(process.stdout)
     except json.JSONDecodeError as error:
         raise GateError("pinned provenance receipt is not JSON") from error
-    if receipt.get("status") != "PASS" or receipt.get("registry_sha256") != M7_SHA256:
+    assertions = receipt.get("assertions", receipt.get("semantic_records", 0))
+    if (
+        receipt.get("status") != "PASS"
+        or receipt.get("registry_sha256") != M7_SHA256
+        or receipt.get("semantic_records") != 2227
+        or receipt.get("mapped") != 2227
+        or receipt.get("source_clauses") != 2207
+        or receipt.get("included_sources") != 177
+        or receipt.get("unmapped") != 0
+        or not isinstance(assertions, int)
+        or isinstance(assertions, bool)
+        or assertions != 2227
+        or receipt.get("delta_assertions") != 9
+    ):
         raise GateError("pinned provenance receipt did not PASS")
 
 

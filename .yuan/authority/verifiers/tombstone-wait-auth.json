@@ -1,0 +1,15 @@
+{
+  "schema_version": "yuan.human-gate-verifier/v1",
+  "id": "yuan.legacy-tombstone-human-gate",
+  "revision": "1",
+  "decision": "WAIT_AUTH",
+  "required_fields": [
+    "human_identity",
+    "grant_id",
+    "authorized_paths",
+    "recovery_window",
+    "risk_acknowledgement"
+  ],
+  "minimum_assertions": 1,
+  "candidate_may_self_approve": false
+}

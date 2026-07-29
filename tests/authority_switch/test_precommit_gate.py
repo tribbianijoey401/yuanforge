@@ -28,6 +28,8 @@ class PrecommitGateTests(unittest.TestCase):
             ".yuan/rules/iron-rules.md",
             ".yuan-shadow/report.json",
             ".yuan-m8-projection/report.json",
+            ".yuan-run/contracts/legacy-work.json",
+            ".yuan-run/run-memory.json",
         ):
             with self.subTest(path=path):
                 with self.assertRaises(self.module.GateError):
@@ -40,7 +42,9 @@ class PrecommitGateTests(unittest.TestCase):
                 "AGENTS.md",
                 ".yuan/VERSION",
                 ".yuan/authority/current",
-                ".yuan-run/contracts/work.json",
+                ".yuan-run/active-run.json",
+                ".yuan-run/runs/WORK-1/contracts/work.json",
+                ".yuan-run/runs/WORK-1/runtime-manifest.json",
                 "scripts/yuan_authority.py",
                 "tests/authority_switch/test_authority_switch.py",
             ],
@@ -50,7 +54,7 @@ class PrecommitGateTests(unittest.TestCase):
         receipt = self.module.verify_gate(ROOT, staged_paths=[])
         self.assertEqual("PASS", receipt["status"])
         self.assertEqual("core", receipt["authority"])
-        self.assertEqual(4, receipt["revision"])
+        self.assertEqual(5, receipt["revision"])
 
 
 if __name__ == "__main__":

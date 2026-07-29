@@ -1,0 +1,140 @@
+{
+  "schema_version": "yuan.m8-authority-liveness-evidence/v1",
+  "task_id": "task-011-r1",
+  "source_head": "a888fdd3eb35d06fdc6ca926b37bc8dfbccddc39",
+  "status": "AUTHOR_PASS",
+  "blockers_closed": [
+    {
+      "id": "M8-HO-B01",
+      "evidence": "The active-run pointer selects an independent successor Work with typed M8, M9 dogfood, and human tombstone ACs; exact verifier bindings; bounded grant, scope, effects, and budget.",
+      "assertions": "tests/authority_switch/test_successor_run.py 3/3 PASS"
+    },
+    {
+      "id": "M8-HO-B02",
+      "evidence": "The reducer emits CONTINUE only with an authorized legal step, emits WAIT_AUTH for the ungranted tombstone, and otherwise fails closed.",
+      "assertions": ".yuan/core/0.1/tests/test_replay_pending.py 5/5 PASS"
+    },
+    {
+      "id": "M8-HO-B03",
+      "evidence": "The unchanged protocol and new candidate manifest are bound to 80 positive checks from the older root; the authority-contained verifier blob makes the proof portable.",
+      "assertions": "old Genesis root 80 checks / 7 cases PASS"
+    },
+    {
+      "id": "M8-HO-B04",
+      "evidence": "Runtime append uses immutable generations, rebuilt Memory, a resealed manifest, active-run CAS, authority CAS, and a durable recovery journal.",
+      "assertions": "tests/authority_switch/test_runtime_transaction.py 2/2 PASS"
+    },
+    {
+      "id": "M8-HO-B05",
+      "evidence": "Core pre-commit rejects docs, contracts, protocols, templates, .yuan docs/platforms/rules/skills/specs, ephemeral projections, and legacy root runtime writes.",
+      "assertions": "tests/authority_switch/test_precommit_gate.py 3/3 PASS"
+    },
+    {
+      "id": "M8-HO-B06",
+      "evidence": "Pre-commit requires exact positive 2227 records, 2207 source clauses, 177 sources, zero unmapped, 2227 assertions, and 9 delta assertions.",
+      "assertions": "frozen M7 history replay plus current delta PASS"
+    }
+  ],
+  "activation": {
+    "protocol_sha256_unchanged": "b61422bd4f76033234908fb89c149cccc0ebffd5b502e21eea5e26cd82a9c3c3",
+    "old_candidate_manifest_sha256": "20ac1cbb7f2377d5cecadf3347a40d81e14e8469c6c914701f585a49903d9768",
+    "new_candidate_manifest_sha256": "53b47a9803965be4f81f81ad4081023571af24917c132c38fa777b6d73fc91e1",
+    "older_root_verifier_sha256": "7154a335c742a39fe44c4d1d8c3e803330d75c807ef2fed39c58855d95e1d103",
+    "older_root_receipt_sha256": "6b474c3073f34cc745be4fd05be8d614517622f274bc190c0385855ab6601bf4",
+    "activation_descriptor_sha256": "b590944715e515b6533371e461bfb4afdd87d6d89ba4a75e196336d4d1cb36dd",
+    "candidate_self_trust": false
+  },
+  "provenance": {
+    "frozen_registry_sha256": "4e8d974409bf0ad2bd66df17039c8dee12b6fca03a0e2860ed5ac865615823d4",
+    "baseline_commit": "a888fdd3eb35d06fdc6ca926b37bc8dfbccddc39",
+    "baseline_tree": "5f4c95d8f9513e5a3abe9b302ec3122d84342757",
+    "history_delta_index_sha256": "b674943f4733449b838540c66281cf6e6bd0c0d933bc0414df4e500c10bc0e97",
+    "semantic_records": 2227,
+    "source_clauses": 2207,
+    "included_sources": 177,
+    "unmapped": 0,
+    "historical_assertions": 2227,
+    "delta_assertions": 9,
+    "historical_negative_tests": "11/11 PASS in baseline worktree"
+  },
+  "runtime": {
+    "legacy_archive_manifest_sha256": "a803caf92d9db6b74b67ac8ebd7e4cb76b773a46b267d07406a8298d37891fc4",
+    "legacy_archive_counts": {
+      "work": 1,
+      "attempt": 37,
+      "evidence": 37
+    },
+    "active_runtime_root": ".yuan-run/runs/WORK-yuan-m8-m9-successor-g0001-867cca673431",
+    "active_manifest_sha256": "14481ac160b7d42440ab52fa5c533159f683d598fa9025dc824043dee4fff4de",
+    "active_pointer_sha256": "52e53f00c1854736447737562708a10c58cef772346e78095c6a5dd1121025d7",
+    "active_counts": {
+      "work": 1,
+      "attempt": 1,
+      "evidence": 1
+    },
+    "memory_result": "CONTINUE",
+    "legal_next_ac": "AC-M9-SELF-MODIFICATION-DOGFOOD",
+    "tombstone_requires_new_human_grant": true
+  },
+  "authority": {
+    "revision": 5,
+    "history_length": 5,
+    "record_sha256": "4e5fd4ed37306990b535da9f5a2bc3a0158c104550c3497d36c5207eb1ab000d",
+    "pointer_sha256": "12469275bf2bb8d5fb3c7196663aef4561ee0380e384d4698495d1dbafba1c6d",
+    "single_writable_authority": true,
+    "dual_write": false
+  },
+  "adversarial": {
+    "half_write_fails_closed": true,
+    "half_write_recovery_commits": true,
+    "stale_concurrent_cas_rejected": true,
+    "tampered_generation_rejected": true,
+    "zero_count_provenance_rejected": true,
+    "legacy_specs_staging_rejected": true
+  },
+  "regression": {
+    "core_author": "37/37 PASS",
+    "authority": "8/8 PASS",
+    "distribution": "3/3 PASS",
+    "runtime_seed": "1/1 PASS",
+    "runtime_transaction": "2/2 PASS",
+    "successor": "3/3 PASS",
+    "precommit": "3/3 PASS",
+    "shadow_migration": "10/10 PASS",
+    "m6": "8/8 PASS",
+    "canary": "1/1 PASS",
+    "bootstrap": "31/31 PASS",
+    "core_held_out": "1/1 PASS",
+    "clean_checkout": "PASS: clone, authority verify, pre-commit, Core 37/37, transaction 2/2, successor 3/3, clean status"
+  },
+  "frozen_test_compatibility": {
+    "test": "tests/authority_switch/test_m8_held_out.py",
+    "test_sha256": "782b1ab31856e5b5340986d61062c273769d9c19251bea1bc0e4ebda9527c78f",
+    "not_modified": true,
+    "stale_assertions": [
+      "It treats the legacy .yuan-run root as active instead of resolving .yuan-run/active-run.json, producing seven false B01 failures.",
+      "It compares a rebuild of the active successor to the archived legacy root Memory.",
+      "It requires authority history to end exactly at revisions 1 through 4 and rejects the legitimate revision 5 successor.",
+      "After preserving the exact legacy Memory, it interprets historical CONTINUE with no steps as current despite the active successor's legal M9 step."
+    ],
+    "protocol_failure": false,
+    "reason": "The assertions encode the pre-successor storage layout. The legacy 1/37/37 bytes remain recoverable; current truth is selected by a hash-bound active-run pointer and revision-5 authority record."
+  },
+  "dirty_worktree_protection": {
+    "staged_path_count": 110,
+    "staged_path_list_sha256": "6c2e24fe2a80ad25df7a14ff9a71853502c6e853266409c85468fe4278ad2303",
+    "excluded_user_paths": [
+      ".gitignore",
+      "contracts/architect.md",
+      "contracts/backend-dev.md",
+      "contracts/doc-engineer.md",
+      "contracts/frontend-dev.md",
+      "contracts/quality-auditor.md",
+      "contracts/tester.md",
+      ".yuan/rules/test-integrity.md",
+      "docs/decisions/OPEN-DECISIONS.md",
+      ".yuan-shadow/"
+    ],
+    "legacy_or_ephemeral_paths_staged": false
+  }
+}
