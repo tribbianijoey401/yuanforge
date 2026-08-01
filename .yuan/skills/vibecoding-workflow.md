@@ -1,11 +1,23 @@
 ---
 name: vibecoding-workflow
-description: >
-  YuanForge 核心工作流。开发任何功能时加载。触发：用户说「开发」「实现」
-  「做项目」「继续」「build」、Phase 1 启动、Plan 确认后进入 Phase 2。
-  编排 12 人专家团完整流程：Product Analyst→Architect→Dev→4审查官→Tester→Doc Engineer。
-  遵循 5 份协议（.yuan/specs/）+ 十条铁律。Conductor = Workflow Interpreter。
-version: 2.0.0
+title: Vibecoding 工作流规范
+description: Vibecoding 工作流规范，迭代式开发的工作流和节奏控制
+category: vibe-coding
+stage: published
+created_at: 2026-07-21T17:36:34Z
+last_modified: 2026-07-21T17:36:34Z
+author: team-ui
+verified_by: ["team-ui"]
+tags: ["workflow", "agile", "iteration"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # YuanForge 核心工作流

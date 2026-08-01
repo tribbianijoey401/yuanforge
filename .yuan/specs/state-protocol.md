@@ -1,3 +1,26 @@
+---
+name: state-protocol
+title: 状态协议（第5协议）
+description: 状态协议，持久化状态的管理和版本控制
+category: state-protocol
+stage: published
+created_at: 2026-07-21T10:43:00Z
+last_modified: 2026-07-21T10:43:00Z
+author: framework-team
+verified_by: ["framework-team", "admin"]
+tags: ["state", "persistent", "versioning"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
+---
+
+
 # State Protocol — 状态协议
 
 > **依赖**: runtime-protocol → object-protocol

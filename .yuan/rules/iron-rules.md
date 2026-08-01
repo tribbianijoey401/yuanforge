@@ -1,9 +1,23 @@
 ---
 name: iron-rules
-description: >
-  十条铁律 + Loop Engineering 四条原则 + 根本原则
-spec_type: rule
-version: "3.0.0"
+title: YuanForge 十条铁律
+description: YuanForge 十条铁律，框架最高级别的不可违反原则
+category: rule
+stage: published
+created_at: 2026-07-24T11:47:12Z
+last_modified: 2026-07-24T11:47:12Z
+author: framework-team
+verified_by: ["admin", "E0B1EF3D1314C9D3050CC4B9E3818005"]
+tags: ["iron-rule", "constitution", "principle"]
+priority: high
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # YuanForge 铁律

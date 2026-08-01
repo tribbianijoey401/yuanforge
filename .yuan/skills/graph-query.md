@@ -1,10 +1,23 @@
 ---
 name: graph-query
-description: >
-  知识图谱查询 Skill。调用 query-graph.py 从 graph/index.json 查询相关知识摘要。
-  配合 knowledge-injection 使用：Pitfall grep 做精确匹配，图谱做扩展发现。
-  任何人都能在任何阶段调用。
-version: 1.0.0
+title: 图查询语言规范
+description: 图查询语言规范，用于查询知识图谱的 DSL 语法
+category: graph-query
+stage: published
+created_at: 2026-07-14T16:15:22Z
+last_modified: 2026-07-14T16:15:22Z
+author: team-architect
+verified_by: []
+tags: ["graph", "query", "analysis"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # Graph Query — 知识图谱查询 Skill

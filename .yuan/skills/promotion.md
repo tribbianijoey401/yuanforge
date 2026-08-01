@@ -1,7 +1,23 @@
 ---
 name: promotion
-description: "知识晋升管线 — Workspace Close 时将长期知识从 Runtime 提取到 Knowledge。FEATURE→features/, ADR→decisions/, BUG→pitfalls(if repeatable)。确定性规则：EXTRACT→VALIDATE→PROPOSE→MERGE。Conductor 在 Phase 6 执行。"
-version: 1.0.0
+title: Skill 升级与降级机制
+description: Skill 升级与降级机制，Skill 从草稿到正式发布再到降级的完整流程
+category: skill-promotion
+stage: published
+created_at: 2026-07-20T18:09:56Z
+last_modified: 2026-07-20T18:09:56Z
+author: team-lead
+verified_by: []
+tags: ["promotion", "degradation", "workflow"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # promotion — 知识晋升管线

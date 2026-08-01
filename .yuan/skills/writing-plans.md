@@ -1,12 +1,23 @@
 ---
 name: writing-plans
-description: >
-写 Implementation Plan 时加载。触发：Architect 分析完需求要做 Plan、
-用户说「写计划」「做方案」「设计架构」「Plan」、新功能启动进入设计阶段。
-产出 Pipeline-as-Code 格式的 Plan 文件，定义 Stage → Task → Gate 流水线。
-读写：ARCHITECTURE（架构参考）、PROGRESS（标记当前 Plan）、
-features/（关联功能文档）、pitfalls（避开已知坑）。
-version: 1.0.0
+title: Plan 工程化写作指南
+description: Plan 工程化写作指南，为 Architect 提供的 Plan 编写规范
+category: plan-writing
+stage: published
+created_at: 2026-07-09T15:30:19Z
+last_modified: 2026-07-09T15:30:19Z
+author: team-architect
+verified_by: ["team-architect"]
+tags: ["plan", "writing", "api-contract"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # 写 Plan Skill

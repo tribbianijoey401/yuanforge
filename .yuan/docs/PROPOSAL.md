@@ -1,9 +1,23 @@
 ---
 name: PROPOSAL
-description: >
-  文档格式规格书：提案事务格式
-spec_type: document-format
-version: "3.0.0"
+title: 提案文件格式规范
+description: 提案文件格式规范，定义功能提案的结构和内容要求
+category: proposal-format
+stage: draft
+created_at: 2026-07-21T10:37:27Z
+last_modified: 2026-07-21T10:37:27Z
+author: framework-team
+verified_by: []
+tags: ["proposal", "format", "review"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # PROPOSAL — 提案事务规格书

@@ -1,3 +1,26 @@
+---
+name: dispatch-routing
+title: 跨 Agent 路由表
+description: 跨 Agent 路由表，任务失败时的回退路由规则
+category: rule
+stage: draft
+created_at: 2026-07-21T15:46:50Z
+last_modified: 2026-07-21T15:46:50Z
+author: framework-team
+verified_by: []
+tags: ["routing", "dispatch", "coordination"]
+priority: high
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
+---
+
+
 # dispatch-routing.md — 跨 agent 路由表
 
 > 路由表随 Agent 增减 / 职责微调频繁变动，属「协调规则」而非「不变词汇」。

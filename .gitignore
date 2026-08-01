@@ -2,10 +2,3 @@ yuanforge/
 .yuan/plans/
 docs/graph/
 __pycache__/
-# Runtime-generated artifacts (ephemeral, regenerated per session)
-.yuan/runtime/metadata/
-.yuan/runtime/log/
-.yuan/runtime/shadow/logs/
-work/WORK.md
-work/STATE.md
-work/views/

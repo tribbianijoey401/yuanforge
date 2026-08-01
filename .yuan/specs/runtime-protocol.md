@@ -1,3 +1,26 @@
+---
+name: runtime-protocol
+title: 运行时协议（第4协议）
+description: 运行时协议（第5协议），运行时上下文和状态的规范
+category: runtime-protocol
+stage: published
+created_at: 2026-07-24T11:48:01Z
+last_modified: 2026-07-24T11:48:01Z
+author: framework-team
+verified_by: ["framework-team", "admin"]
+tags: ["runtime", "execution", "tick"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
+---
+
+
 # Runtime Protocol — 运行时层协议
 
 > **依赖**: workflow-protocol
@@ -34,7 +57,7 @@ Runtime 层不回答的问题：
 task:
   id: "T02"
   goal: "auth-module"
-  description: "实现注册 API"
+  description: 运行时协议（第5协议），运行时上下文和状态的规范
   owner: "Backend Dev"
   depends_on: ["T01"]
   status: "READY"

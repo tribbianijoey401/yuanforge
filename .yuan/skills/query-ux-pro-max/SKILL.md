@@ -1,7 +1,23 @@
 ---
 name: query-ux-pro-max
-description: 查询 UI-UX-Pro-Max 行业设计知识库，获取特定行业的 UI 惯例、风格推荐和 UX 指南。不凭记忆猜测行业 UX 惯例。
-trigger: UI Designer 或 UX Reviewer 遇到特定行业/产品类型的 UX 惯例不确定时调用
+title: Query UX Pro Max 查询交互规范
+description: Query UX Pro Max 查询交互规范，高级查询交互的最佳实践和设计模式
+category: query-ux
+stage: published
+created_at: 2026-07-08T19:19:02Z
+last_modified: 2026-07-08T19:19:02Z
+author: team-ui
+verified_by: ["team-ui"]
+tags: ["query", "ux", "interaction-design"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # Query UX Pro Max — 行业 UX 知识查询

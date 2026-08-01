@@ -1,9 +1,23 @@
 ---
 name: plan-format
-description: >
-  Plan 工程化格式规范（含 Dispatch Table）
-spec_type: rule
-version: "3.0.0"
+title: Plan 工程化格式规范
+description: Plan 工程化格式规范，Architect 产出 Plan 的精确格式要求
+category: rule
+stage: published
+created_at: 2026-07-21T15:39:07Z
+last_modified: 2026-07-21T15:39:07Z
+author: team-architect
+verified_by: ["team-architect"]
+tags: ["plan", "format", "api-contract"]
+priority: high
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # Plan 工程化格式规范

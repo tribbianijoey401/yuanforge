@@ -1,10 +1,23 @@
 ---
 name: subagent-driven-development
-description: >
-  Phase 2-5 执行引擎。Conductor 按调度循环派发 Task 到 12 人专家团。
-  触发：Plan 确认后进入 Phase 2、用户说「执行 Plan」「开始实现」。
-  管理 TASK_BOARD、派发 Subagent（并行 Dev → 并行 4 审查官 → Tester → Doc Engineer）。
-version: 2.0.0
+title: 子代理驱动开发模式
+description: 子代理驱动开发模式，Conductor 如何向子 Agent 派发任务
+category: subagent-dev
+stage: published
+created_at: 2026-07-21T15:39:07Z
+last_modified: 2026-07-21T15:39:07Z
+author: team-conductor
+verified_by: ["team-conductor"]
+tags: ["subagent", "delegation", "orchestration"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # Subagent 驱动开发 Skill

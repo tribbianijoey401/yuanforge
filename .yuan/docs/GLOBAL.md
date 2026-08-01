@@ -1,9 +1,23 @@
 ---
 name: GLOBAL
-description: >
-  文档格式规格书：全局文档与 knowledge/ 格式
-spec_type: document-format
-version: "3.0.0"
+title: 全局上下文管理规范
+description: 全局上下文管理规范，定义会话间上下文传递的规则和边界
+category: global-context
+stage: published
+created_at: 2026-07-21T10:37:27Z
+last_modified: 2026-07-21T10:37:27Z
+author: framework-team
+verified_by: []
+tags: ["context", "global", "management"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # GLOBAL — 全局文档规格书

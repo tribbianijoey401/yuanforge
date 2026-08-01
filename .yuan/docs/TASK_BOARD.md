@@ -1,9 +1,23 @@
 ---
 name: TASK_BOARD
-description: >
-  文档格式规格书：多 Agent 任务板
-spec_type: document-format
-version: "3.0.0"
+title: 多 Agent 任务板共享规格书
+description: 多 Agent 协作任务板共享规格书，定义任务状态机、上下文传递和故障处理机制
+category: task-board
+stage: published
+created_at: 2026-07-22T15:37:54Z
+last_modified: 2026-07-22T15:37:54Z
+author: framework-team
+verified_by: ["admin", "E0B1EF3D1314C9D3050CC4B9E3818005"]
+tags: ["task-board", "coordination", "state-machine"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # TASK_BOARD — 多 Agent 共享任务文档规格书

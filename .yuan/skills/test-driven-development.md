@@ -1,11 +1,23 @@
 ---
 name: test-driven-development
-description: >
-  Dev 写代码时加载。触发：Phase 2 执行 Task、Dev subagent 启动、
-  用户说「写测试」「TDD」、需要写实现代码。强制 Red→Green→Refactor 循环，
-  禁止先写代码后补测试。读写：features/当前（更新修改文件表）、
-  CONVENTIONS（代码规范）、bugs/（测试失败时记录 Bug 文档）。
-version: 1.0.0
+title: 测试驱动开发规范
+description: 测试驱动开发规范，Red-Green-Refactor 流程的详细指引
+category: tdd
+stage: published
+created_at: 2026-07-09T17:47:11Z
+last_modified: 2026-07-09T17:47:11Z
+author: team-tester
+verified_by: ["team-tester"]
+tags: ["tdd", "testing", "red-green-refactor"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # TDD Skill

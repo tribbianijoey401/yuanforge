@@ -1,11 +1,23 @@
 ---
 name: requesting-code-review
-description: >
-  代码审查 Skill。4 审查官并行：Spec Reviewer (🔴Blocker) + Security Auditor (🔴Blocker)
-  + Quality Auditor (🟢Advisory↗) + UX Reviewer (🟢Advisory↗)。
-  触发：Phase 4 质量层、Dev 完成 Task 后、用户说「审查」「review」。
-  所有审查官双轨运行（合规路径 + 对抗路径），报告独立呈现。
-version: 2.0.0
+title: 代码审查请求流程
+description: 代码审查请求流程，如何规范地发起代码审查
+category: code-review
+stage: published
+created_at: 2026-07-21T15:39:07Z
+last_modified: 2026-07-21T15:39:07Z
+author: team-spec-reviewer
+verified_by: []
+tags: ["code-review", "pr", "quality-assurance"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # 代码审查 Skill

@@ -1,9 +1,23 @@
 ---
 name: GRAPH
-description: >
-  文档格式规格书：知识图谱格式
-spec_type: document-format
-version: "3.0.0"
+title: 数据流图绘制规范
+description: 数据流图绘制规范，定义系统数据流的可视化表达方式
+category: data-flow-graph
+stage: published
+created_at: 2026-07-21T10:37:27Z
+last_modified: 2026-07-21T10:37:27Z
+author: framework-team
+verified_by: []
+tags: ["graph", "diagram", "visualization"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # GRAPH — 知识图谱规格书

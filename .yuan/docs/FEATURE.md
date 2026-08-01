@@ -1,9 +1,23 @@
 ---
 name: FEATURE
-description: >
-  文档格式规格书：会话特性文件
-spec_type: document-format
-version: "3.0.0"
+title: 功能文档规格书
+description: 功能文档规格书，定义用户故事和验收标准的写作规范
+category: feature-definition
+stage: published
+created_at: 2026-07-21T15:39:07Z
+last_modified: 2026-07-21T15:39:07Z
+author: framework-team
+verified_by: []
+tags: ["feature", "definition", "user-stories"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # FEATURE — 需求规格书
