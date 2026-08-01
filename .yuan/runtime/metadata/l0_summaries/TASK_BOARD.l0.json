@@ -1,0 +1,20 @@
+{
+  "name": "TASK_BOARD",
+  "title": "多 Agent 任务板共享规格书",
+  "category": "task-board",
+  "stage": "published",
+  "tags": [
+    "task-board",
+    "coordination",
+    "state-machine"
+  ],
+  "priority": 3,
+  "author": "framework-team",
+  "description_excerpt": "多 Agent 协作任务板共享规格书，定义任务状态机、上下文传递和故障处理机制",
+  "last_modified": "",
+  "read_me_first": [
+    "<SECTION-END:tb-6>",
+    "## 目的",
+    "TASK_BOARD.md 是多 Agent 协作的**唯一真相源**。"
+  ]
+}

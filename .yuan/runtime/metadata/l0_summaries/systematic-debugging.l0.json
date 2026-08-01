@@ -1,0 +1,22 @@
+{
+  "name": "systematic-debugging",
+  "title": "系统性调试协议",
+  "description": "系统性调试协议，Debug 的标准流程和诊断方法",
+  "category": "debugging",
+  "stage": "published",
+  "created_at": "2026-07-09T17:47:11Z",
+  "last_modified": "2026-07-09T17:47:11Z",
+  "author": "team-tester",
+  "verified_by": [
+    ""
+  ],
+  "tags": [
+    "debugging",
+    "diagnosis",
+    "troubleshooting"
+  ],
+  "priority": 3,
+  "metadata": {},
+  "full_path": ".yuan/skills/systematic-debugging.md",
+  "excerpt": "name: systematic-debugging\ntitle: 系统性调试协议\ndescription: 系统性调试协议，Debug 的标准流程和诊断方法\ncategory: debugging\nstage: published\ncreated_at: 2026-07-09T17:47:11Z\nlast_modified: 2026-07-09T17:47:11Z\nauthor: team-t"
+}

@@ -1,0 +1,20 @@
+{
+  "name": "FEATURE",
+  "title": "功能文档规格书",
+  "category": "feature-definition",
+  "stage": "published",
+  "tags": [
+    "feature",
+    "definition",
+    "user-stories"
+  ],
+  "priority": 3,
+  "author": "framework-team",
+  "description_excerpt": "功能文档规格书，定义用户故事和验收标准的写作规范",
+  "last_modified": "",
+  "read_me_first": [
+    "<SECTION-END:feat-purpose>",
+    "## 目的",
+    "FEATURE.md 是需求的**单一真相源**（铁律Ⅵ）。承载 Product Analyst 的 5 维度澄清产出，供 Architect 作为设计输入。"
+  ]
+}

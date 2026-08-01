@@ -1,0 +1,20 @@
+{
+  "name": "graph-query",
+  "title": "图查询语言规范",
+  "category": "graph-query",
+  "stage": "published",
+  "tags": [
+    "graph",
+    "query",
+    "analysis"
+  ],
+  "priority": "medium",
+  "author": "team-architect",
+  "description_excerpt": "图查询语言规范，用于查询知识图谱的 DSL 语法",
+  "last_modified": "",
+  "read_me_first": [
+    "## 触发条件",
+    "## 执行步骤",
+    "### 步骤 1：调用查询脚本"
+  ]
+}

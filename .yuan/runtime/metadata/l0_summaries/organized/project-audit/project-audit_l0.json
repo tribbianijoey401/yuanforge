@@ -1,0 +1,20 @@
+{
+  "name": "project-audit",
+  "title": "项目审计流程",
+  "category": "project-audit",
+  "stage": "published",
+  "tags": [
+    "audit",
+    "security",
+    "compliance"
+  ],
+  "priority": "medium",
+  "author": "team-security-auditor",
+  "description_excerpt": "项目审计流程，Security Auditor 和 Quality Auditor 的审计工作流",
+  "last_modified": "",
+  "read_me_first": [
+    "## 触发条件",
+    "用户说以下任何一句时激活：",
+    "## 审计流程（7 步）"
+  ]
+}

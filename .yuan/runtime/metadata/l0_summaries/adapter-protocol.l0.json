@@ -1,0 +1,20 @@
+{
+  "name": "adapter-protocol",
+  "title": "适配器协议（第2协议）",
+  "category": "adapter-protocol",
+  "stage": "published",
+  "tags": [
+    "adapter",
+    "platform",
+    "mapping"
+  ],
+  "priority": 3,
+  "author": "framework-team",
+  "description_excerpt": "适配器协议（第3协议），平台适配器的规范",
+  "last_modified": "",
+  "read_me_first": [
+    ">",
+    "## 一、设计原则",
+    "YuanForge 不构建 Runtime。"
+  ]
+}

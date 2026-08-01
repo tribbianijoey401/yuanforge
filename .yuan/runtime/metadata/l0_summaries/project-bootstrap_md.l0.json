@@ -1,0 +1,16 @@
+{
+  "name": "project-bootstrap",
+  "title": "",
+  "category": "",
+  "stage": "",
+  "tags": [],
+  "priority": 5,
+  "author": "",
+  "description_excerpt": ">",
+  "last_modified": "",
+  "read_me_first": [
+    "## 触发条件",
+    "用户说以下任何一句时激活：",
+    "激活后判断模式："
+  ]
+}

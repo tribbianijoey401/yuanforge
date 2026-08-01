@@ -1,0 +1,20 @@
+{
+  "name": "promotion",
+  "title": "Skill 升级与降级机制",
+  "category": "skill-promotion",
+  "stage": "published",
+  "tags": [
+    "promotion",
+    "degradation",
+    "workflow"
+  ],
+  "priority": "medium",
+  "author": "team-lead",
+  "description_excerpt": "Skill 升级与降级机制，Skill 从草稿到正式发布再到降级的完整流程",
+  "last_modified": "",
+  "read_me_first": [
+    "## 一、设计原则",
+    "当前（LLM 驱动）:",
+    "Conductor 读完 Workspace → 自己判断\"哪些值得蒸馏\" → 手动创建 knowledge/ 文件"
+  ]
+}

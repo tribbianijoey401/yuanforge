@@ -1,0 +1,20 @@
+{
+  "name": "role-switch",
+  "title": "角色切换协议",
+  "category": "role-switching",
+  "stage": "published",
+  "tags": [
+    "role-switch",
+    "tier-delegation",
+    "fallback"
+  ],
+  "priority": 3,
+  "author": "team-conductor",
+  "description_excerpt": "角色切换协议，Tier 3 模式下的角色切换机制和上下文重建",
+  "last_modified": "",
+  "read_me_first": [
+    "## 何时触发",
+    "## 协议流程",
+    "### Conductor → 目标 Agent"
+  ]
+}

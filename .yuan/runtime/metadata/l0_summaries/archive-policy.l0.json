@@ -1,0 +1,18 @@
+{
+  "name": "archivepolicy",
+  "title": "Archive Policy — Workspace 归档规则",
+  "description": "e 时）。",
+  "category": "doc",
+  "stage": "published",
+  "created_at": "2026-07-27T17:11:00Z",
+  "last_modified": "2026-07-27T17:11:00Z",
+  "author": "framework-team",
+  "verified_by": [],
+  "tags": [
+    "doc"
+  ],
+  "priority": 5,
+  "metadata": {},
+  "full_path": "docs/policies/archive-policy.md",
+  "excerpt": "Archive Policy — Workspace 归档规则\n\n> **适用范围**：Workspace 关闭后的归档操作。\n> **执行者**：Conductor（Workspace Close 时）。\n\n\n\n 一、归档时机\n\n| 触发条件 | 行为 |\n|||\n| 所有 Task 终态 + 蒸馏完成 | 立即归档 Workspace → `archive/` |\n| Workspace 超过"
+}

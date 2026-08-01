@@ -1,0 +1,20 @@
+{
+  "name": "state-protocol",
+  "title": "状态协议（第5协议）",
+  "category": "state-protocol",
+  "stage": "published",
+  "tags": [
+    "state",
+    "persistent",
+    "versioning"
+  ],
+  "priority": "medium",
+  "author": "framework-team",
+  "description_excerpt": "状态协议，持久化状态的管理和版本控制",
+  "last_modified": "",
+  "read_me_first": [
+    ">",
+    ">",
+    "## 一、设计原则"
+  ]
+}

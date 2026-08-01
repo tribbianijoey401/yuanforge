@@ -1,0 +1,38 @@
+{
+  "total_reads": 4,
+  "last_updated": "2026-07-24T2026-07-27T16:23:47Z",
+  "most_read_documents": [
+    {
+      "path": "docs/TASK_BOARD.md",
+      "count": 1,
+      "last_read_at": "2026-07-27T17:05:24Z"
+    },
+    {
+      "path": "specs/action-protocol.md",
+      "count": 1,
+      "last_read_at": "2026-07-27T17:16:41Z"
+    },
+    {
+      "path": "specs/state-protocol.md",
+      "count": 1,
+      "last_read_at": "2026-07-27T17:16:41Z"
+    },
+    {
+      "path": "specs/workflow-protocol.md",
+      "count": 1,
+      "last_read_at": "2026-07-27T17:16:41Z"
+    }
+  ],
+  "recent_activity": {
+    "today": {
+      "reads": 4,
+      "writes": 0,
+      "skills_executed": 0
+    },
+    "this_week": {
+      "reads": 0,
+      "writes": 0,
+      "skills_executed": 0
+    }
+  }
+}

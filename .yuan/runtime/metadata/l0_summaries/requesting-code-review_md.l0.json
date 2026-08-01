@@ -1,0 +1,20 @@
+{
+  "name": "requesting-code-review",
+  "title": "代码审查请求流程",
+  "category": "code-review",
+  "stage": "published",
+  "tags": [
+    "code-review",
+    "pr",
+    "quality-assurance"
+  ],
+  "priority": 3,
+  "author": "team-spec-reviewer",
+  "description_excerpt": "代码审查请求流程，如何规范地发起代码审查",
+  "last_modified": "",
+  "read_me_first": [
+    "## 触发条件",
+    "## 四审查官并行",
+    "Dev Task ✅完成"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "docs-framework",
+  "title": "文档框架规则",
+  "category": "doc",
+  "stage": "published",
+  "tags": [
+    "docs",
+    "framework",
+    "structure"
+  ],
+  "priority": "medium",
+  "author": "framework-team",
+  "description_excerpt": "文档框架规则，docs/ 目录的组织结构和命名规范",
+  "last_modified": "",
+  "read_me_first": [
+    "## 核心定位",
+    "docs/ = 项目的结构化知识网络",
+    "### 知识分层原则（← NF-06 吸收）"
+  ]
+}

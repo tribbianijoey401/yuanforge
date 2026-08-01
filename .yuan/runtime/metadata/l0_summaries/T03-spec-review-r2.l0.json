@@ -1,0 +1,18 @@
+{
+  "name": "T03specreviewr2",
+  "title": "# Spec Review: T01-T02（复审）",
+  "description": "| 恢复仅接受 `PROGRESS.md` 指向、未归档且包含 `TASK_BOARD.md` 的 Workspace；明确禁止目录扫描推断。 |",
+  "category": "doc",
+  "stage": "published",
+  "created_at": "2026-07-27T17:11:00Z",
+  "last_modified": "2026-07-27T17:11:00Z",
+  "author": "framework-team",
+  "verified_by": [],
+  "tags": [
+    "doc"
+  ],
+  "priority": 5,
+  "metadata": {},
+  "full_path": "docs/archive/20260717-framework-audit/T03-spec-review-r2.md",
+  "excerpt": "Spec Review: T01-T02（复审）\n\n| 验收标准 | 结果 | 备注 |\n||||\n| 已结束会话不会被恢复流程误判为活动会话 | ✅ | 恢复仅接受 `PROGRESS.md` 指向、未归档且包含 `TASK_BOARD.md` 的 Workspace；明确禁止目录扫描推断。 |\n| DocsOS 路径唯一且存在 | ✅ | 旧全局文档路径已清除；陷阱知识已迁移为带 frontm"
+}
