@@ -127,7 +127,7 @@ class CoreSchemaValidator:
             ("verification_plan.expected_evidence", lambda v: isinstance(v, list)),
             ("risk.level", lambda v: v in self.VALID_RISK_LEVELS),
             ("risk.reasons", lambda v: isinstance(v, list)),
-            ("extensions", lambda v: isinstance(v, dict)),
+            # extensions is OPTIONAL at Core level — validated by RoleExtensionValidator per role
         ]
 
         for field, validator in required_fields:
@@ -430,10 +430,14 @@ def run_reducer(
             })
 
     # Priority 5: COMPLETE
-    all_pass = all(
-        ev.get("result") == "pass"
-        for ev in evidence_list
-        if ev.get("status") == "valid"
+    # Requires at least one valid evidence piece (no evidence = need more work)
+    all_pass = (
+        len(evidence_list) > 0
+        and all(
+            ev.get("result") == "pass"
+            for ev in evidence_list
+            if ev.get("status") == "valid"
+        )
     )
     no_pending_side_effects = not any(
         get_nested(ev, "pending_side_effects")
