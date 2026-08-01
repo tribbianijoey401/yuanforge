@@ -1,13 +1,23 @@
 ---
 name: systematic-debugging
-description: >
-遇到 Bug 或异常时加载。触发：测试失败、用户报 Bug、Agent 遇到错误、
-Tester 发现回归、Reviewer 发现代码问题需要追根因。
-4 阶段系统调试法：复现→定位→根因→修复。核心价值是追溯 Bug 到
-对应的 Feature 文档和 ADR 决策，理解原始设计意图后再修复。
-读写：bugs/（创建/补充 Bug 文档）、features/关联（追溯到引入的 Feature）、
-pitfalls（新坑记录）、ARCHITECTURE（理解系统结构）。
-version: 1.0.0
+title: 系统性调试协议
+description: 系统性调试协议，Debug 的标准流程和诊断方法
+category: debugging
+stage: published
+created_at: 2026-07-09T17:47:11Z
+last_modified: 2026-07-09T17:47:11Z
+author: team-tester
+verified_by: []
+tags: ["debugging", "diagnosis", "troubleshooting"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # 系统调试 Skill

@@ -1,14 +1,28 @@
 ---
 name: seam-agreement
-description: >
-  Seam 预约定：代码合并边界规范
-spec_type: rule
-version: "3.0.0"
+title: Seam 预约定：前后端接口契约
+description: Seam 预约定，前后端接口契约的规范模板
+category: rule
+stage: published
+created_at: 2026-07-24T11:48:18Z
+last_modified: 2026-07-24T11:48:18Z
+author: team-front-end-backend
+verified_by: ["frontend-dev", "backend-dev"]
+tags: ["seam", "agreement", "interface-contract"]
+priority: high
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 ---
 name: seam-agreement
-description: 前后端接口契约约定 — 前后端 Dev 共享的唯一真相源。首次使用时由前后端 Dev 协商填写。
+description: Seam 预约定，前后端接口契约的规范模板
 version: 1.0.0
 ---
 

@@ -1,0 +1,18 @@
+{
+  "name": "CONVENTIONS",
+  "title": "📐 规范约定 (CONVENTIONS.md)",
+  "description": "类型 | 规范 | 示例 |",
+  "category": "doc",
+  "stage": "published",
+  "created_at": "2026-07-27T17:11:00Z",
+  "last_modified": "2026-07-27T17:11:00Z",
+  "author": "framework-team",
+  "verified_by": [],
+  "tags": [
+    "doc"
+  ],
+  "priority": 5,
+  "metadata": {},
+  "full_path": "docs/CONVENTIONS.md",
+  "excerpt": "📐 规范约定 (CONVENTIONS.md)\n\n> **本文件回答：\"怎么写代码才算对？\"**\n> 写代码前必读。全体 Agent 共同维护。\n\n\n\n 代码规范\n\n 命名\n\n| 类型 | 规范 | 示例 |\n||||\n| 文件 | 小写 + 连字符 | `user-auth.ts`, `user_model.py` |\n| 类 | PascalCase | `UserAuth`, `UserMo"
+}

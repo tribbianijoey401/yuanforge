@@ -1,0 +1,22 @@
+{
+  "name": "requesting-code-review",
+  "title": "代码审查请求流程",
+  "description": "代码审查请求流程，如何规范地发起代码审查",
+  "category": "code-review",
+  "stage": "published",
+  "created_at": "2026-07-21T15:39:07Z",
+  "last_modified": "2026-07-21T15:39:07Z",
+  "author": "team-spec-reviewer",
+  "verified_by": [
+    ""
+  ],
+  "tags": [
+    "code-review",
+    "pr",
+    "quality-assurance"
+  ],
+  "priority": 3,
+  "metadata": {},
+  "full_path": ".yuan/skills/requesting-code-review.md",
+  "excerpt": "name: requesting-code-review\ntitle: 代码审查请求流程\ndescription: 代码审查请求流程，如何规范地发起代码审查\ncategory: code-review\nstage: published\ncreated_at: 2026-07-21T15:39:07Z\nlast_modified: 2026-07-21T15:39:07Z\nauthor: team-"
+}

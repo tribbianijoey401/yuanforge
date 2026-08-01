@@ -1,0 +1,39 @@
+# Yuan Core Baseline Lock
+
+**Format:** yuan.core.baseline/v1  
+**Generated:** 2026-07-31  
+**Version:** 0.1
+
+## Purpose
+
+This lock file records the canonical hash of the entire `.yuan/core/` directory tree, establishing a fixed baseline that all subsequent operations must respect unless explicitly superseded by an approved Change.
+
+## Canonical Hash
+
+```
+sha256:a005c637d50296f4b2b80083010e3f9be0d33ba9dafca73a138ecd262b3c2bcb
+```
+
+> This hash is computed from all `.md` files under `.yuan/core/` (excluding BASELINE.lock itself), sorted lexicographically, with concatenated sha256sum outputs.
+
+## Hash Calculation Method
+
+1. Recursively list all files under `.yuan/core/` (excluding BASELINE.lock itself)
+2. Sort filenames lexicographically
+3. For each file, compute `sha256sum` output (hash + space + newline + filename)
+4. Concatenate all lines in order
+5. Compute SHA256 of the concatenated stream
+
+The resulting hash becomes the canonical baseline for this Core version.
+
+## Validation Rule
+
+Any deviation from this baseline must go through the Change schema process. The Reducer shall reject any Proposal that modifies Core files without an approved Change record referencing this baseline lock.
+
+Violations of this baseline trigger invariant **I7** (Core Trust Boundary protection).
+
+## History
+
+| Revision | Hash | Author | Date | Description |
+|----------|------|--------|------|-------------|
+| 0 | a005c637d50296f4b2b80083010e3f9be0d33ba9dafca73a138ecd262b3c2bcb | Migration Automation | 2026-07-31 | Initial Core skeleton creation (Phase 1) |

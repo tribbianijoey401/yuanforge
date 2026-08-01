@@ -1,0 +1,18 @@
+{
+  "name": "T03specreview",
+  "title": "# Spec Review: T01-T02",
+  "description": "GENTS.md` 仍要求扫描 `docs/YYYYMMDD-*`；未定义“活跃”的可判定条件，历史目录仍可能触发恢复提示。 |",
+  "category": "doc",
+  "stage": "published",
+  "created_at": "2026-07-27T17:11:00Z",
+  "last_modified": "2026-07-27T17:11:00Z",
+  "author": "framework-team",
+  "verified_by": [],
+  "tags": [
+    "doc"
+  ],
+  "priority": 5,
+  "metadata": {},
+  "full_path": "docs/archive/20260717-framework-audit/T03-spec-review.md",
+  "excerpt": "Spec Review: T01-T02\n\n| 验收标准 | 结果 | 备注 |\n||||\n| 已结束会话不会被恢复流程误判为活动会话 | ❌ | `AGENTS.md` 仍要求扫描 `docs/YYYYMMDD-*`；未定义“活跃”的可判定条件，历史目录仍可能触发恢复提示。 |\n| DocsOS 路径唯一且存在 | ✅ | 关键规则、合约、协议与 Memory Skill 已指向存在的 Docs"
+}

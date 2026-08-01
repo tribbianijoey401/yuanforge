@@ -1,3 +1,26 @@
+---
+name: contract-conventions
+title: 合约约定规范
+description: 合约约定规范，跨 Agent 约定的词汇和通用术语
+category: rule
+stage: published
+created_at: 2026-07-22T10:51:58Z
+last_modified: 2026-07-22T10:51:58Z
+author: framework-team
+verified_by: []
+tags: ["contract", "convention", "cross-agent"]
+priority: high
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
+---
+
+
 # contract-conventions.md — 角色层共享规约（只放真正不变的部分）
 
 > 本文件只承载「跨 agent 不变」的词汇与要求。各 agent 的**具体规则**（执行权限、冻结基准、对抗目标、输出列、门禁阈值、路由条目）写在各自合约里，**创建时定下**（见 `templates/role-contract.md`）。

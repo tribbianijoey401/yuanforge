@@ -1,11 +1,23 @@
 ---
 name: project-memory
-description: >
-  维护 YuanForge 的 .yuan/docs/ 项目记忆体系时加载。触发：Phase 4 回顾、
-  需要归档 PITFALLS、写 SESSION_LOG、维护框架级记忆。负责 6 份 Memory 文件
-  的生命周期管理。注意：这是框架层记忆，不是项目 docs/（项目层规范见
-  .yuan/docs/）。
-version: 2.0.0
+title: 项目记忆管理机制
+description: 项目记忆管理机制，跨会话的项目状态持久化策略
+category: project-memory
+stage: published
+created_at: 2026-07-20T18:14:33Z
+last_modified: 2026-07-20T18:14:33Z
+author: team-doc-engineer
+verified_by: []
+tags: ["memory", "state-persistence", "checkpoint"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # 项目记忆管理

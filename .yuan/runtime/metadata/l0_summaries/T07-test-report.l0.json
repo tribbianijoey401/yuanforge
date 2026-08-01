@@ -1,0 +1,18 @@
+{
+  "name": "T07testreport",
+  "title": "# 测试报告：YuanForge 框架逻辑审计修复",
+  "description": "ipts/pre-commit` | ✅ 通过 |",
+  "category": "doc",
+  "stage": "published",
+  "created_at": "2026-07-27T17:11:00Z",
+  "last_modified": "2026-07-27T17:11:00Z",
+  "author": "framework-team",
+  "verified_by": [],
+  "tags": [
+    "doc"
+  ],
+  "priority": 5,
+  "metadata": {},
+  "full_path": "docs/archive/20260717-framework-audit/T07-test-report.md",
+  "excerpt": "测试报告：YuanForge 框架逻辑审计修复\n\n| 检查项 | 结果 |\n|--||\n| Python 编译：`scripts/build-graph.py`、`scripts/pre-commit` | ✅ 通过 |\n| Graph 完整性：`python scripts/build-graph.py --check` | ✅ 通过 |\n| Graph 统计 | ✅ 3 个节点，0 条边 |\n"
+}

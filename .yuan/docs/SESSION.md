@@ -1,9 +1,23 @@
 ---
 name: SESSION
-description: >
-  文档格式规格书：Workspace 会话文件
-spec_type: document-format
-version: "3.0.0"
+title: Workspace 会话文件格式规范
+description: Workspace 会话文件夹格式规范，定义会话命名规则和目录结构
+category: session-workspace
+stage: published
+created_at: 2026-07-21T10:37:27Z
+last_modified: 2026-07-21T10:37:27Z
+author: framework-team
+verified_by: ["admin"]
+tags: ["session", "workspace", "recovery"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # SESSION — 会话文档规格书

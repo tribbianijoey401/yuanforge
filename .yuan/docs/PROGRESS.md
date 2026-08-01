@@ -1,9 +1,23 @@
 ---
 name: PROGRESS
-description: >
-  文档格式规格书：进度中枢格式
-spec_type: document-format
-version: "3.0.0"
+title: 会话进度追踪与恢复机制
+description: 会话进度追踪与恢复机制，定义 PROGRESS.md 的格式和用途
+category: progress-tracking
+stage: published
+created_at: 2026-07-21T10:37:27Z
+last_modified: 2026-07-21T10:37:27Z
+author: framework-team
+verified_by: ["admin"]
+tags: ["progress", "tracking", "state"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # PROGRESS — 进度中枢规格书

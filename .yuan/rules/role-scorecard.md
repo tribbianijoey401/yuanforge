@@ -1,3 +1,26 @@
+---
+name: role-scorecard
+title: 角色规范符合性审计评分卡
+description: 角色规范符合性审计评分卡，各 Agent 角色的 7 原理评分标准
+category: doc
+stage: published
+created_at: 2026-07-24T11:50:43Z
+last_modified: 2026-07-24T11:50:43Z
+author: framework-team
+verified_by: []
+tags: ["scorecard", "audit", "quality-assurance"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
+---
+
+
 # role-scorecard.md — 角色规范符合性审计
 
 > 定位：审计 instrument，**不是规则制定处**。各 agent 的门禁/执行权限/对抗要求已在创建时（role-contract.md）固化进合约；本卡只**核查创建是否做对**。

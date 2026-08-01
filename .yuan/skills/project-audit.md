@@ -1,12 +1,23 @@
 ---
 name: project-audit
-description: >
-审计现有项目，填充 YuanForge docs/ 说明书。触发：用户说「审计项目」
-「接手项目」「了解现有项目」「嫁接 YuanForge」「填充说明书」「分析现有代码」
-「项目审计」。也用于 project-bootstrap 的嫁接模式。
-读取项目全部代码，填写 PROGRESS/ARCHITECTURE/decisions/glossary/
-pitfalls/features/SETUP/CONVENTIONS。产出审计报告，列出 docs/ 与实际代码的差异。
-version: 1.0.0
+title: 项目审计流程
+description: 项目审计流程，Security Auditor 和 Quality Auditor 的审计工作流
+category: project-audit
+stage: published
+created_at: 2026-07-09T15:31:09Z
+last_modified: 2026-07-09T15:31:09Z
+author: team-security-auditor
+verified_by: []
+tags: ["audit", "security", "compliance"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # 项目审计 Skill

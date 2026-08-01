@@ -1,3 +1,26 @@
+---
+name: adapter-protocol
+title: 适配器协议（第2协议）
+description: 适配器协议（第3协议），平台适配器的规范
+category: adapter-protocol
+stage: published
+created_at: 2026-07-21T10:43:00Z
+last_modified: 2026-07-21T10:43:00Z
+author: framework-team
+verified_by: ["framework-team", "admin"]
+tags: ["adapter", "platform", "mapping"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
+---
+
+
 # Adapter Protocol — 平台适配协议
 
 > **依赖**: runtime-protocol → action-protocol

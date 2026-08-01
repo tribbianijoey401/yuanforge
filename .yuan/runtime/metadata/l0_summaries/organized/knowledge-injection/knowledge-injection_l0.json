@@ -1,0 +1,20 @@
+{
+  "name": "knowledge-injection",
+  "title": "知识注入协议",
+  "category": "knowledge-injection",
+  "stage": "published",
+  "tags": [
+    "knowledge-injection",
+    "context-summarization",
+    "pitfall-awareness"
+  ],
+  "priority": "medium",
+  "author": "team-conductor",
+  "description_excerpt": "知识注入协议，AI 框架中的知识蒸馏与上下文注入机制",
+  "last_modified": "",
+  "read_me_first": [
+    "## 触发条件",
+    "## 执行步骤",
+    "### 步骤 1：提取 Task 模块标签"
+  ]
+}

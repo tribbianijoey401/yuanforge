@@ -1,0 +1,20 @@
+{
+  "name": "runtime-protocol",
+  "title": "运行时协议（第4协议）",
+  "category": "runtime-protocol",
+  "stage": "published",
+  "tags": [
+    "runtime",
+    "execution",
+    "tick"
+  ],
+  "priority": 3,
+  "author": "framework-team",
+  "description_excerpt": "运行时协议（第5协议），运行时上下文和状态的规范",
+  "last_modified": "",
+  "read_me_first": [
+    ">",
+    "## 一、设计第一性原理",
+    "Runtime 层回答的问题："
+  ]
+}

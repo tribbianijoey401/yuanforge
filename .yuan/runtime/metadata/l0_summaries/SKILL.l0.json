@@ -1,0 +1,22 @@
+{
+  "name": "debug-feedback-loop",
+  "title": "调试反馈循环协议",
+  "description": "调试反馈循环，调试过程中的反馈回路和问题定位方法",
+  "category": "debugging",
+  "stage": "published",
+  "created_at": "2026-07-08T18:15:40Z",
+  "last_modified": "2026-07-08T18:15:40Z",
+  "author": "team-tester",
+  "verified_by": [
+    "team-tester"
+  ],
+  "tags": [
+    "debug",
+    "feedback",
+    "cycle"
+  ],
+  "priority": 3,
+  "metadata": {},
+  "full_path": ".yuan/skills/debug-feedback-loop/SKILL.md",
+  "excerpt": "name: debug-feedback-loop\ntitle: 调试反馈循环协议\ndescription: 调试反馈循环，调试过程中的反馈回路和问题定位方法\ncategory: debugging\nstage: published\ncreated_at: 2026-07-08T18:15:40Z\nlast_modified: 2026-07-08T18:15:40Z\nauthor: team-t"
+}

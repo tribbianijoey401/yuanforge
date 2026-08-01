@@ -1,0 +1,18 @@
+{
+  "name": "project-bootstrap",
+  "title": "Project-Bootstrap",
+  "description": ">",
+  "category": "skill",
+  "stage": "published",
+  "created_at": "2026-07-27T17:11:00Z",
+  "last_modified": "2026-07-27T17:11:00Z",
+  "author": "framework-team",
+  "verified_by": [],
+  "tags": [
+    "skill"
+  ],
+  "priority": 5,
+  "metadata": {},
+  "full_path": ".yuan/skills/project-bootstrap.md",
+  "excerpt": "name: project-bootstrap\ndescription: >\n  创建新项目或嫁接现有项目时加载。触发：用户说「创建项目」「初始化」\n  「用 YuanForge 启动」「新建项目」、从一个 idea 开始，或「嫁接 YuanForge」\n  「给现有项目接入 Yuan」。两种模式：\n  ① 全新模式 — 运行 yuanforge-init 初始化项目结构。\n  ② 嫁接模式 — "
+}

@@ -1,7 +1,23 @@
 ---
 name: role-switch
-description: Tier 3 兜底派发协议 — 当平台无 subagent 也无后台进程时，同一 Agent 内切换 persona 执行任务
-version: "3.0.0"
+title: 角色切换协议
+description: 角色切换协议，Tier 3 模式下的角色切换机制和上下文重建
+category: role-switching
+stage: published
+created_at: 2026-07-21T10:37:10Z
+last_modified: 2026-07-21T10:37:10Z
+author: team-conductor
+verified_by: []
+tags: ["role-switch", "tier-delegation", "fallback"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # Role-Switch Protocol — Tier 3 角色切换

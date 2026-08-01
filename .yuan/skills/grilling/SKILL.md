@@ -1,7 +1,23 @@
 ---
 name: grilling
-description: 结构化逼问循环 — 逐条提问、等待反馈、不批量；并强制覆盖 5 大认知盲区维度，消除需求→规格的认知差。Product Analyst 需求澄清核心方法。
-trigger: Product Analyst 澄清需求（强制 5 维度）、Architect 确认设计理解书、任何需要用户决策的对话
+title: 逼问澄清协议（需求追问机制）
+description: 逼问澄清协议（需求追问机制），Product Analyst 用于澄清模糊需求的逼问循环协议
+category: grilling
+stage: published
+created_at: 2026-07-21T15:39:07Z
+last_modified: 2026-07-21T15:39:07Z
+author: team-product-analyst
+verified_by: ["team-product-analyst"]
+tags: ["grilling", "clarification", "requirements-gathering"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # Grilling — 结构化逼问循环

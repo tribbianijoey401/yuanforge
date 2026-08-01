@@ -1,9 +1,23 @@
 ---
 name: docs-framework
-description: >
-  文档框架规则：docs/ 目录组织与命名规范
-spec_type: rule
-version: "3.0.0"
+title: 文档框架规则
+description: 文档框架规则，docs/ 目录的组织结构和命名规范
+category: doc
+stage: published
+created_at: 2026-07-21T10:37:43Z
+last_modified: 2026-07-21T10:37:43Z
+author: framework-team
+verified_by: []
+tags: ["docs", "framework", "structure"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # docs/ 说明书体系规范

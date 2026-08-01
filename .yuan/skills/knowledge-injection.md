@@ -1,10 +1,23 @@
 ---
 name: knowledge-injection
-description: >
-  Conductor 派发 Task 前的知识注入 Skill。
-  根据 Task 模块标签匹配 Pitfall，把摘要注入到子 Agent 的 context 中。
-  任何人都能在任何阶段调用。
-version: 1.0.0
+title: 知识注入协议
+description: 知识注入协议，AI 框架中的知识蒸馏与上下文注入机制
+category: knowledge-injection
+stage: published
+created_at: 2026-07-14T16:14:04Z
+last_modified: 2026-07-14T16:14:04Z
+author: team-conductor
+verified_by: []
+tags: ["knowledge-injection", "context-summarization", "pitfall-awareness"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # Knowledge Injection — 知识注入 Skill

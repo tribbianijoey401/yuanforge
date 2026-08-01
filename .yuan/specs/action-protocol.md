@@ -1,3 +1,26 @@
+---
+name: action-protocol
+title: 动作协议（第1协议）
+description: 动作协议（第2协议），定义单个动作的格式和语义
+category: action-protocol
+stage: published
+created_at: 2026-07-21T10:43:00Z
+last_modified: 2026-07-21T10:43:00Z
+author: framework-team
+verified_by: ["framework-team", "admin"]
+tags: ["action", "protocol", "step-by-step"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
+---
+
+
 # Action Protocol — 动作协议
 
 > **依赖**: runtime-protocol → state-protocol

@@ -1,3 +1,26 @@
+---
+name: workflow-protocol
+title: 工作流协议（核心协调协议）
+description: 工作流协议（第1协议），核心协调协议，定义 Agent 间的协作流程
+category: workflow-protocol
+stage: published
+created_at: 2026-07-22T14:11:51Z
+last_modified: 2026-07-22T14:11:51Z
+author: framework-team
+verified_by: ["framework-team", "admin"]
+tags: ["workflow", "orchestration", "conductor"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
+---
+
+
 # Workflow Protocol — 工作流协议
 
 > **协议定位**：定义 YuanForge 的软件开发流程——项目从用户需求到交付的完整阶段。

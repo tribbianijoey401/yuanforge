@@ -1,3 +1,26 @@
+---
+name: object-protocol
+title: 对象协议（第3协议）
+description: 对象协议（第4协议），数据对象的结构定义
+category: object-protocol
+stage: published
+created_at: 2026-07-22T10:30:26Z
+last_modified: 2026-07-22T10:30:26Z
+author: framework-team
+verified_by: ["framework-team", "admin"]
+tags: ["object", "entity", "structure"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
+---
+
+
 # Object Protocol — 对象协议
 
 > **依赖**: 无（意图层起点）

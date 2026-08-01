@@ -1,0 +1,20 @@
+{
+  "name": "systematic-debugging",
+  "title": "系统性调试协议",
+  "category": "debugging",
+  "stage": "published",
+  "tags": [
+    "debugging",
+    "diagnosis",
+    "troubleshooting"
+  ],
+  "priority": 3,
+  "author": "team-tester",
+  "description_excerpt": "系统性调试协议，Debug 的标准流程和诊断方法",
+  "last_modified": "",
+  "read_me_first": [
+    "## 触发条件",
+    "## 流程：4 阶段调试法",
+    "### Phase 1: 复现"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "adr-001",
+  "title": "Goal/Workflow Protocol 统一 Gate 模型 + goal-protocol.md 删除",
+  "description": "atus: implemented",
+  "category": "doc",
+  "stage": "published",
+  "created_at": "2026-07-27T17:11:00Z",
+  "last_modified": "2026-07-27T17:11:00Z",
+  "author": "framework-team",
+  "verified_by": [],
+  "tags": [
+    "architecture",
+    "protocol",
+    "gate-model"
+  ],
+  "priority": 5,
+  "metadata": {},
+  "full_path": "docs/knowledge/decisions/ADR-001.md",
+  "excerpt": "name: adr-001\ntitle: Goal/Workflow Protocol 统一 Gate 模型 + goal-protocol.md 删除\ndate: 2026-07-22\nstatus: implemented\ntags: [architecture, protocol, gate-model]\n\n\n ADR-001: Goal/Workflow Protocol 统一 Gate "
+}

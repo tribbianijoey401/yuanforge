@@ -1,0 +1,20 @@
+{
+  "name": "PROGRESS",
+  "title": "会话进度追踪与恢复机制",
+  "category": "progress-tracking",
+  "stage": "published",
+  "tags": [
+    "progress",
+    "tracking",
+    "state"
+  ],
+  "priority": 3,
+  "author": "framework-team",
+  "description_excerpt": "会话进度追踪与恢复机制，定义 PROGRESS.md 的格式和用途",
+  "last_modified": "",
+  "read_me_first": [
+    "## 目的",
+    "Agent 每次启动必读的第一个文档。记录项目整体进度，指向当前活跃的会话文件夹。",
+    "## 格式"
+  ]
+}

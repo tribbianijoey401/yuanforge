@@ -1,0 +1,47 @@
+#!/bin/bash
+# YuanCore Validator Wrapper
+# This script serves as a simple entry point for external validation calls
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PYTHON_SCRIPT="$SCRIPT_DIR/../scripts/validation/core_validator.py"
+TESTS_SCRIPT="$SCRIPT_DIR/../scripts/validation/phase3-tests.py"
+
+# Check if python3 is available
+if ! command -v python3 &> /dev/null; then
+    echo "ERROR: python3 is required and cannot be found"
+    exit 1
+fi
+
+case "$1" in
+    validate-proposal)
+        shift
+        python3 "$PYTHON_SCRIPT" validate-proposal "$@"
+        ;;
+    fingerprint)
+        shift
+        python3 "$PYTHON_SCRIPT" fingerprint "$@"
+        ;;
+    tests)
+        python3 "$TESTS_SCRIPT"
+        ;;
+    status)
+        echo "YuanCore Validator Status:"
+        echo "  Core scripts: $PYTHON_SCRIPT"
+        echo "  Tests: $TESTS_SCRIPT"
+        echo "  Python: $(python3 --version)"
+        ;;
+    *)
+        echo "Usage: $0 {validate-proposal|fingerprint|tests|status}"
+        echo ""
+        echo "Commands:"
+        echo "  validate-proposal <proposal_path> [--role <role>]     Validate a proposal file"
+        echo "  fingerprint <proposal_path>                           Compute strategy fingerprint"
+        echo " tests                                                 Run Phase 3 acceptance tests"
+        echo " status                                               Show validator status"
+        exit 1
+        ;;
+esac
+
+exit 0

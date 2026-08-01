@@ -1,9 +1,23 @@
 ---
 name: ARCHITECTURE
-description: >
-  文档格式规格书：系统架构文档格式
-spec_type: document-format
-version: "3.0.0"
+title: 框架架构概览
+description: 框架架构概览，提供 YuanForge 系统架构的整体视图
+category: architecture-overview
+stage: published
+created_at: 2026-07-21T10:37:27Z
+last_modified: 2026-07-21T10:37:27Z
+author: framework-team
+verified_by: []
+tags: ["architecture", "overview", "design"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # ARCHITECTURE — 架构文档规格书

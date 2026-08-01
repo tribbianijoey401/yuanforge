@@ -1,0 +1,20 @@
+{
+  "name": "contract-conventions",
+  "title": "合约约定规范",
+  "category": "rule",
+  "stage": "published",
+  "tags": [
+    "contract",
+    "convention",
+    "cross-agent"
+  ],
+  "priority": "high",
+  "author": "framework-team",
+  "description_excerpt": "合约约定规范，跨 Agent 约定的词汇和通用术语",
+  "last_modified": "",
+  "read_me_first": [
+    "## 三档门禁词汇（统一含义，所有 agent 共用）",
+    "## 防御性指令 · 格式要求（各 agent 须遵守，具体内容各填）",
+    "每个 agent 合约须声明「执行前校验清单」= 铁律 + 本合约 + 本角色冻结基准（具体文件名写在合约「工作依据」）。"
+  ]
+}

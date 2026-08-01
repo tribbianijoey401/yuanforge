@@ -1,11 +1,23 @@
 ---
 name: distill-workspace
-description: >
-  Workspace 知识蒸馏 Skill。覆盖即时蒸馏（Bug 修复时触发）和批量蒸馏（Workspace Close 时触发）。
-  即时蒸馏：判断 BUG-NNN.md 是否通用 → 调用 distill-pitfall.sh 生成 PIT-NNN.md。
-  批量蒸馏：打勾式 Checklist，确保 FEATURE/ADR 蒸馏、归档、图谱重建。
-  任何人能在任何阶段调用。
-version: 1.0.0
+title: Workspace 知识蒸馏机制
+description: Workspace 知识蒸馏机制，将会话知识提炼为正式文档的流程
+category: workspace-distillation
+stage: draft
+created_at: 2026-07-14T16:10:43Z
+last_modified: 2026-07-14T16:10:43Z
+author: team-doc-engineer
+verified_by: []
+tags: ["distillation", "knowledge-transfer", "archive"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # Distill Workspace — 知识蒸馏 Skill

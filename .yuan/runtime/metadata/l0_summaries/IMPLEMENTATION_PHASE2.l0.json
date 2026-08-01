@@ -1,0 +1,18 @@
+{
+  "name": "IMPLEMENTATIONPHASE2",
+  "title": "YuanForge 第二阶段实施方案",
+  "description": "# 1. 文件读取审计拦截器",
+  "category": "doc",
+  "stage": "published",
+  "created_at": "2026-07-27T17:11:00Z",
+  "last_modified": "2026-07-27T17:11:00Z",
+  "author": "framework-team",
+  "verified_by": [],
+  "tags": [
+    "doc"
+  ],
+  "priority": 5,
+  "metadata": {},
+  "full_path": "docs/IMPLEMENTATION_PHASE2.md",
+  "excerpt": "YuanForge 第二阶段实施方案\n 读取审计、L0 加载、Git Hook、知识沉淀工作流\n\n**日期:** 2026-07-27\n**实施目标:** 完成第二阶段功能集成\n\n\n\n 1. 文件读取审计拦截器\n\n 1.1 已创建文件\n```\n/home/admin/yuanforge/lib/audit_wrapper.py     核心审计模块\n/home/admin/yuanforge/li"
+}

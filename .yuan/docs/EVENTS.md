@@ -1,9 +1,23 @@
 ---
 name: EVENTS
-description: >
-  文档格式规格书：事件存储格式
-spec_type: document-format
-version: "3.0.0"
+title: 事件日志格式规范
+description: 事件日志格式规范，定义结构化事件记录的语法和语义
+category: event-logging
+stage: published
+created_at: 2026-07-21T10:37:27Z
+last_modified: 2026-07-21T10:37:27Z
+author: framework-team
+verified_by: []
+tags: ["events", "logging", "audit"]
+priority: medium
+metadata:
+  read_count: 0
+  last_read_by: null
+  last_read_at: null
+  used_in_conversations: []
+  avg_read_duration_s: null
+  quality_score: null
+  verification_level: basic
 ---
 
 # EVENTS — 事件存储规格书
