@@ -1,6 +1,0 @@
----
-name: promotion
-description: "知识晋升管线 — Workspace Close 时将长期知识从 Runtime 提取到 Knowledge。FEATURE→features/, ADR→decisions/, BUG→pitfalls(if repeatable)。确定性规则：EXTRACT→VALIDATE→PROPOSE→MERGE。Conductor 在 Phase 6 执行。"
-version: 1.0.0
----
-

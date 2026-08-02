@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuan.local/schemas/conformance-report.schema.json",
+  "title": "Yuan Conformance 报告",
+  "type": "object",
+  "required": ["schema_version", "status", "harness_digest", "checks"],
+  "properties": {
+    "schema_version": {"const": "yuan.conformance-report/v1"},
+    "status": {"const": "PASS"},
+    "harness_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "checks": {
+      "type": "object",
+      "required": ["unit_tests", "schemas", "adapter", "size_budget", "reproducible_release"]
+    }
+  },
+  "additionalProperties": false
+}

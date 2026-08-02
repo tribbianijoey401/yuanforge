@@ -1,8 +1,0 @@
----
-name: adr-001
-title: Goal/Workflow Protocol 统一 Gate 模型 + goal-protocol.md 删除
-date: 2026-07-22
-status: implemented
-tags: [architecture, protocol, gate-model]
----
-

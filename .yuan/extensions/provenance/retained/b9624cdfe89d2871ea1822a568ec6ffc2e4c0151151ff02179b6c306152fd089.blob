@@ -1,8 +1,0 @@
-### 2. 启动新项目（从 YuanForge 复制）
-
-```bash
-cp -r yuanforge my-awesome-project
-cd my-awesome-project
-git init && git add -A && git commit -m "init: from YuanForge"
-```
-

@@ -1,6 +1,0 @@
-REPO_ROOT = Path(subprocess.check_output(
-    ['git', 'rev-parse', '--show-toplevel'], text=True
-).strip())
-
-# ── 1. Changed files ──────────────────────────────────────────────
-

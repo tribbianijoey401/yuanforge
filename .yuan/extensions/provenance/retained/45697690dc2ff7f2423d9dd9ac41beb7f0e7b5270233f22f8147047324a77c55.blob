@@ -1,7 +1,0 @@
-### 更新规则
-
-- Agent 在每个子步骤完成后写入 checkpoint
-- 最少每 5 分钟写一次（即使子步骤未完成）
-- Agent 完成任务后标记 `status: completed`，写最终 snapshot
-- Agent 失败时标记 `status: failed`，写 failure snapshot（含 failure_reason）
-

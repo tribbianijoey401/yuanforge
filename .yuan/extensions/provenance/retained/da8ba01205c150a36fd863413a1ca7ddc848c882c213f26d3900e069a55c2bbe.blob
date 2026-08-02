@@ -1,3 +1,0 @@
-FIELD_RE = re.compile(r'^[-*]\s+(\w[\w\-]*)\s*:', re.MULTILINE)
-
-

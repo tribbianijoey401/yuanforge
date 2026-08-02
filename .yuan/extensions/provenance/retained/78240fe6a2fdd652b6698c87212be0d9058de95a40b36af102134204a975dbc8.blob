@@ -1,5 +1,0 @@
-### Stage 模型
-- UIAbility：页面容器
-- ExtensionAbility：后台服务
-- UIAbility 生命周期：Create → WindowStage → Foreground → Background → Destroy
-

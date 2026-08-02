@@ -1,9 +1,0 @@
-### 1.3 Git 历史速览
-
-```bash
-git log --oneline -20
-git log --oneline --all --graph -30  # 看分支情况
-```
-
----
-

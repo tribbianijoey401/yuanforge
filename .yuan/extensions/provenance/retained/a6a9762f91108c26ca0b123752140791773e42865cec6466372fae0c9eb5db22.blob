@@ -1,5 +1,0 @@
-# 验证者/评审者模式（商业级必读）
-
-> 写代码的人最不该是判它对不对的人——他带着"我已经做完了"的偏差，会把自己的实现当正确答案。商业级交付要把**执行者（actor）与检查者（checker）解耦**：检查者在**全新上下文**里、**只看 diff + 验收标准**做独立判定，给出结构化的 pass/fail，fail 就**带证据打回**，而不是顺着实现点头。
-> 这份规范定义验证者/评审者的职责、输入边界与判定协议，并立一道**过度设计护栏**——验证者只挑"对不对、需求满没满足"的硬伤，不发明风格活、不为审而审。它和 `agentic-delivery/01-standards/test-integrity-and-anti-gaming`（防作弊）、`agentic-delivery/01-standards/test-discipline-for-generated-code`（测什么）互补，与 `development/01-standards/code-review-and-pr-hygiene`（人工评审礼仪）分工：本规范回答的是"谁来验、看什么、怎么判、怎么打回"。
-

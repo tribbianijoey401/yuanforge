@@ -1,5 +1,0 @@
-def format_json(results, graph):
-    """输出 JSON 格式。"""
-    return json.dumps(results, ensure_ascii=False, indent=2)
-
-

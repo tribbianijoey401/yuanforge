@@ -1,8 +1,0 @@
-## 十二、与其他协议的关系
-
-| 协议 | 依赖方式 |
-|------|---------|
-| Object Protocol | 定义了本文管理其状态的对象 |
-| Action Protocol | Action 触发本文的状态转换 |
-| Workflow Protocol | Workflow 决定何时触发哪个转换 |
-| Adapter Protocol | Adapter 执行状态转换的具体动作 |

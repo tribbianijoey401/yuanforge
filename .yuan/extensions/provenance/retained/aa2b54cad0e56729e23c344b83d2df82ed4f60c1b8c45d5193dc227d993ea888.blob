@@ -1,9 +1,0 @@
-### 1. 代码文件
-
-提交到仓库，路径与 Dispatch Table 中「产出物」一致。
-
-```bash
-git add <files>
-git commit -m "feat(task-NNN): <标题>"
-```
-

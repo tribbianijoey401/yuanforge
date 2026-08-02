@@ -1,1 +1,0 @@
-"""Bootstrap verifier tests."""

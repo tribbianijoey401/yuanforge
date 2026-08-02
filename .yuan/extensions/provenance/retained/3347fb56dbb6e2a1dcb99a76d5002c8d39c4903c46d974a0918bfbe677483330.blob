@@ -1,2 +1,0 @@
-from trust_semantics import canonical_digest, self_modification_authorized
-

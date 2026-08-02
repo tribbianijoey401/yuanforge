@@ -1,8 +1,0 @@
-def _is_within(path: pathlib.Path, root: pathlib.Path) -> bool:
-    try:
-        path.resolve().relative_to(root.resolve())
-        return True
-    except ValueError:
-        return False
-
-

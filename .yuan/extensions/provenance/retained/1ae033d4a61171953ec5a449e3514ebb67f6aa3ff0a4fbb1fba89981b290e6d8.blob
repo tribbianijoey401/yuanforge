@@ -1,6 +1,0 @@
-### Goal 推导规则
-
-当 `goal = auth-module` 的所有 Task 均为 `DONE`，且 Security Auditor 无 Blocker，则 Goal DONE。
-
----
-

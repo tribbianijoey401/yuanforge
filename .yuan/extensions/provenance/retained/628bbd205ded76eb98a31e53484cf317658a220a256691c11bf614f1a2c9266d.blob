@@ -1,7 +1,0 @@
-### 方法 C：用 AGENTS.md 引导
-
-大多数现代 Agent 平台（Cursor、Claude Code、Codex CLI）会**自动读取**根目录的 `AGENTS.md`。
-你只需告诉 Agent："按照 YuanForge 框架开发这个项目"，它自会找到规则。
-
----
-

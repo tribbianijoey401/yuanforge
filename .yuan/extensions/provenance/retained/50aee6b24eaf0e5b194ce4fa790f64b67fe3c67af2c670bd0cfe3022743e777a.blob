@@ -1,8 +1,0 @@
-## 三、Loop（执行引擎）
-
-> Loop 是 Conductor 中的固定循环，无业务感知，只机械推进 Task。
-
-```
-READ → SELECT → DISPATCH → WAIT → DIGEST → UPDATE → CHECK → (LOOP)
-```
-

@@ -1,1 +1,0 @@
-EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()

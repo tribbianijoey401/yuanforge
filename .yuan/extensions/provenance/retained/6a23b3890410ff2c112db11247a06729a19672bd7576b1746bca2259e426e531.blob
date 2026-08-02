@@ -1,5 +1,0 @@
-## 门禁定义
-- 档位：🟢 Advisory↗（Plan 阶段，不阻塞开发）
-- 通过判定：PLAN.md 含完整 Dispatch Table + API 契约冻结 + 数据模型 + OPEN-DECISIONS 已登记（如有悬决项须落 `docs/decisions/OPEN-DECISIONS.md`）
-- 稳定性分类：演进型
-

@@ -1,9 +1,0 @@
-### Step 5: 准备开发
-
-现在你可以对 Agent 说：
-> "开始开发 [你的第一个功能]"
-
-Agent 将自动加载 `docs/INDEX.md` → `docs/PROGRESS.md` 启动工作流。
-
----
-

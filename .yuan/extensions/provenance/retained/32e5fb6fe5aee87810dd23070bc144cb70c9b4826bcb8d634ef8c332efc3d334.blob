@@ -1,4 +1,0 @@
-### 规则层
-.yuan/rules/iron-rules.md  # 铁律文件 — 锚点断裂会导致 Agent 加载失败
-.yuan/rules/seam-agreement.md  # Seam Agreement 模板 — 字段变更影响 CAL 解析
-

@@ -1,8 +1,0 @@
-### OKLCH 色彩空间
-
-- 比 HSL 感知均匀：50% lightness 的黄和蓝在 HSL 里亮度感差异巨大，OKLCH 里等步进 lightness 视觉也等步进。
-- `oklch(lightness chroma hue)`，lightness 0–100%，chroma 约 0–0.4，hue 0–360。
-- 建色阶：固定 chroma+hue，变 lightness；**接近纯白或纯黑时降 chroma**，否则高 chroma 在极端 lightness 显得 garish。
-- 新颜色一律 OKLCH 声明，hex 只出现在第三方示例或导入资产里。
-- 不要默认选 hue 250（蓝）或 hue 60（暖橙），那是 AI 设计的默认反射，不是任何具体品牌的正确答案。
-

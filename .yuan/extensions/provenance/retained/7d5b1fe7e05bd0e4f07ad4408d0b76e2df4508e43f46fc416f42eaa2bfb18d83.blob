@@ -1,6 +1,0 @@
-def paths_overlap(left: pathlib.Path, right: pathlib.Path) -> bool:
-    return (
-        left == right
-        or left in right.parents
-        or right in left.parents
-    )

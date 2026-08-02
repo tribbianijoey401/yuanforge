@@ -1,8 +1,0 @@
-## 二、DAG 拓扑
-
-Workflow 是完成 Goal 的**静态路径模板**，定义标准阶段，不包含执行细节。
-
-```
-Discover → Plan → Build → Verify → Promote
-```
-

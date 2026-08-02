@@ -1,7 +1,0 @@
-def trusted_now(value: datetime | None) -> datetime:
-    observed = value or datetime.now(timezone.utc)
-    if observed.tzinfo is None:
-        raise ValueError("trusted clock must be timezone-aware")
-    return observed.astimezone(timezone.utc)
-
-

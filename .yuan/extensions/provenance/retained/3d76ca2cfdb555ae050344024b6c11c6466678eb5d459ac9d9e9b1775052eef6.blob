@@ -1,8 +1,0 @@
-## 门禁定义（创建时定下；稳定型固化 / 演进型可迭代修改）    # 质量门禁在创建时定下，但非永久冻结
-- 本 agent 档位：🔴 Blocker / 🟡 Hard Gate / 🟢 Advisory↗
-- 是否允许执行动作：是（经 Adapter 编排）/ 否（仅审查，绝不改实现）
-- 通过判定：可判定的布尔谓词（如「逐条对照 AC 一致」）
-- **稳定性分类（决定修改管控）**：
-  - 稳定型（审查官：Spec / Design / Security / Quality / UX Reviewer）：门禁固化，修改须走 ADR。
-  - 演进型（Conductor / PA / Architect / Dev / UI Designer / Doc Engineer）：允许在迭代回顾后修改门禁定义，但须**同步更新 role-scorecard 审计 + 记录变更理由**（透明修改记录）；受审计约束，不得开倒车。
-

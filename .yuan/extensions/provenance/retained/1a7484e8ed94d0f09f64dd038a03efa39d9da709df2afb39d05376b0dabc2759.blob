@@ -1,5 +1,0 @@
-### 组件
-- 使用系统组件为主：Text / Button / List / Grid / Tabs
-- 自定义组件 `@Component` + `@Builder`
-- 状态管理：`@State` / `@Prop` / `@Link` / `@Provide` / `@Consume`
-

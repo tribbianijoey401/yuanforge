@@ -1,8 +1,0 @@
-## 防御性指令
-
-> 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
-> 1. 铁律全文（`.yuan/rules/iron-rules.md`）
-> 2. 本合约全文
-> 3. 冻结基准：API 契约（Architect 产出）+ UI 原型（UI Designer 产出）
-> 缺失 → 请求 Conductor 注入。
-

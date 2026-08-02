@@ -1,8 +1,0 @@
-#### optimize — 优化
-
-性能与加载优化。CLS / 图片 / 懒加载。
-
-- **执行步骤**：测当前状态（Core Web Vitals / bundle / runtime / 网络）→ 找瓶颈 → 加载优化（图片 / JS bundle / CSS / 字体 / 加载策略）→ 渲染优化（避免 layout thrashing / `contain` / `content-visibility`）→ 动效优化（GPU 加速 / 60fps / IntersectionObserver）→ Core Web Vitals（LCP <2.5s / INP <200ms / CLS <0.1）。
-- **检查项**：现代图片格式（WebP / AVIF）；`srcset` + `sizes` 响应式图；`loading="lazy"` 折叠下；`font-display: swap` + subset + preload 关键字重；`aspect-ratio` 预留图位防 CLS；批量读后批量写避免 layout thrashing。
-- **反模式**：未测就优化（过早优化）；牺牲 a11y 换性能；`will-change` 到处用（建层耗内存）；折叠上内容懒加载；微优化忽略主要瓶颈；忘记移动端（更慢设备更慢网络）。
-

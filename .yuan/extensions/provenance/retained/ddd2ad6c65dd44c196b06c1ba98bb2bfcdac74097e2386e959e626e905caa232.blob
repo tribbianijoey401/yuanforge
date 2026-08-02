@@ -1,7 +1,0 @@
-PROTECTED_DIRS = [
-    ".yuan/skills/user-",  # 用户自定义 skill（目录名前缀）
-    "docs/knowledge/features/",  # 用户自定义知识
-    "docs/knowledge/modules/",
-]
-
-# 所有框架同步项（用于验证源完整性）

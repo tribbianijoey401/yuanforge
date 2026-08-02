@@ -1,4 +1,0 @@
-def _collection_digest(items: list[dict[str, Any]]) -> str:
-    return canonical_digest(items)
-
-

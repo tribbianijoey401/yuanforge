@@ -1,8 +1,0 @@
-#### colorize — 配色
-
-基于寄存器 + 品牌选配色方案，token 化。
-
-- **执行步骤**：评估当前配色机会（缺色 / 误用 / 语义空缺）→ 选策略（Restrained / Committed / Full palette / Drenched）→ 60-30-10 视觉重量分配 → OKLCH 色彩空间 → 写 token。
-- **检查项**：OKLCH 而非 HSL（感知均匀）；中性带微量 chroma 倾向品牌色而非纯灰；语义色完整（success/error/warning/info）；WCAG AA 达标；不靠颜色单一传递信息；无紫蓝梯度（AI slop）；`border-left/right > 1px` 的色条绝对禁止。
-- **反模式**：彩虹大杂烩；灰色字压在彩色底上（用同色更暗的色阶或透明度）；默认紫蓝梯度；用 alpha 透明度代替显式覆盖色（alpha 是设计气味）。
-

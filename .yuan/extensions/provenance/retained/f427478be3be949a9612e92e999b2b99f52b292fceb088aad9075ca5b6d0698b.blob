@@ -1,2 +1,0 @@
-REQUIRED_FIELDS = {'id', 'object_type', 'lifecycle', 'owner', 'status', 'summary', 'confidence'}
-

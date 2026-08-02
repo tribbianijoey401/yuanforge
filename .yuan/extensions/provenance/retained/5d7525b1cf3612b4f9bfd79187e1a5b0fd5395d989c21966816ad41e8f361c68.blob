@@ -1,7 +1,0 @@
-# Knowledge Injection — 知识注入 Skill
-
-> **让知识从"写了不读"变成"不读不行"。**
-> Conductor 派发 Task 前，自动匹配相关 Pitfall 并注入 context。
-
----
-

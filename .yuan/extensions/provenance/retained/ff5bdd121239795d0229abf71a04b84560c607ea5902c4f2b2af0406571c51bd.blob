@@ -1,9 +1,0 @@
-### 品牌字体
-```css
-:root {
-  --font-display: 'Inter', 'Noto Sans SC', sans-serif;
-  --font-body: 'Inter', 'Noto Sans SC', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-}
-```
-

@@ -1,8 +1,0 @@
-#### document — 文档
-
-生成 DESIGN.md 设计规范文档。
-
-- **执行步骤**：扫描模式（默认）或种子模式（pre-implementation）→ 找设计资产（CSS custom properties / Tailwind config / CSS-in-JS / token 文件 / 组件库 / 全局样式 / 渲染输出）→ 自动提取（色彩 / 字体 / 阴影 / 组件）→ 暂存 frontmatter → 问质性输入（Creative North Star / Overview voice / 色彩性格 / 阴影哲学 / 组件哲学）→ 写 DESIGN.md（YAML frontmatter + 6 节固定顺序）。
-- **检查项**：frontmatter 用 `{path.to.token}` 引用；色彩按项目姿态选 OKLCH 或 hex（不分裂真相源）；组件 sub-token 限 8 prop（backgroundColor/textColor/typography/rounded/padding/size/height/width）；6 节字符精确匹配 spec（Overview / Colors / Typography / Elevation / Components / Do's and Don'ts）；不额外加顶节。
-- **反模式**：silent overwrite 已存在 DESIGN.md；编排额外顶节（Layout Principles / Motion 等）塞进 spec 之外；用 Material 默认名重命名项目已用的 scale key。
-

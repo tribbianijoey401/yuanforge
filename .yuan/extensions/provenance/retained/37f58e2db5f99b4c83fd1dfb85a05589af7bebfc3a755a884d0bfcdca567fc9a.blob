@@ -1,8 +1,0 @@
-## 防御性指令
-
-> 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
-> 1. 铁律全文（`.yuan/rules/iron-rules.md`）
-> 2. 本合约全文
-> 3. 冻结基准：TASK_BOARD.md（当前状态）
-> 缺失 → 自检查（Conductor 无外部依赖）。
-

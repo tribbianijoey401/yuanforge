@@ -1,4 +1,0 @@
-### Live / Hook 仅 Web
-
-Live 模式（浏览器内变体热替换）与设计检测 Hook 仅在 web 项目启用。Native 项目（含 RN / Flutter）由 `.tsx/.ts/.js` 组成，Hook 会误报，所以路由直接跳过。
-

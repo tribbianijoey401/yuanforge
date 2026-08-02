@@ -1,9 +1,0 @@
-### 当确实无法构建 loop
-
-停止，明确说尝试了什么。向用户请求：
-- (a) 接入可复现的环境
-- (b) 捕获的 artifact（HAR/log dump/core dump/录屏+时间戳）
-- (c) 允许加临时生产 instrumentation
-
-**不得在无 loop 的情况下进入 Phase 1。**
-

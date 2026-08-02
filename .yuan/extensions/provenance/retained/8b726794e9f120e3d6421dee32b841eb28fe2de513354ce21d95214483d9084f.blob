@@ -1,9 +1,0 @@
-### 6.3 回环学习
-
-遍历 knowledge/pitfalls/：
-- 项目特有 → 留在此文件
-- 领域通用 → 提炼为 Skill
-- 框架通用 → 反馈到 YuanForge
-
----
-

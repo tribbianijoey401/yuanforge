@@ -1,8 +1,0 @@
-## 技术架构建议
-- **前端**：Next.js 14+ / React 18+ / Vue 3
-- **状态管理**：TanStack Query + Zustand / Pinia
-- **UI 框架**：Tailwind CSS + Radix UI / Headless UI
-- **后端**：FastAPI / Express + PostgreSQL
-- **认证**：JWT + RBAC
-- **部署**：Vercel / CloudBase + 云数据库
-

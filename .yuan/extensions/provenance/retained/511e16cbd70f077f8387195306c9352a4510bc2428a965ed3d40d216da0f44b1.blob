@@ -1,7 +1,0 @@
-### 第一步：Product Analyst 澄清需求
-
-1. 用户给出 vibe / 一句话需求
-2. 派发 Product Analyst → 加载 `grilling` Skill，强制 5 维度覆盖门禁（范围/交互/异常/数据/非功能）全部通过 → 产出 FEATURE.md（用户故事 + 验收标准 + 风险标签 + 澄清记录）
-3. **澄清门禁校验：** Conductor 检查 FEATURE.md 是否覆盖 5 维度（维度剪裁须有声明理由）。任一维度缺失且无剪裁声明 → 打回 Product Analyst 补澄清，不得进入下一步
-4. 用户确认后进入下一步
-

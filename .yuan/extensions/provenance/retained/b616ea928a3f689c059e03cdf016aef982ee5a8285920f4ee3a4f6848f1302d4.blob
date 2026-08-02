@@ -1,7 +1,0 @@
-## 说明
-
-框架修改的 PTG 验证不同于产品代码：
-- 不需要内存数据库，因为框架操作的是 Markdown 文件和 Python 脚本
-- PTG 的核心是"变更后的框架仍能正常驱动 Conductor Loop"
-- 每次内核变更跑 `ptg-cal-gen.py` 验证 schema 完整性 + `framework-self-test` 验证结构一致性
-- 真正的 L1 集成测试 = 用新框架在一个临时项目中完整跑一个 Goal

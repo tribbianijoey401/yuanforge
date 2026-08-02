@@ -1,2 +1,0 @@
-# ========== 确定 severity ==========
-if [[ -z "$BUG_SEVERITY" ]]; then

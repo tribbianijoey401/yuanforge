@@ -1,4 +1,0 @@
-### 合约层（框架自身运行时验证）
-contracts/tester.md  # Tester 合约 — 包含 PTG/CAL/Anti-patterns 验证步骤
-contracts/quality-auditor.md  # Quality Auditor — 含 Advisory 升级规则
-

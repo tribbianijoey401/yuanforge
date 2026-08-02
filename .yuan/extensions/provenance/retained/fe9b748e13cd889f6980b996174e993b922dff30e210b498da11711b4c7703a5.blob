@@ -1,8 +1,0 @@
----
-name: plan-format
-description: >
-  Plan 工程化格式规范（含 Dispatch Table）
-spec_type: rule
-version: "3.0.0"
----
-

@@ -1,9 +1,0 @@
-def immutable_binding_matches(left: Any, right: Any) -> bool:
-    keys = ("id", "revision", "sha256")
-    return (
-        isinstance(left, dict)
-        and isinstance(right, dict)
-        and all(left.get(key) == right.get(key) for key in keys)
-    )
-
-

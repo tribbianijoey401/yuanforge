@@ -1,8 +1,0 @@
-### AP-CONTRACT-001: 合约缺门禁定义段
-
-- **描述**: Arch Agent 产出合约文件时只写职责和规则，但遗漏 `## 门禁定义` 段落。导致 Role-Scorecard P-D 评分无法判定，Gate 机制失效。
-- **重现条件**: 创建新角色合约时，仅参照旧合约的 `工作依据/产出/行为规则` 部分，忽略了模板中的门禁定义段。
-- **修复方式**: 在 contract-conventions.md 中声明硬性段要求，conductor 派发 Architect 时注入模板链接。
-- **验证方式**: `pre-commit` 脚本扫描 contracts/*.md 是否包含 `## 门禁定义` 标题；Role-Scorecard P-D 检查扣 0.5 分。
-- **@ptg**: true
-

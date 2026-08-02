@@ -1,9 +1,0 @@
-## 门禁绑定（触发点）
-
-| 阶段 | 触发角色 | 动作 |
-|------|----------|------|
-| Phase 2 设计 | UI Designer 原型 + Conductor 抽查 | emoji 正则扫描 |
-| Phase 3 实现 | Frontend Dev 实现 + Conductor 联调 | 替换 emoji / 去渐变 / 去硬编码 |
-| Phase 4 审查 | UX Reviewer 审查 | 打回 Frontend Dev |
-
-> *注：`ui-designer.md` 的 AI 模板味反模式（三种收敛风格、占位英雄区等）与本节互补，共同压制"看起来能跑"的模板 UI。*

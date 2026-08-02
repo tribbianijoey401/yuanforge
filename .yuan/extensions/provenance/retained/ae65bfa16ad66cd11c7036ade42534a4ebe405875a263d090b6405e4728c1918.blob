@@ -1,6 +1,0 @@
-### 第六步：知识蒸馏（Workspace Close）
-
-所有 Task 终态后，执行知识蒸馏——把长期有价值的知识从 Runtime 提取到 Knowledge 层。
-
-**蒸馏 = 即时蒸馏（过程中做） + 批量蒸馏（Close 时做）**
-

@@ -1,9 +1,0 @@
-### 4.1 输入
-
-```
-扫描 docs/knowledge/**/*.md
-解析每个文件的 YAML frontmatter
-忽略非 knowledge/ 目录的文件
-忽略 frontmatter 解析失败的文件（warn，不中断）
-```
-

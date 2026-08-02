@@ -1,7 +1,0 @@
-## 何时触发
-
-- Conductor 平台探测结果：`delegate_task` 不可用 + `terminal(background=true)` 不可用
-- 典型场景：Manual 模式、Cursor、不支持的 Agent 平台
-
----
-

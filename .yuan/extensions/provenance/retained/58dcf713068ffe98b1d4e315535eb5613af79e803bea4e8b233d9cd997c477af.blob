@@ -1,7 +1,0 @@
-### 实践
-
-- polish / typeset / layout / colorize 等设计命令：专注视觉与体验标杆，不主动跑 a11y 扫描。
-- audit 命令：5 维度之一就是 a11y，0–4 评分，P0–P3 严重度，配修复建议与 suggested command。
-- 设计期写语义 HTML 是基本工，不算 a11y 检查（那是实现质量）。a11y 检查指：对比度达标、键盘顺序、屏幕阅读器播报、ARIA 角色 / 标签 / 状态、焦点管理、reduced motion、高对比模式。
-- 暗底亮字行高 +0.05–0.1 这类补偿是**设计决策**，写在 typeset 里；不是 a11y 检查项。
-

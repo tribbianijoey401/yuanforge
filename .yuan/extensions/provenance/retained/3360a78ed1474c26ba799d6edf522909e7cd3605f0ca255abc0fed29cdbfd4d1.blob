@@ -1,6 +1,0 @@
-## Bounded（打回-重做上限）
-
-- 同一 Task 打回-重做最多 3 轮。
-- 连续 3 轮无进展 → 升级通知 Architect / Conductor，不无限循环。
-
-> *本规则与 iron-rules 的"循环收敛"（铁律 Ⅹ）互补：每个 exceed gate 必须收敛，RoleVerdict 的 Bounded 给出"打回次数"机械上限。*

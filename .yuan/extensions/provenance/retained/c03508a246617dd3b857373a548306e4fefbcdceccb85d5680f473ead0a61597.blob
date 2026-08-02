@@ -1,9 +1,0 @@
-### Checkpoint 四类信息
-
-| 字段 | 说明 |
-|------|------|
-| `verified_facts` | 已验证事实（如"API 正常"、"Redis 连接池配置正确"） |
-| `current_state` | 当前状态快照（如"Task-17 RUNNING"） |
-| `next_action` | 下一步（如"等待 Reviewer"、"执行 TDD Red"） |
-| `failed_hypotheses` | 已失败假设（仅保留 ACTIVE 状态的） |
-

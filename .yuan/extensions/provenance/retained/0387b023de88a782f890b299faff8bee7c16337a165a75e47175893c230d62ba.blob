@@ -1,7 +1,0 @@
-### 5.1 手动构建
-
-```bash
-python scripts/build-graph.py
-# 输出: docs/graph/index.json
-```
-

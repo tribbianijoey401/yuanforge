@@ -1,7 +1,0 @@
----
-name: verdict-protocol
-description: 结构化裁决协议（RoleVerdict）— 审查官统一以 verdict/blocking/advisory/evidence 输出
-spec_type: rule
-version: "1.0.0"
----
-

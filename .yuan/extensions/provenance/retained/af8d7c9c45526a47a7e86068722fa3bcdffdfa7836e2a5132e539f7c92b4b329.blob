@@ -1,7 +1,0 @@
-## 通用规范
-
-- 所有配色均按 WCAG AA+ 校验（正文 ≥ 4.5:1，大字 ≥ 3:1）
-- Primary / Accent 区分：Primary 是品牌色，Accent 是 CTA 行动色
-- 深色模式配色采用"反相 + 调暗"策略，避免直接反色
-- Tailwind 用法：将下列颜色赋给 `theme.colors`，按语义命名
-

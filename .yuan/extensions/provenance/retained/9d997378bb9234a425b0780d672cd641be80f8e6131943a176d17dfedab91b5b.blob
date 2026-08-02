@@ -1,8 +1,0 @@
-### 步骤 1：调用查询脚本
-
-```bash
-python3 scripts/query-graph.py --module <tag> --format short
-python3 scripts/query-graph.py --feature FEAT-NNN --format detailed
-python3 scripts/query-graph.py --pitfall PIT-NNN --format short
-```
-

@@ -1,5 +1,0 @@
-## 门禁定义
-- 档位：🟢 Advisory↗（调度阶段）
-- 通过判定：所有 Task 终态 + Tester 全绿 + Doc Engineer 归档完成
-- 稳定性分类：演进型
-

@@ -1,4 +1,0 @@
-def _relative(path: pathlib.Path, root: pathlib.Path) -> str:
-    return path.resolve().relative_to(root.resolve()).as_posix()
-
-

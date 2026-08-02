@@ -1,8 +1,0 @@
-### 与崩溃恢复协议的关系
-
-崩溃恢复协议（见上文）的步骤 4.c 中，Conductor 读 `SESSION_LOG` 获取已完成的宏观信息；**Agent Snapshot 补充了微观信息**——具体做到哪个文件、哪一步、什么思路。两者结合提供完整的恢复上下文。
-
-> **当前阶段**：Agent Snapshot 是规范定义。当前 Agent 实现中，Snapshot 的写入是可选的增强。Conductor 不强制要求 Agent 写 Snapshot。
-
-
-<SECTION-END:session-final>

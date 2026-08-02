@@ -1,4 +1,0 @@
-## 四、Runtime 对象
-
-Runtime 对象回答了「项目正在做什么」。它们存放在 `docs/YYYYMMDD-描述/` 下或从 Events 派生。
-

@@ -1,0 +1,31 @@
+{
+  "schema_version": "yuan.adapter/v1",
+  "adapter_id": "codex-audited",
+  "platform": "codex",
+  "profile": "AUDITED",
+  "capabilities": {
+    "artifact_audit": {
+      "status": "SUPPORTED",
+      "reason": "Yuan 在 Attempt 前后计算并验证 Artifact Manifest。"
+    },
+    "scoped_file_cas": {
+      "status": "UNSUPPORTED",
+      "reason": "Codex 原生文件工具无法被 Yuan 物理撤销。"
+    },
+    "bounded_command": {
+      "status": "UNSUPPORTED",
+      "reason": "Codex 原生 Shell 不能由 Yuan 强制替换。"
+    },
+    "llm_proposal": {
+      "status": "UNSUPPORTED",
+      "reason": "Codex 未向项目内 Harness 暴露独立模型调用接口。"
+    },
+    "physical_effect_mediation": {
+      "status": "UNSUPPORTED",
+      "reason": "开放 Codex 会话存在 Yuan Port 之外的原生副作用通道。"
+    }
+  },
+  "port": null,
+  "notes": "该 Descriptor 只声明可验证的 AUDITED 保证，不宣称 ENFORCED。",
+  "digest": "89ec8a30673f6bf48a776490c3fa8c47033678f51c4e4d7a75715679d4de3e70"
+}

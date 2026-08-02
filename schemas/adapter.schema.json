@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuan.local/schemas/adapter.schema.json",
+  "title": "Yuan Adapter 描述符",
+  "type": "object",
+  "required": ["schema_version", "adapter_id", "platform", "profile", "capabilities", "port", "notes", "digest"],
+  "properties": {
+    "schema_version": {"const": "yuan.adapter/v1"},
+    "adapter_id": {"type": "string"},
+    "platform": {"type": "string"},
+    "profile": {"enum": ["GUIDED", "AUDITED", "ENFORCED"]},
+    "capabilities": {"type": "object"},
+    "port": {"type": ["object", "null"]},
+    "notes": {"type": "string"},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

@@ -1,7 +1,0 @@
-# Merge Policy — Proposal 合并规则
-
-> **适用范围**：Proposal 层（`docs/proposals/`）→ Knowledge 层的合并。
-> **当前状态**：Proposal 层尚未实现。本文档定义未来合并规则，当前仅供 Conductor 蒸馏时参考。
-
----
-

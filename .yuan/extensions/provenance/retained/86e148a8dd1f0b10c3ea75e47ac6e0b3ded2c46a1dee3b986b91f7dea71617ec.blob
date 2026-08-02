@@ -1,4 +1,0 @@
-class UnsupportedCapability(PortError):
-    pass
-
-

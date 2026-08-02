@@ -1,6 +1,0 @@
-# PROPOSAL — 提案事务规格书
-
-> 管辖 `docs/proposals/`。Proposal 是 Knowledge 层的写事务——保证原子性和并发安全。
-
----
-

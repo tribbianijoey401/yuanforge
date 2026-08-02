@@ -1,9 +1,0 @@
-## 一、合并时机
-
-| 触发条件 | 合并者 |
-|---------|--------|
-| Agent 提交 Proposal，Conductor 审查通过 | Conductor |
-| Proposal 超过 7 天未处理 | Conductor 自动关闭（不合并） |
-
----
-

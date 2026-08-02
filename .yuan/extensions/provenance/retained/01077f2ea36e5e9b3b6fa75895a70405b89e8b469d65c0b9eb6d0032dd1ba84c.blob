@@ -1,5 +1,0 @@
-## VA-4 禁止硬编码颜色
-
-- 除 `#fff` `#000` 外，所有颜色通过 Design Token 引用。
-- Token 体系由 Architect 在 Plan 的 Spec 段锁定。
-

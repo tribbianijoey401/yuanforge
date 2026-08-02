@@ -1,8 +1,0 @@
-## 与其他规则的关系
-
-| 规则 | 关系 |
-|------|------|
-| iron-rules.md | 铁律 Ⅵ「文档即代码」— 本文档是其具体实现 |
-| plan-format.md | Plan 存会话文件夹的 PLAN.md |
-| project-bootstrap | 读 `.yuan/docs/` 规格书 → 生成 docs/ |
-| project-audit | 读 `.yuan/docs/` 规格书 → 审计现有项目 |

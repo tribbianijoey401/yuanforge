@@ -1,8 +1,0 @@
-## 五、Event Log（事件日志）
-
-> 每条记录为不可变的 JSONL 行，用于审计和恢复。
-
-```json
-{"type": "TASK_STATUS_CHANGED", "timestamp": "2026-07-17T10:30:00Z", "workspace": "20260717-auth", "actor": "conductor", "payload": {"task_id": "T05", "from": "READY", "to": "RUNNING", "reason": "dispatched to backend-dev"}}
-```
-

@@ -1,9 +1,0 @@
----
-name: ptg-runner
-description: >
-  PTG（物理测试门控）执行器 — 读取 docs/ptg-critical.md 清单，在真实环境中运行指定模块的集成测试。
-  与 CAL 配合：PTG 指定"在哪跑"，CAL 生成"验证什么"。
-version: "1.0.0"
-spec_type: skill
----
-

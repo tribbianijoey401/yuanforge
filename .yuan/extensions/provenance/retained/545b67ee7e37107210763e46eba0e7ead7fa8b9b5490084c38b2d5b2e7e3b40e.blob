@@ -1,1 +1,0 @@
-from schema_runtime import validate_schema

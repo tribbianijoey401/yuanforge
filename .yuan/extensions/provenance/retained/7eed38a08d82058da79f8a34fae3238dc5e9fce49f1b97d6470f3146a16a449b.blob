@@ -1,8 +1,0 @@
-# YuanForge 核心工作流
-
-> **这是元框架的 Workflow Protocol 实现。** Conductor = Workflow Interpreter：
-> 读 Workspace → 读 Workflow Protocol → 读 State Protocol → 产生 Action → 调 Adapter → 更新 Docs。
-> 所有 YuanForge 项目必须遵循此工作流。
-
----
-

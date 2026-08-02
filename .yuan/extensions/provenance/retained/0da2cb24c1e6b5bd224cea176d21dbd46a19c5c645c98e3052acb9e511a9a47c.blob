@@ -1,8 +1,0 @@
-#### live — 实时变体
-
-浏览器内选元素 → 选设计动作 → AI 生成 HTML+CSS 变体热替换。仅 web。
-
-- **执行步骤**：boot → 打开 app URL（不是 helper port）→ 长轮询循环（generate / steer / accept / discard / prefetch / manual_edit_apply / timeout / exit）→ 失败用 `live-status` / `live-resume` 恢复（持久化 journal）。
-- **检查项**：PRODUCT.md 战略决策赢，DESIGN.md 视觉决策赢；不贴 PRODUCT/DESIGN 全文进 chat；变体必须声明签名参数（color-amount / scale / density / structure 等）；无 DESIGN.md 时从 CSS 变量 + 计算样式 + 兄弟组件提取身份，身份保留是默认，偏离要明确触发。
-- **反模式**：把 helper port 当 app URL；短 `--timeout=`（必须长轮询）；chat 啰嗦 recap；忽略持久化 journal。
-

@@ -1,8 +1,0 @@
-### Conductor 禁止事项
-
-- ❌ 自己写代码（那是 frontend-dev / backend-dev 的事）
-- ❌ 自己审查代码（那是 spec-reviewer / security-auditor 的事）
-- ❌ 跳过门禁
-- ❌ 猜上游产出物内容（让 Agent 自己去读文件）
-- ❌ 在 Task 未完成时提前创建下游 Task（等上游 done 再创建）
-

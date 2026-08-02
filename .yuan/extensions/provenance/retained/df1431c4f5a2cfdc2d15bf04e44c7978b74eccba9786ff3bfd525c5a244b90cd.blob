@@ -1,8 +1,0 @@
-# TASK_BOARD — 多 Agent 共享任务文档规格书
-
-> 管辖每个会话文件夹中的 TASK_BOARD.md。所有 Agent 通过它进行任务沟通和状态同步。
-
----
-
-<SECTION-END:tb-6>
-

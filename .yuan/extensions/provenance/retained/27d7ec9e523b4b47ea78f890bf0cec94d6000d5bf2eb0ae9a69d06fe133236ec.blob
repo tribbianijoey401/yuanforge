@@ -1,6 +1,0 @@
-def work_revision_valid(work: dict[str, Any]) -> bool:
-    return (
-        work.get("revision", {}).get("id") == work.get("work_id")
-        and work.get("revision", {}).get("sha256")
-        == canonical_digest(work, omitted_paths=(("revision", "sha256"),))
-    )

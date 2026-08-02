@@ -1,8 +1,0 @@
-## 触发条件
-
-- Phase 4 质量层：所有 Dev Task Complete
-- Conductor 收集所有 ✅完成 信号 → 同时派发 4 个审查官
-- 用户说「审查」「review」「检查」
-
----
-

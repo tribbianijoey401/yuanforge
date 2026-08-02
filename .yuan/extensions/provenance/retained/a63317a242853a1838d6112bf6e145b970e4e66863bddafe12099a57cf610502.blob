@@ -1,7 +1,0 @@
-# Subagent 驱动开发 Skill
-
-> **YuanForge 的 Phase 2-5 执行引擎。**
-> Conductor = Workflow Interpreter：读 Workflow Protocol → 读 TASK_BOARD → 产生 Action → 委托 Adapter。
-
----
-

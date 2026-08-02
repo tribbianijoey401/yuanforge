@@ -1,5 +1,0 @@
-changed = subprocess.check_output(
-    ['git', 'diff', '--cached', '--name-only', '--diff-filter=ACM'],
-    text=True
-).strip().split('\n')
-

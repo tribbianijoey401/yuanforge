@@ -1,9 +1,0 @@
-### Step G2: 初始化 docs/ 说明书（空模板）
-
-```bash
-mkdir -p docs
-# 按 .yuan/docs/ 规格书创建全局文档（同 Step 3）
-```
-
-此时 docs/ 只有 7 个全局文档（INDEX/PROGRESS/ARCHITECTURE/SETUP/CONVENTIONS/glossary/pitfalls），内容待 Step G3 填充。
-

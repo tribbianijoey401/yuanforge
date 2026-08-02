@@ -1,1 +1,0 @@
-VALID_CONFIDENCE = {'verified', 'stale', 'draft', 'deprecated'}

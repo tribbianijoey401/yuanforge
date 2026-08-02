@@ -1,7 +1,0 @@
-### Kit Consumption Rule
-
-- 一套全局组件 kit，每页都吃。优先用 kit 原语（`.ks-button` `.ks-bento` `.ks-section`），禁止重复造同类组件类（`.hero-cta-primary` `.footer-cta` 都是 `.ks-button-primary` 的违规重造）。
-- 仅当 kit 真不覆盖时才发明，且要 flag —— 真正解决复现需求的新模式属于 kit，不属于页 CSS。
-- 页 CSS 用于真正页面特定的景色（hero 插画、独特编辑视觉），不是重造 kit 已有的原语。
-- kit 原语消费 token，不硬编码值。需要 kit 外的颜色 / 字号 / 缓动时直接读 token（`var(--brand-accent)` `var(--type-display-size)`），不在页 CSS 里手打 oklch 值或字号。
-

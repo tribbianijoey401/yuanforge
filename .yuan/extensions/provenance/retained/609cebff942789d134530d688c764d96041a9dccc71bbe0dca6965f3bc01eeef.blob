@@ -1,7 +1,0 @@
-## Pitfalls
-
-- **不要只归档不蒸馏** — 只 mv 到 archive/ = 知识永远困在 archive 中
-- **PIT-NNN 编号递增** — 扫描 knowledge/pitfalls/ 下已有文件，取最大序号 +1
-- **verified_commit 必须准确** — 蒸馏前执行 `git log -1 --oneline`，不要猜
-- **蒸馏 ≠ 归档** — 归档是冻起来，蒸馏是提取有价值的事实
-- **即时蒸馏优先于批量蒸馏** — Bug 修完就蒸馏，不等 Close

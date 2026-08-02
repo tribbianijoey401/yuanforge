@@ -1,4 +1,7 @@
-yuanforge/
-.yuan/plans/
-docs/graph/
 __pycache__/
+*.py[cod]
+.pytest_cache/
+.yuan-run/
+dist/
+build/
+*.egg-info/

@@ -1,1 +1,0 @@
-VALID_PITFALL_STATUS = {'active', 'resolved', 'archived'}

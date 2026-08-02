@@ -1,5 +1,0 @@
-### 导航栏
-- 自定义导航栏需计算安全区高度：`statusBarHeight + 44px`
-- 页面滚动时导航栏样式变化需节流处理
-- 返回按钮默认存在，首页可配置 `navigationStyle: 'custom'`
-

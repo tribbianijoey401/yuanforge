@@ -1,9 +1,0 @@
-## 目的
-
-FEATURE.md 是需求的**单一真相源**（铁律Ⅵ）。承载 Product Analyst 的 5 维度澄清产出，供 Architect 作为设计输入。
-
-- 消除「认知差」：把人类需求中的隐含假设显式化
-- 单文档真相源：不另产独立澄清文档，5 维度吸收进用户故事 + 验收标准
-- Architect 顺 TASK_BOARD 原因指针读取本文件
-
-<SECTION-END:feat-pos>

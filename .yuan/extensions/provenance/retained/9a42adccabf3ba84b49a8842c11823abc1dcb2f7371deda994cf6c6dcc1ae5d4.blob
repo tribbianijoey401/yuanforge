@@ -1,9 +1,0 @@
-# ========== 提取 BUG 信息 ==========
-BUG_ID=""
-BUG_TITLE=""
-BUG_SEVERITY=""
-BUG_SUMMARY=""
-BUG_CAUSE=""
-BUG_FIX=""
-BUG_LESSON=""
-

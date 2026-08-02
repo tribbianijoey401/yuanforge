@@ -1,4 +1,0 @@
-class ScopeViolation(PortError):
-    pass
-
-

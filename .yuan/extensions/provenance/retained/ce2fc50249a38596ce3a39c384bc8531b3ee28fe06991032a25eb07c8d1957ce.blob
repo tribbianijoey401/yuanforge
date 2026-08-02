@@ -1,8 +1,0 @@
-### 5.7 glossary.md
-
-```
-从代码中提取领域术语：
-- 如果项目是电商 → SKU/SPU/OMS/WMS...
-- 如果是 SaaS → Tenant/Workspace/Subscription...
-```
-

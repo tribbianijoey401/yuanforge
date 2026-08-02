@@ -1,4 +1,0 @@
-### 场景
-
-Conductor 异常中断（Agent 窗口崩溃、平台故障、网络断开）后，新 Conductor 启动时无法依赖「正常跨会话启动」流程——因为 SESSION_LOG 可能不完整、TASK_BOARD 里 🔨 任务已废弃、Git working tree 可能是脏的。
-

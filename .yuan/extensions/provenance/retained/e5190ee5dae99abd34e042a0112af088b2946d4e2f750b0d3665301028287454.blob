@@ -1,7 +1,0 @@
-### Step 3: 定义 Stage 和 Gate
-
-每个 Stage 出口定义 Gate：
-- **G1 (Plan Gate):** Plan 完整 + 用户确认 → 进入 Phase 2
-- **G2 (Task Gate):** 每个 Task 后 Spec Review + Quality Review
-- **G3 (Integration Gate):** Stage 全部完成，全量测试 PASS
-

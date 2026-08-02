@@ -1,8 +1,0 @@
-def query_by_feature(graph, feature_id):
-    """按 Feature ID 查询依赖。"""
-    for node in graph.get("nodes", []):
-        if node.get("id") == feature_id:
-            return node
-    return None
-
-

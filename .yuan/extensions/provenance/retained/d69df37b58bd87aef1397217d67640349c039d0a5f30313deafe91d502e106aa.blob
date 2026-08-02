@@ -1,7 +1,0 @@
-### Step G4: 首次 Commit
-
-```bash
-git add -A
-git commit -m "init: graft YuanForge framework + project audit"
-```
-

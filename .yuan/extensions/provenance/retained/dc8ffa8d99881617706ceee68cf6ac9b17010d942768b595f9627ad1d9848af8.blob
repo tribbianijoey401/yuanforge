@@ -1,4 +1,0 @@
-## 3. 前端目录结构
-
-前端多框架目录模板见 `agents/mvp-dev-expert-team-frontend.md`「项目目录结构」章节（Vue / Next.js / Taro / Nuxt 均含 `pages/components/services/utils/types/stores` 分层）。同样遵循：组件按功能拆分、API 调用统一封装在 `services/`、页面只做组装不堆逻辑。
-

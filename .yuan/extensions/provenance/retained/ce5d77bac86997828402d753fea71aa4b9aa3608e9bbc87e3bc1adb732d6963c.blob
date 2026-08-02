@@ -1,7 +1,0 @@
-@dataclass
-class LegacyScan:
-    active_workspace_id: str | None
-    workspaces: list[LegacyWorkspace]
-    unresolved: list[dict[str, str]]
-
-

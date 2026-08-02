@@ -1,7 +1,0 @@
-# Dispatch Table 协议规范
-
-> **Dispatch Table 是 Agent 之间的调度协议。** 平台无关——任何 LLM Agent 或 Runtime Engine 都能解析并执行。
-> 语言：**自然语言（人类） + Schema（机器）。** Markdown 是人类视图，Schema 是机器视图。
-
----
-

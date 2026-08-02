@@ -1,8 +1,0 @@
-# Plan 工程化格式规范
-
-> Plan 不是给人类看的笔记，而是 Agent 军团的**作战指令书**。
-> 任何 Architect Agent 产出 Plan 时，必须严格遵守此格式。
-> Conductor Agent 依赖此格式解析 Task、构建 DAG、派发任务。
-
----
-

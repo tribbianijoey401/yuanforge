@@ -1,3 +1,0 @@
-PROTECTED_SELF_MOD_TARGETS = {"protocol", "core", "harness", "validator", "authority"}
-
-

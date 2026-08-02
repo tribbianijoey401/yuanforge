@@ -1,8 +1,0 @@
----
-name: TASK_BOARD
-description: >
-  文档格式规格书：多 Agent 任务板
-spec_type: document-format
-version: "3.0.0"
----
-

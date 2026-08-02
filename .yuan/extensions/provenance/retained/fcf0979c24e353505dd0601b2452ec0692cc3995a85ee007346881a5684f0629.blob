@@ -1,5 +1,0 @@
-### 页面尺寸
-- 设计稿基准：750rpx
-- 安全区域：iPhone X+ 底部 34px
-- 建议使用 `env(safe-area-inset-bottom)` 适配
-

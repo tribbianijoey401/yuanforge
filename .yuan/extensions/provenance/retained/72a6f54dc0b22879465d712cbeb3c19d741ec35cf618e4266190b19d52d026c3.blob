@@ -1,9 +1,0 @@
-def query_by_pitfall(graph, pitfall_id):
-    """按 Pitfall ID 查询影响范围。"""
-    affected = []
-    for edge in graph.get("edges", []):
-        if edge.get("source") == pitfall_id or edge.get("target") == pitfall_id:
-            affected.append(edge)
-    return affected
-
-

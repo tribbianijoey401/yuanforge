@@ -1,6 +1,0 @@
-### 最小多租户（1天可上线）
-1. 所有表加 tenant_id 字段
-2. JWT携带 tenant_id
-3. 查询自动过滤
-4. 简单角色区分（admin / member）
-

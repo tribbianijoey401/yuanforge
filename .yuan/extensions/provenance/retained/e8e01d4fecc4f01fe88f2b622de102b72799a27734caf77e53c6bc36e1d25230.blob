@@ -1,8 +1,0 @@
-#### typeset — 排版
-
-字体阶梯 / 字重 / 行高 / 字距。寄存器间有分歧。
-
-- **执行步骤**：双盲评估（A 排版评估 + B 机械预扫描，detector 输出不能先于视觉判断进入上下文）→ 字体选择流程（3 个具象品牌口音词 → 反射拒绝清单 → 真实字体目录浏览 → 交叉验证）→ 阶梯与权重策略 → 可读性修整 → OpenType 细节。
-- **检查项**：body ≥16px、行宽 45–75ch、行高随字号反比、暗底亮字 +0.05–0.1 行高 + 微字距；全大写标签加 5–12% letter-spacing；`font-display: swap` + fallback metric 匹配；变量字体 3+ 字重比静态多文件小；不硬编码 px，用 rem；不 disable 缩放。
-- **反模式**：反射性选 Inter / Roboto / Fraunces / Playfair / Space Grotesk（训练数据默认）；14/15/16px 这种扁平阶梯；一族里挑两个相似 sans 配对；装饰字用于正文；`user-scalable=no`。
-

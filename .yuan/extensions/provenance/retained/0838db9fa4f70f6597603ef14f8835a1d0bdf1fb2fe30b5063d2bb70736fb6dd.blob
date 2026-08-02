@@ -1,2 +1,0 @@
-GRAPH_FILE = GRAPH_DIR / "index.json"
-

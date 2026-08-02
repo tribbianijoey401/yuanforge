@@ -1,8 +1,0 @@
-#### animate — 动效
-
-动效系统 / 缓动 / 时长 / 空间连续。寄存器间有分歧。
-
-- **执行步骤**：评估动效机会（缺反馈 / 突兀切换 / 关系不清 / 缺 delight / 缺引导）→ 策略（一个 hero 时刻 + 反馈层 + 转场层 + delight 层）→ 实施（入场 / 微交互 / 状态转场 / 导航流 / 反馈引导）。
-- **检查项**：100/300/500 时长规则（100–150 ms 即时反馈 / 200–300 ms 状态切换 / 300–500 ms 布局变化 / 500–800 ms 入场）；用 ease-out-quart/quint/expo，**永不** bounce 或 elastic；退场比入场快约 75%；`prefers-reduced-motion` 必尊重；不随意动画 `width/height/top/left/margin`，用 transform / FLIP / grid-template-rows。
-- **反模式**：bounce / elastic 缓动；反馈动效 >500 ms；无目的动效；动画一切（疲劳）；忽略 reduced motion；阻塞交互。
-

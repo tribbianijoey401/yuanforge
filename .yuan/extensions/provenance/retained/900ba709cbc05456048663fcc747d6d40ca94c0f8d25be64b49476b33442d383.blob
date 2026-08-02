@@ -1,7 +1,0 @@
-### Step 1: 复制元框架
-
-```bash
-cp -r yuanforge my-new-project
-cd my-new-project
-```
-

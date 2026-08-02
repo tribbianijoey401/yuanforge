@@ -1,6 +1,0 @@
-## 反模式警告
-- 不要用emoji做AI功能图标（用Lucide：Sparkles/Brain/Wand2）
-- 不要用"Welcome to Our AI"等空洞占位（展示真实AI能力）
-- 不要硬编码颜色（Design Token引用）
-- 不要弹跳缓动（用150ms收敛值）
-- 不要千篇一律Hero（展示真实AI交互场景）

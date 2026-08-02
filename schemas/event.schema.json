@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuan.local/schemas/event.schema.json",
+  "title": "Yuan Ledger 事件",
+  "type": "object",
+  "required": ["schema_version", "run_id", "sequence", "previous", "type", "created_at", "payload", "digest"],
+  "properties": {
+    "schema_version": {"const": "yuan.event/v1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "sequence": {"type": "integer", "minimum": 1},
+    "previous": {"type": ["string", "null"]},
+    "type": {"enum": ["WORK_ACCEPTED", "ARTIFACT_BASELINED", "AUTHORIZATION_REQUIRED", "BUDGET_EXHAUSTED", "ATTEMPT_PREPARED", "ATTEMPT_DISPATCHED", "ATTEMPT_OBSERVED", "ATTEMPT_COMMITTED", "ATTEMPT_UNKNOWN", "ATTEMPT_RECONCILED", "EVIDENCE_RECORDED", "RESULT_REDUCED"]},
+    "created_at": {"type": "string", "minLength": 1},
+    "payload": {"type": "object"},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

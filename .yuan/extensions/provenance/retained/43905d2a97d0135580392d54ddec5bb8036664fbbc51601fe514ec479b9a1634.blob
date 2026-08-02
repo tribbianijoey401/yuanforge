@@ -1,8 +1,0 @@
-def _inside(root: pathlib.Path, value: pathlib.Path) -> bool:
-    try:
-        value.resolve(strict=False).relative_to(root)
-    except ValueError:
-        return False
-    return True
-
-

@@ -1,8 +1,0 @@
-#### clarify — 澄清
-
-文案与信息层级清晰化。
-
-- **执行步骤**：找清晰度问题（jargon / 歧义 / 被动 / 长度 / 假设 / 缺上下文 / 语气错位）→ 策略（主信息 / 行动 / 语气 / 约束）→ 系统化改写（错误消息 / 表单标签 / 按钮 CTA / 帮助文本 / 空状态 / 成功消息 / 加载态 / 确认对话框 / 导航）。
-- **检查项**：错误消息公式（发生了什么 + 为什么 + 怎么修）；按钮"verb + object"（"Save changes" 不是 "OK"）；破坏性操作命名破坏（"Delete 5 items" 不是 "Delete selected"）；术语一致（Delete / Settings / Sign in / Create 各选一个）；空状态是 onboarding 时刻；加载文案产品特定（不"Herding pixels"）；链接文本独立有意义。
-- **反模式**：jargon 不解释；责备用户（"You made an error"）；模糊错误（"Something went wrong"）；为变体换术语；错误用幽默；占位符当唯一标签。
-

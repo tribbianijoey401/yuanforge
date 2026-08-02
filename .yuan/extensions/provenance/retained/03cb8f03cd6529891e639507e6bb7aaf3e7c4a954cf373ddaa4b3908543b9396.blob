@@ -1,8 +1,0 @@
-### AP-SCHEMA-003: 42703 — 持久化状态与模型不一致
-
-- **描述**: 数据库表结构变更后（加列/改类型/删字段），API schema 和 seam-agreement 未同步更新。运行时访问已不存在的列或在 mock 测试中看似正常，上线后因列不存在而 42703。
-- **重现条件**: Dev 修改 DB migration → 修改 Model → 但未在 seam-agreement.md 中更新对应字段 → Tester 跑的是 mock 而非真实 DB。
-- **修复方式**: 引入 CAL（合同断言层），seam-agreement.md 字段定义带 @ptg 注解 → ptg-cal-gen.py 生成 pytest 断言 → PTG 环境执行。
-- **验证方式**: PTG 运行真实 DB + CAL 断言。表结构与 seam-agreement 字段不匹配时阻塞合并。
-- **@ptg**: true
-

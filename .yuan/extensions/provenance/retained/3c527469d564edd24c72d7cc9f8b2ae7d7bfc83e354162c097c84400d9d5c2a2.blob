@@ -1,8 +1,0 @@
-## 质量门禁
-
-| Gate | 检查内容 | 通过标准 | 执行者 |
-|------|---------|---------|--------|
-| G1 | Plan 完整性 + 用户确认设计理解书 | Dispatch Table 无遗漏、依赖正确、用户确认 | 用户 |
-| G2 | 四审查官并行 | 🔴 Blocker 全部解决 | spec-reviewer, security-auditor, quality-auditor, ux-reviewer |
-| G3 | 集成测试 | 🟡 Hard Gate — 全量测试 PASS | tester |
-| G4 | 文档归档 | Doc Engineer 归档完成 | doc-engineer |

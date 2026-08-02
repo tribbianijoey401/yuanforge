@@ -1,8 +1,0 @@
-### 阻塞三档定义
-
-| 档位 | 颜色 | 规则 | 持有者 |
-|------|------|------|--------|
-| **Blocker** | 🔴 | 不解决不能合入 | Spec Reviewer, Security Auditor |
-| **Hard Gate** | 🟡 | 必须全绿才能交付，但不阻塞其他审查 | Tester |
-| **Advisory** | 🟢 | 强烈建议，可记录豁免理由 | Quality Auditor, UX Reviewer |
-

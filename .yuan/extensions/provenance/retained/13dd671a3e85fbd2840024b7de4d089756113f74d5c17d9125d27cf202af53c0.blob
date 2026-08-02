@@ -1,5 +1,0 @@
-### 网络请求
-- HTTP：`@ohos.net.http`
-- WebSocket：`@ohos.net.webSocket`
-- 证书校验必须配置
-

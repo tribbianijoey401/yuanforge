@@ -1,8 +1,0 @@
----
-name: SESSION
-description: >
-  文档格式规格书：Workspace 会话文件
-spec_type: document-format
-version: "3.0.0"
----
-

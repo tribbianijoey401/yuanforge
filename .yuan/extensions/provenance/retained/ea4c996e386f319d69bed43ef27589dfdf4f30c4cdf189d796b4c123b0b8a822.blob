@@ -1,9 +1,0 @@
-## 触发条件
-
-| 类型 | 触发时机 | 执行者 |
-|------|---------|--------|
-| **即时蒸馏** | 任何 Agent 修复 Bug 后，标记 `BUG-NNN.md` 状态为完成 | 发现者 / Conductor |
-| **批量蒸馏** | Conductor 检测到所有 Task 终态，进入 Workspace Close | Conductor |
-
----
-

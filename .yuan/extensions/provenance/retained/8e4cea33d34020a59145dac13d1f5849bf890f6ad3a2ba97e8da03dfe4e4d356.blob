@@ -1,5 +1,0 @@
-# Framework PTG Critical Modules
-
-> 框架本身的关键模块，任何修改必须通过物理测试门控验证。
-> Tester 在执行内核 Goal 时读取此清单。
-

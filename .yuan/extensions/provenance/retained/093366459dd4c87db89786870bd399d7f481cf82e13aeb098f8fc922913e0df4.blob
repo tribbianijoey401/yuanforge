@@ -1,8 +1,0 @@
-# 测试完整性与反作弊规范（Test Integrity / Anti-Gaming）
-
-> **来源**：参考 MVP 开发专家团的 test-integrity-anti-gaming 规范。
-> **目的**：YuanForge 的 Tester 是 🟡 Hard Gate（全量测试 PASS 才交付），但"通过测试"本身可被游戏化——改松测试比改对代码省力。本规则给出**作弊目录 + 完整性差异 + 留出集**三道闸，让"全绿"在确认没作弊后才可信。
-> **与 YuanForge 的衔接**：与 `verdict-protocol.md`（谁来裁、怎么判）互补——本规则管"凭什么信这套绿测"，verdict-protocol 管"结论怎么结构化回传"。Tester 合约的「反作弊检查」小节引用本规则。
-
----
-

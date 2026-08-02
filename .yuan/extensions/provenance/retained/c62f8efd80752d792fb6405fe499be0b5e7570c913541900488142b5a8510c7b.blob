@@ -1,6 +1,0 @@
----
-name: query-ux-pro-max
-description: 查询 UI-UX-Pro-Max 行业设计知识库，获取特定行业的 UI 惯例、风格推荐和 UX 指南。不凭记忆猜测行业 UX 惯例。
-trigger: UI Designer 或 UX Reviewer 遇到特定行业/产品类型的 UX 惯例不确定时调用
----
-

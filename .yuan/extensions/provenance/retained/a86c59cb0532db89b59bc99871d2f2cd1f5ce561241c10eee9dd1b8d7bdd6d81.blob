@@ -1,7 +1,0 @@
-## 防御性指令（引用 contract-conventions.md）                # M6
-> 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
-1. 铁律全文
-2. 本合约全文
-3. 冻结基准（见「工作依据」具体文件名）
-缺失 → 请求 Conductor 注入。
-

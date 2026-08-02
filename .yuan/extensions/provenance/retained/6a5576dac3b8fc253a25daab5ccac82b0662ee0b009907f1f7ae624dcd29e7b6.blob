@@ -1,8 +1,0 @@
-### 正文规则
-
-- 蒸馏后正文应精简（原 FEATURE.md 可能 5KB → 蒸馏后 1-2KB）
-- 必须保留到 source session 的链接（如 `[PLAN](../archive/YYYYMMDD-描述/PLAN.md)`）
-- 正文是 Markdown，不是原始 Workspace 文件的拷贝
-
----
-

@@ -1,8 +1,0 @@
-## 七、与其他协议的关系
-
-| 协议 | 依赖方式 |
-|------|---------|
-| Object Protocol | Adapter 操作的对象由 Object Protocol 定义 |
-| State Protocol | Adapter 执行的状态转换由 State Protocol 定义 |
-| Action Protocol | Adapter 实现的接口由 Action Protocol 定义 |
-| Workflow Protocol | Adapter 由 Workflow Interpreter（Conductor）调用 |

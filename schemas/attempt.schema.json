@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuan.local/schemas/attempt.schema.json",
+  "title": "Yuan Attempt 提案",
+  "type": "object",
+  "required": ["attempt_id", "strategy", "hypothesis", "relevant_inputs", "action", "budget_charge"],
+  "properties": {
+    "attempt_id": {"type": "string", "minLength": 1},
+    "strategy": {"type": "string", "minLength": 1},
+    "hypothesis": {"type": "object", "required": ["claim", "falsification"]},
+    "relevant_inputs": {"type": "array"},
+    "action": {
+      "type": "object",
+      "required": ["type", "mutating", "side_effect_class", "paths", "grant_id", "high_impact"],
+      "properties": {
+        "type": {"enum": ["file-read", "file-write", "command", "verify", "reconcile"]},
+        "mutating": {"type": "boolean"},
+        "side_effect_class": {"enum": ["none", "filesystem", "process", "network", "external"]},
+        "paths": {"type": "array", "items": {"type": "string"}},
+        "grant_id": {"type": ["string", "null"]},
+        "high_impact": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "budget_charge": {"type": "object"}
+  },
+  "additionalProperties": false
+}

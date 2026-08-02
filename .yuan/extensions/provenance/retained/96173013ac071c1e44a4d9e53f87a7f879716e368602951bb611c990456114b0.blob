@@ -1,8 +1,0 @@
-## 审计检查点（每条核查合约「创建时」是否已声明，而非运行期才定）
-- P-A DRY：共享词汇/要求引用 contract-conventions.md，未把跨 agent 内容抄进本合约；路由条目对齐共享路由表。
-- P-B 基准：合约「工作依据」填了本 agent 具体的冻结基准文件。新增加载：seam-agreement.md 含 @ptg 注解（如有外部依赖字段）→ 缺则扣 0.3。
-- P-C 对抗：合约「对抗式审查」填了本 agent 具体对抗目标，且满足 ≥1 尝试要求。Tester 必须含 PTG+CAL+anti-patterns 验证。
-- P-D 门禁：合约「门禁定义」固化了本 agent 档位 + 是否可执行 + 可判定通过谓词（无主观自检）。新增加载：docs/ptg-critical.md 存在、CAL 脚本已生成可执行 → 缺则扣 0.3；Quality Auditor 含 Advisory 自动升级规则 → 缺则扣 0.2。
-- P-E 非职责：合约显式声明「执行权限 / 不负责」，边界划到层。
-- P-F 骨架：符合 role-contract.md 节结构（含门禁定义段）。
-- P-G 闭环：产出命名消费者 + 反馈/蒸馏通道。
