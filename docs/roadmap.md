@@ -56,6 +56,7 @@
 - 在全新环境运行完整 Conformance Suite。
 - 旧规则无权批准或否决新 Release。
 - 本次暴力重构不再实现旧框架数据迁移。
+- 轻量项目安装器固定 `yuan.pyz`、合并 Agent Bootstrap，并支持安全 Stage/Update/Rollback。
 
 退出 Evidence：自包含 Zipapp Test、两次构建逐字节一致、Release/Source Hash 验证与完整 Conformance Suite。
 

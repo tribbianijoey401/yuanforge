@@ -10,7 +10,80 @@ Yuan 是一个协议优先、面向持久化 LLM 软件工程的 Harness。它�
 - Run Memory 是可由 Ledger 重建的一次性投影。
 - 开放 Agent 平台默认使用 `AUDITED` Profile；受控平台可以安装 `ENFORCED` Adapter。
 
-## 快速开始
+## 推荐用法：安装并由 LLM 开始工作
+
+从 Yuan 源码仓库执行：
+
+```powershell
+python -B scripts/sync_project.py install G:\projects\my-project --profile AUDITED
+```
+
+也可以先安装 Yuan CLI，再执行同一能力：
+
+```powershell
+python -m pip install .
+yuan project install G:\projects\my-project --profile AUDITED
+```
+
+安装器会：
+
+- 把确定性 Runtime 固定为目标项目的 `.yuan/bin/yuan.pyz`。
+- 创建 `.yuan/config.json`、`.yuan/protocol.md`、Adapter Descriptor 和 Install Record。
+- 在保留项目原文的前提下，安装或更新 `AGENTS.md` 中带标记的 Yuan Bootstrap。
+- 在 `.gitignore` 中维护 `.yuan-run/`、Draft、Candidate 和本地 Release Backup。
+- 初始化首个空 Run；之后由 Agent 根据用户意图 Author Work。
+
+安装完成后，用户只需要在目标项目中向 Codex 等 Agent 描述需求。Agent 通过项目固定入口运行 Yuan：
+
+```powershell
+python -B .yuan/bin/yuan.pyz --root . status
+```
+
+推荐流程：
+
+1. 使用 Codex、Claude Code 等 Agent 打开目标项目根目录。
+2. 开始一个新项目或新需求时，直接向 LLM 发送：
+
+   ```text
+   请读取项目根目录 AGENTS.md，并按照 Yuan Agent Bootstrap 开始一个新的 Work。我的需求是：<在这里描述需求>
+   ```
+
+3. 会话中断、切换平台或稍后恢复时，向 LLM 发送：
+
+   ```text
+   请读取项目根目录 AGENTS.md，检查 Yuan 当前状态，并按照 Yuan Agent Bootstrap 继续未完成的 Work；只有 Reducer 返回 COMPLETE 时才报告完成。
+   ```
+
+LLM 会先读取 Bootstrap，再通过项目内固定 Runtime 恢复 Run Memory、Work、Attempt 和 Evidence。用户不需要手工重述此前过程。安装脚本成功后也会显示以上提示；机器可解析的单个 JSON 保留在标准输出，提示写入标准错误流。
+
+详细安装边界与目录结构见 [项目安装与更新](docs/installation.md)。
+
+## 推荐用法：同步 Yuan 更新
+
+先更新 Yuan 源码仓库，再同步目标项目：
+
+```powershell
+git pull
+python -B scripts/sync_project.py update G:\projects\my-project
+```
+
+或使用已升级的全局 CLI：
+
+```powershell
+python -m pip install --upgrade .
+yuan project update G:\projects\my-project
+```
+
+更新不会删除 `.yuan-run/`，也不会覆盖 `AGENTS.md` 的项目自有内容。没有 Active Work 或当前结果为 `COMPLETE` 时，新 Runtime 原子激活并保存旧 Runtime Backup；其他非终态会返回 `STAGED`，需要在当前 Work 完成后再次运行更新命令。
+
+脚本结果含义：
+
+- `INSTALLED`：安装完成，可以使用上面的“开始新工作”提示。
+- `UNCHANGED`：目标项目已经是当前版本，可直接开始或继续 Work。
+- `UPDATED`：新 Runtime 已激活，可让 LLM 继续读取当前状态。
+- `STAGED`：当前 Work 未完成；先使用“继续未完成工作”提示，达到 `COMPLETE` 后再次执行 `update`。
+
+## 手动 Core 流程
 
 ```powershell
 python -m pip install -e .
@@ -19,7 +92,8 @@ yuan work template > work.draft.json
 # 编辑草稿，然后绑定 Verifier 文件闭包并接受 Work：
 yuan work bind-verifier work.draft.json --criterion AC-001 > work.json
 yuan work accept work.json
-# 按 schemas/attempt.schema.json 创建 proposal.json：
+# 根据当前文件自动绑定 Relevant Input Digest：
+yuan attempt template --attempt-id ATT-001 --strategy "实现需求" --claim "修改满足 AC" --falsification "Verifier 失败" --input src/app.py --action-type file-write --path src --side-effect-class filesystem --grant-id GRANT-001 > proposal.json
 yuan attempt begin proposal.json
 # 紧邻真实动作之前执行：
 yuan attempt dispatch --attempt ATT-001

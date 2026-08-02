@@ -18,6 +18,7 @@ from yuan.adapters import validate_adapter_descriptor  # noqa: E402
 from yuan.canonical import canonical_bytes, digest_bytes  # noqa: E402
 from yuan.identity import harness_digest  # noqa: E402
 from yuan.ledger import atomic_write  # noqa: E402
+from yuan.project import BOOTSTRAP_END, BOOTSTRAP_START, bootstrap_bytes  # noqa: E402
 from yuan.release import build_zipapp, verify_release  # noqa: E402
 
 
@@ -70,6 +71,17 @@ def validate_size_budget() -> dict[str, object]:
     return {"status": "PASS", "protocol_nonempty_lines": protocol_lines, "kernel_python_lines": python_lines}
 
 
+def validate_bootstrap() -> dict[str, object]:
+    root_bootstrap = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+    if root_bootstrap.count(BOOTSTRAP_START) != 1 or root_bootstrap.count(BOOTSTRAP_END) != 1:
+        raise RuntimeError("根 AGENTS.md 的 Yuan Managed Block 不唯一")
+    managed = root_bootstrap.split(BOOTSTRAP_START, 1)[1].split(BOOTSTRAP_END, 1)[0].strip()
+    packaged = bootstrap_bytes().decode("utf-8").strip()
+    if managed != packaged:
+        raise RuntimeError("根 AGENTS.md 与发行包 Agent Bootstrap 不一致")
+    return {"status": "PASS", "bootstrap_digest": digest_bytes(bootstrap_bytes())}
+
+
 def validate_reproducible_release() -> dict[str, object]:
     with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
         first_artifact = Path(first) / "yuan.pyz"
@@ -103,6 +115,7 @@ def build_report() -> dict[str, object]:
             "adapter_id": descriptor["adapter_id"],
             "profile": descriptor["profile"],
         },
+        "bootstrap": validate_bootstrap(),
         "size_budget": validate_size_budget(),
         "reproducible_release": validate_reproducible_release(),
     }

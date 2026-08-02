@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import zipfile
+from importlib import resources
 from pathlib import Path
 from typing import Any
 
@@ -42,26 +43,60 @@ def _zip_info(name: str) -> zipfile.ZipInfo:
     return info
 
 
+def _write_zipapp(output: Path, entries: list[tuple[str, bytes]]) -> None:
+    output = output.resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output.with_name(f".{output.name}.{os.getpid()}.tmp")
+    try:
+        with zipfile.ZipFile(temporary, "w") as archive:
+            archive.writestr(_zip_info("__main__.py"), MAIN)
+            for archive_path, payload in entries:
+                archive.writestr(_zip_info(archive_path), payload)
+        os.replace(temporary, output)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+
+
+def _resource_payloads() -> list[tuple[str, bytes]]:
+    payloads: list[tuple[str, bytes]] = []
+
+    def visit(node: Any, relative: Path) -> None:
+        for child in sorted(node.iterdir(), key=lambda item: item.name):
+            child_relative = relative / child.name
+            if child.is_dir():
+                if child.name != "__pycache__":
+                    visit(child, child_relative)
+            elif child.name.endswith(".pyc"):
+                continue
+            else:
+                payloads.append(((Path("yuan") / child_relative).as_posix(), child.read_bytes()))
+
+    visit(resources.files("yuan"), Path())
+    return payloads
+
+
+def build_runtime_zipapp(output: Path) -> dict[str, Any]:
+    """从当前已安装 Package 构建项目固定的确定性 Runtime。"""
+
+    entries = _resource_payloads()
+    if not entries:
+        raise ValidationError("已安装的 Yuan Package 为空")
+    _write_zipapp(output, entries)
+    payload = output.resolve().read_bytes()
+    return {"path": output.name, "digest": digest_bytes(payload), "bytes": len(payload)}
+
+
 def build_zipapp(repo_root: Path, output: Path) -> dict[str, Any]:
     repo_root = repo_root.resolve()
     output = output.resolve()
     entries = source_entries(repo_root)
     if not entries:
         raise ValidationError("Release Source 为空")
-    output.parent.mkdir(parents=True, exist_ok=True)
-    temporary = output.with_name(f".{output.name}.{os.getpid()}.tmp")
-    try:
-        with zipfile.ZipFile(temporary, "w") as archive:
-            archive.writestr(_zip_info("__main__.py"), MAIN)
-            for entry in entries:
-                archive.writestr(
-                    _zip_info(entry["archive_path"]),
-                    (repo_root / entry["source_path"]).read_bytes(),
-                )
-        os.replace(temporary, output)
-    finally:
-        if temporary.exists():
-            temporary.unlink()
+    _write_zipapp(
+        output,
+        [(entry["archive_path"], (repo_root / entry["source_path"]).read_bytes()) for entry in entries],
+    )
     payload = output.read_bytes()
     manifest = {
         "schema_version": "yuan.release-manifest/v1",

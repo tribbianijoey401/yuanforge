@@ -1,4 +1,3 @@
-<!-- yuan:bootstrap:start -->
 # Yuan Agent Bootstrap
 
 当 `.yuan/config.json` 存在时，本项目启用 Yuan Harness。项目固定的执行入口是：
@@ -34,4 +33,3 @@ python -B .yuan/bin/yuan.pyz --root .
 只允许报告 Reducer 的唯一结果：`CONTINUE`、`CORRECT`、`COMPLETE`、`BLOCKED`、`WAIT_AUTH` 或 `BUDGET_EXIT`。只有 `COMPLETE` 可以向用户报告工作完成；`UNKNOWN` 必须通过新的只读 Reconciliation Attempt 解析。
 
 `AGENTS.md` 只是平台 Adapter，不是 Core Truth。若本段与固定的 Protocol 或 Kernel 冲突，以机械校验结果为准并 fail-closed。
-<!-- yuan:bootstrap:end -->

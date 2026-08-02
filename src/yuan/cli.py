@@ -5,19 +5,16 @@ from __future__ import annotations
 import argparse
 import copy
 import json
-import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from . import __version__
 from .adapters import validate_adapter_descriptor
 from .canonical import canonical_bytes, digest, digest_bytes
 from .errors import YuanError
-from .identity import environment_binding, harness_digest, protocol_bytes
-from .ledger import Ledger, atomic_write
 from .paths import resolve_inside
+from .project import initialize_repository, install_project, update_project
 from .release import read_manifest, verify_release
 from .runtime import (
     accept_work,
@@ -35,8 +32,7 @@ from .runtime import (
     run_verifier,
     start_successor,
 )
-from .validate import with_digest
-from .validate import identifier
+from .validate import validate_proposal, with_digest
 
 
 class ChineseArgumentParser(argparse.ArgumentParser):
@@ -65,32 +61,7 @@ def emit(value: Any) -> None:
 
 
 def init_repository(root: Path, profile: str, run_id: str | None) -> dict[str, Any]:
-    root = root.resolve()
-    config_path = root / ".yuan" / "config.json"
-    if config_path.exists():
-        raise YuanError("仓库已经初始化")
-    if profile == "ENFORCED":
-        raise YuanError("ENFORCED 需要另行安装符合规范的 Action Port Adapter")
-    protocol = protocol_bytes()
-    selected_protocol = root / ".yuan" / "protocol.md"
-    atomic_write(selected_protocol, protocol)
-    config = with_digest({
-        "schema_version": "yuan.config/v1",
-        "profile": profile,
-        "protocol": {"id": "yuan.core", "revision": "0.2", "digest": digest_bytes(protocol)},
-        "harness": {"id": "yuan.python", "revision": __version__, "digest": harness_digest()},
-        "state_root": ".yuan-run",
-        "artifact_exclude": [".yuan-run/**", ".git/**", "__pycache__/**", "*.pyc"],
-        "environment": environment_binding(),
-    })
-    atomic_write(config_path, canonical_bytes(config))
-    if run_id is None:
-        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        run_id = f"RUN-{stamp}-{os.getpid()}"
-    identifier(run_id, "run_id")
-    Ledger(root / config["state_root"], run_id).run_root.mkdir(parents=True, exist_ok=False)
-    atomic_write(root / config["state_root"] / "current.json", canonical_bytes({"run_id": run_id}))
-    return {"status": "INITIALIZED", "run_id": run_id, "profile": profile, "protocol": config["protocol"], "harness": config["harness"]}
+    return initialize_repository(root, profile, run_id)
 
 
 def work_template(root: Path, *, successor: bool = False) -> dict[str, Any]:
@@ -105,6 +76,10 @@ def work_template(root: Path, *, successor: bool = False) -> dict[str, Any]:
         from .runtime import predecessor_binding
 
         work["predecessor"] = predecessor_binding(ledger, projection)
+        work["profile"] = config["profile"]
+        work["protocol"] = config["protocol"]
+        work["harness"] = config["harness"]
+        work["artifact"]["environment"] = config["environment"]
         work["created_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         return with_digest(work)
     verifier_files = [{"path": "tests/verify.py", "digest": "0" * 64}]
@@ -157,6 +132,55 @@ def work_template(root: Path, *, successor: bool = False) -> dict[str, Any]:
     return with_digest(work)
 
 
+def attempt_template(
+    root: Path,
+    *,
+    attempt_id: str,
+    strategy: str,
+    claim: str,
+    falsification: str,
+    inputs: list[str],
+    action_type: str,
+    paths: list[str],
+    side_effect_class: str,
+    grant_id: str | None,
+    read_only: bool,
+    high_impact: bool,
+    tool_calls: int,
+    command_seconds: int,
+) -> dict[str, Any]:
+    projection = rebuild(root, write=False)
+    if projection["work"] is None or projection["errors"]:
+        raise YuanError("没有合法 Active Work，不能创建 Proposal")
+    relevant = []
+    for relative in inputs:
+        target = resolve_inside(root.resolve(), relative)
+        if target.is_symlink() or not target.is_file():
+            raise YuanError(f"Relevant Input 不存在或不安全：{relative}")
+        relevant.append({"path": relative.replace("\\", "/"), "digest": digest_bytes(target.read_bytes())})
+    proposal = {
+        "attempt_id": attempt_id,
+        "strategy": strategy,
+        "hypothesis": {"claim": claim, "falsification": falsification},
+        "relevant_inputs": relevant,
+        "action": {
+            "type": action_type,
+            "mutating": not read_only,
+            "side_effect_class": side_effect_class,
+            "paths": [item.replace("\\", "/") for item in paths],
+            "grant_id": grant_id,
+            "high_impact": high_impact,
+        },
+        "budget_charge": {
+            "ticks": 1,
+            "attempts": 1,
+            "tool_calls": tool_calls,
+            "command_seconds": command_seconds,
+        },
+    }
+    return validate_proposal(proposal)
+
+
 def parser() -> argparse.ArgumentParser:
     top = ChineseArgumentParser(prog="yuan", description="Yuan 确定性 Harness Microkernel")
     top.add_argument("--root", type=Path, default=Path.cwd(), help="仓库根目录，默认使用当前目录")
@@ -175,6 +199,20 @@ def parser() -> argparse.ArgumentParser:
     work_bind.add_argument("--criterion", required=True)
     attempt = commands.add_parser("attempt", help="管理 Attempt 生命周期")
     attempt_sub = attempt.add_subparsers(dest="attempt_command", required=True)
+    attempt_template_parser = attempt_sub.add_parser("template", help="根据当前文件生成带 Input Digest 的 Proposal")
+    attempt_template_parser.add_argument("--attempt-id", required=True)
+    attempt_template_parser.add_argument("--strategy", required=True)
+    attempt_template_parser.add_argument("--claim", required=True)
+    attempt_template_parser.add_argument("--falsification", required=True)
+    attempt_template_parser.add_argument("--input", action="append", default=[])
+    attempt_template_parser.add_argument("--action-type", choices=("file-read", "file-write", "command", "verify"), required=True)
+    attempt_template_parser.add_argument("--path", action="append", default=[])
+    attempt_template_parser.add_argument("--side-effect-class", choices=("none", "filesystem", "process", "network", "external"), required=True)
+    attempt_template_parser.add_argument("--grant-id")
+    attempt_template_parser.add_argument("--read-only", action="store_true")
+    attempt_template_parser.add_argument("--high-impact", action="store_true")
+    attempt_template_parser.add_argument("--tool-calls", type=int, default=1)
+    attempt_template_parser.add_argument("--command-seconds", type=int, default=0)
     attempt_begin = attempt_sub.add_parser("begin", help="准备新的 Attempt")
     attempt_begin.add_argument("file", type=Path)
     attempt_dispatch = attempt_sub.add_parser("dispatch", help="记录 Attempt 已派发")
@@ -219,6 +257,14 @@ def parser() -> argparse.ArgumentParser:
     release_verify.add_argument("manifest", type=Path)
     release_verify.add_argument("--artifact", type=Path, required=True)
     release_verify.add_argument("--check-source", action="store_true")
+    project = commands.add_parser("project", help="安装或同步目标项目的 Yuan Runtime")
+    project_sub = project.add_subparsers(dest="project_command", required=True)
+    project_install = project_sub.add_parser("install", help="向目标项目安装固定 Runtime 与 Agent Bootstrap")
+    project_install.add_argument("target", type=Path)
+    project_install.add_argument("--profile", choices=("AUDITED",), default="AUDITED")
+    project_install.add_argument("--run-id")
+    project_update = project_sub.add_parser("update", help="安全同步当前 Yuan Release")
+    project_update.add_argument("target", type=Path)
     localize_parser(top)
     return top
 
@@ -247,6 +293,23 @@ def execute(args: argparse.Namespace) -> Any:
             item["digest"] = digest_bytes(path.read_bytes())
         verifier["digest"] = digest({"kind": verifier.get("kind"), "entrypoint": verifier.get("entrypoint"), "files": files})
         return with_digest(work)
+    if args.command == "attempt" and args.attempt_command == "template":
+        return attempt_template(
+            root,
+            attempt_id=args.attempt_id,
+            strategy=args.strategy,
+            claim=args.claim,
+            falsification=args.falsification,
+            inputs=args.input,
+            action_type=args.action_type,
+            paths=args.path,
+            side_effect_class=args.side_effect_class,
+            grant_id=args.grant_id,
+            read_only=args.read_only,
+            high_impact=args.high_impact,
+            tool_calls=args.tool_calls,
+            command_seconds=args.command_seconds,
+        )
     if args.command == "attempt" and args.attempt_command == "begin":
         return begin_attempt(root, read_json(args.file))
     if args.command == "attempt" and args.attempt_command == "dispatch":
@@ -289,6 +352,10 @@ def execute(args: argparse.Namespace) -> Any:
             args.artifact,
             repo_root=root if args.check_source else None,
         )
+    if args.command == "project" and args.project_command == "install":
+        return install_project(args.target, profile=args.profile, run_id=args.run_id)
+    if args.command == "project" and args.project_command == "update":
+        return update_project(args.target)
     if args.command == "seal":
         return with_digest(read_json(args.file))
     raise AssertionError("到达不可达的 Command 分支")

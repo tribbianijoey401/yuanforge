@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuan.local/schemas/project-install.schema.json",
+  "title": "Yuan 项目安装记录",
+  "type": "object",
+  "required": ["schema_version", "framework_version", "runtime", "protocol_digest", "bootstrap_digest", "adapter_digest", "digest"],
+  "properties": {
+    "schema_version": {"const": "yuan.project-install/v1"},
+    "framework_version": {"type": "string"},
+    "runtime": {
+      "type": "object",
+      "required": ["path", "digest", "bytes"],
+      "properties": {
+        "path": {"const": ".yuan/bin/yuan.pyz"},
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "protocol_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "bootstrap_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "adapter_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}
