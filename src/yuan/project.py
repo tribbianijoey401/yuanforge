@@ -662,35 +662,11 @@ def update_project(
                     "release_proof": current_record.get("release"),
                     "agent_guidance": agent_guidance(root, capability_profile),
                 }
-            # 状态检查必须使用候选 Release：项目固定的旧 Runtime 可能包含
-            # 已修复的 Artifact 枚举缺陷（如缺少 node_modules 排除），
-            # 用旧 Runtime 检查会导致自举死锁，永远无法完成更新。
-            current_status = _pinned_status(root, candidate)
-            work = current_status.get("work")
-            result = current_status.get("decision", {}).get("result")
-            errors = current_status.get("errors")
-            safe_empty = work is None and errors == [] and current_status.get("source_count") == 0
-            safe_terminal = work is not None and result in SAFE_UPDATE_RESULTS and errors == []
-            if not (safe_empty or safe_terminal):
-                staged = candidate.with_name(f"{artifact['digest']}.pyz")
-                os.replace(candidate, staged)
-                metadata = with_digest({
-                    "schema_version": "yuan.staged-release/v1",
-                    "artifact": {key: artifact[key] for key in ("path", "digest", "bytes")},
-                    "manifest": artifact["manifest"],
-                    "proof": proof,
-                    "blocked_by_result": result,
-                })
-                atomic_write(staged.with_suffix(".json"), canonical_bytes(metadata))
-                _cleanup_candidates(root, artifact["digest"])
-                return {
-                    "status": "STAGED",
-                    "root": str(root),
-                    "runtime_digest": artifact["digest"],
-                    "candidate": str(staged.relative_to(root)),
-                    "blocked_by_result": result,
-                    "agent_guidance": agent_guidance(root, capability_profile),
-                }
+            # 状态检查必须在「候选 Kernel + 迁移后 config」下执行：
+            # 固定旧 Runtime 可能携带已修复的 Artifact 枚举缺陷（如缺少
+            # node_modules 排除），而候选 Kernel 又无法通过旧 config 的
+            # Harness 绑定校验。因此先事务化迁移部署，再用新 Runtime
+            # 检查状态；不安全则回滚整个事务并暂存候选 Release。
             snapshot = _snapshot_deployment(root)
             current_files = _deployment_files_for_record(current_record)
             next_files = _deployment_files_for_profile(capability_profile)
@@ -714,6 +690,32 @@ def update_project(
             except Exception:
                 _restore(root, captured)
                 raise
+            work = verified.get("work")
+            result = verified.get("decision", {}).get("result")
+            errors = verified.get("errors")
+            safe_empty = work is None and errors == [] and verified.get("source_count") == 0
+            safe_terminal = work is not None and result in SAFE_UPDATE_RESULTS and errors == []
+            if not (safe_empty or safe_terminal):
+                _restore(root, captured)
+                staged = candidate.with_name(f"{artifact['digest']}.pyz")
+                os.replace(candidate, staged)
+                metadata = with_digest({
+                    "schema_version": "yuan.staged-release/v1",
+                    "artifact": {key: artifact[key] for key in ("path", "digest", "bytes")},
+                    "manifest": artifact["manifest"],
+                    "proof": proof,
+                    "blocked_by_result": result,
+                })
+                atomic_write(staged.with_suffix(".json"), canonical_bytes(metadata))
+                _cleanup_candidates(root, artifact["digest"])
+                return {
+                    "status": "STAGED",
+                    "root": str(root),
+                    "runtime_digest": artifact["digest"],
+                    "candidate": str(staged.relative_to(root)),
+                    "blocked_by_result": result,
+                    "agent_guidance": agent_guidance(root, capability_profile),
+                }
             _cleanup_candidates(root)
             return {
                 "status": "UPDATED",
