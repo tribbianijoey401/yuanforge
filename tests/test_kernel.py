@@ -18,6 +18,8 @@ from yuan.capabilities import (
     capability_manifest,
     installed_catalog,
     resolve_capabilities,
+    route_capabilities,
+    routing_plan,
 )
 from yuan.cli import attempt_template, init_repository, parser as cli_parser, work_template
 from yuan.errors import IntegrityError, ValidationError
@@ -41,22 +43,50 @@ from yuan.runtime import (
     add_evidence,
     begin_attempt,
     dispatch_attempt,
+    handoff_template,
     load_config,
     observe_attempt,
     list_runs,
     predecessor_binding,
+    replay,
     rebuild,
     record_reduction,
+    record_handoff,
     mark_attempt_unknown,
     resolve_attempt,
     run_verifier,
     start_successor,
+    state_root,
+    supersede_work,
     verify_work_verifiers,
 )
 from yuan.validate import validate_evidence, validate_work, with_digest
+from yuan.workflow import confirm_intake, confirm_work, intake_decision, intake_template
 
 
 ZERO = "0" * 64
+
+
+def confirmed_intake(request: str, *, risk: str = "R2", signals: list[str] | None = None) -> dict:
+    value = intake_template(request)
+    value["risk"] = {"level": risk, "rationale": f"测试固定为 {risk}。"}
+    value["signals"] = list(signals or [])
+    value = with_digest(value)
+    return confirm_intake(value, "测试用户确认需求、答案、假设与风险")
+
+
+def core_routing(*, risk: str = "R2", signals: list[str] | None = None) -> dict:
+    return with_digest({
+        "schema_version": "yuan.routing/v1",
+        "profile_id": "core",
+        "profile_digest": digest({"profile": "core"}),
+        "risk": risk,
+        "signals": list(signals or []),
+        "agents": [],
+        "skills": [],
+        "handoff_agents": [],
+        "artifact_review_agents": [],
+    })
 
 
 def release_context_for_digest(artifact_digest: str) -> dict:
@@ -141,13 +171,16 @@ class RuntimeCase(unittest.TestCase):
             "digest": digest_bytes((self.root / "tests" / "verify_value.py").read_bytes()),
         }]
         work = {
-            "schema_version": "yuan.work/v1",
+            "schema_version": "yuan.work/v2",
             "work_id": "WORK-TEST",
             "revision": 1,
             "goal": "修改 VALUE 并证明结果。",
             "profile": "AUDITED",
             "protocol": self.config["protocol"],
             "harness": self.config["harness"],
+            "intake": confirmed_intake("修改 VALUE 并证明结果。"),
+            "routing": core_routing(),
+            "confirmation": None,
             "artifact": {
                 "root": ".",
                 "include": ["**"],
@@ -181,7 +214,7 @@ class RuntimeCase(unittest.TestCase):
             "predecessor": None,
             "created_at": "2026-08-02T00:00:00Z",
         }
-        return with_digest(work)
+        return confirm_work(work, "测试用户确认完整 Work Contract")
 
     def proposal(self, *, attempt_id: str = "ATT-001", path: str = "src") -> dict:
         return {
@@ -224,6 +257,31 @@ class RuntimeCase(unittest.TestCase):
         (self.root / "src" / "app.py").write_text("VALUE = 2\n", encoding="utf-8")
         result = observe_attempt(self.root, "ATT-001", {"kind": "agent-platform", "status": "OK"})
         self.assertEqual(result["decision"]["result"], "CONTINUE")
+
+    def start_routed_successor(self) -> dict:
+        supersede_work(self.root, reason="用户改变了验收范围", request="修改 VALUE 并完成独立测试交接。")
+        _, ledger = active_ledger(self.root)
+        projection = rebuild(self.root, write=False)
+        successor = copy.deepcopy(self.work)
+        successor["revision"] = 2
+        successor["goal"] = "修改 VALUE 并完成独立测试交接。"
+        successor["intake"] = confirmed_intake(successor["goal"])
+        successor["routing"] = with_digest({
+            "schema_version": "yuan.routing/v1",
+            "profile_id": "core",
+            "profile_digest": digest({"profile": "core"}),
+            "risk": "R2",
+            "signals": [],
+            "agents": ["backend-developer", "tester"],
+            "skills": [],
+            "handoff_agents": ["backend-developer", "tester"],
+            "artifact_review_agents": ["backend-developer", "tester"],
+        })
+        successor["predecessor"] = predecessor_binding(ledger, projection)
+        successor = confirm_work(successor, "用户确认变更后的完整 Work Contract")
+        start_successor(self.root, successor, "RUN-TEST-R2")
+        self.work = successor
+        return successor
 
     def evidence(self, status: str = "PASS") -> dict:
         artifact = build_manifest(
@@ -381,6 +439,19 @@ class RuntimeCase(unittest.TestCase):
         self.assertEqual(result["decision"]["result"], "BLOCKED")
         self.assertEqual(rebuild(self.root)["attempts"]["ATT-001"]["state"], "UNKNOWN")
 
+    def test_unknown_run_cannot_escape_through_generic_successor(self) -> None:
+        begin_attempt(self.root, self.proposal())
+        dispatch_attempt(self.root, "ATT-001")
+        mark_attempt_unknown(self.root, "ATT-001", "模拟未解析副作用")
+        _, ledger = active_ledger(self.root)
+        projection = rebuild(self.root, write=False)
+        successor = copy.deepcopy(self.work)
+        successor["revision"] = 2
+        successor["predecessor"] = predecessor_binding(ledger, projection)
+        successor = confirm_work(successor, "用户确认候选继任契约")
+        with self.assertRaisesRegex(ValidationError, "WORK_SUPERSEDED"):
+            start_successor(self.root, successor, "RUN-UNKNOWN-ESCAPE")
+
     def test_reconciliation_refuses_changes_outside_original_scope(self) -> None:
         begin_attempt(self.root, self.proposal())
         dispatch_attempt(self.root, "ATT-001")
@@ -441,6 +512,30 @@ class RuntimeCase(unittest.TestCase):
         self.assertEqual(receipt["status"], "RECOVERED")
         self.assertEqual(len(ledger.events()), 2)
 
+    def test_ledger_transition_compare_and_swap_rejects_stale_head(self) -> None:
+        _, ledger = active_ledger(self.root)
+        projection = rebuild(self.root, write=False)
+        event = ledger.append(
+            "RESULT_REDUCED",
+            {"result": projection["decision"]["result"], "projection_digest": projection["digest"]},
+            expected_head=projection["source_head"],
+        )
+        self.assertEqual(event["previous"], projection["source_head"])
+        with self.assertRaisesRegex(IntegrityError, "Ledger Head CAS 失败"):
+            ledger.append(
+                "RESULT_REDUCED",
+                {"result": "CONTINUE", "projection_digest": projection["digest"]},
+                expected_head=projection["source_head"],
+            )
+
+    def test_replay_blocks_incomplete_work_acceptance_transition(self) -> None:
+        config = load_config(self.root)
+        incomplete = Ledger(state_root(self.root, config), "RUN-INCOMPLETE-WORK")
+        incomplete.append("WORK_ACCEPTED", self.work, expected_head=None)
+        projection = replay(incomplete)
+        self.assertEqual(projection["decision"]["result"], "BLOCKED")
+        self.assertIn("Work 缺少 ARTIFACT_BASELINED Event", projection["errors"])
+
     def test_selected_protocol_is_verified_on_every_command(self) -> None:
         (self.root / ".yuan" / "protocol.md").write_text("tampered\n", encoding="utf-8")
         with self.assertRaises(IntegrityError):
@@ -455,7 +550,7 @@ class RuntimeCase(unittest.TestCase):
         successor["revision"] = 2
         successor["predecessor"] = predecessor_binding(ledger, projection)
         successor["grants"][0]["scopes"].append("README.md")
-        successor = with_digest(successor)
+        successor = confirm_work(successor, "用户确认扩展后的授权范围")
         result = start_successor(self.root, successor, "RUN-TEST-R2")
         self.assertEqual(result["status"], "SUCCESSOR_ACTIVE")
         self.assertEqual(result["projection"]["work"]["revision"], 2)
@@ -473,7 +568,7 @@ class RuntimeCase(unittest.TestCase):
         successor["revision"] = 2
         successor["predecessor"] = predecessor_binding(ledger, projection)
         successor["predecessor"]["head_digest"] = "9" * 64
-        successor = with_digest(successor)
+        successor = confirm_work(successor, "用户确认错误前任测试契约")
         with self.assertRaises(ValidationError):
             start_successor(self.root, successor, "RUN-BAD-R2")
         self.assertEqual(active_ledger(self.root)[1].run_id, "RUN-TEST")
@@ -484,12 +579,145 @@ class RuntimeCase(unittest.TestCase):
         successor = copy.deepcopy(self.work)
         successor["revision"] = 2
         successor["predecessor"] = predecessor_binding(ledger, projection)
-        successor = with_digest(successor)
+        successor = confirm_work(successor, "用户确认非终态继任测试契约")
         with self.assertRaises(ValidationError):
             start_successor(self.root, successor, "RUN-EARLY-R2")
 
+    def test_work_cannot_start_without_final_user_confirmation(self) -> None:
+        unconfirmed = copy.deepcopy(self.work)
+        unconfirmed["confirmation"] = None
+        unconfirmed = with_digest(unconfirmed)
+        with self.assertRaisesRegex(ValidationError, "尚未获得用户最终确认"):
+            accept_work(self.root, unconfirmed)
+
+    def test_unresolved_attempt_prevents_mid_work_requirement_change(self) -> None:
+        begin_attempt(self.root, self.proposal())
+        with self.assertRaisesRegex(ValidationError, "存在未解析 Attempt"):
+            supersede_work(self.root, reason="用户改变范围", request="新的需求")
+
+    def test_unresolved_attempt_prevents_role_handoff(self) -> None:
+        begin_attempt(self.root, self.proposal())
+        with self.assertRaisesRegex(ValidationError, "存在未解析 Attempt"):
+            handoff_template(
+                self.root,
+                handoff_id="HANDOFF-UNSTABLE",
+                agent_id="tester",
+                to_agent_id="user",
+                phase="verification",
+                status="READY",
+                summary="错误地在未解析 Attempt 上交接。",
+                evidence_ids=[],
+            )
+
+    def test_mid_work_change_closes_old_work_and_starts_confirmed_successor(self) -> None:
+        successor = self.start_routed_successor()
+        self.assertEqual(successor["revision"], 2)
+        self.assertEqual(rebuild(self.root)["decision"]["result"], "CONTINUE")
+        runs = list_runs(self.root)
+        self.assertEqual(runs["current_run_id"], "RUN-TEST-R2")
+        self.assertEqual(len(runs["runs"]), 2)
+
+    def test_required_role_handoff_gates_completion(self) -> None:
+        self.start_routed_successor()
+        self.commit_change()
+        verified = run_verifier(self.root, "AC-VALUE", "ATT-001")
+        self.assertEqual(verified["decision"]["result"], "CONTINUE")
+        self.assertIn("tester", " ".join(verified["decision"]["reasons"]))
+        evidence_id = verified["event"]["payload"]["evidence_id"]
+        with self.assertRaisesRegex(ValidationError, "必须引用当前 Evidence"):
+            handoff_template(
+                self.root,
+                handoff_id="HANDOFF-TESTER-EMPTY",
+                agent_id="tester",
+                to_agent_id="user",
+                phase="verification",
+                status="READY",
+                summary="没有引用 Evidence 的无效审查。",
+                evidence_ids=[],
+            )
+        tester_handoff = handoff_template(
+            self.root,
+            handoff_id="HANDOFF-TESTER-001",
+            agent_id="tester",
+            to_agent_id="user",
+            phase="verification",
+            status="READY",
+            summary="独立验证通过，边界与失败路径均已检查。",
+            evidence_ids=[evidence_id],
+        )
+        with self.assertRaisesRegex(ValidationError, "前序 Agent 尚未 READY"):
+            record_handoff(self.root, tester_handoff)
+        developer_handoff = handoff_template(
+            self.root,
+            handoff_id="HANDOFF-BACKEND-001",
+            agent_id="backend-developer",
+            to_agent_id="tester",
+            phase="implementation",
+            status="READY",
+            summary="实现增量及其验证线索已交给 Tester。",
+            evidence_ids=[evidence_id],
+        )
+        self.assertEqual(record_handoff(self.root, developer_handoff)["decision"]["result"], "CONTINUE")
+        recorded = record_handoff(self.root, tester_handoff)
+        self.assertEqual(recorded["decision"]["result"], "COMPLETE")
+
+    def test_replay_rejects_out_of_order_role_handoff_event(self) -> None:
+        self.start_routed_successor()
+        self.commit_change()
+        verified = run_verifier(self.root, "AC-VALUE", "ATT-001")
+        tester_handoff = handoff_template(
+            self.root,
+            handoff_id="HANDOFF-OUT-OF-ORDER",
+            agent_id="tester",
+            to_agent_id="user",
+            phase="verification",
+            status="READY",
+            summary="绕过 Writer Guard 的倒序交接。",
+            evidence_ids=[verified["event"]["payload"]["evidence_id"]],
+        )
+        _, ledger = active_ledger(self.root)
+        ledger.append("ROLE_HANDOFF_RECORDED", tester_handoff)
+        projection = rebuild(self.root)
+        self.assertEqual(projection["decision"]["result"], "BLOCKED")
+        self.assertIn("前序 Agent 尚未 READY", " ".join(projection["errors"]))
+
 
 class PureKernelTests(unittest.TestCase):
+    def test_intake_blocks_on_unanswered_question_and_requires_confirmation(self) -> None:
+        intake = intake_template("实现一个尚未明确权限边界的功能。")
+        intake["questions"] = [{
+            "id": "Q-AUTH",
+            "question": "哪些角色可以执行此操作？",
+            "blocking": True,
+            "answer": None,
+        }]
+        intake = with_digest(intake)
+        self.assertEqual(intake_decision(intake)["reason_code"], "NEEDS_INPUT")
+        with self.assertRaisesRegex(ValidationError, "未回答的阻塞问题"):
+            confirm_intake(intake, "确认")
+        intake["questions"][0]["answer"] = "仅管理员。"
+        intake = with_digest(intake)
+        self.assertEqual(intake_decision(intake)["reason_code"], "NEEDS_CONFIRMATION")
+        confirmed = confirm_intake(intake, "用户确认需求、答案、假设和风险")
+        self.assertEqual(intake_decision(confirmed)["reason_code"], "INTAKE_CONFIRMED")
+
+    def test_stale_or_negative_role_handoff_cannot_complete(self) -> None:
+        projection = self.projection()
+        projection["work"]["routing"] = {
+            "handoff_agents": ["tester"],
+            "artifact_review_agents": ["tester"],
+        }
+        projection["criterion_evidence"] = {"AC": {"status": "PASS", "current": True}}
+        projection["agent_handoffs"] = {
+            "tester": {"agent_id": "tester", "status": "READY", "current": False},
+        }
+        self.assertEqual(reduce_projection(projection)["result"], "CONTINUE")
+        projection["agent_handoffs"]["tester"] = {
+            "agent_id": "tester", "status": "NEEDS_WORK", "current": True,
+        }
+        projection["latest_handoff"] = projection["agent_handoffs"]["tester"]
+        self.assertEqual(reduce_projection(projection)["result"], "CORRECT")
+
     def test_canonical_json_is_stable_and_rejects_nan(self) -> None:
         self.assertEqual(canonical_bytes({"b": 2, "a": "元"}), b'{"a":"\xe5\x85\x83","b":2}')
         with self.assertRaises(ValidationError):
@@ -510,6 +738,7 @@ class PureKernelTests(unittest.TestCase):
             "budgets": {"ticks": 5},
             "acceptance_criteria": [{"id": "AC", "required": True}],
             "safety_invariants": [{"criterion_id": "AC"}],
+            "routing": {"handoff_agents": [], "artifact_review_agents": []},
         }
         return {
             "work": work,
@@ -784,6 +1013,40 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertEqual(len(selection["rules"]), len(catalog["required_rules"]))
         self.assertEqual(selection["agents"][0]["id"], "conductor")
         self.assertEqual(selection["skills"][0]["id"], "project-lifecycle")
+        routed = subprocess.run(
+            [
+                sys.executable, "-B", str(runtime), "--root", str(self.root),
+                "capability", "route", "--risk", "R1", "--signal", "backend",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=30,
+        )
+        self.assertEqual(routed.returncode, 0, routed.stderr.decode(errors="replace"))
+        route = json.loads(routed.stdout)
+        self.assertEqual(route["status"], "ROUTED")
+        self.assertEqual(
+            route["routing"]["agents"],
+            ["conductor", "backend-developer", "spec-reviewer", "tester"],
+        )
+        assignments = {item["agent_id"]: item["skills"] for item in route["assignments"]}
+        self.assertIn("test-driven-development", assignments["backend-developer"])
+        self.assertIn("code-review", assignments["spec-reviewer"])
+        self.assertEqual(
+            set(route["routing"]["skills"]),
+            {skill_id for skill_ids in assignments.values() for skill_id in skill_ids},
+        )
+        signal_ids = list(catalog["workflow"]["signal_routes"])
+        for risk in ("R0", "R1", "R2"):
+            for signals in [[], *[[signal_id] for signal_id in signal_ids]]:
+                candidate = route_capabilities(self.root, risk=risk, signals=signals)
+                assigned = {
+                    skill_id
+                    for assignment in candidate["assignments"]
+                    for skill_id in assignment["skills"]
+                }
+                self.assertEqual(set(candidate["routing"]["skills"]), assigned)
 
     def test_custom_extension_can_be_bound_discovered_and_isolated(self) -> None:
         install_project(self.root, release_context=self.release_context, run_id="RUN-CUSTOM-EXTENSION")
@@ -830,7 +1093,7 @@ class ProjectInstallerTests(unittest.TestCase):
 
     def test_first_work_template_uses_non_artifact_verifier_draft(self) -> None:
         install_project(self.root, release_context=self.release_context, run_id="RUN-FIRST-WORK-TEMPLATE")
-        work = work_template(self.root)
+        work = work_template(self.root, intake=confirmed_intake("创建首个测试 Work。"))
         verifier = work["acceptance_criteria"][0]["verifier"]
         self.assertTrue(verifier["entrypoint"].startswith(".yuan/drafts/verifiers/"))
         self.assertIn(verifier["entrypoint"], {item["path"] for item in verifier["files"]})
@@ -840,15 +1103,11 @@ class ProjectInstallerTests(unittest.TestCase):
         install_project(self.root, release_context=self.release_context, run_id="RUN-LLM-BOOTSTRAP")
         initial = project_status(self.root)
         self.assertEqual(initial["decision"], {"result": "BLOCKED", "reasons": ["没有 Active Work"]})
-        selection = resolve_capabilities(
-            self.root,
-            rules=[],
-            agents=["conductor"],
-            skills=["project-lifecycle", "work-authoring", "verifier-authoring"],
-        )
-        self.assertEqual(selection["status"], "RESOLVED")
+        selection = route_capabilities(self.root, risk="R2", signals=[])
+        self.assertEqual(selection["status"], "ROUTED")
+        self.assertEqual(selection["routing"]["agents"], ["conductor", "tester"])
 
-        work = work_template(self.root)
+        work = work_template(self.root, intake=confirmed_intake("创建内容为 hello 的 app.txt。"))
         verifier_path = self.root / work["acceptance_criteria"][0]["verifier"]["entrypoint"]
         verifier_path.parent.mkdir(parents=True)
         verifier_path.write_text(
@@ -872,7 +1131,14 @@ class ProjectInstallerTests(unittest.TestCase):
         work["grants"][0]["action_types"] = ["file-write"]
         work["grants"][0]["side_effect_classes"] = ["filesystem"]
         work["grants"][0]["scopes"] = ["app.txt"]
-        work = with_digest(work)
+        work = confirm_work(work, "用户确认 app.txt 的完整 Work Contract")
+        under_routed = copy.deepcopy(work)
+        for field in ("agents", "handoff_agents", "artifact_review_agents"):
+            under_routed["routing"][field].remove("tester")
+        under_routed["routing"] = with_digest(under_routed["routing"])
+        under_routed = confirm_work(under_routed, "测试用户确认被错误降级的 Routing")
+        with self.assertRaisesRegex(ValidationError, "Routing 与已安装 Capability Workflow 不匹配"):
+            accept_work(self.root, under_routed)
         accepted = accept_work(self.root, work)
         self.assertEqual(accepted["decision"]["result"], "CONTINUE")
 
@@ -898,7 +1164,18 @@ class ProjectInstallerTests(unittest.TestCase):
         observed = observe_attempt(self.root, "ATT-FIRST-WORK", {"kind": "agent-platform", "status": "OK"})
         self.assertEqual(observed["decision"]["result"], "CONTINUE")
         verified = run_verifier(self.root, "AC-001", "ATT-FIRST-WORK")
-        self.assertEqual(verified["decision"]["result"], "COMPLETE")
+        self.assertEqual(verified["decision"]["result"], "CONTINUE")
+        handoff = handoff_template(
+            self.root,
+            handoff_id="HO-TESTER-FIRST",
+            agent_id="tester",
+            to_agent_id="conductor",
+            phase="verification",
+            status="READY",
+            summary="Tester 已验证 app.txt 的当前 Artifact。",
+            evidence_ids=[verified["event"]["payload"]["evidence_id"]],
+        )
+        self.assertEqual(record_handoff(self.root, handoff)["decision"]["result"], "COMPLETE")
         self.assertEqual(record_reduction(self.root)["decision"]["result"], "COMPLETE")
 
     def test_capability_tamper_fails_installation_verification(self) -> None:
@@ -907,6 +1184,15 @@ class ProjectInstallerTests(unittest.TestCase):
         rule.write_text(rule.read_text(encoding="utf-8") + "篡改\n", encoding="utf-8")
         with self.assertRaises(IntegrityError):
             project_status(self.root)
+
+    def test_runtime_rejects_config_capability_binding_drift(self) -> None:
+        install_project(self.root, release_context=self.release_context, run_id="RUN-CAPABILITY-BINDING")
+        config_path = self.root / ".yuan" / "config.json"
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+        config["capability"]["digest"] = "0" * 64
+        atomic_write(config_path, canonical_bytes(with_digest(config)))
+        with self.assertRaisesRegex(IntegrityError, "Capability Profile Binding 不匹配"):
+            load_config(self.root)
 
     def test_update_stages_candidate_while_work_is_nonterminal(self) -> None:
         install_project(self.root, release_context=self.release_context, run_id="RUN-STAGE-TEST")
@@ -927,14 +1213,18 @@ class ProjectInstallerTests(unittest.TestCase):
             "timeout_seconds": 10,
             "files": files,
         }
-        work = with_digest({
-            "schema_version": "yuan.work/v1",
+        intake = confirmed_intake("保持非终态以验证 Candidate Staging。")
+        work = {
+            "schema_version": "yuan.work/v2",
             "work_id": "WORK-STAGE",
             "revision": 1,
             "goal": "保持非终态以验证 Candidate Staging。",
             "profile": config["profile"],
             "protocol": config["protocol"],
             "harness": config["harness"],
+            "intake": intake,
+            "routing": routing_plan(self.root, risk="R2", signals=[]),
+            "confirmation": None,
             "artifact": {
                 "root": ".",
                 "include": ["**"],
@@ -954,7 +1244,8 @@ class ProjectInstallerTests(unittest.TestCase):
             "budgets": {"ticks": 2, "attempts": 2, "tool_calls": 2, "command_seconds": 2},
             "predecessor": None,
             "created_at": "2026-08-02T00:00:00Z",
-        })
+        }
+        work = confirm_work(work, "用户确认 Candidate Staging 测试契约")
         accept_work(self.root, work)
         current = (self.root / ".yuan" / "bin" / "yuan.pyz").read_bytes()
         next_context, builder = altered_candidate(b"candidate-release")
@@ -970,6 +1261,16 @@ class ProjectInstallerTests(unittest.TestCase):
         staged_path.write_bytes(staged_path.read_bytes() + b"tampered")
         with self.assertRaises(IntegrityError):
             project_status(self.root)
+        superseded = supersede_work(
+            self.root,
+            reason="用户关闭旧范围并准备新需求",
+            request="使用新框架开始继任需求。",
+        )
+        self.assertEqual(superseded["decision"]["reason_code"], "WORK_SUPERSEDED")
+        with mock.patch("yuan.project.build_runtime_zipapp", side_effect=builder):
+            updated = update_project(self.root, release_context=next_context)
+        self.assertEqual(updated["status"], "UPDATED")
+        self.assertEqual(updated["decision"]["reason_code"], "WORK_SUPERSEDED")
 
     def test_complete_work_allows_verified_update(self) -> None:
         (self.root / "src").mkdir()
@@ -981,12 +1282,13 @@ class ProjectInstallerTests(unittest.TestCase):
             encoding="utf-8",
         )
         install_project(self.root, release_context=self.release_context, run_id="RUN-COMPLETE-UPDATE")
-        work = work_template(self.root)
+        work = work_template(self.root, intake=confirmed_intake("验证完成态更新。"))
         files = [{"path": "tests/verify.py", "digest": digest_bytes(verifier_path.read_bytes())}]
         verifier = work["acceptance_criteria"][0]["verifier"]
         verifier.update(id="test.complete-update", entrypoint="tests/verify.py", files=files)
         verifier["digest"] = digest({"kind": verifier["kind"], "entrypoint": verifier["entrypoint"], "files": files})
-        accept_work(self.root, with_digest(work))
+        work = confirm_work(work, "用户确认完成态更新 Work")
+        accept_work(self.root, work)
         proposal = attempt_template(
             self.root,
             attempt_id="ATT-COMPLETE-UPDATE",
@@ -1004,7 +1306,18 @@ class ProjectInstallerTests(unittest.TestCase):
             command_seconds=0,
         )
         begin_attempt(self.root, proposal)
-        run_verifier(self.root, "AC-001", "ATT-COMPLETE-UPDATE")
+        verified = run_verifier(self.root, "AC-001", "ATT-COMPLETE-UPDATE")
+        handoff = handoff_template(
+            self.root,
+            handoff_id="HO-TESTER-UPDATE",
+            agent_id="tester",
+            to_agent_id="conductor",
+            phase="verification",
+            status="READY",
+            summary="Tester 已验证完成态更新的当前 Artifact。",
+            evidence_ids=[verified["event"]["payload"]["evidence_id"]],
+        )
+        record_handoff(self.root, handoff)
         self.assertEqual(record_reduction(self.root)["decision"]["result"], "COMPLETE")
         next_context, builder = altered_candidate(b"complete-update")
         with mock.patch("yuan.project.build_runtime_zipapp", side_effect=builder):

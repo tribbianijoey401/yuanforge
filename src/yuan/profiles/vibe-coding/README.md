@@ -4,12 +4,12 @@
 
 ## 加载顺序
 
-1. 始终读取 `capability resolve` 返回的全部 Required Rules；当前 Profile 为 `rules/00` 至 `rules/07`。
-2. 根据 Work 风险与任务类型，从 `agents/` 选择角色。
-3. 只加载与当前 Tick 相关的 `skills/*/SKILL.md`，不要一次加载全部内容。
+1. 新需求先完成 Intake 与用户确认。
+2. 运行 `capability route`；始终读取返回的全部 Required Rules，Agent 与 Skill 只能来自 `routing/assignments`。
+3. 每个角色只加载 Assignment 中与当前阶段相关的 `skills/*/SKILL.md`，不要一次加载全部内容。
 4. 项目自定义能力写入 `.yuan/extensions/custom/`，不得修改本目录中的托管文件。
 
-Catalog 已由 `.yuan/extensions/manifest.json` 暴露。使用固定 Runtime 的 `capability list` 查看触发条件，使用 `capability resolve` 获得本 Tick 必须读取的路径和 Digest。
+Catalog 与 Workflow 已由 `.yuan/extensions/manifest.json` 暴露。使用固定 Runtime 的 `capability list` 查看能力，使用 `capability route --risk ... --signal ...` 获得本 Work 的路径、Digest 和 Agent→Skill Assignment。
 
 ## 能力边界
 
@@ -19,8 +19,8 @@ Catalog 已由 `.yuan/extensions/manifest.json` 暴露。使用固定 Runtime �
 
 ## 默认工作流
 
-`理解意图 → 建立 Work Contract → 设计 → 实现 → 独立验证 → Reducer 判定 → 交付/纠正`
+`Intake → 用户确认 → 风险路由 → Work 最终确认 → 设计/实现 → Evidence → Role Handoff → Reducer → 交付/纠正`
 
 ## Agent 通用契约
 
-每个 Agent 接收：Active Work、相关 Artifact、前序 Attempt/Evidence 和明确范围。输出必须是 Work/Proposal 草案、Artifact 修改、审查发现或 Verifier Evidence 之一，并给出来源指针。Agent 不得自行宣布 Core Result；Reviewer 不得修改被审对象；平台无法提供独立 Agent 时必须声明角色隔离降级。
+每个 Agent 接收：Active Work Digest、Routing Assignment、相关 Artifact、前序 Attempt/Evidence/Handoff 和明确范围。输出必须是 Intake/Work/Proposal 草案、Artifact 修改、审查发现、Evidence 或 `READY/NEEDS_WORK` Handoff 候选，并给出来源指针。Agent 不得自行宣布 Core Result；Reviewer 不得修改被审对象；平台无法提供独立 Agent 时必须声明角色隔离降级。

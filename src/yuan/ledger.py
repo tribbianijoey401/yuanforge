@@ -14,6 +14,9 @@ from .canonical import canonical_bytes, digest, digest_bytes, verify_digest
 from .errors import IntegrityError
 
 
+_ANY_HEAD = object()
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
@@ -111,9 +114,18 @@ class Ledger:
             raise IntegrityError("Ledger Head 结构不合法")
         return value
 
-    def append(self, event_type: str, payload: dict[str, Any]) -> dict[str, Any]:
+    def append(
+        self,
+        event_type: str,
+        payload: dict[str, Any],
+        *,
+        expected_head: str | None | object = _ANY_HEAD,
+    ) -> dict[str, Any]:
         with exclusive_lock(self.lock_path):
             head = self._head()
+            actual_head = None if head is None else head["event_digest"]
+            if expected_head is not _ANY_HEAD and expected_head != actual_head:
+                raise IntegrityError("Ledger Head CAS 失败，状态已被其他 Transition 推进")
             sequence = 1 if head is None else head["sequence"] + 1
             previous = None if head is None else head["event_digest"]
             event = {

@@ -1,19 +1,24 @@
 # Vibe Coding 工作流规则
 
-## 启动
+## 需求入口
 
-- 先读取仓库结构、入口、测试、文档和 Git 状态，再用自己的话说明项目目标与约束。
-- 将一句话需求转成小而可验证的 Acceptance Criteria；不清楚但不影响安全的细节可作显式假设。
-- 修改前给出与风险相称的计划。简单修复可以是一到三步，高风险变更必须包含回滚和验证。
+1. 先运行 `status` 与 `capability list`；状态或能力完整性失败时 fail-closed。
+2. 每个新请求先创建 Intake。会改变验收、安全边界或不可逆选择的问题必须询问用户；不得替用户回答。
+3. Intake 的答案、可撤销假设、风险理由和 Signals 经用户确认后，才能执行 `capability route`。
+4. Routing 是 Agent、Skill 与审查要求的唯一来源；按返回的 Assignment 加载内容。
+5. Work/Verifier 完成后，把 Goal、Scope、Criterion、Grant、Budget 与 Routing 再次展示给用户；确认后才能接受 Work。
 
-## 实施
+## 实施与角色交接
 
-- 每个 Tick 只推进一个可验证增量；先检查相关代码，再做最小闭合修改。
-- 保留用户已有改动，不清理、不覆盖无关文件。
-- 优先修根因；发现请求之外的问题时记录，不擅自扩大范围。
+1. 每个 Tick 只推进一个可验证增量；保留用户已有改动，不覆盖无关文件。
+2. Conductor 的每个派发包包含 Work Digest、角色、目标、范围、输入、禁止项、产出和验证方法。
+3. 角色完成阶段时必须记录 `READY` 或 `NEEDS_WORK` Handoff；Reviewer 不修改被审对象，发现交回实现角色形成 `CORRECT` 闭环。
+4. Artifact Reviewer 的旧 Handoff 会在 Artifact 变化后失效，必须重新审查。
+5. Required Criterion Evidence 和全部 Required Handoff 同时有效之前，不得 `COMPLETE`。
 
-## 收敛
+## 中途需求变更
 
-- 实现后运行最贴近改动的验证，再运行合理范围的回归验证。
-- 失败时改变假设或策略，不重复相同输入与相同动作。
-- 只有全部 Required Criterion 具有当前、有效 Evidence，Reducer 才能输出 `COMPLETE`。
+1. 用户修改已确认的目标、范围、验收、授权或风险时，不得直接编辑 Active Work。
+2. 先解析所有 `PREPARED`、`DISPATCHED`、`OBSERVED` 或 `UNKNOWN` Attempt。
+3. 对 `CONTINUE/CORRECT` Work 记录 `WORK_SUPERSEDED`，保留旧历史；重新创建 Intake、取得两次确认、生成 Routing，再启动绑定前任 Head 的 Successor。
+4. 仅补充不改变契约的上下文可写入下一次派发包；是否改变契约有疑义时按需求变更处理。

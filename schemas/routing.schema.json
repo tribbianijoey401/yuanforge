@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuan.local/schemas/routing.schema.json",
+  "title": "Yuan 确定性 Agent/Skill Routing Contract",
+  "type": "object",
+  "required": ["schema_version", "profile_id", "profile_digest", "risk", "signals", "agents", "skills", "handoff_agents", "artifact_review_agents", "digest"],
+  "properties": {
+    "schema_version": {"const": "yuan.routing/v1"},
+    "profile_id": {"type": "string"},
+    "profile_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "risk": {"enum": ["R0", "R1", "R2"]},
+    "signals": {"type": "array", "uniqueItems": true},
+    "agents": {"type": "array", "uniqueItems": true},
+    "skills": {"type": "array", "uniqueItems": true},
+    "handoff_agents": {"type": "array", "uniqueItems": true},
+    "artifact_review_agents": {"type": "array", "uniqueItems": true},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

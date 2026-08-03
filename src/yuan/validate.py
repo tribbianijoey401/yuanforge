@@ -11,6 +11,7 @@ from typing import Any
 from .canonical import digest, verify_digest
 from .errors import ValidationError
 from .paths import normalize_relative, scope_contains
+from .workflow import validate_intake, validate_routing, validate_work_confirmation
 
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 IDENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$")
@@ -48,7 +49,12 @@ def binding(value: Any, label: str) -> dict[str, Any]:
     return value
 
 
-def validate_work(value: Any, *, require_digest: bool = True) -> dict[str, Any]:
+def validate_work(
+    value: Any,
+    *,
+    require_digest: bool = True,
+    require_confirmation: bool = False,
+) -> dict[str, Any]:
     require(isinstance(value, dict), "Work 必须是 Object")
     require_keys(
         value,
@@ -56,16 +62,21 @@ def validate_work(value: Any, *, require_digest: bool = True) -> dict[str, Any]:
             "schema_version", "work_id", "revision", "goal", "profile",
             "protocol", "harness", "artifact", "acceptance_criteria",
             "safety_invariants", "grants", "budgets", "predecessor", "created_at",
+            "intake", "routing", "confirmation",
         },
         "Work",
     )
-    require(value["schema_version"] == "yuan.work/v1", "不支持该 Work Schema")
+    require(value["schema_version"] == "yuan.work/v2", "不支持该 Work Schema")
     identifier(value["work_id"], "work_id")
     require(isinstance(value["revision"], int) and value["revision"] > 0, "Work revision 不合法")
     require(isinstance(value["goal"], str) and value["goal"].strip(), "goal 不能为空")
     require(value["profile"] in PROFILES, "profile 不合法")
     binding(value["protocol"], "protocol")
     binding(value["harness"], "harness")
+    intake = validate_intake(value["intake"], require_confirmation=True)
+    routing = validate_routing(value["routing"])
+    require(routing["risk"] == intake["risk"]["level"], "Routing Risk 与 Intake 不匹配")
+    require(routing["signals"] == intake["signals"], "Routing Signals 与 Intake 不匹配")
     predecessor = value["predecessor"]
     if predecessor is not None:
         require(isinstance(predecessor, dict), "predecessor 必须是 Object 或 null")
@@ -120,6 +131,7 @@ def validate_work(value: Any, *, require_digest: bool = True) -> dict[str, Any]:
         require(verifier["digest"] == digest(closure), "Verifier Closure digest 不匹配")
         require(isinstance(item["min_assertions"], int) and item["min_assertions"] > 0, "min_assertions 必须为正数")
         require(item["independence"] in {"independent", "previous-root", "external"}, "independence 不合法")
+    require(any(item["required"] for item in criteria), "Work 至少需要一个 Required Acceptance Criterion")
 
     invariants = value["safety_invariants"]
     require(isinstance(invariants, list), "safety_invariants 必须是 List")
@@ -152,6 +164,7 @@ def validate_work(value: Any, *, require_digest: bool = True) -> dict[str, Any]:
     require_keys(budgets, {"ticks", "attempts", "tool_calls", "command_seconds"}, "budgets")
     for name, amount in budgets.items():
         require(isinstance(amount, int) and amount >= 0, f"Budget 不合法：{name}")
+    validate_work_confirmation(value["confirmation"], value, required=require_confirmation)
     if require_digest:
         require(verify_digest(value), "Work digest 不匹配")
     return value

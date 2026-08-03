@@ -5,8 +5,8 @@ description: 在提交、推送、发布或交接前验证范围、证据、可�
 
 # 发布与交接
 
-1. 检查 Work Result、Git diff、测试 Evidence、版本与迁移。
+1. 检查 Work Confirmation、Reducer Result、Required Role Handoff、Git diff、测试 Evidence、版本与迁移。
 2. 确认提交只包含当前范围，秘密与临时产物未进入版本库。
 3. 推送或发布前确认 Grant；保留远程回执。
-4. 交付说明包括变化、验证、升级/回滚命令、已知限制。
+4. 交付说明包括确认范围、变化、验证、角色审查、升级/回滚命令和已知限制。
 5. “已提交”“已推送”“已部署”“线上已验证”是不同事实，分别证明。

@@ -6,7 +6,9 @@ Yuan 是包裹 Agent 平台的最小确定性控制内核：LLM 提出候选，�
 
 ```mermaid
 flowchart LR
-    U["人类意图"] --> W["不可变 Work"]
+    U["人类意图"] --> I["Intake + 用户确认"]
+    I --> C["Risk/Signal 确定性路由"]
+    C --> W["不可变 Work + 最终确认"]
     L["LLM Proposal"] --> A["Attempt"]
     W --> A
     A --> P["平台动作 / Port"]
@@ -16,6 +18,8 @@ flowchart LR
     W --> R["纯 Reducer"]
     A --> R
     E --> R
+    H["Role Handoff"] --> R
+    W --> H
     R --> O["六种结果之一"]
     W --> G["Hash-chain Ledger"]
     A --> G
@@ -42,6 +46,7 @@ LLM 从来不是上述权威。`AGENTS.md` 只是帮助 LLM 进入协议的 Adap
 | `canonical.py` | 唯一 Canonical JSON 编码与 SHA-256 Identity |
 | `paths.py` | Relative Path 约束与 Scope 匹配 |
 | `validate.py` | Work、Proposal、Evidence、Grant 与 Binding 语义 |
+| `workflow.py` | Intake/Work Confirmation、Routing 与 Role Handoff 语义 |
 | `artifacts.py` | 有界稳定枚举、Manifest 与 Diff |
 | `ledger.py` | 不可变 Event/Blob、Hash Chain、Atomic Head 与恢复 |
 | `runtime.py` | Work/Attempt/Evidence 生命周期与确定性 Replay |
@@ -85,15 +90,16 @@ Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact M
 ## 标准 AUDITED 生命周期
 
 1. `yuan init` 固定 Protocol、Kernel、Environment 与 Profile。
-2. `yuan work template` 创建 Work 草稿。
-3. `yuan work bind-verifier` 计算 Verifier Closure Hash 并重新封装 Work。
-4. `yuan work accept` 验证 Work 并固定初始 Artifact。
-5. `yuan attempt begin` 验证 Relevant Input、Grant、Budget 与重复策略。
-6. `yuan attempt dispatch` 持久化打开 Mutation Window。
-7. Agent 只执行已声明动作。
-8. `yuan attempt observe` 关闭窗口、验证 Diff，并记录 `COMMITTED` 或 `UNKNOWN`。
-9. `yuan verify` 直接运行预绑定只读 Verifier 并创建 Evidence。
-10. `yuan reduce` 派生唯一结果并刷新 Run Memory。
+2. `yuan intake template/check/confirm` 固定问题、答案、假设、风险和第一次用户确认。
+3. `yuan capability route` 从 Risk/Signal 生成唯一 Agent→Skill Assignment。
+4. `yuan work template/bind-verifier/confirm` 创建完整契约并绑定第二次用户确认。
+5. `yuan work accept` 验证 Confirmation/Routing/Verifier 并固定初始 Artifact。
+6. `yuan attempt begin/dispatch/observe` 验证并审计一个有界副作用。
+7. `yuan verify` 运行预绑定只读 Verifier并创建 Evidence。
+8. 每个 Routing 角色通过 `handoff template/record` 记录 `READY` 或 `NEEDS_WORK`。
+9. `yuan reduce` 仅在 Evidence、Side Effect 与 Required Handoff 全部满足时派生 `COMPLETE`。
+
+用户中途改变契约时，`run supersede` 关闭旧 Work，Successor 从新 Intake 和两次确认重新开始；历史不被覆盖。
 
 ## 安全声明
 
@@ -103,6 +109,6 @@ Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact M
 
 Core 只定义确定性语义，不承担全部软件工程知识。发行包默认携带 `vibe-coding` Capability Profile：Rules 约束工作纪律，Agents 隔离职责，Skills 提供按需流程。它们只能帮助编写 Work/Proposal、指导动作或生成 Evidence，不能增加 Primitive、Result 或修改 `COMPLETE` 谓词。
 
-托管能力逐文件绑定到 Capability Manifest 和 Install Record，并参与安装事务、更新、完整性检查与回滚。每个 Bundled Profile 通过 `profile.json` 自描述，Kernel 无需硬编码 Profile 名称；Runtime 的 `capability list/resolve` 提供确定性发现与最小上下文加载。
+托管能力逐文件绑定到 Capability Manifest 和 Install Record，并参与安装事务、更新、完整性检查与回滚。每个 Bundled Profile 通过 `profile.json` 自描述；其 Workflow 同时定义 Risk Route、Signal Route、Agent→Skill Assignment 和 Artifact Reviewer。Runtime 的 `capability route` 机械生成唯一 Work Routing，`list/resolve` 负责发现与按需加载。
 
 项目能力位于 `.yuan/extensions/custom/<extension-id>/`，不进入框架托管集合。Custom Descriptor 自绑定逐文件 Digest；损坏的自定义扩展被隔离并报告，不会使 Core 或托管 Profile 成为隐藏依赖。

@@ -17,6 +17,7 @@ from .ledger import Ledger, atomic_write, exclusive_lock
 from .paths import scope_contains
 from .reducer import reduce_projection
 from .validate import action_authorized, identifier, validate_evidence, validate_proposal, validate_work
+from .workflow import validate_handoff
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -32,7 +33,10 @@ def read_json(path: Path) -> dict[str, Any]:
 def load_config(root: Path) -> dict[str, Any]:
     path = root.resolve() / ".yuan" / "config.json"
     value = read_json(path)
-    required = {"schema_version", "profile", "protocol", "harness", "state_root", "artifact_exclude", "environment", "digest"}
+    required = {
+        "schema_version", "profile", "protocol", "harness", "state_root",
+        "artifact_exclude", "environment", "capability", "digest",
+    }
     if set(value) != required or value["schema_version"] != "yuan.config/v1":
         raise IntegrityError("Yuan config 不合法")
     if not verify_digest(value):
@@ -46,6 +50,20 @@ def load_config(root: Path) -> dict[str, Any]:
         raise IntegrityError("已选择的 Protocol digest 不匹配")
     if harness_digest() != value["harness"].get("digest"):
         raise IntegrityError("当前 Kernel 与固定的 Harness 不匹配")
+    capability = value["capability"]
+    if capability is not None:
+        from .capabilities import read_installed_manifest
+        from .validate import binding
+
+        binding(capability, "capability")
+        manifest = read_installed_manifest(root)
+        expected = {
+            "id": manifest["profile_id"],
+            "revision": manifest["profile_version"],
+            "digest": manifest["digest"],
+        }
+        if capability != expected:
+            raise IntegrityError("Yuan config 与已安装 Capability Profile Binding 不匹配")
     return value
 
 
@@ -99,6 +117,10 @@ def replay(ledger: Ledger, *, current_artifact_digest: str | None = None) -> dic
         "evidence": {},
         "criterion_evidence": {},
         "latest_evidence": None,
+        "handoffs": {},
+        "agent_handoffs": {},
+        "latest_handoff": None,
+        "superseded": None,
         "authorization_required": None,
         "budgets_used": {"ticks": 0, "attempts": 0, "tool_calls": 0, "command_seconds": 0},
         "errors": [],
@@ -113,7 +135,7 @@ def replay(ledger: Ledger, *, current_artifact_digest: str | None = None) -> dic
             if kind == "WORK_ACCEPTED":
                 if projection["work"] is not None:
                     raise IntegrityError("Run 包含多个 Work Record")
-                projection["work"] = validate_work(payload)
+                projection["work"] = validate_work(payload, require_confirmation=True)
             elif kind == "ARTIFACT_BASELINED":
                 if projection["work"] is None or projection["expected_artifact"] is not None:
                     raise IntegrityError("Artifact Baseline 位置错误或重复")
@@ -276,6 +298,40 @@ def replay(ledger: Ledger, *, current_artifact_digest: str | None = None) -> dic
                 projection["evidence"][evidence["evidence_id"]] = item
                 projection["criterion_evidence"][evidence["criterion_id"]] = item
                 projection["latest_evidence"] = item
+            elif kind == "ROLE_HANDOFF_RECORDED":
+                work = projection["work"]
+                if work is None:
+                    raise IntegrityError("Role Handoff 早于 Work")
+                handoff = validate_handoff(payload, work)
+                if handoff["handoff_id"] in projection["handoffs"]:
+                    raise IntegrityError("Role Handoff id 重复")
+                _validate_handoff_order(projection, work, handoff)
+                for evidence_id in handoff["evidence_ids"]:
+                    evidence = projection["evidence"].get(evidence_id)
+                    if not evidence or evidence.get("current") is not True:
+                        raise IntegrityError("Role Handoff 引用了不存在或过期的 Evidence")
+                current = current_artifact_digest is None or handoff["artifact_digest"] == current_artifact_digest
+                item = {**handoff, "current": current}
+                projection["handoffs"][handoff["handoff_id"]] = item
+                projection["agent_handoffs"][handoff["agent_id"]] = item
+                projection["latest_handoff"] = item
+            elif kind == "WORK_SUPERSEDED":
+                if projection["work"] is None or projection["superseded"] is not None:
+                    raise IntegrityError("Work Supersede 位置错误或重复")
+                if set(payload) != {"reason", "request", "request_digest"}:
+                    raise IntegrityError("Work Supersede Payload 不合法")
+                if (
+                    not isinstance(payload["reason"], str)
+                    or not payload["reason"].strip()
+                    or not isinstance(payload["request"], str)
+                    or not payload["request"].strip()
+                    or payload["request_digest"] != digest_bytes(payload["request"].encode("utf-8"))
+                ):
+                    raise IntegrityError("Work Supersede Request Binding 不合法")
+                unresolved = _unresolved_attempt_ids(projection)
+                if unresolved:
+                    raise IntegrityError("Work Supersede 时存在未解析副作用")
+                projection["superseded"] = payload
             elif kind == "RESULT_REDUCED":
                 if payload.get("result") not in {"CONTINUE", "CORRECT", "COMPLETE", "BLOCKED", "WAIT_AUTH", "BUDGET_EXIT"}:
                     raise IntegrityError("已存储的 Result 名称不合法")
@@ -286,6 +342,8 @@ def replay(ledger: Ledger, *, current_artifact_digest: str | None = None) -> dic
             break
     projection["source_head"] = None if not events else events[-1]["digest"]
     projection["source_count"] = len(events)
+    if projection["work"] is not None and projection["expected_artifact"] is None:
+        projection["errors"].append("Work 缺少 ARTIFACT_BASELINED Event")
     in_flight = any(item["state"] in {"DISPATCHED", "UNKNOWN"} for item in projection["attempts"].values())
     if (
         current_artifact_digest is not None
@@ -313,22 +371,32 @@ def rebuild(root: Path, *, write: bool = True) -> dict[str, Any]:
 
 def accept_work(root: Path, work: dict[str, Any]) -> dict[str, Any]:
     config, ledger = active_ledger(root)
-    validate_work(work)
+    validate_work(work, require_confirmation=True)
     if work["profile"] != config["profile"] or work["protocol"] != config["protocol"] or work["harness"] != config["harness"]:
         raise ValidationError("Work 未绑定已选择的 Profile、Protocol 与 Harness")
     if work["artifact"]["environment"] != config["environment"]:
         raise ValidationError("Work Environment 与初始化环境不一致")
+    if config["capability"] is not None:
+        from .capabilities import routing_plan
+
+        if work["routing"] != routing_plan(
+            root,
+            risk=work["intake"]["risk"]["level"],
+            signals=work["intake"]["signals"],
+        ):
+            raise ValidationError("Work Routing 与已安装 Capability Workflow 不匹配")
     if work["predecessor"] is not None:
         raise ValidationError("首个 Run 的 Work predecessor 必须为 null")
     verify_work_verifiers(root, work)
     if ledger.events():
         raise IntegrityError("当前 Run 已存在不可变历史")
-    ledger.append("WORK_ACCEPTED", work)
+    accepted = ledger.append("WORK_ACCEPTED", work, expected_head=None)
     manifest = artifact_for(root, work)
     manifest_blob = ledger.put_blob(canonical_bytes(manifest))
     ledger.append(
         "ARTIFACT_BASELINED",
         {"artifact_digest": manifest["digest"], "manifest_blob": manifest_blob},
+        expected_head=accepted["digest"],
     )
     return rebuild(root)
 
@@ -353,7 +421,9 @@ def start_successor(root: Path, work: dict[str, Any], run_id: str) -> dict[str, 
     current = rebuild(root, write=False)
     if current["decision"]["result"] not in {"COMPLETE", "BLOCKED", "WAIT_AUTH", "BUDGET_EXIT"}:
         raise ValidationError("只有 Terminal Run 才能创建 Successor")
-    validate_work(work)
+    if current["decision"]["result"] == "BLOCKED" and current["decision"].get("reason_code") != "WORK_SUPERSEDED":
+        raise ValidationError("BLOCKED Run 只有经 WORK_SUPERSEDED 明确关闭后才能创建 Successor")
+    validate_work(work, require_confirmation=True)
     old_work = current["work"]
     if old_work is None:
         raise IntegrityError("当前 Run 没有 Work")
@@ -366,13 +436,26 @@ def start_successor(root: Path, work: dict[str, Any], run_id: str) -> dict[str, 
         raise ValidationError("Successor Work 没有绑定当前 Profile、Protocol 与 Harness")
     if work["artifact"]["environment"] != config["environment"]:
         raise ValidationError("Successor Work Environment Binding 不匹配")
+    if config["capability"] is not None:
+        from .capabilities import routing_plan
+
+        if work["routing"] != routing_plan(
+            root,
+            risk=work["intake"]["risk"]["level"],
+            signals=work["intake"]["signals"],
+        ):
+            raise ValidationError("Successor Work Routing 与 Capability Workflow 不匹配")
     verify_work_verifiers(root, work)
     successor = Ledger(state_root(root, config), run_id)
     successor.run_root.mkdir(parents=True, exist_ok=False)
-    successor.append("WORK_ACCEPTED", work)
+    accepted = successor.append("WORK_ACCEPTED", work, expected_head=None)
     manifest = artifact_for(root, work)
     manifest_blob = successor.put_blob(canonical_bytes(manifest))
-    successor.append("ARTIFACT_BASELINED", {"artifact_digest": manifest["digest"], "manifest_blob": manifest_blob})
+    successor.append(
+        "ARTIFACT_BASELINED",
+        {"artifact_digest": manifest["digest"], "manifest_blob": manifest_blob},
+        expected_head=accepted["digest"],
+    )
     pointer = state_root(root, config) / "current.json"
     lock = state_root(root, config) / ".current.lock"
     with exclusive_lock(lock):
@@ -461,7 +544,11 @@ def begin_attempt(root: Path, proposal: dict[str, Any]) -> dict[str, Any]:
             if newer is None or newer.get("attempt_id") == attempt["attempt_id"]:
                 raise ValidationError("相同 Strategy 与 Input 没有更新的 Evidence")
     if not action_authorized(work, proposal["action"]):
-        event = ledger.append("AUTHORIZATION_REQUIRED", {"attempt_id": proposal["attempt_id"], "action": proposal["action"]})
+        event = ledger.append(
+            "AUTHORIZATION_REQUIRED",
+            {"attempt_id": proposal["attempt_id"], "action": proposal["action"]},
+            expected_head=projection["source_head"],
+        )
         projection = rebuild(root)
         return {"event": event, "decision": projection["decision"]}
     if any(
@@ -471,6 +558,7 @@ def begin_attempt(root: Path, proposal: dict[str, Any]) -> dict[str, Any]:
         event = ledger.append(
             "BUDGET_EXHAUSTED",
             {"attempt_id": proposal["attempt_id"], "budget_charge": proposal["budget_charge"]},
+            expected_head=projection["source_head"],
         )
         return {"event": event, "decision": rebuild(root)["decision"]}
     manifest = artifact_for(root, work)
@@ -486,6 +574,7 @@ def begin_attempt(root: Path, proposal: dict[str, Any]) -> dict[str, Any]:
             "manifest_before_blob": manifest_blob,
             "proposal": proposal,
         },
+        expected_head=projection["source_head"],
     )
     return {"event": event, "decision": rebuild(root)["decision"]}
 
@@ -499,9 +588,13 @@ def dispatch_attempt(root: Path, attempt_id: str) -> dict[str, Any]:
     work = projection["work"]
     current = artifact_for(root, work)
     if current["digest"] != attempt["artifact_before"]:
-        event = ledger.append("ATTEMPT_UNKNOWN", {"attempt_id": attempt_id, "reason": "Artifact 在 Dispatch 前已改变"})
+        event = ledger.append(
+            "ATTEMPT_UNKNOWN",
+            {"attempt_id": attempt_id, "reason": "Artifact 在 Dispatch 前已改变"},
+            expected_head=projection["source_head"],
+        )
         return {"event": event, "decision": rebuild(root)["decision"]}
-    event = ledger.append("ATTEMPT_DISPATCHED", {"attempt_id": attempt_id})
+    event = ledger.append("ATTEMPT_DISPATCHED", {"attempt_id": attempt_id}, expected_head=projection["source_head"])
     return {"event": event, "decision": rebuild(root)["decision"]}
 
 
@@ -524,6 +617,7 @@ def observe_attempt(root: Path, attempt_id: str, receipt: dict[str, Any]) -> dic
         event = ledger.append(
             "ATTEMPT_UNKNOWN",
             {"attempt_id": attempt_id, "reason": "存在未声明的 Artifact 修改", "unexpected_paths": unexpected, "receipt_blob": receipt_blob},
+            expected_head=projection["source_head"],
         )
         return {"event": event, "decision": rebuild(root)["decision"]}
     observed = ledger.append(
@@ -536,10 +630,12 @@ def observe_attempt(root: Path, attempt_id: str, receipt: dict[str, Any]) -> dic
             "receipt_blob": receipt_blob,
             "receipt_digest": digest(receipt),
         },
+        expected_head=projection["source_head"],
     )
     committed = ledger.append(
         "ATTEMPT_COMMITTED",
         {"attempt_id": attempt_id, "artifact_after": after["digest"], "receipt_digest": digest(receipt)},
+        expected_head=observed["digest"],
     )
     return {"events": [observed, committed], "decision": rebuild(root)["decision"]}
 
@@ -556,6 +652,7 @@ def mark_attempt_unknown(root: Path, attempt_id: str, reason: str) -> dict[str, 
     event = ledger.append(
         "ATTEMPT_UNKNOWN",
         {"attempt_id": attempt_id, "reason": reason.strip()},
+        expected_head=projection["source_head"],
     )
     return {"event": event, "decision": rebuild(root)["decision"]}
 
@@ -616,6 +713,7 @@ def resolve_attempt(
             "artifact_after": manifest["digest"],
             "manifest_after_blob": manifest_blob,
         },
+        expected_head=projection["source_head"],
     )
     return {"event": event, "decision": rebuild(root)["decision"]}
 
@@ -634,8 +732,106 @@ def add_evidence(root: Path, evidence: dict[str, Any]) -> dict[str, Any]:
     source_artifact = attempt.get("artifact_after", attempt.get("artifact_before"))
     if evidence["artifact"]["digest"] != source_artifact:
         raise ValidationError("Evidence Artifact 与来源 Attempt 不匹配")
-    event = ledger.append("EVIDENCE_RECORDED", evidence)
+    event = ledger.append("EVIDENCE_RECORDED", evidence, expected_head=projection["source_head"])
     return {"event": event, "decision": rebuild(root)["decision"]}
+
+
+def handoff_template(
+    root: Path,
+    *,
+    handoff_id: str,
+    agent_id: str,
+    to_agent_id: str,
+    phase: str,
+    status: str,
+    summary: str,
+    evidence_ids: list[str],
+) -> dict[str, Any]:
+    projection = rebuild(root, write=False)
+    work = projection["work"]
+    if work is None or projection["errors"] or projection.get("superseded") is not None:
+        raise IntegrityError("没有可交接的 Active Work")
+    if unresolved := _unresolved_attempt_ids(projection):
+        raise ValidationError("存在未解析 Attempt，不能生成 Role Handoff：" + ", ".join(unresolved))
+    artifact = artifact_for(root, work)
+    value = {
+        "schema_version": "yuan.handoff/v1",
+        "handoff_id": handoff_id,
+        "work": {"id": work["work_id"], "revision": work["revision"], "digest": work["digest"]},
+        "agent_id": agent_id,
+        "to_agent_id": to_agent_id,
+        "phase": phase,
+        "status": status,
+        "summary": summary,
+        "artifact_digest": artifact["digest"],
+        "evidence_ids": evidence_ids,
+        "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+    }
+    value["digest"] = digest(value, ("digest",))
+    return validate_handoff(value, work)
+
+
+def _validate_handoff_order(projection: dict[str, Any], work: dict[str, Any], handoff: dict[str, Any]) -> None:
+    order = work["routing"]["handoff_agents"]
+    for agent_id in order[:order.index(handoff["agent_id"])]:
+        prior = projection["agent_handoffs"].get(agent_id)
+        if not prior or prior["status"] != "READY" or (
+            agent_id in work["routing"]["artifact_review_agents"] and prior.get("current") is not True
+        ):
+            raise ValidationError(f"前序 Agent 尚未 READY 或 Handoff 已过期：{agent_id}")
+
+
+def _unresolved_attempt_ids(projection: dict[str, Any]) -> list[str]:
+    return sorted(
+        attempt_id for attempt_id, attempt in projection["attempts"].items()
+        if attempt["state"] in {"PREPARED", "DISPATCHED", "OBSERVED", "UNKNOWN"}
+    )
+
+
+def record_handoff(root: Path, handoff: dict[str, Any]) -> dict[str, Any]:
+    _, ledger = active_ledger(root)
+    projection = rebuild(root, write=False)
+    work = projection["work"]
+    if work is None or projection["errors"] or projection.get("superseded") is not None:
+        raise IntegrityError("没有可记录交接的 Active Work")
+    if unresolved := _unresolved_attempt_ids(projection):
+        raise ValidationError("存在未解析 Attempt，不能记录 Role Handoff：" + ", ".join(unresolved))
+    validate_handoff(handoff, work)
+    if handoff["handoff_id"] in projection["handoffs"]:
+        raise ValidationError("Role Handoff id 已存在")
+    _validate_handoff_order(projection, work, handoff)
+    artifact = artifact_for(root, work)
+    if handoff["artifact_digest"] != artifact["digest"]:
+        raise ValidationError("Role Handoff Artifact Binding 已过期")
+    for evidence_id in handoff["evidence_ids"]:
+        evidence = projection["evidence"].get(evidence_id)
+        if not evidence or evidence.get("current") is not True:
+            raise ValidationError("Role Handoff 引用了不存在或过期的 Evidence")
+    event = ledger.append("ROLE_HANDOFF_RECORDED", handoff, expected_head=projection["source_head"])
+    return {"event": event, "decision": rebuild(root)["decision"]}
+
+
+def supersede_work(root: Path, *, reason: str, request: str) -> dict[str, Any]:
+    """由显式用户变更关闭非终态 Work；历史保留并可创建 Successor。"""
+
+    if not isinstance(reason, str) or not reason.strip() or not isinstance(request, str) or not request.strip():
+        raise ValidationError("Supersede reason 与新 request 不能为空")
+    _, ledger = active_ledger(root)
+    projection = rebuild(root, write=False)
+    if projection["work"] is None or projection["errors"] or projection.get("superseded") is not None:
+        raise IntegrityError("当前没有可 Supersede 的合法 Work")
+    if projection["decision"]["result"] not in {"CONTINUE", "CORRECT"}:
+        raise ValidationError("只有 CONTINUE 或 CORRECT Work 需要显式 Supersede")
+    unresolved = _unresolved_attempt_ids(projection)
+    if unresolved:
+        raise ValidationError("存在未解析 Attempt，不能 Supersede：" + ", ".join(sorted(unresolved)))
+    payload = {
+        "reason": reason.strip(),
+        "request": request.strip(),
+        "request_digest": digest_bytes(request.strip().encode("utf-8")),
+    }
+    event = ledger.append("WORK_SUPERSEDED", payload, expected_head=projection["source_head"])
+    return {"event": event, "decision": rebuild(root)["decision"], "successor_required": True}
 
 
 _VERIFIER_WRAPPER = r'''
@@ -763,6 +959,7 @@ def record_reduction(root: Path) -> dict[str, Any]:
     event = ledger.append(
         "RESULT_REDUCED",
         {"result": projection["decision"]["result"], "projection_digest": projection["digest"]},
+        expected_head=projection["source_head"],
     )
     final = rebuild(root)
     return {"event": event, "decision": final["decision"], "projection_digest": final["digest"]}

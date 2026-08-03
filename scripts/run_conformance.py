@@ -63,7 +63,7 @@ def validate_size_budget() -> dict[str, object]:
     protocol_lines = sum(bool(line.strip()) for line in protocol.splitlines())
     core_names = {
         "artifacts.py", "canonical.py", "errors.py", "identity.py", "ledger.py",
-        "paths.py", "ports.py", "reducer.py", "runtime.py", "validate.py",
+        "paths.py", "ports.py", "reducer.py", "runtime.py", "validate.py", "workflow.py",
     }
     counts = {
         path.name: sum(bool(line.strip()) for line in path.read_text(encoding="utf-8").splitlines())
@@ -121,8 +121,13 @@ def validate_capability_profile() -> dict[str, object]:
             "skill_count": len(manifest["skills"]),
         })
     bootstrap = bootstrap_bytes().decode("utf-8")
-    if "capability list" not in bootstrap or "capability resolve" not in bootstrap or "没有 Active Work" not in bootstrap:
-        raise RuntimeError("Agent Bootstrap 没有实现能力路由或首个 Work 入口")
+    required_flow_terms = [
+        "capability list", "capability route", "intake template", "intake confirm",
+        "work confirm", "handoff record", "run supersede", "没有 Active Work",
+    ]
+    missing = [item for item in required_flow_terms if item not in bootstrap]
+    if missing:
+        raise RuntimeError("Agent Bootstrap 缺少闭环入口：" + ", ".join(missing))
     return {
         "status": "PASS",
         "profiles": summaries,

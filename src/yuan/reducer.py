@@ -23,6 +23,14 @@ def reduce_projection(projection: dict[str, Any]) -> dict[str, Any]:
             reasons.append("没有 Active Work")
         return {"result": "BLOCKED", "reasons": sorted(set(reasons))}
 
+    if projection.get("superseded") is not None:
+        return {
+            "result": "BLOCKED",
+            "reasons": ["用户已变更需求，当前 Work 已被不可变 Supersede Event 关闭"],
+            "reason_code": "WORK_SUPERSEDED",
+            "successor_required": True,
+        }
+
     if projection.get("authorization_required"):
         return {
             "result": "WAIT_AUTH",
@@ -44,14 +52,31 @@ def reduce_projection(projection: dict[str, Any]) -> dict[str, Any]:
         if evidence.get("status") == "PASS" and evidence.get("current") is True
     }
     invariants_hold = all(item["criterion_id"] in passed for item in work["safety_invariants"])
+    required_handoffs = work["routing"]["handoff_agents"]
+    artifact_review_agents = set(work["routing"]["artifact_review_agents"])
+    handoffs = projection.get("agent_handoffs", {})
+    ready_handoffs = {
+        agent_id
+        for agent_id, handoff in handoffs.items()
+        if handoff.get("status") == "READY"
+        and (agent_id not in artifact_review_agents or handoff.get("current") is True)
+    }
     complete = (
         all(item["id"] in passed for item in required)
         and invariants_hold
+        and all(agent_id in ready_handoffs for agent_id in required_handoffs)
         and not unresolved
         and all(value["state"] in {"COMMITTED", "NOT_APPLICABLE"} for value in attempts.values())
     )
     if complete:
         return {"result": "COMPLETE", "reasons": ["全部 Completion Predicate 成立"]}
+
+    newest_handoff = projection.get("latest_handoff")
+    if newest_handoff and newest_handoff.get("status") == "NEEDS_WORK" and projection.get("legal_next_step", True):
+        return {
+            "result": "CORRECT",
+            "reasons": [f"Agent {newest_handoff['agent_id']} 的 Handoff 要求继续修正"],
+        }
 
     newest = projection.get("latest_evidence")
     if newest and newest.get("status") == "FAIL" and projection.get("legal_next_step", True):
@@ -67,6 +92,9 @@ def reduce_projection(projection: dict[str, Any]) -> dict[str, Any]:
         unmet = sorted(item["id"] for item in required if item["id"] not in passed)
         if unmet:
             reasons.append("未满足 Acceptance Criterion：" + ", ".join(unmet))
+        missing_handoffs = sorted(agent_id for agent_id in required_handoffs if agent_id not in ready_handoffs)
+        if missing_handoffs:
+            reasons.append("未完成或已过期的 Role Handoff：" + ", ".join(missing_handoffs))
         return {"result": "CONTINUE", "reasons": reasons or ["仍有合法工作"]}
 
     return {"result": "BLOCKED", "reasons": ["不存在安全合法的下一步"]}

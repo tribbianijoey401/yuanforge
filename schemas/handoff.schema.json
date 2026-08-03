@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuan.local/schemas/handoff.schema.json",
+  "title": "Yuan Agent Role Handoff",
+  "type": "object",
+  "required": ["schema_version", "handoff_id", "work", "agent_id", "to_agent_id", "phase", "status", "summary", "artifact_digest", "evidence_ids", "created_at", "digest"],
+  "properties": {
+    "schema_version": {"const": "yuan.handoff/v1"},
+    "handoff_id": {"type": "string", "minLength": 1},
+    "work": {"type": "object"},
+    "agent_id": {"type": "string", "minLength": 1},
+    "to_agent_id": {"type": "string", "minLength": 1},
+    "phase": {"enum": ["intake", "design", "implementation", "review", "verification", "handoff"]},
+    "status": {"enum": ["READY", "NEEDS_WORK"]},
+    "summary": {"type": "string", "minLength": 1},
+    "artifact_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "evidence_ids": {"type": "array", "uniqueItems": true},
+    "created_at": {"type": "string", "minLength": 1},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

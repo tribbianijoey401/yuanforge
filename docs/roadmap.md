@@ -81,6 +81,17 @@
 
 退出 Evidence：Catalog 完整性、Runtime 解析、Custom Extension 篡改隔离，以及空项目从 `BLOCKED: 没有 Active Work` 到 `COMPLETE` 的端到端测试。
 
+## M8 — 用户意图与角色流程闭环（已完成）
+
+- Intake 持久化 Blocking Question、Answer、Assumption、Risk/Signal 与第一次用户确认。
+- 完整 Work Contract 在 Verifier、Grant、Budget 与 Routing 固定后获得第二次用户确认。
+- Capability Workflow 确定性生成 Risk/Signal Route 和 Agent→Skill Assignment；Work 接受时 Kernel 重算，不能手工降级。
+- 每个 Routing 角色通过不可变 `READY/NEEDS_WORK` Handoff 交接；Artifact Reviewer Handoff 随 Artifact 变化过期。
+- `NEEDS_WORK` 进入 `CORRECT`；Required Evidence 与 Required Handoff 共同构成 Completion Predicate。
+- 非终态需求变化通过 `WORK_SUPERSEDED` 和绑定旧 Head 的 Successor 闭环，不编辑历史。
+
+退出 Evidence：未回答 Intake/未确认 Work 拒绝、确定性 Routing、Required/Stale/Negative Handoff Gate、未解析 Attempt 禁止 Supersede，以及确认后的 Successor 端到端测试。
+
 ## 永久复杂度限制
 
 - Protocol 不超过 500 个非空行。

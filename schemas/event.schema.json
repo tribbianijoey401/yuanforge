@@ -9,7 +9,7 @@
     "run_id": {"type": "string", "minLength": 1},
     "sequence": {"type": "integer", "minimum": 1},
     "previous": {"type": ["string", "null"]},
-    "type": {"enum": ["WORK_ACCEPTED", "ARTIFACT_BASELINED", "AUTHORIZATION_REQUIRED", "BUDGET_EXHAUSTED", "ATTEMPT_PREPARED", "ATTEMPT_DISPATCHED", "ATTEMPT_OBSERVED", "ATTEMPT_COMMITTED", "ATTEMPT_UNKNOWN", "ATTEMPT_RECONCILED", "EVIDENCE_RECORDED", "RESULT_REDUCED"]},
+    "type": {"enum": ["WORK_ACCEPTED", "WORK_SUPERSEDED", "ARTIFACT_BASELINED", "AUTHORIZATION_REQUIRED", "BUDGET_EXHAUSTED", "ATTEMPT_PREPARED", "ATTEMPT_DISPATCHED", "ATTEMPT_OBSERVED", "ATTEMPT_COMMITTED", "ATTEMPT_UNKNOWN", "ATTEMPT_RECONCILED", "EVIDENCE_RECORDED", "ROLE_HANDOFF_RECORDED", "RESULT_REDUCED"]},
     "created_at": {"type": "string", "minLength": 1},
     "payload": {"type": "object"},
     "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}

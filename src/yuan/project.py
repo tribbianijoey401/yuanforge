@@ -33,7 +33,6 @@ BOOTSTRAP_START = "<!-- yuan:bootstrap:start -->"
 BOOTSTRAP_END = "<!-- yuan:bootstrap:end -->"
 GITIGNORE_START = "# yuan:managed:start"
 GITIGNORE_END = "# yuan:managed:end"
-SAFE_UPDATE_RESULTS = {"COMPLETE"}
 DEPLOYMENT_LOCK_TIMEOUT = 10.0
 CORE_DEPLOYMENT_FILES = (
     ".yuan/bin/yuan.pyz",
@@ -58,7 +57,8 @@ def agent_guidance(root: Path, capability_profile: str = DEFAULT_PROFILE) -> dic
         "status_command": "python -B .yuan/bin/yuan.pyz --root . status",
         "capability_profile": capability_profile,
         "start_prompt": (
-            "请读取项目根目录 AGENTS.md，并按照 Yuan Agent Bootstrap 开始一个新的 Work。"
+            "请读取项目根目录 AGENTS.md，并按照 Yuan Agent Bootstrap 从 Intake 开始新需求；"
+            "需要时向我提问，并在需求摘要和完整 Work 两个节点等待我确认。"
             "我的需求是：<在这里描述需求>"
         ),
         "continue_prompt": (
@@ -158,6 +158,17 @@ def initialize_repository(root: Path, profile: str, run_id: str | None) -> dict[
     if ledger.run_root.exists():
         raise YuanError("Run id 已存在")
     protocol = protocol_bytes()
+    capability = None
+    capability_path = root / CAPABILITY_MANIFEST_PATH
+    if capability_path.is_file():
+        installed_capability = _read_object(capability_path, "Capability Profile Manifest")
+        if not verify_digest(installed_capability):
+            raise IntegrityError("初始化时 Capability Profile Manifest 不合法")
+        capability = {
+            "id": installed_capability["profile_id"],
+            "revision": installed_capability["profile_version"],
+            "digest": installed_capability["digest"],
+        }
     atomic_write(root / ".yuan" / "protocol.md", protocol)
     config = with_digest({
         "schema_version": "yuan.config/v1",
@@ -167,6 +178,7 @@ def initialize_repository(root: Path, profile: str, run_id: str | None) -> dict[
         "state_root": ".yuan-run",
         "artifact_exclude": [".yuan-run/**", ".git/**", "__pycache__/**", "*.pyc"],
         "environment": environment_binding(),
+        "capability": capability,
     })
     atomic_write(config_path, canonical_bytes(config))
     ledger.run_root.mkdir(parents=True, exist_ok=False)
@@ -679,6 +691,12 @@ def update_project(
                 config["protocol"] = {"id": "yuan.core", "revision": "0.2", "digest": digest_bytes(protocol)}
                 config["harness"] = {"id": "yuan.python", "revision": __version__, "digest": harness_digest()}
                 config["environment"] = environment_binding()
+                next_capability = capability_manifest(capability_profile)
+                config["capability"] = {
+                    "id": next_capability["profile_id"],
+                    "revision": next_capability["profile_version"],
+                    "digest": next_capability["digest"],
+                }
                 atomic_write(root / ".yuan" / "protocol.md", protocol)
                 atomic_write(root / ".yuan" / "config.json", canonical_bytes(with_digest(config)))
                 _write_adapter(root)
@@ -694,7 +712,9 @@ def update_project(
             result = verified.get("decision", {}).get("result")
             errors = verified.get("errors")
             safe_empty = work is None and errors == [] and verified.get("source_count") == 0
-            safe_terminal = work is not None and result in SAFE_UPDATE_RESULTS and errors == []
+            safe_terminal = work is not None and errors == [] and (
+                result == "COMPLETE" or verified.get("decision", {}).get("reason_code") == "WORK_SUPERSEDED"
+            )
             if not (safe_empty or safe_terminal):
                 _restore(root, captured)
                 staged = candidate.with_name(f"{artifact['digest']}.pyz")
@@ -751,7 +771,9 @@ def rollback_project(root: Path, runtime_digest: str) -> dict[str, Any]:
         errors = current.get("errors")
         result = current.get("decision", {}).get("result")
         safe_empty = work is None and errors == [] and current.get("source_count") == 0
-        safe_terminal = work is not None and result == "COMPLETE" and errors == []
+        safe_terminal = work is not None and errors == [] and (
+            result == "COMPLETE" or current.get("decision", {}).get("reason_code") == "WORK_SUPERSEDED"
+        )
         snapshot_root = root / ".yuan" / "releases" / runtime_digest
         target_config = _read_object(snapshot_root / "files" / ".yuan/config.json", "Snapshot Config")
         bindings_match = work is None or (

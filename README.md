@@ -10,6 +10,7 @@ Yuan 是一个协议优先、面向持久化 LLM 软件工程的 Harness。它�
 - Run Memory 是可由 Ledger 重建的一次性投影。
 - 开放 Agent 平台默认使用 `AUDITED` Profile；受控平台可以安装 `ENFORCED` Adapter。
 - 默认安装 `vibe-coding` 能力 Profile，提供具体的 Rules、Agents 与 Skills；它们指导 LLM 工作，但不重定义 Core Truth。
+- 新需求通过 Intake 与完整 Work 两次用户确认；Risk/Signal 机械生成 Agent→Skill Assignment，角色以可重放 Handoff 闭环。
 
 ## 推荐用法：安装并由 LLM 开始工作
 
@@ -50,7 +51,7 @@ python -B .yuan/bin/yuan.pyz --root . status
 2. 开始一个新项目或新需求时，直接向 LLM 发送：
 
    ```text
-   请读取项目根目录 AGENTS.md，并按照 Yuan Agent Bootstrap 开始一个新的 Work。我的需求是：<在这里描述需求>
+   请读取项目根目录 AGENTS.md，并按照 Yuan Agent Bootstrap 从 Intake 开始新需求；需要时向我提问，并在需求摘要和完整 Work 两个节点等待我确认。我的需求是：<在这里描述需求>
    ```
 
 3. 会话中断、切换平台或稍后恢复时，向 LLM 发送：
@@ -59,13 +60,17 @@ python -B .yuan/bin/yuan.pyz --root . status
    请读取项目根目录 AGENTS.md，检查 Yuan 当前状态，并按照 Yuan Agent Bootstrap 继续未完成的 Work；只有 Reducer 返回 COMPLETE 时才报告完成。
    ```
 
-LLM 会先读取 Bootstrap，通过项目内固定 Runtime 恢复状态，然后运行 `capability list` 获取触发条件、用 `capability resolve` 选择本 Tick 的 Rules/Agents/Skills。初始状态的唯一原因如果是“没有 Active Work”，LLM 会进入首个 Work Authoring，而不是把正常空 Run 当成故障。用户不需要手工重述此前过程。安装脚本成功后也会显示以上提示；机器可解析的单个 JSON 保留在标准输出，提示写入标准错误流。
+LLM 会先读取 Bootstrap，通过项目内固定 Runtime 恢复状态。没有 Active Work 时，它先创建 Intake：只询问会改变验收或安全边界的问题，把答案、假设、风险和 Signals 展示给用户确认；随后由 `capability route` 生成不可删减的 Agent→Skill Assignment。完整 Work、Verifier、授权和预算会再次展示给用户确认，之后才开始修改。用户不需要手工重述此前过程。安装脚本成功后也会显示以上提示；机器可解析的单个 JSON 保留在标准输出，提示写入标准错误流。
+
+执行期间，每个路由角色都必须记录 `READY` 或 `NEEDS_WORK` Handoff。审查角色的 Handoff 绑定当前 Artifact，代码变化会让旧审查自动过期。Required Evidence 和 Required Handoff 都成立，Reducer 才会返回 `COMPLETE`。
+
+如果用户中途改变已确认需求，LLM 不会修改旧 Work：它先解析在途副作用，追加 `WORK_SUPERSEDED`，然后从新 Intake、两次用户确认和确定性 Routing 创建绑定旧 Head 的 Successor Work。这样旧实现与新意图不会混在同一历史中。
 
 默认能力层包含：
 
 - `rules/`：边界、工作流、Evidence、风险审查、计划、测试与交付规则。
 - `agents/`：Conductor、Product Analyst、Architect、前后端开发、设计、规格、安全、质量、UX、Tester 和 Documentation Engineer。
-- `skills/`：项目生命周期、仓库审计、Work/Verifier 编写、计划、TDD、系统化调试、代码审查、多 Agent 开发、Custom Extension 和发布交接。
+- `skills/`：项目生命周期、需求澄清、仓库审计、Work/Verifier 编写、计划、TDD、系统化调试、代码审查、多 Agent 开发、Custom Extension 和发布交接。
 
 框架更新会原子更新这些托管能力。项目专属规则或 Skill 放入 `.yuan/extensions/custom/<extension-id>/`，使用 Custom Extension Descriptor 绑定后会进入同一 Catalog；安装器不会覆盖它们。完整扩展协议见 [Capability Profile 与 Custom Extension](docs/extensions.md)。
 
@@ -88,7 +93,7 @@ python -B scripts/run_conformance.py
 yuan project update G:\projects\my-project --release-root .
 ```
 
-更新不会删除 `.yuan-run/`，不会覆盖 `AGENTS.md` 的项目自有内容或 `.yuan/extensions/custom/`。安装、更新和回滚共用项目级 Deployment Lock。没有 Active Work 或当前结果为 `COMPLETE` 时，新 Runtime 原子激活并保存包含 Runtime、Config、Protocol、Bootstrap、Adapter、能力 Profile 和 Release Evidence 的完整旧部署快照；其他非终态会返回 `STAGED`，需要在当前 Work 完成后再次运行更新命令。
+更新不会删除 `.yuan-run/`，不会覆盖 `AGENTS.md` 的项目自有内容或 `.yuan/extensions/custom/`。安装、更新和回滚共用项目级 Deployment Lock。没有 Active Work、当前结果为 `COMPLETE`，或 Work 已通过 `WORK_SUPERSEDED` 明确关闭时，新 Runtime 原子激活并保存包含 Runtime、Config、Protocol、Bootstrap、Adapter、能力 Profile 和 Release Evidence 的完整旧部署快照；其他非终态会返回 `STAGED`，需要在安全边界后再次运行更新命令。
 
 检查当前部署和暂存 Candidate：
 
@@ -117,9 +122,16 @@ Rollback 只在没有 Work，或当前 Work 已 `COMPLETE` 且仍绑定目标快
 ```powershell
 python -m pip install -e .
 yuan --root . init --profile AUDITED
-yuan work template > work.draft.json
+yuan intake template --request "实现可验证需求" > intake.draft.json
+# 填写问题答案、假设、风险和 Signals；展示给用户并取得明确确认：
+yuan seal intake.draft.json > intake.sealed.json
+yuan intake check intake.sealed.json
+yuan intake confirm intake.sealed.json --statement "用户确认需求摘要" > intake.json
+yuan work template --intake intake.json > work.draft.json
 # 编辑草稿，在 .yuan/drafts/verifiers/ 创建只读 Verifier，然后绑定文件闭包并接受 Work：
-yuan work bind-verifier work.draft.json --criterion AC-001 > work.json
+yuan work bind-verifier work.draft.json --criterion AC-001 > work.bound.json
+# 展示完整 Work、角色路由、授权和预算，并取得用户最终确认：
+yuan work confirm work.bound.json --statement "用户确认完整 Work Contract" > work.json
 yuan work accept work.json
 # 根据当前文件自动绑定 Relevant Input Digest：
 yuan attempt template --attempt-id ATT-001 --strategy "实现需求" --claim "修改满足 AC" --falsification "Verifier 失败" --input src/app.py --action-type file-write --path src --side-effect-class filesystem --grant-id GRANT-001 > proposal.json
@@ -130,6 +142,9 @@ yuan attempt dispatch --attempt ATT-001
 # 把平台回执写入 receipt.json：
 yuan attempt observe --attempt ATT-001 --receipt receipt.json
 yuan verify --criterion AC-001 --attempt ATT-001
+# 对 Routing 中每个角色生成并记录 READY/NEEDS_WORK Handoff：
+yuan handoff template --handoff-id HANDOFF-TEST-001 --agent tester --to user --phase verification --status READY --summary "验证通过" --evidence EVD-001 > handoff.json
+yuan handoff record handoff.json
 yuan reduce
 ```
 
@@ -159,4 +174,4 @@ Conformance Suite 会验证全部 Unit Test、Schema、Codex `AUDITED` Adapter�
 
 `main` 的 Push/Pull Request 会由 GitHub Actions 自动运行 Conformance 和 Wheel 构建。推送与 `pyproject.toml` 版本一致的 `v*` Tag 时，Release Workflow 会发布 `yuan.pyz`、Manifest、Conformance Report、SHA-256 文件和 GitHub Artifact Provenance。
 
-M0–M6 均已完成；详细语义、限制与退出 Evidence 见 [开发路线图](docs/roadmap.md)。开放 Agent 平台的实际保证等级仍是 `AUDITED`；这不是未完成项，而是对平台旁路能力的诚实边界。
+M0–M8 均已完成；详细语义、限制与退出 Evidence 见 [开发路线图](docs/roadmap.md)。开放 Agent 平台的实际保证等级仍是 `AUDITED`；这不是未完成项，而是对平台旁路能力的诚实边界。

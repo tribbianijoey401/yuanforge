@@ -43,9 +43,9 @@ python -B scripts/sync_project.py install <目标项目> --profile AUDITED --cap
 python -B .yuan/bin/yuan.pyz --root .
 ```
 
-这样全局 Python Package 的升级不会静默改变项目 Runtime。Bootstrap 先验证状态，再调用 `capability list/resolve` 加载固定 Profile 的 Required Rules 和当前任务所需 Agent/Skill。初始 `BLOCKED: 没有 Active Work` 是进入首个 Work Authoring 的唯一例外。Verifier 在 Work 接受前只能创建于 `.yuan/drafts/verifiers/`，不会形成未受管辖的 Artifact 修改。能力层指导 Work Authoring、Proposal、实施和验证；只有 Core Reducer 的 `COMPLETE` 可以报告完成。
+这样全局 Python Package 的升级不会静默改变项目 Runtime。Bootstrap 先验证状态与 Catalog；空 Run 从 Intake 开始，取得需求确认后由 `capability route` 返回固定 Profile 的 Rules、Agent→Skill Assignment 和审查要求。完整 Work 再次确认后才能接受。Verifier 在 Work 接受前只能创建于 `.yuan/drafts/verifiers/`，不会形成未受管辖的 Artifact 修改。执行角色必须记录 Handoff；只有 Core Reducer 的 `COMPLETE` 可以报告完成。
 
-首个 Run 没有 Work，因此初始 `status` 返回 `BLOCKED` 且原因为“没有 Active Work”。这不是故障：Agent 应根据当前用户请求创建 Verifier 和首个 Work。后续新请求通过 Successor Work/New Run 继续，不重写历史。
+首个 Run 没有 Work，因此初始 `status` 返回 `BLOCKED` 且原因为“没有 Active Work”。这不是故障：Agent 应依次完成 Intake、问题回答、用户确认、风险路由、Work/Verifier 和最终用户确认。后续新请求通过 Successor Work/New Run 继续；非终态需求变更先 `WORK_SUPERSEDED`，不重写历史。
 
 ## 同步更新
 
@@ -59,7 +59,7 @@ python -B scripts/sync_project.py update <目标项目>
 2. 从当前 Yuan Release 构建新的确定性 Candidate，并验证 Manifest、Conformance 与 Source Binding。
 3. Candidate 与当前 Runtime 相同则返回 `UNCHANGED`，仅校准 Managed Bootstrap。
 4. Active Work 非终态时返回 `STAGED`，Candidate 与带 Digest 的 Metadata 写入被忽略的 `.yuan/candidates/`，旧 Candidate 自动清理，不切换当前 Runtime。
-5. 没有 Work 或当前结果为 `COMPLETE` 时，保存完整旧部署快照，更新 Protocol/Config/Bootstrap/能力 Profile/Release Evidence 并原子切换。
+5. 没有 Work、当前结果为 `COMPLETE`，或 Work 已通过 `WORK_SUPERSEDED` 明确关闭时，保存完整旧部署快照，更新 Protocol/Config/Bootstrap/能力 Profile/Release Evidence 并原子切换。
 6. 使用新固定 Runtime 重新执行 `status`；失败时恢复全部 Managed File。
 
 项目更新默认保持原 Install Record 中选择的 Capability Profile，不会静默切换；可用 `--capability-profile` 在空 Run 或 `COMPLETE` 安全边界显式切换。若新发行包不提供目标 Profile，更新在写入前失败。Profile 内删除的托管文件会在事务中移除，失败时恢复；`.yuan/extensions/custom/` 始终不参与框架覆盖或删除。

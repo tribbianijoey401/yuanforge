@@ -22,7 +22,20 @@
       },
       "additionalProperties": false
     },
-    "budget_charge": {"type": "object"}
+    "budget_charge": {"type": "object"},
+    "reconciliation": {
+      "type": "object",
+      "required": ["target_attempt_id"],
+      "properties": {"target_attempt_id": {"type": "string", "minLength": 1}},
+      "additionalProperties": false
+    }
   },
+  "allOf": [
+    {
+      "if": {"properties": {"action": {"properties": {"type": {"const": "reconcile"}}}}},
+      "then": {"required": ["reconciliation"]},
+      "else": {"not": {"required": ["reconciliation"]}}
+    }
+  ],
   "additionalProperties": false
 }

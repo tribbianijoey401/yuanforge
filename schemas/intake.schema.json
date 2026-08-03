@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuan.local/schemas/intake.schema.json",
+  "title": "Yuan Work Intake 与用户确认",
+  "type": "object",
+  "required": ["schema_version", "request", "questions", "assumptions", "risk", "signals", "confirmation", "created_at", "digest"],
+  "properties": {
+    "schema_version": {"const": "yuan.intake/v1"},
+    "request": {"type": "string", "minLength": 1},
+    "questions": {"type": "array"},
+    "assumptions": {"type": "array"},
+    "risk": {"type": "object"},
+    "signals": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "confirmation": {"type": ["object", "null"]},
+    "created_at": {"type": "string", "minLength": 1},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

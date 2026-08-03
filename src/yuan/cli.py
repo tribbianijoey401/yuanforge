@@ -18,6 +18,8 @@ from .capabilities import (
     available_profiles,
     bind_custom_descriptor,
     installed_catalog,
+    route_capabilities,
+    routing_plan,
     resolve_capabilities,
 )
 from .errors import YuanError
@@ -37,6 +39,7 @@ from .runtime import (
     active_ledger,
     begin_attempt,
     dispatch_attempt,
+    handoff_template,
     load_config,
     list_runs,
     mark_attempt_unknown,
@@ -44,11 +47,20 @@ from .runtime import (
     read_json,
     rebuild,
     record_reduction,
+    record_handoff,
     resolve_attempt,
     run_verifier,
     start_successor,
+    supersede_work,
 )
-from .validate import validate_proposal, with_digest
+from .validate import validate_proposal, validate_work, with_digest
+from .workflow import (
+    confirm_intake,
+    confirm_work,
+    intake_decision,
+    intake_template as create_intake_template,
+    validate_intake,
+)
 
 
 class ChineseArgumentParser(argparse.ArgumentParser):
@@ -89,8 +101,41 @@ def init_repository(root: Path, profile: str, run_id: str | None) -> dict[str, A
     return initialize_repository(root, profile, run_id)
 
 
-def work_template(root: Path, *, successor: bool = False) -> dict[str, Any]:
+def _core_routing(risk: str, signals: list[str]) -> dict[str, Any]:
+    value = {
+        "schema_version": "yuan.routing/v1",
+        "profile_id": "core",
+        "profile_digest": digest({"profile": "core"}),
+        "risk": risk,
+        "signals": signals,
+        "agents": [],
+        "skills": [],
+        "handoff_agents": [],
+        "artifact_review_agents": [],
+    }
+    return with_digest(value)
+
+
+def work_template(
+    root: Path,
+    *,
+    successor: bool = False,
+    intake: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     config = load_config(root)
+    if intake is None:
+        if config["capability"] is not None:
+            raise YuanError("已安装工程能力要求先创建并确认 Intake，再生成 Work")
+        intake = create_intake_template("手动 Core Work")
+        intake["risk"] = {"level": "R2", "rationale": "手动 Core 流程，不启用工程角色路由。"}
+        intake = with_digest(intake)
+        intake = confirm_intake(intake, "手动 Core 流程确认")
+    validate_intake(intake, require_confirmation=True)
+    routing = (
+        routing_plan(root, risk=intake["risk"]["level"], signals=intake["signals"])
+        if config["capability"] is not None
+        else _core_routing(intake["risk"]["level"], intake["signals"])
+    )
     if successor:
         _, ledger = active_ledger(root)
         projection = rebuild(root, write=False)
@@ -105,6 +150,9 @@ def work_template(root: Path, *, successor: bool = False) -> dict[str, Any]:
         work["protocol"] = config["protocol"]
         work["harness"] = config["harness"]
         work["artifact"]["environment"] = config["environment"]
+        work["intake"] = intake
+        work["routing"] = routing
+        work["confirmation"] = None
         work["created_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         return with_digest(work)
     verifier_path = ".yuan/drafts/verifiers/AC-001.py"
@@ -119,13 +167,16 @@ def work_template(root: Path, *, successor: bool = False) -> dict[str, Any]:
         "files": verifier_files,
     }
     work = {
-        "schema_version": "yuan.work/v1",
+        "schema_version": "yuan.work/v2",
         "work_id": "WORK-001",
         "revision": 1,
         "goal": "替换为具体、可测试的目标。",
         "profile": config["profile"],
         "protocol": config["protocol"],
         "harness": config["harness"],
+        "intake": intake,
+        "routing": routing,
+        "confirmation": None,
         "artifact": {
             "root": ".",
             "include": ["**"],
@@ -214,15 +265,28 @@ def parser() -> argparse.ArgumentParser:
     init = commands.add_parser("init", help="初始化 Yuan Runtime")
     init.add_argument("--profile", choices=("GUIDED", "AUDITED", "ENFORCED"), default="AUDITED")
     init.add_argument("--run-id")
+    intake = commands.add_parser("intake", help="澄清并确认用户需求")
+    intake_sub = intake.add_subparsers(dest="intake_command", required=True)
+    intake_template_parser = intake_sub.add_parser("template", help="创建需求 Intake 草稿")
+    intake_template_parser.add_argument("--request", required=True)
+    intake_check = intake_sub.add_parser("check", help="检查待决问题与确认状态")
+    intake_check.add_argument("file", type=Path)
+    intake_confirm = intake_sub.add_parser("confirm", help="绑定用户对需求、答案、假设和风险的确认")
+    intake_confirm.add_argument("file", type=Path)
+    intake_confirm.add_argument("--statement", required=True)
     work = commands.add_parser("work", help="管理不可变 Work Contract")
     work_sub = work.add_subparsers(dest="work_command", required=True)
     work_template_parser = work_sub.add_parser("template", help="生成 Work 草稿")
     work_template_parser.add_argument("--successor", action="store_true", help="基于当前 Terminal Run 生成继任 Work")
+    work_template_parser.add_argument("--intake", type=Path, help="已确认的 Intake JSON")
     work_accept = work_sub.add_parser("accept", help="验证并接受 Work")
     work_accept.add_argument("file", type=Path)
     work_bind = work_sub.add_parser("bind-verifier", help="绑定 Verifier Closure digest")
     work_bind.add_argument("file", type=Path)
     work_bind.add_argument("--criterion", required=True)
+    work_confirm = work_sub.add_parser("confirm", help="绑定用户对完整 Work Contract 的最终确认")
+    work_confirm.add_argument("file", type=Path)
+    work_confirm.add_argument("--statement", required=True)
     attempt = commands.add_parser("attempt", help="管理 Attempt 生命周期")
     attempt_sub = attempt.add_subparsers(dest="attempt_command", required=True)
     attempt_template_parser = attempt_sub.add_parser("template", help="根据当前文件生成带 Input Digest 的 Proposal")
@@ -260,6 +324,18 @@ def parser() -> argparse.ArgumentParser:
     verify = commands.add_parser("verify", help="运行 Work 预绑定的 Verifier")
     verify.add_argument("--criterion", required=True)
     verify.add_argument("--attempt", required=True)
+    handoff = commands.add_parser("handoff", help="记录 Agent 角色输出与下一角色交接")
+    handoff_sub = handoff.add_subparsers(dest="handoff_command", required=True)
+    handoff_template_parser = handoff_sub.add_parser("template", help="生成绑定当前 Work/Artifact 的 Role Handoff")
+    handoff_template_parser.add_argument("--handoff-id", required=True)
+    handoff_template_parser.add_argument("--agent", required=True)
+    handoff_template_parser.add_argument("--to", required=True)
+    handoff_template_parser.add_argument("--phase", choices=("intake", "design", "implementation", "review", "verification", "handoff"), required=True)
+    handoff_template_parser.add_argument("--status", choices=("READY", "NEEDS_WORK"), required=True)
+    handoff_template_parser.add_argument("--summary", required=True)
+    handoff_template_parser.add_argument("--evidence", action="append", default=[])
+    handoff_record = handoff_sub.add_parser("record", help="验证并追加不可变 Role Handoff")
+    handoff_record.add_argument("file", type=Path)
     commands.add_parser("status", help="重建并显示当前 Run Memory")
     commands.add_parser("rebuild", help="从 Ledger 重建 Run Memory")
     commands.add_parser("reduce", help="记录 Reducer 的唯一判定")
@@ -273,6 +349,9 @@ def parser() -> argparse.ArgumentParser:
     run_successor = run_sub.add_parser("successor", help="以显式 Predecessor Binding 创建继任 Run")
     run_successor.add_argument("file", type=Path)
     run_successor.add_argument("--run-id", required=True)
+    run_supersede = run_sub.add_parser("supersede", help="因用户需求变更关闭当前非终态 Work")
+    run_supersede.add_argument("--reason", required=True)
+    run_supersede.add_argument("--request", required=True)
     adapter = commands.add_parser("adapter", help="检查 Adapter Capability Descriptor")
     adapter_sub = adapter.add_subparsers(dest="adapter_command", required=True)
     adapter_check = adapter_sub.add_parser("check", help="验证 Adapter Descriptor")
@@ -309,6 +388,9 @@ def parser() -> argparse.ArgumentParser:
     capability_resolve.add_argument("--rule", action="append", default=[])
     capability_resolve.add_argument("--agent", action="append", default=[])
     capability_resolve.add_argument("--skill", action="append", default=[])
+    capability_route = capability_sub.add_parser("route", help="根据 Risk 与 Signal 生成确定性 Agent/Skill 路由")
+    capability_route.add_argument("--risk", choices=("R0", "R1", "R2"), required=True)
+    capability_route.add_argument("--signal", action="append", default=[])
     capability_bind = capability_sub.add_parser("bind-custom", help="绑定 Custom Extension 文件与 Descriptor Digest")
     capability_bind.add_argument("directory", type=Path)
     capability_bind.add_argument("--write", action="store_true", help="原子更新扩展的 extension.json")
@@ -320,8 +402,15 @@ def execute(args: argparse.Namespace) -> Any:
     root = args.root.resolve()
     if args.command == "init":
         return init_repository(root, args.profile, args.run_id)
+    if args.command == "intake" and args.intake_command == "template":
+        return create_intake_template(args.request)
+    if args.command == "intake" and args.intake_command == "check":
+        return intake_decision(read_json(args.file))
+    if args.command == "intake" and args.intake_command == "confirm":
+        return confirm_intake(read_json(args.file), args.statement)
     if args.command == "work" and args.work_command == "template":
-        return work_template(root, successor=args.successor)
+        intake_value = None if args.intake is None else read_json(args.intake)
+        return work_template(root, successor=args.successor, intake=intake_value)
     if args.command == "work" and args.work_command == "accept":
         return accept_work(root, read_json(args.file))
     if args.command == "work" and args.work_command == "bind-verifier":
@@ -339,7 +428,12 @@ def execute(args: argparse.Namespace) -> Any:
                 raise YuanError(f"Verifier File 不存在或不安全：{item['path']}")
             item["digest"] = digest_bytes(path.read_bytes())
         verifier["digest"] = digest({"kind": verifier.get("kind"), "entrypoint": verifier.get("entrypoint"), "files": files})
+        work["confirmation"] = None
         return with_digest(work)
+    if args.command == "work" and args.work_command == "confirm":
+        work = confirm_work(read_json(args.file), args.statement)
+        validate_work(work, require_confirmation=True)
+        return work
     if args.command == "attempt" and args.attempt_command == "template":
         return attempt_template(
             root,
@@ -373,6 +467,19 @@ def execute(args: argparse.Namespace) -> Any:
         return resolve_attempt(root, args.attempt, args.reconciler, args.resolution, args.evidence)
     if args.command == "verify":
         return run_verifier(root, args.criterion, args.attempt)
+    if args.command == "handoff" and args.handoff_command == "template":
+        return handoff_template(
+            root,
+            handoff_id=args.handoff_id,
+            agent_id=args.agent,
+            to_agent_id=args.to,
+            phase=args.phase,
+            status=args.status,
+            summary=args.summary,
+            evidence_ids=args.evidence,
+        )
+    if args.command == "handoff" and args.handoff_command == "record":
+        return record_handoff(root, read_json(args.file))
     if args.command in {"status", "rebuild"}:
         return rebuild(root)
     if args.command == "reduce":
@@ -385,6 +492,8 @@ def execute(args: argparse.Namespace) -> Any:
         return list_runs(root)
     if args.command == "run" and args.run_command == "successor":
         return start_successor(root, read_json(args.file), args.run_id)
+    if args.command == "run" and args.run_command == "supersede":
+        return supersede_work(root, reason=args.reason, request=args.request)
     if args.command == "adapter" and args.adapter_command == "check":
         descriptor = validate_adapter_descriptor(read_json(args.file), root)
         return {
@@ -424,6 +533,8 @@ def execute(args: argparse.Namespace) -> Any:
             agents=args.agent,
             skills=args.skill,
         )
+    if args.command == "capability" and args.capability_command == "route":
+        return route_capabilities(root, risk=args.risk, signals=args.signal)
     if args.command == "capability" and args.capability_command == "bind-custom":
         directory = resolve_inside(root, args.directory.as_posix())
         custom_root = (root / CUSTOM_ROOT).resolve()

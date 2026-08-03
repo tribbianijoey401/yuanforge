@@ -4,7 +4,7 @@
 
 发行包从 `src/yuan/profiles/<profile-id>/profile.json` 自动发现 Profile。新增 Profile 不需要修改 Kernel，只需提供：
 
-- `profile.json`：版本、Required Rules、Agent Catalog、Skill Catalog 和 `use_when`；
+- `profile.json`：版本、Required Rules、Agent/Skill Catalog、`use_when` 与确定性 Workflow；
 - `rules/*.md`；
 - `agents/*.md`；
 - `skills/<skill-id>/SKILL.md`。
@@ -25,10 +25,13 @@ python -B scripts/sync_project.py update <项目> --capability-profile <新-prof
 
 ```powershell
 python -B .yuan/bin/yuan.pyz --root . capability list
+python -B .yuan/bin/yuan.pyz --root . capability route --risk R1 --signal backend
 python -B .yuan/bin/yuan.pyz --root . capability resolve --agent architect --skill writing-plans
 ```
 
-`list` 返回描述和触发条件，不需要读取全部文件。`resolve` 总是返回全部 Required Rules，并为所选 Agent/Skill 返回路径与 Digest。LLM 只读取这些文件；文件被篡改时命令失败。
+`list` 返回 Catalog 与 Workflow。`route` 从已确认 Risk/Signal 生成唯一 Routing、Agent→Skill `assignments` 和所有需要读取的路径/Digest；它是 Work 接受时 Kernel 重算的路由来源。`resolve` 仅用于显式加载自定义能力或诊断。文件被篡改时命令失败。
+
+Bundled Workflow 必须覆盖 R0/R1/R2、至少一个 Signal、全部 Agent 的 Skill Assignment，并声明会随 Artifact 变化而失效的 Reviewer。新增 Agent 却没有 Assignment 会使 Profile fail-closed。
 
 ## Project Custom Extension
 
@@ -46,4 +49,4 @@ python -B .yuan/bin/yuan.pyz --root . capability bind-custom .yuan/extensions/cu
 python -B .yuan/bin/yuan.pyz --root . capability resolve --skill team:deploy-review
 ```
 
-Custom Extension 只能指导 Proposal 或产生 Evidence，不能修改 Core Result、Install Record 或托管 Profile。
+Custom Extension 只能指导 Proposal 或产生 Evidence，不能修改 Core Result、Install Record、托管 Profile 或其确定性 Risk Route。需要把 Custom Agent/Skill 纳入强制 Routing 时，应发布新的 Bundled Profile 版本，而不是依赖隐式 Prompt。
