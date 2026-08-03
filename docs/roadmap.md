@@ -71,10 +71,20 @@
 
 退出 Evidence：非法 Run ID/Conformance 无残留、并发锁、Stage Metadata、完整 Update/Rollback、Wheel 安装和 CI Workflow。
 
+## M7 — 可调用工程能力层（已完成）
+
+- Bundled Capability Profile 自动发现与安装时显式选择。
+- 带 `use_when` 的 Rules/Agents/Skills Catalog，以及 Runtime `list/resolve` 路由。
+- 首个空 Run、Verifier 草稿、Work 接受与首个 `COMPLETE` 的闭合流程。
+- Custom Extension 命名空间、逐文件 Digest、错误隔离和更新保留。
+- Profile 文件增删参与安装事务、Snapshot 与 Rollback。
+
+退出 Evidence：Catalog 完整性、Runtime 解析、Custom Extension 篡改隔离，以及空项目从 `BLOCKED: 没有 Active Work` 到 `COMPLETE` 的端到端测试。
+
 ## 永久复杂度限制
 
 - Protocol 不超过 500 个非空行。
-- Reference Kernel 超过 3,000 个非空 Python 行前必须进行 Design Review；空行不作为复杂度预算。
+- Core Kernel 与 Deployment/Capability 支撑层分别限制为 2,000 个非空 Python 行；超限前必须进行 Design Review，空行不计。
 - Core 只使用标准库。
 - 不要求 Daemon、SQLite/Database、Network Service、Role System 或隐藏 Extension。
 - Extension 可以提出候选或生产 Evidence，但不能增加 Result 或改变 Core Completion Truth。

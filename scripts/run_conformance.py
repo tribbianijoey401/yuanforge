@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from yuan.adapters import validate_adapter_descriptor  # noqa: E402
 from yuan.canonical import canonical_bytes, digest_bytes  # noqa: E402
-from yuan.capabilities import capability_manifest, capability_payloads  # noqa: E402
+from yuan.capabilities import available_profiles, capability_manifest, capability_payloads  # noqa: E402
 from yuan.identity import harness_digest  # noqa: E402
 from yuan.ledger import atomic_write  # noqa: E402
 from yuan.project import BOOTSTRAP_END, BOOTSTRAP_START, bootstrap_bytes  # noqa: E402
@@ -61,15 +61,28 @@ def validate_schemas() -> dict[str, object]:
 def validate_size_budget() -> dict[str, object]:
     protocol = (ROOT / "src" / "yuan" / "protocol.md").read_text(encoding="utf-8")
     protocol_lines = sum(bool(line.strip()) for line in protocol.splitlines())
-    python_lines = sum(
-        sum(bool(line.strip()) for line in path.read_text(encoding="utf-8").splitlines())
+    core_names = {
+        "artifacts.py", "canonical.py", "errors.py", "identity.py", "ledger.py",
+        "paths.py", "ports.py", "reducer.py", "runtime.py", "validate.py",
+    }
+    counts = {
+        path.name: sum(bool(line.strip()) for line in path.read_text(encoding="utf-8").splitlines())
         for path in sorted((ROOT / "src" / "yuan").glob("*.py"))
-    )
+    }
+    core_lines = sum(count for name, count in counts.items() if name in core_names)
+    support_lines = sum(count for name, count in counts.items() if name not in core_names)
     if protocol_lines > 500:
         raise RuntimeError(f"Protocol 超出 500 个非空行：{protocol_lines}")
-    if python_lines > 3000:
-        raise RuntimeError(f"Reference Kernel 超出 3000 个非空 Python 行 Design Review 阈值：{python_lines}")
-    return {"status": "PASS", "protocol_nonempty_lines": protocol_lines, "kernel_python_nonempty_lines": python_lines}
+    if core_lines > 2000:
+        raise RuntimeError(f"Core Kernel 超出 2000 个非空 Python 行 Design Review 阈值：{core_lines}")
+    if support_lines > 2000:
+        raise RuntimeError(f"Deployment/Capability 支撑层超出 2000 个非空 Python 行 Design Review 阈值：{support_lines}")
+    return {
+        "status": "PASS",
+        "protocol_nonempty_lines": protocol_lines,
+        "core_python_nonempty_lines": core_lines,
+        "support_python_nonempty_lines": support_lines,
+    }
 
 
 def validate_bootstrap() -> dict[str, object]:
@@ -84,23 +97,35 @@ def validate_bootstrap() -> dict[str, object]:
 
 
 def validate_capability_profile() -> dict[str, object]:
-    manifest = capability_manifest()
-    payloads = capability_payloads()
-    kinds = {item["kind"] for item in manifest["files"]}
-    paths = {path for path, _ in payloads}
-    if not {"rules", "agents", "skills"} <= kinds:
-        raise RuntimeError("默认能力 Profile 缺少 Rules、Agents 或 Skills")
-    if len(paths) != len(payloads) or len(paths) != len(manifest["files"]):
-        raise RuntimeError("默认能力 Profile 路径重复或 Manifest 不完整")
+    summaries = []
+    for profile_id in available_profiles():
+        manifest = capability_manifest(profile_id)
+        payloads = capability_payloads(profile_id)
+        kinds = {item["kind"] for item in manifest["files"]}
+        paths = {path for path, _ in payloads}
+        if not {"rules", "agents", "skills"} <= kinds:
+            raise RuntimeError(f"能力 Profile 缺少 Rules、Agents 或 Skills：{profile_id}")
+        if len(paths) != len(payloads) or len(paths) != len(manifest["files"]):
+            raise RuntimeError(f"能力 Profile 路径重复或 Manifest 不完整：{profile_id}")
+        catalog_paths = set(manifest["required_rules"]) | {
+            item["path"] for item in manifest["agents"] + manifest["skills"]
+        }
+        if not catalog_paths <= paths:
+            raise RuntimeError(f"能力 Catalog 引用了未打包文件：{profile_id}")
+        summaries.append({
+            "profile_id": profile_id,
+            "profile_version": manifest["profile_version"],
+            "manifest_digest": manifest["digest"],
+            "file_count": len(paths),
+            "agent_count": len(manifest["agents"]),
+            "skill_count": len(manifest["skills"]),
+        })
     bootstrap = bootstrap_bytes().decode("utf-8")
-    if ".yuan/extensions/manifest.json" not in bootstrap or "skills/*/SKILL.md" not in bootstrap:
-        raise RuntimeError("Agent Bootstrap 没有加载能力 Profile")
+    if "capability list" not in bootstrap or "capability resolve" not in bootstrap or "没有 Active Work" not in bootstrap:
+        raise RuntimeError("Agent Bootstrap 没有实现能力路由或首个 Work 入口")
     return {
         "status": "PASS",
-        "profile_id": manifest["profile_id"],
-        "profile_version": manifest["profile_version"],
-        "manifest_digest": manifest["digest"],
-        "file_count": len(paths),
+        "profiles": summaries,
     }
 
 

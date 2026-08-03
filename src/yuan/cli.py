@@ -12,7 +12,16 @@ from typing import Any
 
 from .adapters import validate_adapter_descriptor
 from .canonical import canonical_bytes, digest, digest_bytes
+from .capabilities import (
+    CUSTOM_ROOT,
+    DEFAULT_PROFILE,
+    available_profiles,
+    bind_custom_descriptor,
+    installed_catalog,
+    resolve_capabilities,
+)
 from .errors import YuanError
+from .ledger import atomic_write
 from .paths import resolve_inside
 from .project import (
     initialize_repository,
@@ -67,6 +76,15 @@ def emit(value: Any) -> None:
     sys.stdout.buffer.write(canonical_bytes(value) + b"\n")
 
 
+def configure_utf8_streams() -> None:
+    """确保 Windows 终端中的中文 Help 与错误信息使用 UTF-8。"""
+
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            reconfigure(encoding="utf-8")
+
+
 def init_repository(root: Path, profile: str, run_id: str | None) -> dict[str, Any]:
     return initialize_repository(root, profile, run_id)
 
@@ -89,13 +107,14 @@ def work_template(root: Path, *, successor: bool = False) -> dict[str, Any]:
         work["artifact"]["environment"] = config["environment"]
         work["created_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         return with_digest(work)
-    verifier_files = [{"path": "tests/verify.py", "digest": "0" * 64}]
+    verifier_path = ".yuan/drafts/verifiers/AC-001.py"
+    verifier_files = [{"path": verifier_path, "digest": "0" * 64}]
     verifier = {
         "id": "replace-me",
         "revision": "1",
-        "digest": digest({"kind": "python-script", "entrypoint": "tests/verify.py", "files": verifier_files}),
+        "digest": digest({"kind": "python-script", "entrypoint": verifier_path, "files": verifier_files}),
         "kind": "python-script",
-        "entrypoint": "tests/verify.py",
+        "entrypoint": verifier_path,
         "timeout_seconds": 30,
         "files": verifier_files,
     }
@@ -269,6 +288,7 @@ def parser() -> argparse.ArgumentParser:
     project_install = project_sub.add_parser("install", help="向目标项目安装固定 Runtime 与 Agent Bootstrap")
     project_install.add_argument("target", type=Path)
     project_install.add_argument("--profile", choices=("AUDITED",), default="AUDITED")
+    project_install.add_argument("--capability-profile", choices=available_profiles(), default=DEFAULT_PROFILE)
     project_install.add_argument("--run-id")
     project_install.add_argument("--release-root", type=Path, default=Path.cwd(), help="Yuan Source/Release 根目录")
     project_install.add_argument("--conformance-report", type=Path, default=Path("dist/conformance-report.json"), help="相对 Release Root 的验证报告")
@@ -276,11 +296,22 @@ def parser() -> argparse.ArgumentParser:
     project_update.add_argument("target", type=Path)
     project_update.add_argument("--release-root", type=Path, default=Path.cwd(), help="Yuan Source/Release 根目录")
     project_update.add_argument("--conformance-report", type=Path, default=Path("dist/conformance-report.json"), help="相对 Release Root 的验证报告")
+    project_update.add_argument("--capability-profile", choices=available_profiles(), help="在安全激活边界切换能力 Profile")
     project_status_parser = project_sub.add_parser("status", help="检查项目部署与暂存版本")
     project_status_parser.add_argument("target", type=Path)
     project_rollback = project_sub.add_parser("rollback", help="恢复完整部署快照")
     project_rollback.add_argument("target", type=Path)
     project_rollback.add_argument("runtime_digest")
+    capability = commands.add_parser("capability", help="发现并解析 Rules、Agents 与 Skills")
+    capability_sub = capability.add_subparsers(dest="capability_command", required=True)
+    capability_sub.add_parser("list", help="列出已安装能力及触发条件")
+    capability_resolve = capability_sub.add_parser("resolve", help="解析本 Tick 要加载的能力文件")
+    capability_resolve.add_argument("--rule", action="append", default=[])
+    capability_resolve.add_argument("--agent", action="append", default=[])
+    capability_resolve.add_argument("--skill", action="append", default=[])
+    capability_bind = capability_sub.add_parser("bind-custom", help="绑定 Custom Extension 文件与 Descriptor Digest")
+    capability_bind.add_argument("directory", type=Path)
+    capability_bind.add_argument("--write", action="store_true", help="原子更新扩展的 extension.json")
     localize_parser(top)
     return top
 
@@ -370,20 +401,51 @@ def execute(args: argparse.Namespace) -> Any:
         )
     if args.command == "project" and args.project_command == "install":
         context = load_release_context(args.release_root, args.release_root / args.conformance_report)
-        return install_project(args.target, release_context=context, profile=args.profile, run_id=args.run_id)
+        return install_project(
+            args.target,
+            release_context=context,
+            profile=args.profile,
+            capability_profile=args.capability_profile,
+            run_id=args.run_id,
+        )
     if args.command == "project" and args.project_command == "update":
         context = load_release_context(args.release_root, args.release_root / args.conformance_report)
-        return update_project(args.target, release_context=context)
+        return update_project(args.target, release_context=context, capability_profile=args.capability_profile)
     if args.command == "project" and args.project_command == "status":
         return project_status(args.target)
     if args.command == "project" and args.project_command == "rollback":
         return rollback_project(args.target, args.runtime_digest)
+    if args.command == "capability" and args.capability_command == "list":
+        return installed_catalog(root)
+    if args.command == "capability" and args.capability_command == "resolve":
+        return resolve_capabilities(
+            root,
+            rules=args.rule,
+            agents=args.agent,
+            skills=args.skill,
+        )
+    if args.command == "capability" and args.capability_command == "bind-custom":
+        directory = resolve_inside(root, args.directory.as_posix())
+        custom_root = (root / CUSTOM_ROOT).resolve()
+        if directory == custom_root or custom_root not in directory.parents:
+            raise YuanError("Custom Extension 必须位于 .yuan/extensions/custom/<extension-id>/")
+        descriptor = bind_custom_descriptor(directory)
+        if args.write:
+            atomic_write(directory / "extension.json", canonical_bytes(descriptor))
+            return {
+                "status": "CUSTOM_BOUND",
+                "extension_id": descriptor["extension_id"],
+                "descriptor": (directory / "extension.json").relative_to(root).as_posix(),
+                "digest": descriptor["digest"],
+            }
+        return descriptor
     if args.command == "seal":
         return with_digest(read_json(args.file))
     raise AssertionError("到达不可达的 Command 分支")
 
 
 def main(argv: list[str] | None = None) -> int:
+    configure_utf8_streams()
     try:
         args = parser().parse_args(argv)
         emit(execute(args))

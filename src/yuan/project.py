@@ -17,6 +17,7 @@ from .canonical import canonical_bytes, digest_bytes, verify_digest
 from .capabilities import (
     DEFAULT_PROFILE,
     MANIFEST_PATH as CAPABILITY_MANIFEST_PATH,
+    available_profiles,
     capability_manifest,
     capability_paths,
     capability_payloads,
@@ -43,21 +44,19 @@ CORE_DEPLOYMENT_FILES = (
     ".yuan/release-manifest.json",
     ".yuan/conformance-report.json",
 )
-DEPLOYMENT_FILES = CORE_DEPLOYMENT_FILES + capability_paths()
-INSTALL_TRANSACTION_FILES = DEPLOYMENT_FILES + ("AGENTS.md", ".gitignore", ".yuan-run/current.json")
 GITIGNORE_CONTENT = ".yuan-run/\n.yuan/drafts/\n.yuan/candidates/\n.yuan/releases/"
 REQUIRED_CONFORMANCE_CHECKS = {
     "unit_tests", "schemas", "adapter", "bootstrap", "capability_profile", "automation", "size_budget", "reproducible_release"
 }
 
 
-def agent_guidance(root: Path) -> dict[str, str]:
+def agent_guidance(root: Path, capability_profile: str = DEFAULT_PROFILE) -> dict[str, str]:
     """返回安装后可直接交给 Agent 的开始与继续提示。"""
 
     return {
         "project_root": str(root.resolve()),
         "status_command": "python -B .yuan/bin/yuan.pyz --root . status",
-        "capability_profile": DEFAULT_PROFILE,
+        "capability_profile": capability_profile,
         "start_prompt": (
             "请读取项目根目录 AGENTS.md，并按照 Yuan Agent Bootstrap 开始一个新的 Work。"
             "我的需求是：<在这里描述需求>"
@@ -303,15 +302,66 @@ def _write_adapter(root: Path) -> None:
     )
 
 
-def _write_capabilities(root: Path) -> dict[str, Any]:
+def _write_capabilities(root: Path, profile_id: str) -> dict[str, Any]:
     """安装发行包托管的能力文件；项目自定义能力位于独立目录。"""
 
-    for relative, payload in capability_payloads():
+    for relative, payload in capability_payloads(profile_id):
         atomic_write(root / relative, payload)
-    manifest = with_digest(capability_manifest())
+    manifest = with_digest(capability_manifest(profile_id))
     atomic_write(root / CAPABILITY_MANIFEST_PATH, canonical_bytes(manifest))
     (root / ".yuan" / "extensions" / "custom").mkdir(parents=True, exist_ok=True)
     return manifest
+
+
+def _capability_profile_id(record: dict[str, Any]) -> str:
+    profile = record.get("capability_profile")
+    if not isinstance(profile, dict) or not isinstance(profile.get("id"), str):
+        return DEFAULT_PROFILE
+    return profile["id"]
+
+
+def _deployment_files_for_record(record: dict[str, Any]) -> tuple[str, ...]:
+    values = list(CORE_DEPLOYMENT_FILES)
+    profile = record.get("capability_profile")
+    if isinstance(profile, dict):
+        files = profile.get("files")
+        if not isinstance(files, list):
+            raise IntegrityError("Install Record Capability File Set 不合法")
+        values.append(CAPABILITY_MANIFEST_PATH)
+        for item in files:
+            path = item.get("path") if isinstance(item, dict) else None
+            if (
+                not isinstance(path, str)
+                or not path.startswith(".yuan/extensions/")
+                or path.startswith(".yuan/extensions/custom/")
+                or ".." in Path(path).parts
+            ):
+                raise IntegrityError("Install Record 包含不安全的 Capability Path")
+            values.append(path)
+    return tuple(dict.fromkeys(values))
+
+
+def _deployment_files_for_profile(profile_id: str) -> tuple[str, ...]:
+    return CORE_DEPLOYMENT_FILES + capability_paths(profile_id)
+
+
+def _transaction_files(*groups: tuple[str, ...]) -> tuple[str, ...]:
+    values = [item for group in groups for item in group]
+    values.extend(("AGENTS.md", ".gitignore", ".yuan-run/current.json"))
+    return tuple(dict.fromkeys(values))
+
+
+def _remove_obsolete_capabilities(root: Path, current: tuple[str, ...], target: tuple[str, ...]) -> None:
+    target_set = set(target)
+    for relative in current:
+        if (
+            relative not in target_set
+            and relative.startswith(".yuan/extensions/")
+            and not relative.startswith(".yuan/extensions/custom/")
+        ):
+            path = root / relative
+            if path.is_file():
+                path.unlink()
 
 
 def _read_object(path: Path, label: str) -> dict[str, Any]:
@@ -350,7 +400,7 @@ def _verify_installation(root: Path) -> dict[str, Any]:
         manifest = _read_object(root / CAPABILITY_MANIFEST_PATH, "Capability Profile Manifest")
         if (
             not isinstance(profile, dict)
-            or manifest.get("schema_version") != "yuan.capability-profile/v1"
+            or manifest.get("schema_version") not in {"yuan.capability-profile/v1", "yuan.capability-profile/v2"}
             or not verify_digest(manifest)
             or manifest.get("digest") != profile.get("manifest_digest")
             or manifest.get("profile_id") != profile.get("id")
@@ -401,13 +451,14 @@ def _restore(root: Path, captured: dict[str, bytes | None]) -> None:
 
 def _snapshot_deployment(root: Path) -> dict[str, Any]:
     record = _verify_installation(root)
+    deployment_files = _deployment_files_for_record(record)
     runtime_digest = record["runtime"]["digest"]
     target = root / ".yuan" / "releases" / runtime_digest
     manifest_path = target / "snapshot.json"
     if manifest_path.is_file():
         return _load_snapshot(root, runtime_digest)
     files = []
-    for relative in DEPLOYMENT_FILES:
+    for relative in deployment_files:
         source = root / relative
         if source.is_file():
             payload = source.read_bytes()
@@ -445,7 +496,17 @@ def _load_snapshot(root: Path, runtime_digest: str) -> dict[str, Any]:
         raise IntegrityError("Deployment Snapshot 结构不合法")
     paths = []
     for item in files:
-        if not isinstance(item, dict) or item.get("path") not in DEPLOYMENT_FILES:
+        path_value = item.get("path") if isinstance(item, dict) else None
+        if (
+            not isinstance(path_value, str)
+            or (
+                path_value not in CORE_DEPLOYMENT_FILES
+                and path_value != CAPABILITY_MANIFEST_PATH
+                and not path_value.startswith(".yuan/extensions/")
+            )
+            or path_value.startswith(".yuan/extensions/custom/")
+            or ".." in Path(path_value).parts
+        ):
             raise IntegrityError("Deployment Snapshot 包含未知路径")
         paths.append(item["path"])
         source = target / "files" / item["path"]
@@ -454,7 +515,7 @@ def _load_snapshot(root: Path, runtime_digest: str) -> dict[str, Any]:
         payload = source.read_bytes()
         if digest_bytes(payload) != item.get("digest") or len(payload) != item.get("bytes"):
             raise IntegrityError("Deployment Snapshot 文件损坏")
-    required = set(DEPLOYMENT_FILES[:5])
+    required = set(CORE_DEPLOYMENT_FILES[:5])
     if len(paths) != len(set(paths)) or not required <= set(paths):
         raise IntegrityError("Deployment Snapshot 文件集合不完整或重复")
     if set(blocks) != {"bootstrap", "gitignore"}:
@@ -503,6 +564,7 @@ def install_project(
     *,
     release_context: dict[str, Any],
     profile: str = "AUDITED",
+    capability_profile: str = DEFAULT_PROFILE,
     run_id: str | None = None,
 ) -> dict[str, Any]:
     root = root.resolve()
@@ -510,6 +572,8 @@ def install_project(
         raise ValidationError(f"目标项目目录不存在：{root}")
     if profile != "AUDITED":
         raise ValidationError("轻量项目安装器当前只提供 Codex AUDITED Adapter")
+    if capability_profile not in available_profiles():
+        raise ValidationError(f"发行包不包含 Capability Profile：{capability_profile}")
     run_id = _resolved_run_id(run_id)
     lock = root / ".yuan" / ".deployment.lock"
     with exclusive_lock(lock, timeout=DEPLOYMENT_LOCK_TIMEOUT):
@@ -517,7 +581,8 @@ def install_project(
             raise ValidationError("目标项目已安装 Yuan；请使用 project update")
         agents = _merged_marked(root / "AGENTS.md", bootstrap_bytes().decode("utf-8"), BOOTSTRAP_START, BOOTSTRAP_END)
         ignored = _merged_marked(root / ".gitignore", GITIGNORE_CONTENT, GITIGNORE_START, GITIGNORE_END)
-        captured = _capture(root, INSTALL_TRANSACTION_FILES)
+        deployment_files = _deployment_files_for_profile(capability_profile)
+        captured = _capture(root, _transaction_files(deployment_files))
         run_root = root / ".yuan-run" / "runs" / run_id
         candidate = root / ".yuan" / "candidates" / f"install-{os.getpid()}.pyz"
         artifact = build_runtime_zipapp(candidate)
@@ -526,7 +591,7 @@ def install_project(
             runtime = root / ".yuan" / "bin" / "yuan.pyz"
             atomic_write(runtime, candidate.read_bytes())
             _write_adapter(root)
-            _write_capabilities(root)
+            _write_capabilities(root, capability_profile)
             atomic_write(root / "AGENTS.md", agents)
             atomic_write(root / ".gitignore", ignored)
             initialized = initialize_repository(root, profile, run_id)
@@ -551,7 +616,7 @@ def install_project(
             "install_digest": record["digest"],
             "release_proof": proof,
             "decision": status["decision"],
-            "agent_guidance": agent_guidance(root),
+            "agent_guidance": agent_guidance(root, capability_profile),
         }
 
 
@@ -566,7 +631,12 @@ def _read_install_config(root: Path) -> dict[str, Any]:
     return value
 
 
-def update_project(root: Path, *, release_context: dict[str, Any]) -> dict[str, Any]:
+def update_project(
+    root: Path,
+    *,
+    release_context: dict[str, Any],
+    capability_profile: str | None = None,
+) -> dict[str, Any]:
     root = root.resolve()
     runtime = root / ".yuan" / "bin" / "yuan.pyz"
     with exclusive_lock(root / ".yuan" / ".deployment.lock", timeout=DEPLOYMENT_LOCK_TIMEOUT):
@@ -574,12 +644,16 @@ def update_project(root: Path, *, release_context: dict[str, Any]) -> dict[str, 
             raise ValidationError("目标项目没有可更新的 Yuan 安装")
         current_status = _pinned_status(root, runtime)
         current_record = _verify_installation(root)
+        current_capability_profile = _capability_profile_id(current_record)
+        capability_profile = capability_profile or current_capability_profile
+        if capability_profile not in available_profiles():
+            raise ValidationError(f"新发行包不提供目标 Capability Profile：{capability_profile}")
         current_digest = current_record["runtime"]["digest"]
         candidate = root / ".yuan" / "candidates" / f"yuan-{os.getpid()}.pyz"
         artifact = build_runtime_zipapp(candidate)
         try:
             proof = _validated_release(candidate, artifact, release_context)
-            if artifact["digest"] == current_digest:
+            if artifact["digest"] == current_digest and capability_profile == current_capability_profile:
                 _cleanup_candidates(root)
                 return {
                     "status": "UNCHANGED",
@@ -587,7 +661,7 @@ def update_project(root: Path, *, release_context: dict[str, Any]) -> dict[str, 
                     "runtime_digest": current_digest,
                     "install_digest": current_record["digest"],
                     "release_proof": current_record.get("release"),
-                    "agent_guidance": agent_guidance(root),
+                    "agent_guidance": agent_guidance(root, capability_profile),
                 }
             work = current_status.get("work")
             result = current_status.get("decision", {}).get("result")
@@ -612,12 +686,15 @@ def update_project(root: Path, *, release_context: dict[str, Any]) -> dict[str, 
                     "runtime_digest": artifact["digest"],
                     "candidate": str(staged.relative_to(root)),
                     "blocked_by_result": result,
-                    "agent_guidance": agent_guidance(root),
+                    "agent_guidance": agent_guidance(root, capability_profile),
                 }
             snapshot = _snapshot_deployment(root)
-            captured = _capture(root, INSTALL_TRANSACTION_FILES)
+            current_files = _deployment_files_for_record(current_record)
+            next_files = _deployment_files_for_profile(capability_profile)
+            captured = _capture(root, _transaction_files(current_files, next_files))
             try:
                 atomic_write(runtime, candidate.read_bytes())
+                _remove_obsolete_capabilities(root, current_files, next_files)
                 config = _read_install_config(root)
                 protocol = protocol_bytes()
                 config["protocol"] = {"id": "yuan.core", "revision": "0.2", "digest": digest_bytes(protocol)}
@@ -626,7 +703,7 @@ def update_project(root: Path, *, release_context: dict[str, Any]) -> dict[str, 
                 atomic_write(root / ".yuan" / "protocol.md", protocol)
                 atomic_write(root / ".yuan" / "config.json", canonical_bytes(with_digest(config)))
                 _write_adapter(root)
-                _write_capabilities(root)
+                _write_capabilities(root, capability_profile)
                 _install_bootstrap(root)
                 _write_release_evidence(root, artifact, release_context)
                 record = _install_record(root, artifact, proof)
@@ -644,7 +721,7 @@ def update_project(root: Path, *, release_context: dict[str, Any]) -> dict[str, 
                 "install_digest": record["digest"],
                 "release_proof": proof,
                 "decision": verified["decision"],
-                "agent_guidance": agent_guidance(root),
+                "agent_guidance": agent_guidance(root, capability_profile),
             }
         finally:
             if candidate.is_file():
@@ -681,10 +758,13 @@ def rollback_project(root: Path, runtime_digest: str) -> dict[str, Any]:
         if not (safe_empty or safe_terminal) or not bindings_match:
             raise ValidationError("当前 Run 或 Work Binding 不允许恢复该部署快照")
         _snapshot_deployment(root)
-        captured = _capture(root, INSTALL_TRANSACTION_FILES)
+        current_files = _deployment_files_for_record(current_record)
+        target_files = tuple(item["path"] for item in target["files"])
+        deployment_union = tuple(dict.fromkeys(current_files + target_files))
+        captured = _capture(root, _transaction_files(deployment_union))
         try:
             available = {item["path"] for item in target["files"]}
-            for relative in DEPLOYMENT_FILES:
+            for relative in deployment_union:
                 destination = root / relative
                 if relative in available:
                     atomic_write(destination, (snapshot_root / "files" / relative).read_bytes())
@@ -715,7 +795,7 @@ def rollback_project(root: Path, runtime_digest: str) -> dict[str, Any]:
             "runtime_digest": runtime_digest,
             "install_digest": restored_record["digest"],
             "decision": verified["decision"],
-            "agent_guidance": agent_guidance(root),
+            "agent_guidance": agent_guidance(root, _capability_profile_id(restored_record)),
         }
 
 

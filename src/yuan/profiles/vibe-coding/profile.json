@@ -1,0 +1,44 @@
+{
+  "schema_version": "yuan.capability-source/v1",
+  "profile_id": "vibe-coding",
+  "profile_version": "1.1.0",
+  "description": "面向可验证、可恢复 Vibe Coding 的默认工程能力。",
+  "required_rules": [
+    "rules/00-boundary.md",
+    "rules/01-workflow.md",
+    "rules/02-evidence.md",
+    "rules/03-risk-and-review.md",
+    "rules/04-planning.md",
+    "rules/05-testing.md",
+    "rules/06-delivery.md",
+    "rules/07-agent-routing.md"
+  ],
+  "agents": [
+    {"id": "conductor", "path": "agents/conductor.md", "description": "把意图转为 Work 并路由确定性流程。", "use_when": ["每个新 Work", "恢复未完成 Work", "跨角色协调"]},
+    {"id": "product-analyst", "path": "agents/product-analyst.md", "description": "提炼用户价值与可验证验收标准。", "use_when": ["需求含糊", "范围或风险未明确"]},
+    {"id": "architect", "path": "agents/architect.md", "description": "设计模块、接口、迁移与回滚。", "use_when": ["多模块变更", "架构或数据模型变化"]},
+    {"id": "frontend-developer", "path": "agents/frontend-developer.md", "description": "实现前端状态、交互与可访问性。", "use_when": ["前端或 UI 实现"]},
+    {"id": "backend-developer", "path": "agents/backend-developer.md", "description": "实现领域逻辑、API 与持久化。", "use_when": ["后端、API 或数据变更"]},
+    {"id": "ui-designer", "path": "agents/ui-designer.md", "description": "建立可实现的视觉与组件规范。", "use_when": ["新界面", "视觉体系变化"]},
+    {"id": "design-reviewer", "path": "agents/design-reviewer.md", "description": "实现前证伪设计完整性。", "use_when": ["R0/R1 设计", "跨边界方案"]},
+    {"id": "spec-reviewer", "path": "agents/spec-reviewer.md", "description": "独立检查实现是否满足 Work。", "use_when": ["R0/R1 交付", "行为变更"]},
+    {"id": "security-auditor", "path": "agents/security-auditor.md", "description": "检查安全与滥用路径。", "use_when": ["R0", "认证、权限、秘密或敏感数据"]},
+    {"id": "quality-auditor", "path": "agents/quality-auditor.md", "description": "检查维护性、性能与兼容性。", "use_when": ["复杂实现", "性能或可靠性敏感"]},
+    {"id": "ux-reviewer", "path": "agents/ux-reviewer.md", "description": "验证真实用户任务与可访问性。", "use_when": ["用户界面行为变化"]},
+    {"id": "tester", "path": "agents/tester.md", "description": "独立设计并执行验证矩阵。", "use_when": ["所有行为变更", "发布前"]},
+    {"id": "documentation-engineer", "path": "agents/documentation-engineer.md", "description": "同步已验证行为、使用与迁移文档。", "use_when": ["接口、使用方式或架构变化"]}
+  ],
+  "skills": [
+    {"id": "project-lifecycle", "path": "skills/project-lifecycle/SKILL.md", "description": "从初始 BLOCKED 或历史状态启动、继续和结束 Work。", "use_when": ["开始新需求", "继续上次工作", "安装后首次对话"]},
+    {"id": "repository-audit", "path": "skills/repository-audit/SKILL.md", "description": "建立仓库功能、架构、测试与风险地图。", "use_when": ["理解仓库", "接手项目", "大规模重构"]},
+    {"id": "work-authoring", "path": "skills/work-authoring/SKILL.md", "description": "编写范围、Grant、Budget 与验收标准。", "use_when": ["创建或继任 Work"]},
+    {"id": "verifier-authoring", "path": "skills/verifier-authoring/SKILL.md", "description": "在非 Artifact 草稿区创建可绑定的只读 Verifier。", "use_when": ["Work 尚未绑定 Verifier", "新增 Acceptance Criterion"]},
+    {"id": "writing-plans", "path": "skills/writing-plans/SKILL.md", "description": "生成可验证、可回滚的实施计划。", "use_when": ["多步骤或高风险变更"]},
+    {"id": "test-driven-development", "path": "skills/test-driven-development/SKILL.md", "description": "执行 Red、Green、Refactor 闭环。", "use_when": ["缺陷修复", "稳定行为实现"]},
+    {"id": "systematic-debugging", "path": "skills/systematic-debugging/SKILL.md", "description": "以可证伪假设定位根因。", "use_when": ["测试失败", "运行异常", "连续修复无效"]},
+    {"id": "code-review", "path": "skills/code-review/SKILL.md", "description": "独立审查规格、安全、回归和测试充分性。", "use_when": ["实现完成", "合入前"]},
+    {"id": "subagent-driven-development", "path": "skills/subagent-driven-development/SKILL.md", "description": "按角色与依赖拆分多 Agent 工作。", "use_when": ["平台支持多 Agent", "至少两个独立任务"]},
+    {"id": "custom-extension-authoring", "path": "skills/custom-extension-authoring/SKILL.md", "description": "创建可发现、可校验且不改变 Core Truth 的项目扩展。", "use_when": ["新增项目规则", "新增 Agent", "新增 Skill"]},
+    {"id": "release-and-handoff", "path": "skills/release-and-handoff/SKILL.md", "description": "验证提交、推送、发布和交接事实。", "use_when": ["提交", "推送", "发布", "交接"]}
+  ]
+}

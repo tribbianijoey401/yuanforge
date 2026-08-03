@@ -1,6 +1,6 @@
 """Yuan 协议优先 Harness 微内核。"""
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 RESULTS = (
     "CONTINUE",

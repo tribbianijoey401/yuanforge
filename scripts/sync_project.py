@@ -19,6 +19,7 @@ from yuan.project import (  # noqa: E402
     rollback_project,
     update_project,
 )
+from yuan.capabilities import DEFAULT_PROFILE, available_profiles  # noqa: E402
 
 
 class ChineseArgumentParser(argparse.ArgumentParser):
@@ -104,10 +105,12 @@ def main() -> int:
     install = commands.add_parser("install", help="首次安装")
     install.add_argument("target", type=Path)
     install.add_argument("--profile", choices=("AUDITED",), default="AUDITED")
+    install.add_argument("--capability-profile", choices=available_profiles(), default=DEFAULT_PROFILE)
     install.add_argument("--run-id")
     install.add_argument("--conformance-report", type=Path, help="使用已有且匹配当前 Release 的 Conformance Report")
     update = commands.add_parser("update", help="同步当前 Yuan Release")
     update.add_argument("target", type=Path)
+    update.add_argument("--capability-profile", choices=available_profiles(), help="在安全激活边界切换能力 Profile")
     update.add_argument("--conformance-report", type=Path, help="使用已有且匹配当前 Release 的 Conformance Report")
     status = commands.add_parser("status", help="检查项目部署与暂存版本")
     status.add_argument("target", type=Path)
@@ -122,10 +125,15 @@ def main() -> int:
                 args.target,
                 release_context=_verified_context(args.conformance_report),
                 profile=args.profile,
+                capability_profile=args.capability_profile,
                 run_id=args.run_id,
             )
         elif args.command == "update":
-            result = update_project(args.target, release_context=_verified_context(args.conformance_report))
+            result = update_project(
+                args.target,
+                release_context=_verified_context(args.conformance_report),
+                capability_profile=args.capability_profile,
+            )
         elif args.command == "status":
             result = project_status(args.target)
         else:

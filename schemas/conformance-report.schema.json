@@ -10,7 +10,7 @@
     "harness_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "checks": {
       "type": "object",
-      "required": ["unit_tests", "schemas", "adapter", "bootstrap", "automation", "size_budget", "reproducible_release"]
+      "required": ["unit_tests", "schemas", "adapter", "bootstrap", "capability_profile", "automation", "size_budget", "reproducible_release"]
     }
   },
   "additionalProperties": false

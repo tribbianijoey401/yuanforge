@@ -103,4 +103,6 @@ Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact M
 
 Core 只定义确定性语义，不承担全部软件工程知识。发行包默认携带 `vibe-coding` Capability Profile：Rules 约束工作纪律，Agents 隔离职责，Skills 提供按需流程。它们只能帮助编写 Work/Proposal、指导动作或生成 Evidence，不能增加 Primitive、Result 或修改 `COMPLETE` 谓词。
 
-托管能力逐文件绑定到 Capability Manifest 和 Install Record，并参与安装事务、更新、完整性检查与回滚。项目能力位于 `.yuan/extensions/custom/`，不进入框架托管集合。
+托管能力逐文件绑定到 Capability Manifest 和 Install Record，并参与安装事务、更新、完整性检查与回滚。每个 Bundled Profile 通过 `profile.json` 自描述，Kernel 无需硬编码 Profile 名称；Runtime 的 `capability list/resolve` 提供确定性发现与最小上下文加载。
+
+项目能力位于 `.yuan/extensions/custom/<extension-id>/`，不进入框架托管集合。Custom Descriptor 自绑定逐文件 Digest；损坏的自定义扩展被隔离并报告，不会使 Core 或托管 Profile 成为隐藏依赖。

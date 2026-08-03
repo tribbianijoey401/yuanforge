@@ -13,6 +13,12 @@ from unittest import mock
 from yuan.artifacts import build_manifest, diff_manifests
 from yuan.adapters import validate_adapter_descriptor
 from yuan.canonical import canonical_bytes, digest, digest_bytes
+from yuan.capabilities import (
+    available_profiles,
+    capability_manifest,
+    installed_catalog,
+    resolve_capabilities,
+)
 from yuan.cli import attempt_template, init_repository, parser as cli_parser, work_template
 from yuan.errors import IntegrityError, ValidationError
 from yuan.identity import harness_digest
@@ -47,7 +53,7 @@ from yuan.runtime import (
     start_successor,
     verify_work_verifiers,
 )
-from yuan.validate import validate_evidence, with_digest
+from yuan.validate import validate_evidence, validate_work, with_digest
 
 
 ZERO = "0" * 64
@@ -489,6 +495,16 @@ class PureKernelTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             canonical_bytes({"bad": math.nan})
 
+    def test_bundled_profile_is_discoverable_and_catalog_is_complete(self) -> None:
+        self.assertIn("vibe-coding", available_profiles())
+        manifest = capability_manifest("vibe-coding")
+        self.assertEqual(manifest["schema_version"], "yuan.capability-profile/v2")
+        self.assertGreaterEqual(len(manifest["required_rules"]), 5)
+        self.assertGreaterEqual(len(manifest["agents"]), 13)
+        self.assertGreaterEqual(len(manifest["skills"]), 10)
+        self.assertIn("project-lifecycle", {item["id"] for item in manifest["skills"]})
+        self.assertIn("verifier-authoring", {item["id"] for item in manifest["skills"]})
+
     def projection(self) -> dict:
         work = {
             "budgets": {"ticks": 5},
@@ -686,6 +702,7 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertTrue(runtime.is_file())
         manifest = json.loads((self.root / ".yuan" / "extensions" / "manifest.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["profile_id"], "vibe-coding")
+        self.assertEqual(manifest["schema_version"], "yuan.capability-profile/v2")
         self.assertTrue((self.root / ".yuan" / "extensions" / "vibe-coding" / "rules" / "01-workflow.md").is_file())
         self.assertTrue((self.root / ".yuan" / "extensions" / "vibe-coding" / "agents" / "conductor.md").is_file())
         self.assertTrue((self.root / ".yuan" / "extensions" / "vibe-coding" / "skills" / "systematic-debugging" / "SKILL.md").is_file())
@@ -736,6 +753,153 @@ class ProjectInstallerTests(unittest.TestCase):
             self.assertEqual((self.root / path).read_bytes(), payload)
         self.assertEqual(project_status(self.root)["runtime_digest"], previous_digest)
         self.assertEqual(custom.read_text(encoding="utf-8"), "# 项目自定义规则\n")
+
+    def test_installed_runtime_lists_and_resolves_capabilities(self) -> None:
+        install_project(self.root, release_context=self.release_context, run_id="RUN-CAPABILITY-CLI")
+        runtime = self.root / ".yuan" / "bin" / "yuan.pyz"
+        listed = subprocess.run(
+            [sys.executable, "-B", str(runtime), "--root", str(self.root), "capability", "list"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=30,
+        )
+        self.assertEqual(listed.returncode, 0, listed.stderr.decode(errors="replace"))
+        catalog = json.loads(listed.stdout)
+        self.assertIn("conductor", {item["id"] for item in catalog["agents"]})
+        self.assertIn("project-lifecycle", {item["id"] for item in catalog["skills"]})
+        resolved = subprocess.run(
+            [
+                sys.executable, "-B", str(runtime), "--root", str(self.root),
+                "capability", "resolve", "--agent", "conductor", "--skill", "project-lifecycle",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=30,
+        )
+        self.assertEqual(resolved.returncode, 0, resolved.stderr.decode(errors="replace"))
+        selection = json.loads(resolved.stdout)
+        self.assertEqual(selection["status"], "RESOLVED")
+        self.assertEqual(len(selection["rules"]), len(catalog["required_rules"]))
+        self.assertEqual(selection["agents"][0]["id"], "conductor")
+        self.assertEqual(selection["skills"][0]["id"], "project-lifecycle")
+
+    def test_custom_extension_can_be_bound_discovered_and_isolated(self) -> None:
+        install_project(self.root, release_context=self.release_context, run_id="RUN-CUSTOM-EXTENSION")
+        extension = self.root / ".yuan" / "extensions" / "custom" / "team"
+        skill = extension / "skills" / "deploy-review" / "SKILL.md"
+        skill.parent.mkdir(parents=True)
+        skill.write_text("# 团队发布审查\n", encoding="utf-8")
+        draft = {
+            "schema_version": "yuan.custom-extension/v1",
+            "extension_id": "team",
+            "description": "团队工程规则。",
+            "rules": [],
+            "agents": [],
+            "skills": [{
+                "id": "deploy-review",
+                "path": "skills/deploy-review/SKILL.md",
+                "description": "团队发布前审查。",
+                "use_when": ["发布前"],
+            }],
+        }
+        (extension / "extension.json").write_text(json.dumps(draft, ensure_ascii=False), encoding="utf-8")
+        runtime = self.root / ".yuan" / "bin" / "yuan.pyz"
+        bound = subprocess.run(
+            [
+                sys.executable, "-B", str(runtime), "--root", str(self.root),
+                "capability", "bind-custom", ".yuan/extensions/custom/team", "--write",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=30,
+        )
+        self.assertEqual(bound.returncode, 0, bound.stderr.decode(errors="replace"))
+        self.assertEqual(json.loads(bound.stdout)["status"], "CUSTOM_BOUND")
+        catalog = installed_catalog(self.root)
+        self.assertEqual(catalog["custom_errors"], [])
+        self.assertIn("team:deploy-review", {item["id"] for item in catalog["skills"]})
+        selection = resolve_capabilities(self.root, rules=[], agents=[], skills=["team:deploy-review"])
+        self.assertEqual(selection["skills"][0]["source"], "custom")
+        skill.write_text("tampered\n", encoding="utf-8")
+        catalog = installed_catalog(self.root)
+        self.assertEqual(catalog["agents"][0]["id"], "conductor")
+        self.assertEqual(catalog["custom_errors"][0]["extension_id"], "team")
+
+    def test_first_work_template_uses_non_artifact_verifier_draft(self) -> None:
+        install_project(self.root, release_context=self.release_context, run_id="RUN-FIRST-WORK-TEMPLATE")
+        work = work_template(self.root)
+        verifier = work["acceptance_criteria"][0]["verifier"]
+        self.assertTrue(verifier["entrypoint"].startswith(".yuan/drafts/verifiers/"))
+        self.assertIn(verifier["entrypoint"], {item["path"] for item in verifier["files"]})
+        self.assertEqual(validate_work(work), work)
+
+    def test_empty_project_can_follow_bootstrap_to_complete_first_work(self) -> None:
+        install_project(self.root, release_context=self.release_context, run_id="RUN-LLM-BOOTSTRAP")
+        initial = project_status(self.root)
+        self.assertEqual(initial["decision"], {"result": "BLOCKED", "reasons": ["没有 Active Work"]})
+        selection = resolve_capabilities(
+            self.root,
+            rules=[],
+            agents=["conductor"],
+            skills=["project-lifecycle", "work-authoring", "verifier-authoring"],
+        )
+        self.assertEqual(selection["status"], "RESOLVED")
+
+        work = work_template(self.root)
+        verifier_path = self.root / work["acceptance_criteria"][0]["verifier"]["entrypoint"]
+        verifier_path.parent.mkdir(parents=True)
+        verifier_path.write_text(
+            "import json, pathlib, sys\n"
+            "passed = (pathlib.Path(sys.argv[1]) / 'app.txt').read_text(encoding='utf-8') == 'hello\\n'\n"
+            "print(json.dumps({'status': 'PASS' if passed else 'FAIL', 'assertions': [{'id': 'app-content', 'passed': passed}]}))\n",
+            encoding="utf-8",
+        )
+        work["goal"] = "创建内容为 hello 的 app.txt。"
+        criterion = work["acceptance_criteria"][0]
+        criterion["description"] = "app.txt 的内容严格等于 hello 加换行。"
+        criterion["verifier"]["id"] = "verify.app-content"
+        files = criterion["verifier"]["files"]
+        files[0]["digest"] = digest_bytes(verifier_path.read_bytes())
+        criterion["verifier"]["digest"] = digest({
+            "kind": criterion["verifier"]["kind"],
+            "entrypoint": criterion["verifier"]["entrypoint"],
+            "files": files,
+        })
+        work["safety_invariants"] = []
+        work["grants"][0]["action_types"] = ["file-write"]
+        work["grants"][0]["side_effect_classes"] = ["filesystem"]
+        work["grants"][0]["scopes"] = ["app.txt"]
+        work = with_digest(work)
+        accepted = accept_work(self.root, work)
+        self.assertEqual(accepted["decision"]["result"], "CONTINUE")
+
+        proposal = attempt_template(
+            self.root,
+            attempt_id="ATT-FIRST-WORK",
+            strategy="创建目标文件",
+            claim="写入目标内容后 Criterion 成立",
+            falsification="Verifier 观察到缺失或不同内容",
+            inputs=[],
+            action_type="file-write",
+            paths=["app.txt"],
+            side_effect_class="filesystem",
+            grant_id="GRANT-001",
+            read_only=False,
+            high_impact=False,
+            tool_calls=1,
+            command_seconds=0,
+        )
+        begin_attempt(self.root, proposal)
+        dispatch_attempt(self.root, "ATT-FIRST-WORK")
+        (self.root / "app.txt").write_text("hello\n", encoding="utf-8")
+        observed = observe_attempt(self.root, "ATT-FIRST-WORK", {"kind": "agent-platform", "status": "OK"})
+        self.assertEqual(observed["decision"]["result"], "CONTINUE")
+        verified = run_verifier(self.root, "AC-001", "ATT-FIRST-WORK")
+        self.assertEqual(verified["decision"]["result"], "COMPLETE")
+        self.assertEqual(record_reduction(self.root)["decision"]["result"], "COMPLETE")
 
     def test_capability_tamper_fails_installation_verification(self) -> None:
         install_project(self.root, release_context=self.release_context, run_id="RUN-CAPABILITY-TAMPER")

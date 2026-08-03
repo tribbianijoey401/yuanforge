@@ -16,7 +16,7 @@ Yuan 是一个协议优先、面向持久化 LLM 软件工程的 Harness。它�
 从 Yuan 源码仓库执行：
 
 ```powershell
-python -B scripts/sync_project.py install G:\projects\my-project --profile AUDITED
+python -B scripts/sync_project.py install G:\projects\my-project --profile AUDITED --capability-profile vibe-coding
 ```
 
 推荐脚本会先运行完整 Conformance，只有报告中的 Harness 与 Artifact Digest 同时匹配 Candidate 才允许安装。Git Commit 与 Worktree dirty 状态会写入目标项目的 Install Record。
@@ -26,7 +26,7 @@ python -B scripts/sync_project.py install G:\projects\my-project --profile AUDIT
 ```powershell
 python -m pip install .
 python -B scripts/run_conformance.py
-yuan project install G:\projects\my-project --profile AUDITED --release-root .
+yuan project install G:\projects\my-project --profile AUDITED --capability-profile vibe-coding --release-root .
 ```
 
 安装器会：
@@ -59,15 +59,15 @@ python -B .yuan/bin/yuan.pyz --root . status
    请读取项目根目录 AGENTS.md，检查 Yuan 当前状态，并按照 Yuan Agent Bootstrap 继续未完成的 Work；只有 Reducer 返回 COMPLETE 时才报告完成。
    ```
 
-LLM 会先读取 Bootstrap，再通过项目内固定 Runtime 恢复 Run Memory、Work、Attempt 和 Evidence。用户不需要手工重述此前过程。安装脚本成功后也会显示以上提示；机器可解析的单个 JSON 保留在标准输出，提示写入标准错误流。
+LLM 会先读取 Bootstrap，通过项目内固定 Runtime 恢复状态，然后运行 `capability list` 获取触发条件、用 `capability resolve` 选择本 Tick 的 Rules/Agents/Skills。初始状态的唯一原因如果是“没有 Active Work”，LLM 会进入首个 Work Authoring，而不是把正常空 Run 当成故障。用户不需要手工重述此前过程。安装脚本成功后也会显示以上提示；机器可解析的单个 JSON 保留在标准输出，提示写入标准错误流。
 
 默认能力层包含：
 
 - `rules/`：边界、工作流、Evidence、风险审查、计划、测试与交付规则。
 - `agents/`：Conductor、Product Analyst、Architect、前后端开发、设计、规格、安全、质量、UX、Tester 和 Documentation Engineer。
-- `skills/`：仓库审计、Work 编写、计划、TDD、系统化调试、代码审查、多 Agent 开发和发布交接。
+- `skills/`：项目生命周期、仓库审计、Work/Verifier 编写、计划、TDD、系统化调试、代码审查、多 Agent 开发、Custom Extension 和发布交接。
 
-框架更新会原子更新这些托管能力。项目专属规则或 Skill 放入 `.yuan/extensions/custom/`，安装器不会覆盖它们。
+框架更新会原子更新这些托管能力。项目专属规则或 Skill 放入 `.yuan/extensions/custom/<extension-id>/`，使用 Custom Extension Descriptor 绑定后会进入同一 Catalog；安装器不会覆盖它们。完整扩展协议见 [Capability Profile 与 Custom Extension](docs/extensions.md)。
 
 详细安装边界与目录结构见 [项目安装与更新](docs/installation.md)。
 
@@ -118,7 +118,7 @@ Rollback 只在没有 Work，或当前 Work 已 `COMPLETE` 且仍绑定目标快
 python -m pip install -e .
 yuan --root . init --profile AUDITED
 yuan work template > work.draft.json
-# 编辑草稿，然后绑定 Verifier 文件闭包并接受 Work：
+# 编辑草稿，在 .yuan/drafts/verifiers/ 创建只读 Verifier，然后绑定文件闭包并接受 Work：
 yuan work bind-verifier work.draft.json --criterion AC-001 > work.json
 yuan work accept work.json
 # 根据当前文件自动绑定 Relevant Input Digest：
