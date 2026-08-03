@@ -642,7 +642,6 @@ def update_project(
     with exclusive_lock(root / ".yuan" / ".deployment.lock", timeout=DEPLOYMENT_LOCK_TIMEOUT):
         if not (root / ".yuan" / "config.json").is_file() or not runtime.is_file():
             raise ValidationError("目标项目没有可更新的 Yuan 安装")
-        current_status = _pinned_status(root, runtime)
         current_record = _verify_installation(root)
         current_capability_profile = _capability_profile_id(current_record)
         capability_profile = capability_profile or current_capability_profile
@@ -663,6 +662,10 @@ def update_project(
                     "release_proof": current_record.get("release"),
                     "agent_guidance": agent_guidance(root, capability_profile),
                 }
+            # 状态检查必须使用候选 Release：项目固定的旧 Runtime 可能包含
+            # 已修复的 Artifact 枚举缺陷（如缺少 node_modules 排除），
+            # 用旧 Runtime 检查会导致自举死锁，永远无法完成更新。
+            current_status = _pinned_status(root, candidate)
             work = current_status.get("work")
             result = current_status.get("decision", {}).get("result")
             errors = current_status.get("errors")

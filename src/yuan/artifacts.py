@@ -11,7 +11,26 @@ from .errors import IntegrityError, ValidationError
 from .paths import matches_any, normalize_relative
 
 
-DEFAULT_EXCLUDES = [".git/**", ".yuan-run/**", "__pycache__/**", "*.pyc"]
+DEFAULT_EXCLUDES = [
+    ".git/**",
+    ".yuan-run/**",
+    "__pycache__/**",
+    "*.pyc",
+    "node_modules/**",
+    "**/node_modules/**",
+    ".venv/**",
+    "**/.venv/**",
+    "venv/**",
+    "**/venv/**",
+    "dist/**",
+    "**/dist/**",
+    "build/**",
+    "**/build/**",
+    ".next/**",
+    "**/.next/**",
+    ".nuxt/**",
+    "**/.nuxt/**",
+]
 
 
 def build_manifest(
@@ -33,10 +52,11 @@ def build_manifest(
         for name in sorted(dirs):
             path = base / name
             relative = path.relative_to(root).as_posix()
+            if matches_any(relative, excludes) or matches_any(relative + "/x", excludes):
+                continue
             if path.is_symlink():
                 raise IntegrityError(f"Artifact 包含 Directory Link：{relative}")
-            if not matches_any(relative, excludes) and not matches_any(relative + "/x", excludes):
-                kept_dirs.append(name)
+            kept_dirs.append(name)
         dirs[:] = kept_dirs
         for name in sorted(files):
             path = base / name
