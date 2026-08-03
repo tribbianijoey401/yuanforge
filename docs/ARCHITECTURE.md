@@ -98,3 +98,9 @@ Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact M
 ## 安全声明
 
 `AUDITED` 是开放 Agent 平台上的 Detective/Corrective Harness。它能检测 Out-of-band Artifact 修改并使陈旧 Evidence 失效，但不能认证 `.yuan-run` 是否被拥有任意写权限的恶意进程重写。`ENFORCED` 需要平台或 OS 隔离；它是更强的部署 Profile，不是 Prompt 声明。
+
+## 工程能力层
+
+Core 只定义确定性语义，不承担全部软件工程知识。发行包默认携带 `vibe-coding` Capability Profile：Rules 约束工作纪律，Agents 隔离职责，Skills 提供按需流程。它们只能帮助编写 Work/Proposal、指导动作或生成 Evidence，不能增加 Primitive、Result 或修改 `COMPLETE` 谓词。
+
+托管能力逐文件绑定到 Capability Manifest 和 Install Record，并参与安装事务、更新、完整性检查与回滚。项目能力位于 `.yuan/extensions/custom/`，不进入框架托管集合。

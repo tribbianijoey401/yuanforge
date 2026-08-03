@@ -26,6 +26,9 @@ python -B scripts/sync_project.py install <目标项目> --profile AUDITED
     release-manifest.json          Candidate 中每个 Source Entry 与 Runtime 的 Digest
     conformance-report.json        与该 Runtime Digest 绑定的完整验证报告
     install.json                   安装内容、Release Evidence 与 Source Binding
+    extensions/manifest.json       默认能力 Profile 的版本与逐文件 Digest
+    extensions/vibe-coding/        托管的 Rules、Agents 与 Skills
+    extensions/custom/             项目自定义能力，更新时保留
     releases/<runtime-digest>/     可校验的完整旧部署快照
   .yuan-run/                       Ledger、Blob 与 Projection，不提交 Git
 ```
@@ -40,7 +43,7 @@ python -B scripts/sync_project.py install <目标项目> --profile AUDITED
 python -B .yuan/bin/yuan.pyz --root .
 ```
 
-这样全局 Python Package 的升级不会静默改变项目 Runtime。Bootstrap 指导 Agent 完成 Status、Work Authoring、Proposal、Attempt Journal、Verifier、Evidence 与 Reduce 循环；只有 `COMPLETE` 可以报告完成。
+这样全局 Python Package 的升级不会静默改变项目 Runtime。Bootstrap 先验证状态，再加载默认 `vibe-coding` Profile 的基础 Rules，并按当前任务选择 Agent 与 Skill。能力层指导 Work Authoring、Proposal、实施和验证；只有 Core Reducer 的 `COMPLETE` 可以报告完成。
 
 首个 Run 没有 Work，因此初始 `status` 返回 `BLOCKED` 且原因为“没有 Active Work”。这不是故障：Agent 应根据当前用户请求创建 Verifier 和首个 Work。后续新请求通过 Successor Work/New Run 继续，不重写历史。
 
@@ -56,10 +59,10 @@ python -B scripts/sync_project.py update <目标项目>
 2. 从当前 Yuan Release 构建新的确定性 Candidate，并验证 Manifest、Conformance 与 Source Binding。
 3. Candidate 与当前 Runtime 相同则返回 `UNCHANGED`，仅校准 Managed Bootstrap。
 4. Active Work 非终态时返回 `STAGED`，Candidate 与带 Digest 的 Metadata 写入被忽略的 `.yuan/candidates/`，旧 Candidate 自动清理，不切换当前 Runtime。
-5. 没有 Work 或当前结果为 `COMPLETE` 时，保存完整旧部署快照，更新 Protocol/Config/Bootstrap/Release Evidence 并原子切换。
+5. 没有 Work 或当前结果为 `COMPLETE` 时，保存完整旧部署快照，更新 Protocol/Config/Bootstrap/能力 Profile/Release Evidence 并原子切换。
 6. 使用新固定 Runtime 重新执行 `status`；失败时恢复全部 Managed File。
 
-安装、更新、状态检查和回滚共用 `.yuan/.deployment.lock`。旧部署快照位于 `.yuan/releases/<digest>/`，包含 Runtime、Config、Protocol、Install Record、Adapter、Release Evidence 和两个 Managed Block，供本地恢复，不提交 Git。更新不修改 `.yuan-run/current.json` 或任何不可变 Event；下一个 Successor Work 会绑定新的 Protocol、Harness 和 Environment。
+安装、更新、状态检查和回滚共用 `.yuan/.deployment.lock`。旧部署快照位于 `.yuan/releases/<digest>/`，包含 Runtime、Config、Protocol、Install Record、Adapter、托管能力、Release Evidence 和两个 Managed Block，供本地恢复，不提交 Git。更新不修改 `.yuan-run/current.json`、任何不可变 Event 或 `.yuan/extensions/custom/`；下一个 Successor Work 会绑定新的 Protocol、Harness 和 Environment。
 
 ## 状态与回滚
 

@@ -63,6 +63,7 @@ def release_context_for_digest(artifact_digest: str) -> dict:
             "schemas": {"status": "PASS"},
             "adapter": {"status": "PASS"},
             "bootstrap": {"status": "PASS"},
+            "capability_profile": {"status": "PASS"},
             "automation": {"status": "PASS"},
             "size_budget": {"status": "PASS"},
             "reproducible_release": {"status": "PASS", "artifact_digest": artifact_digest},
@@ -683,6 +684,13 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertIn("继续未完成的 Work", installed["agent_guidance"]["continue_prompt"])
         runtime = self.root / ".yuan" / "bin" / "yuan.pyz"
         self.assertTrue(runtime.is_file())
+        manifest = json.loads((self.root / ".yuan" / "extensions" / "manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["profile_id"], "vibe-coding")
+        self.assertTrue((self.root / ".yuan" / "extensions" / "vibe-coding" / "rules" / "01-workflow.md").is_file())
+        self.assertTrue((self.root / ".yuan" / "extensions" / "vibe-coding" / "agents" / "conductor.md").is_file())
+        self.assertTrue((self.root / ".yuan" / "extensions" / "vibe-coding" / "skills" / "systematic-debugging" / "SKILL.md").is_file())
+        custom = self.root / ".yuan" / "extensions" / "custom" / "project-rule.md"
+        custom.write_text("# 项目自定义规则\n", encoding="utf-8")
         agents = (self.root / "AGENTS.md").read_text(encoding="utf-8")
         self.assertIn("# 项目原有规则", agents)
         self.assertEqual(agents.count(BOOTSTRAP_START), 1)
@@ -727,6 +735,14 @@ class ProjectInstallerTests(unittest.TestCase):
         for path, payload in previous_deployment.items():
             self.assertEqual((self.root / path).read_bytes(), payload)
         self.assertEqual(project_status(self.root)["runtime_digest"], previous_digest)
+        self.assertEqual(custom.read_text(encoding="utf-8"), "# 项目自定义规则\n")
+
+    def test_capability_tamper_fails_installation_verification(self) -> None:
+        install_project(self.root, release_context=self.release_context, run_id="RUN-CAPABILITY-TAMPER")
+        rule = self.root / ".yuan" / "extensions" / "vibe-coding" / "rules" / "00-boundary.md"
+        rule.write_text(rule.read_text(encoding="utf-8") + "篡改\n", encoding="utf-8")
+        with self.assertRaises(IntegrityError):
+            project_status(self.root)
 
     def test_update_stages_candidate_while_work_is_nonterminal(self) -> None:
         install_project(self.root, release_context=self.release_context, run_id="RUN-STAGE-TEST")

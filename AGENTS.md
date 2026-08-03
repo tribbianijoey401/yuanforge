@@ -1,3 +1,5 @@
+# Yuan 源码仓库
+
 <!-- yuan:bootstrap:start -->
 # Yuan Agent Bootstrap
 
@@ -11,7 +13,16 @@ python -B .yuan/bin/yuan.pyz --root .
 
 1. 在处理请求前运行 `<入口> status`；命令失败、状态不可解析或 Integrity 校验失败时返回 `BLOCKED`。
 2. 读取 `.yuan/protocol.md`，以 Active Work 的 Artifact Scope、Grant、Budget 和 Acceptance Criterion 为动作边界。
-3. 不得直接编辑 `.yuan/config.json`、`.yuan/protocol.md`、`.yuan/bin/`、`.yuan/install.json` 或 `.yuan-run/`；框架更新只能由外部 Yuan 同步命令执行。
+3. 读取 `.yuan/extensions/manifest.json` 和默认 Profile 的 `README.md`，始终加载其中指定的基础 Rules，再按任务选择 Agent 与 Skill。
+4. 不得直接编辑 `.yuan/config.json`、`.yuan/protocol.md`、`.yuan/bin/`、`.yuan/install.json`、`.yuan/extensions/manifest.json`、托管 Profile 或 `.yuan-run/`；框架更新只能由外部 Yuan 同步命令执行。
+5. 项目自己的规则、角色和 Skill 写入 `.yuan/extensions/custom/`。自定义能力可以补充工作方式，但不能改变 Core Result 或完成条件。
+
+## Rules、Agents 与 Skills
+
+- `rules/` 是每个 Tick 的工程纪律，基础规则必须读取。
+- `agents/` 是职责与审查隔离模板；平台支持多 Agent 时可以派发，不支持时按角色顺序执行并保留独立 Evidence。
+- `skills/*/SKILL.md` 是按需加载的可复用流程。只有描述与当前任务匹配时才加载，避免把全部能力塞入上下文。
+- 这些能力只负责提出 Proposal、指导动作或产生 Evidence；发生冲突时，Protocol、Kernel 和 Reducer 的机械结果优先。
 
 ## Work Authoring
 
@@ -48,3 +59,5 @@ python -B .yuan/bin/yuan.pyz --root .
 
 `AGENTS.md` 只是平台 Adapter，不是 Core Truth。若本段与固定的 Protocol 或 Kernel 冲突，以机械校验结果为准并 fail-closed。
 <!-- yuan:bootstrap:end -->
+
+未安装 `.yuan/config.json` 时，上述 Managed Block 不激活；使用 Codex 原生能力维护 Yuan 源码。

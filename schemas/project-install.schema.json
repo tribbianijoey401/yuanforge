@@ -5,7 +5,7 @@
   "type": "object",
   "required": ["schema_version", "framework_version", "runtime", "protocol_digest", "bootstrap_digest", "adapter_digest", "digest"],
   "properties": {
-    "schema_version": {"enum": ["yuan.project-install/v1", "yuan.project-install/v2"]},
+    "schema_version": {"enum": ["yuan.project-install/v1", "yuan.project-install/v2", "yuan.project-install/v3"]},
     "framework_version": {"type": "string"},
     "runtime": {
       "type": "object",
@@ -20,6 +20,17 @@
     "protocol_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "bootstrap_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "adapter_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "capability_profile": {
+      "type": "object",
+      "required": ["id", "version", "manifest_digest", "files"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "manifest_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "files": {"type": "array", "minItems": 1, "items": {"type": "object"}}
+      },
+      "additionalProperties": false
+    },
     "release": {"type": "object"},
     "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
   },
@@ -27,6 +38,10 @@
     {
       "if": {"properties": {"schema_version": {"const": "yuan.project-install/v2"}}},
       "then": {"required": ["release"]}
+    },
+    {
+      "if": {"properties": {"schema_version": {"const": "yuan.project-install/v3"}}},
+      "then": {"required": ["release", "capability_profile"]}
     }
   ],
   "additionalProperties": false

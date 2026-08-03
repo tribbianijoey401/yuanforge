@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from yuan.adapters import validate_adapter_descriptor  # noqa: E402
 from yuan.canonical import canonical_bytes, digest_bytes  # noqa: E402
+from yuan.capabilities import capability_manifest, capability_payloads  # noqa: E402
 from yuan.identity import harness_digest  # noqa: E402
 from yuan.ledger import atomic_write  # noqa: E402
 from yuan.project import BOOTSTRAP_END, BOOTSTRAP_START, bootstrap_bytes  # noqa: E402
@@ -82,6 +83,27 @@ def validate_bootstrap() -> dict[str, object]:
     return {"status": "PASS", "bootstrap_digest": digest_bytes(bootstrap_bytes())}
 
 
+def validate_capability_profile() -> dict[str, object]:
+    manifest = capability_manifest()
+    payloads = capability_payloads()
+    kinds = {item["kind"] for item in manifest["files"]}
+    paths = {path for path, _ in payloads}
+    if not {"rules", "agents", "skills"} <= kinds:
+        raise RuntimeError("默认能力 Profile 缺少 Rules、Agents 或 Skills")
+    if len(paths) != len(payloads) or len(paths) != len(manifest["files"]):
+        raise RuntimeError("默认能力 Profile 路径重复或 Manifest 不完整")
+    bootstrap = bootstrap_bytes().decode("utf-8")
+    if ".yuan/extensions/manifest.json" not in bootstrap or "skills/*/SKILL.md" not in bootstrap:
+        raise RuntimeError("Agent Bootstrap 没有加载能力 Profile")
+    return {
+        "status": "PASS",
+        "profile_id": manifest["profile_id"],
+        "profile_version": manifest["profile_version"],
+        "manifest_digest": manifest["digest"],
+        "file_count": len(paths),
+    }
+
+
 def validate_automation() -> dict[str, object]:
     conformance = ROOT / ".github" / "workflows" / "conformance.yml"
     release = ROOT / ".github" / "workflows" / "release.yml"
@@ -128,6 +150,7 @@ def build_report() -> dict[str, object]:
             "profile": descriptor["profile"],
         },
         "bootstrap": validate_bootstrap(),
+        "capability_profile": validate_capability_profile(),
         "automation": validate_automation(),
         "size_budget": validate_size_budget(),
         "reproducible_release": validate_reproducible_release(),

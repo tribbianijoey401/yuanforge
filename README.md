@@ -9,6 +9,7 @@ Yuan 是一个协议优先、面向持久化 LLM 软件工程的 Harness。它�
 - JSON Event 不可变并使用内容寻址。
 - Run Memory 是可由 Ledger 重建的一次性投影。
 - 开放 Agent 平台默认使用 `AUDITED` Profile；受控平台可以安装 `ENFORCED` Adapter。
+- 默认安装 `vibe-coding` 能力 Profile，提供具体的 Rules、Agents 与 Skills；它们指导 LLM 工作，但不重定义 Core Truth。
 
 ## 推荐用法：安装并由 LLM 开始工作
 
@@ -32,6 +33,7 @@ yuan project install G:\projects\my-project --profile AUDITED --release-root .
 
 - 把确定性 Runtime 固定为目标项目的 `.yuan/bin/yuan.pyz`。
 - 创建 `.yuan/config.json`、`.yuan/protocol.md`、Release Manifest、Conformance Evidence、Adapter Descriptor 和 Install Record。
+- 安装 `.yuan/extensions/vibe-coding/` 下的规则、Agent 角色和按需 Skill，并把每个文件绑定到 Install Record。
 - 在保留项目原文的前提下，安装或更新 `AGENTS.md` 中带标记的 Yuan Bootstrap。
 - 在 `.gitignore` 中维护 `.yuan-run/`、Draft、Candidate 和本地 Release Backup。
 - 初始化首个空 Run；之后由 Agent 根据用户意图 Author Work。
@@ -59,6 +61,14 @@ python -B .yuan/bin/yuan.pyz --root . status
 
 LLM 会先读取 Bootstrap，再通过项目内固定 Runtime 恢复 Run Memory、Work、Attempt 和 Evidence。用户不需要手工重述此前过程。安装脚本成功后也会显示以上提示；机器可解析的单个 JSON 保留在标准输出，提示写入标准错误流。
 
+默认能力层包含：
+
+- `rules/`：边界、工作流、Evidence、风险审查、计划、测试与交付规则。
+- `agents/`：Conductor、Product Analyst、Architect、前后端开发、设计、规格、安全、质量、UX、Tester 和 Documentation Engineer。
+- `skills/`：仓库审计、Work 编写、计划、TDD、系统化调试、代码审查、多 Agent 开发和发布交接。
+
+框架更新会原子更新这些托管能力。项目专属规则或 Skill 放入 `.yuan/extensions/custom/`，安装器不会覆盖它们。
+
 详细安装边界与目录结构见 [项目安装与更新](docs/installation.md)。
 
 ## 推荐用法：同步 Yuan 更新
@@ -78,7 +88,7 @@ python -B scripts/run_conformance.py
 yuan project update G:\projects\my-project --release-root .
 ```
 
-更新不会删除 `.yuan-run/`，也不会覆盖 `AGENTS.md` 的项目自有内容。安装、更新和回滚共用项目级 Deployment Lock。没有 Active Work 或当前结果为 `COMPLETE` 时，新 Runtime 原子激活并保存包含 Runtime、Config、Protocol、Bootstrap、Adapter 和 Release Evidence 的完整旧部署快照；其他非终态会返回 `STAGED`，需要在当前 Work 完成后再次运行更新命令。
+更新不会删除 `.yuan-run/`，不会覆盖 `AGENTS.md` 的项目自有内容或 `.yuan/extensions/custom/`。安装、更新和回滚共用项目级 Deployment Lock。没有 Active Work 或当前结果为 `COMPLETE` 时，新 Runtime 原子激活并保存包含 Runtime、Config、Protocol、Bootstrap、Adapter、能力 Profile 和 Release Evidence 的完整旧部署快照；其他非终态会返回 `STAGED`，需要在当前 Work 完成后再次运行更新命令。
 
 检查当前部署和暂存 Candidate：
 

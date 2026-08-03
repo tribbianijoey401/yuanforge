@@ -14,6 +14,13 @@ from typing import Any
 
 from . import __version__
 from .canonical import canonical_bytes, digest_bytes, verify_digest
+from .capabilities import (
+    DEFAULT_PROFILE,
+    MANIFEST_PATH as CAPABILITY_MANIFEST_PATH,
+    capability_manifest,
+    capability_paths,
+    capability_payloads,
+)
 from .errors import IntegrityError, ValidationError, YuanError
 from .identity import environment_binding, harness_digest, protocol_bytes
 from .ledger import Ledger, atomic_write, exclusive_lock
@@ -27,7 +34,7 @@ GITIGNORE_START = "# yuan:managed:start"
 GITIGNORE_END = "# yuan:managed:end"
 SAFE_UPDATE_RESULTS = {"COMPLETE"}
 DEPLOYMENT_LOCK_TIMEOUT = 10.0
-DEPLOYMENT_FILES = (
+CORE_DEPLOYMENT_FILES = (
     ".yuan/bin/yuan.pyz",
     ".yuan/config.json",
     ".yuan/protocol.md",
@@ -36,10 +43,11 @@ DEPLOYMENT_FILES = (
     ".yuan/release-manifest.json",
     ".yuan/conformance-report.json",
 )
+DEPLOYMENT_FILES = CORE_DEPLOYMENT_FILES + capability_paths()
 INSTALL_TRANSACTION_FILES = DEPLOYMENT_FILES + ("AGENTS.md", ".gitignore", ".yuan-run/current.json")
 GITIGNORE_CONTENT = ".yuan-run/\n.yuan/drafts/\n.yuan/candidates/\n.yuan/releases/"
 REQUIRED_CONFORMANCE_CHECKS = {
-    "unit_tests", "schemas", "adapter", "bootstrap", "automation", "size_budget", "reproducible_release"
+    "unit_tests", "schemas", "adapter", "bootstrap", "capability_profile", "automation", "size_budget", "reproducible_release"
 }
 
 
@@ -49,6 +57,7 @@ def agent_guidance(root: Path) -> dict[str, str]:
     return {
         "project_root": str(root.resolve()),
         "status_command": "python -B .yuan/bin/yuan.pyz --root . status",
+        "capability_profile": DEFAULT_PROFILE,
         "start_prompt": (
             "请读取项目根目录 AGENTS.md，并按照 Yuan Agent Bootstrap 开始一个新的 Work。"
             "我的需求是：<在这里描述需求>"
@@ -267,13 +276,20 @@ def _write_release_evidence(root: Path, artifact: dict[str, Any], context: dict[
 def _install_record(root: Path, artifact: dict[str, Any], proof: dict[str, Any]) -> dict[str, Any]:
     protocol = root / ".yuan" / "protocol.md"
     adapter = root / ".yuan" / "adapters" / "codex-audited.json"
+    capability = _read_object(root / CAPABILITY_MANIFEST_PATH, "Capability Profile Manifest")
     record = with_digest({
-        "schema_version": "yuan.project-install/v2",
+        "schema_version": "yuan.project-install/v3",
         "framework_version": __version__,
         "runtime": {"path": ".yuan/bin/yuan.pyz", "digest": artifact["digest"], "bytes": artifact["bytes"]},
         "protocol_digest": digest_bytes(protocol.read_bytes()),
         "bootstrap_digest": digest_bytes(bootstrap_bytes()),
         "adapter_digest": digest_bytes(adapter.read_bytes()),
+        "capability_profile": {
+            "id": capability["profile_id"],
+            "version": capability["profile_version"],
+            "manifest_digest": capability["digest"],
+            "files": capability["files"],
+        },
         "release": proof,
     })
     atomic_write(root / ".yuan" / "install.json", canonical_bytes(record))
@@ -285,6 +301,17 @@ def _write_adapter(root: Path) -> None:
         root / ".yuan" / "adapters" / "codex-audited.json",
         canonical_bytes(codex_descriptor()),
     )
+
+
+def _write_capabilities(root: Path) -> dict[str, Any]:
+    """安装发行包托管的能力文件；项目自定义能力位于独立目录。"""
+
+    for relative, payload in capability_payloads():
+        atomic_write(root / relative, payload)
+    manifest = with_digest(capability_manifest())
+    atomic_write(root / CAPABILITY_MANIFEST_PATH, canonical_bytes(manifest))
+    (root / ".yuan" / "extensions" / "custom").mkdir(parents=True, exist_ok=True)
+    return manifest
 
 
 def _read_object(path: Path, label: str) -> dict[str, Any]:
@@ -299,7 +326,7 @@ def _read_object(path: Path, label: str) -> dict[str, Any]:
 
 def _verify_installation(root: Path) -> dict[str, Any]:
     record = _read_object(root / ".yuan" / "install.json", "Install Record")
-    if record.get("schema_version") not in {"yuan.project-install/v1", "yuan.project-install/v2"} or not verify_digest(record):
+    if record.get("schema_version") not in {"yuan.project-install/v1", "yuan.project-install/v2", "yuan.project-install/v3"} or not verify_digest(record):
         raise IntegrityError("Install Record Digest 或版本不合法")
     runtime = root / ".yuan" / "bin" / "yuan.pyz"
     if not runtime.is_file():
@@ -318,7 +345,28 @@ def _verify_installation(root: Path) -> dict[str, Any]:
             raise IntegrityError(f"安装文件与 Install Record 不匹配：{path.name}")
     if digest_bytes(_managed_bytes(root / "AGENTS.md", BOOTSTRAP_START, BOOTSTRAP_END)) != record.get("bootstrap_digest"):
         raise IntegrityError("Agent Bootstrap 与 Install Record 不匹配")
-    if record["schema_version"] == "yuan.project-install/v2":
+    if record["schema_version"] == "yuan.project-install/v3":
+        profile = record.get("capability_profile")
+        manifest = _read_object(root / CAPABILITY_MANIFEST_PATH, "Capability Profile Manifest")
+        if (
+            not isinstance(profile, dict)
+            or manifest.get("schema_version") != "yuan.capability-profile/v1"
+            or not verify_digest(manifest)
+            or manifest.get("digest") != profile.get("manifest_digest")
+            or manifest.get("profile_id") != profile.get("id")
+            or manifest.get("profile_version") != profile.get("version")
+            or manifest.get("files") != profile.get("files")
+        ):
+            raise IntegrityError("Capability Profile 与 Install Record 不匹配")
+        for item in manifest["files"]:
+            path = root / item["path"]
+            if (
+                not path.is_file()
+                or digest_bytes(path.read_bytes()) != item.get("digest")
+                or path.stat().st_size != item.get("bytes")
+            ):
+                raise IntegrityError(f"Capability 文件缺失或损坏：{item.get('path')}")
+    if record["schema_version"] in {"yuan.project-install/v2", "yuan.project-install/v3"}:
         proof = record.get("release")
         if not isinstance(proof, dict) or not verify_digest(proof):
             raise IntegrityError("Deployment Proof 不合法")
@@ -478,6 +526,7 @@ def install_project(
             runtime = root / ".yuan" / "bin" / "yuan.pyz"
             atomic_write(runtime, candidate.read_bytes())
             _write_adapter(root)
+            _write_capabilities(root)
             atomic_write(root / "AGENTS.md", agents)
             atomic_write(root / ".gitignore", ignored)
             initialized = initialize_repository(root, profile, run_id)
@@ -577,6 +626,7 @@ def update_project(root: Path, *, release_context: dict[str, Any]) -> dict[str, 
                 atomic_write(root / ".yuan" / "protocol.md", protocol)
                 atomic_write(root / ".yuan" / "config.json", canonical_bytes(with_digest(config)))
                 _write_adapter(root)
+                _write_capabilities(root)
                 _install_bootstrap(root)
                 _write_release_evidence(root, artifact, release_context)
                 record = _install_record(root, artifact, proof)
@@ -702,6 +752,7 @@ def project_status(root: Path) -> dict[str, Any]:
             "framework_version": record["framework_version"],
             "runtime_digest": record["runtime"]["digest"],
             "source": record.get("release", {}).get("source"),
+            "capability_profile": record.get("capability_profile"),
             "staged": candidates,
             "decision": projection["decision"],
         }
