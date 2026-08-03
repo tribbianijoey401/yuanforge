@@ -13,11 +13,20 @@ from unittest import mock
 from yuan.artifacts import build_manifest, diff_manifests
 from yuan.adapters import validate_adapter_descriptor
 from yuan.canonical import canonical_bytes, digest, digest_bytes
-from yuan.cli import attempt_template, init_repository
+from yuan.cli import attempt_template, init_repository, parser as cli_parser, work_template
 from yuan.errors import IntegrityError, ValidationError
-from yuan.ledger import Ledger, atomic_write
+from yuan.identity import harness_digest
+from yuan.ledger import Ledger, atomic_write, exclusive_lock
 from yuan.ports import ExecutableBinding, ReferencePort
-from yuan.project import BOOTSTRAP_END, BOOTSTRAP_START, agent_guidance, install_project, update_project
+from yuan.project import (
+    BOOTSTRAP_END,
+    BOOTSTRAP_START,
+    agent_guidance,
+    install_project,
+    project_status,
+    rollback_project,
+    update_project,
+)
 from yuan.release import build_runtime_zipapp, build_zipapp, verify_release
 from yuan.reducer import reduce_projection
 from yuan.runtime import (
@@ -31,6 +40,7 @@ from yuan.runtime import (
     list_runs,
     predecessor_binding,
     rebuild,
+    record_reduction,
     mark_attempt_unknown,
     resolve_attempt,
     run_verifier,
@@ -41,6 +51,57 @@ from yuan.validate import validate_evidence, with_digest
 
 
 ZERO = "0" * 64
+
+
+def release_context_for_digest(artifact_digest: str) -> dict:
+    report = {
+        "schema_version": "yuan.conformance-report/v1",
+        "status": "PASS",
+        "harness_digest": harness_digest(),
+        "checks": {
+            "unit_tests": {"status": "PASS"},
+            "schemas": {"status": "PASS"},
+            "adapter": {"status": "PASS"},
+            "bootstrap": {"status": "PASS"},
+            "automation": {"status": "PASS"},
+            "size_budget": {"status": "PASS"},
+            "reproducible_release": {"status": "PASS", "artifact_digest": artifact_digest},
+        },
+    }
+    source = with_digest({
+        "schema_version": "yuan.release-source/v1",
+        "kind": "test",
+        "revision": "TEST",
+        "dirty": False,
+    })
+    return {"report": report, "source": source}
+
+
+def current_release_context() -> dict:
+    with tempfile.TemporaryDirectory() as temporary:
+        artifact = build_runtime_zipapp(Path(temporary) / "yuan.pyz")
+    return release_context_for_digest(artifact["digest"])
+
+
+def altered_candidate(marker: bytes) -> tuple[dict, object]:
+    with tempfile.TemporaryDirectory() as temporary:
+        path = Path(temporary) / "yuan.pyz"
+        base = build_runtime_zipapp(path)
+        payload = path.read_bytes() + marker
+    artifact = copy.deepcopy(base)
+    artifact.update(path="yuan.pyz", digest=digest_bytes(payload), bytes=len(payload))
+    artifact["manifest"]["artifact"] = {"path": "yuan.pyz", "digest": artifact["digest"], "bytes": len(payload)}
+    artifact["manifest"]["digest"] = digest(artifact["manifest"], ("digest",))
+
+    def build(output: Path) -> dict:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_bytes(payload)
+        value = copy.deepcopy(artifact)
+        value["path"] = output.name
+        value["manifest"]["digest"] = digest(value["manifest"], ("digest",))
+        return value
+
+    return release_context_for_digest(artifact["digest"]), build
 
 
 class RuntimeCase(unittest.TestCase):
@@ -231,6 +292,15 @@ class RuntimeCase(unittest.TestCase):
             command_seconds=1,
         )
         self.assertEqual(proposal["relevant_inputs"][0]["digest"], digest_bytes((self.root / "src" / "app.py").read_bytes()))
+
+    def test_attempt_template_cli_accepts_reconciliation_action(self) -> None:
+        args = cli_parser().parse_args([
+            "--root", str(self.root), "attempt", "template",
+            "--attempt-id", "ATT-RECONCILE-TEMPLATE",
+            "--strategy", "只读探测", "--claim", "状态可确定", "--falsification", "状态仍不明确",
+            "--action-type", "reconcile", "--side-effect-class", "none", "--read-only",
+        ])
+        self.assertEqual(args.action_type, "reconcile")
 
     def test_undeclared_mutation_becomes_unknown_and_blocked(self) -> None:
         begin_attempt(self.root, self.proposal())
@@ -566,6 +636,7 @@ class ProjectInstallerTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
+        self.release_context = current_release_context()
         (self.root / "AGENTS.md").write_text("# 项目原有规则\n", encoding="utf-8")
         (self.root / ".gitignore").write_text("node_modules/\n", encoding="utf-8")
 
@@ -574,22 +645,27 @@ class ProjectInstallerTests(unittest.TestCase):
 
     def test_sync_script_prints_machine_result_and_agent_guidance(self) -> None:
         repo = Path(__file__).resolve().parents[1]
-        completed = subprocess.run(
-            [
-                sys.executable,
-                "-B",
-                str(repo / "scripts" / "sync_project.py"),
-                "install",
-                str(self.root),
-                "--run-id",
-                "RUN-SCRIPT-GUIDANCE",
-            ],
-            cwd=repo,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=False,
-            timeout=60,
-        )
+        with tempfile.TemporaryDirectory() as evidence:
+            report = Path(evidence) / "conformance.json"
+            report.write_bytes(canonical_bytes(self.release_context["report"]))
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-B",
+                    str(repo / "scripts" / "sync_project.py"),
+                    "install",
+                    str(self.root),
+                    "--run-id",
+                    "RUN-SCRIPT-GUIDANCE",
+                    "--conformance-report",
+                    str(report),
+                ],
+                cwd=repo,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+                timeout=60,
+            )
         result = json.loads(completed.stdout.decode("utf-8"))
         guidance = completed.stderr.decode("utf-8")
         self.assertEqual(completed.returncode, 0, guidance)
@@ -600,7 +676,7 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertIn("继续未完成工作时发送", guidance)
 
     def test_install_pins_runtime_merges_bootstrap_and_updates(self) -> None:
-        installed = install_project(self.root, run_id="RUN-INSTALL-TEST")
+        installed = install_project(self.root, release_context=self.release_context, run_id="RUN-INSTALL-TEST")
         self.assertEqual(installed["status"], "INSTALLED")
         self.assertEqual(installed["agent_guidance"], agent_guidance(self.root))
         self.assertIn("AGENTS.md", installed["agent_guidance"]["start_prompt"])
@@ -623,21 +699,37 @@ class ProjectInstallerTests(unittest.TestCase):
         )
         self.assertEqual(status.returncode, 0, status.stderr.decode(errors="replace"))
         self.assertIsNone(json.loads(status.stdout)["work"])
-        unchanged = update_project(self.root)
+        unchanged = update_project(self.root, release_context=self.release_context)
         self.assertEqual(unchanged["status"], "UNCHANGED")
         self.assertEqual((self.root / "AGENTS.md").read_text(encoding="utf-8").count(BOOTSTRAP_START), 1)
 
-        old_bytes = runtime.read_bytes() + b"old-release-marker"
-        runtime.write_bytes(old_bytes)
-        previous_digest = digest_bytes(old_bytes)
-        updated = update_project(self.root)
+        previous_bytes = runtime.read_bytes()
+        previous_digest = digest_bytes(previous_bytes)
+        deployment_paths = [
+            ".yuan/config.json",
+            ".yuan/protocol.md",
+            ".yuan/install.json",
+            ".yuan/adapters/codex-audited.json",
+            ".yuan/release-manifest.json",
+            ".yuan/conformance-report.json",
+        ]
+        previous_deployment = {path: (self.root / path).read_bytes() for path in deployment_paths}
+        next_context, builder = altered_candidate(b"next-release")
+        with mock.patch("yuan.project.build_runtime_zipapp", side_effect=builder):
+            updated = update_project(self.root, release_context=next_context)
         self.assertEqual(updated["status"], "UPDATED")
         self.assertNotEqual(digest_bytes(runtime.read_bytes()), previous_digest)
-        backup = self.root / ".yuan" / "releases" / previous_digest / "yuan.pyz"
-        self.assertEqual(backup.read_bytes(), old_bytes)
+        snapshot = self.root / ".yuan" / "releases" / previous_digest / "snapshot.json"
+        self.assertTrue(snapshot.is_file())
+        rolled_back = rollback_project(self.root, previous_digest)
+        self.assertEqual(rolled_back["status"], "ROLLED_BACK")
+        self.assertEqual(runtime.read_bytes(), previous_bytes)
+        for path, payload in previous_deployment.items():
+            self.assertEqual((self.root / path).read_bytes(), payload)
+        self.assertEqual(project_status(self.root)["runtime_digest"], previous_digest)
 
     def test_update_stages_candidate_while_work_is_nonterminal(self) -> None:
-        install_project(self.root, run_id="RUN-STAGE-TEST")
+        install_project(self.root, release_context=self.release_context, run_id="RUN-STAGE-TEST")
         (self.root / "tests").mkdir()
         verifier_path = self.root / "tests" / "verify.py"
         verifier_path.write_text(
@@ -685,20 +777,87 @@ class ProjectInstallerTests(unittest.TestCase):
         })
         accept_work(self.root, work)
         current = (self.root / ".yuan" / "bin" / "yuan.pyz").read_bytes()
-
-        def different_candidate(output: Path) -> dict:
-            payload = current + b"candidate-release"
-            output.parent.mkdir(parents=True, exist_ok=True)
-            output.write_bytes(payload)
-            return {"path": output.name, "digest": digest_bytes(payload), "bytes": len(payload)}
-
-        with mock.patch("yuan.project.build_runtime_zipapp", side_effect=different_candidate):
-            staged = update_project(self.root)
+        next_context, builder = altered_candidate(b"candidate-release")
+        with mock.patch("yuan.project.build_runtime_zipapp", side_effect=builder):
+            staged = update_project(self.root, release_context=next_context)
         self.assertEqual(staged["status"], "STAGED")
         self.assertEqual(staged["agent_guidance"], agent_guidance(self.root))
         self.assertEqual(staged["blocked_by_result"], "CONTINUE")
         self.assertEqual((self.root / ".yuan" / "bin" / "yuan.pyz").read_bytes(), current)
-        self.assertTrue((self.root / staged["candidate"]).is_file())
+        staged_path = self.root / staged["candidate"]
+        self.assertTrue(staged_path.is_file())
+        self.assertEqual(len(project_status(self.root)["staged"]), 1)
+        staged_path.write_bytes(staged_path.read_bytes() + b"tampered")
+        with self.assertRaises(IntegrityError):
+            project_status(self.root)
+
+    def test_complete_work_allows_verified_update(self) -> None:
+        (self.root / "src").mkdir()
+        (self.root / "tests").mkdir()
+        (self.root / "src" / "app.py").write_text("VALUE = 1\n", encoding="utf-8")
+        verifier_path = self.root / "tests" / "verify.py"
+        verifier_path.write_text(
+            "import json\nprint(json.dumps({'status':'PASS','assertions':[{'id':'ok','passed':True}]}))\n",
+            encoding="utf-8",
+        )
+        install_project(self.root, release_context=self.release_context, run_id="RUN-COMPLETE-UPDATE")
+        work = work_template(self.root)
+        files = [{"path": "tests/verify.py", "digest": digest_bytes(verifier_path.read_bytes())}]
+        verifier = work["acceptance_criteria"][0]["verifier"]
+        verifier.update(id="test.complete-update", entrypoint="tests/verify.py", files=files)
+        verifier["digest"] = digest({"kind": verifier["kind"], "entrypoint": verifier["entrypoint"], "files": files})
+        accept_work(self.root, with_digest(work))
+        proposal = attempt_template(
+            self.root,
+            attempt_id="ATT-COMPLETE-UPDATE",
+            strategy="只读验证",
+            claim="Verifier 通过",
+            falsification="Verifier 失败",
+            inputs=["src/app.py"],
+            action_type="file-read",
+            paths=["src"],
+            side_effect_class="none",
+            grant_id="GRANT-001",
+            read_only=True,
+            high_impact=False,
+            tool_calls=1,
+            command_seconds=0,
+        )
+        begin_attempt(self.root, proposal)
+        run_verifier(self.root, "AC-001", "ATT-COMPLETE-UPDATE")
+        self.assertEqual(record_reduction(self.root)["decision"]["result"], "COMPLETE")
+        next_context, builder = altered_candidate(b"complete-update")
+        with mock.patch("yuan.project.build_runtime_zipapp", side_effect=builder):
+            updated = update_project(self.root, release_context=next_context)
+        self.assertEqual(updated["status"], "UPDATED")
+        self.assertEqual(updated["decision"]["result"], "COMPLETE")
+
+    def test_failed_install_restores_original_project(self) -> None:
+        original_agents = (self.root / "AGENTS.md").read_bytes()
+        original_ignore = (self.root / ".gitignore").read_bytes()
+        with self.assertRaises(ValidationError):
+            install_project(self.root, release_context=self.release_context, run_id="invalid run id")
+        self.assertEqual((self.root / "AGENTS.md").read_bytes(), original_agents)
+        self.assertEqual((self.root / ".gitignore").read_bytes(), original_ignore)
+        self.assertFalse((self.root / ".yuan" / "config.json").exists())
+        installed = install_project(self.root, release_context=self.release_context, run_id="RUN-RETRY")
+        self.assertEqual(installed["status"], "INSTALLED")
+
+    def test_install_rejects_unbound_conformance_without_residue(self) -> None:
+        context = copy.deepcopy(self.release_context)
+        context["report"]["checks"]["reproducible_release"]["artifact_digest"] = "0" * 64
+        with self.assertRaises(IntegrityError):
+            install_project(self.root, release_context=context, run_id="RUN-BAD-REPORT")
+        self.assertFalse((self.root / ".yuan" / "config.json").exists())
+        self.assertFalse((self.root / ".yuan" / "bin" / "yuan.pyz").exists())
+        self.assertEqual(list((self.root / ".yuan" / "candidates").glob("*.pyz")), [])
+
+    def test_deployment_lock_rejects_concurrent_install(self) -> None:
+        lock = self.root / ".yuan" / ".deployment.lock"
+        with exclusive_lock(lock):
+            with mock.patch("yuan.project.DEPLOYMENT_LOCK_TIMEOUT", 0.01):
+                with self.assertRaises(IntegrityError):
+                    install_project(self.root, release_context=self.release_context, run_id="RUN-LOCKED")
 
 
 if __name__ == "__main__":

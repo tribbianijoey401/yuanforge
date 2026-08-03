@@ -14,7 +14,14 @@ from .adapters import validate_adapter_descriptor
 from .canonical import canonical_bytes, digest, digest_bytes
 from .errors import YuanError
 from .paths import resolve_inside
-from .project import initialize_repository, install_project, update_project
+from .project import (
+    initialize_repository,
+    install_project,
+    load_release_context,
+    project_status,
+    rollback_project,
+    update_project,
+)
 from .release import read_manifest, verify_release
 from .runtime import (
     accept_work,
@@ -205,7 +212,7 @@ def parser() -> argparse.ArgumentParser:
     attempt_template_parser.add_argument("--claim", required=True)
     attempt_template_parser.add_argument("--falsification", required=True)
     attempt_template_parser.add_argument("--input", action="append", default=[])
-    attempt_template_parser.add_argument("--action-type", choices=("file-read", "file-write", "command", "verify"), required=True)
+    attempt_template_parser.add_argument("--action-type", choices=("file-read", "file-write", "command", "verify", "reconcile"), required=True)
     attempt_template_parser.add_argument("--path", action="append", default=[])
     attempt_template_parser.add_argument("--side-effect-class", choices=("none", "filesystem", "process", "network", "external"), required=True)
     attempt_template_parser.add_argument("--grant-id")
@@ -263,8 +270,17 @@ def parser() -> argparse.ArgumentParser:
     project_install.add_argument("target", type=Path)
     project_install.add_argument("--profile", choices=("AUDITED",), default="AUDITED")
     project_install.add_argument("--run-id")
+    project_install.add_argument("--release-root", type=Path, default=Path.cwd(), help="Yuan Source/Release 根目录")
+    project_install.add_argument("--conformance-report", type=Path, default=Path("dist/conformance-report.json"), help="相对 Release Root 的验证报告")
     project_update = project_sub.add_parser("update", help="安全同步当前 Yuan Release")
     project_update.add_argument("target", type=Path)
+    project_update.add_argument("--release-root", type=Path, default=Path.cwd(), help="Yuan Source/Release 根目录")
+    project_update.add_argument("--conformance-report", type=Path, default=Path("dist/conformance-report.json"), help="相对 Release Root 的验证报告")
+    project_status_parser = project_sub.add_parser("status", help="检查项目部署与暂存版本")
+    project_status_parser.add_argument("target", type=Path)
+    project_rollback = project_sub.add_parser("rollback", help="恢复完整部署快照")
+    project_rollback.add_argument("target", type=Path)
+    project_rollback.add_argument("runtime_digest")
     localize_parser(top)
     return top
 
@@ -353,9 +369,15 @@ def execute(args: argparse.Namespace) -> Any:
             repo_root=root if args.check_source else None,
         )
     if args.command == "project" and args.project_command == "install":
-        return install_project(args.target, profile=args.profile, run_id=args.run_id)
+        context = load_release_context(args.release_root, args.release_root / args.conformance_report)
+        return install_project(args.target, release_context=context, profile=args.profile, run_id=args.run_id)
     if args.command == "project" and args.project_command == "update":
-        return update_project(args.target)
+        context = load_release_context(args.release_root, args.release_root / args.conformance_report)
+        return update_project(args.target, release_context=context)
+    if args.command == "project" and args.project_command == "status":
+        return project_status(args.target)
+    if args.command == "project" and args.project_command == "rollback":
+        return rollback_project(args.target, args.runtime_digest)
     if args.command == "seal":
         return with_digest(read_json(args.file))
     raise AssertionError("到达不可达的 Command 分支")

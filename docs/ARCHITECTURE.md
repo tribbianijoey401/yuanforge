@@ -51,7 +51,7 @@ LLM 从来不是上述权威。`AGENTS.md` 只是帮助 LLM 进入协议的 Adap
 
 Core 只使用 Python 标准库。发行物可以是单个 `yuan.pyz`，不要求 Daemon、Database、Scheduler 或平台服务。
 
-项目安装器属于 Deployment Adapter。它把 `yuan.pyz` 固定到 `.yuan/bin/`，以 Managed Block 合并 `AGENTS.md`，并通过外部同步命令更新；它不能修改 Core Result。Runtime 更新只在没有 Active Work 或当前 Work 已 `COMPLETE` 时激活，非终态只 Stage Candidate。
+项目安装器属于 Deployment Adapter。它把 `yuan.pyz` 固定到 `.yuan/bin/`，以 Managed Block 合并 `AGENTS.md`，并通过外部同步命令更新；它不能修改 Core Result。Candidate 必须绑定 Release Manifest、Conformance 与 Source，所有部署动作通过项目锁串行化。Runtime 更新只在没有 Active Work 或当前 Work 已 `COMPLETE` 时激活，非终态只 Stage Candidate；更新前的完整部署快照允许在相同 Work Binding 边界安全回滚。
 
 ## Profile 保证等级
 

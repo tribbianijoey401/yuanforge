@@ -20,6 +20,8 @@ python -B .yuan/bin/yuan.pyz --root .
 - Acceptance Criterion 必须具体、可执行并绑定预先存在的 Verifier；Verifier 必须输出一个 JSON Object：`{"status":"PASS|FAIL","assertions":[...]}`。
 - 先运行 `work bind-verifier` 固定 Verifier Closure，再运行 `work accept`。不得用文字声明代替 Work 或 Evidence。
 
+首个 Work 的固定顺序是：`work template` 生成草稿，编辑 Goal/Scope/Grant/Budget/Criterion，创建独立 Verifier，运行 `work bind-verifier`，最后运行 `work accept`。每一步先检查 JSON 返回值，失败时不得继续下一步。
+
 ## 一个有副作用的 Tick
 
 1. 使用 `<入口> attempt template` 基于已读取文件生成带 Digest 的 Relevant Input 和 Proposal；同一 Tick 最多一个 Proposal。
@@ -30,6 +32,17 @@ python -B .yuan/bin/yuan.pyz --root .
 6. Receipt 丢失、Timeout、Crash、未声明修改或终态不明确时运行 `attempt mark-unknown`；不得自动重试或假定成功。
 7. 对 Required Criterion 运行 `<入口> verify`，最后运行 `<入口> reduce`。
 
-只允许报告 Reducer 的唯一结果：`CONTINUE`、`CORRECT`、`COMPLETE`、`BLOCKED`、`WAIT_AUTH` 或 `BUDGET_EXIT`。只有 `COMPLETE` 可以向用户报告工作完成；`UNKNOWN` 必须通过新的只读 Reconciliation Attempt 解析。
+## Result 路由与恢复
+
+- `CONTINUE`：基于新 Evidence 提出一个新策略；不得重复相同 Input Fingerprint 与策略。
+- `CORRECT`：承认可信 FAIL Evidence，改变 Hypothesis 或实现后再创建 Attempt。
+- `COMPLETE`：向用户报告完成，并附上 Criterion/Evidence 摘要。
+- `WAIT_AUTH`：说明具体 Effect 与 Scope，请求人类授权；授权必须进入 Successor Work Revision。
+- `BUDGET_EXIT`：停止动作并报告已用 Budget、未完成 Criterion 和建议的新 Work Budget。
+- `BLOCKED`：停止普通动作并报告机械原因；若原因是 `UNKNOWN`，只能启动只读 Reconciliation。
+
+解析 `UNKNOWN` 时，先用 `attempt template --action-type reconcile --read-only` 创建只读 Proposal，再运行 `attempt reconcile --attempt <unknown-id> <proposal>`。探测后通过 `attempt resolve` 追加 `COMMITTED` 或 `NO_EFFECT` Terminal Resolution；不得重写原 Attempt 或自动重试原副作用。
+
+只允许报告 Reducer 的唯一结果：`CONTINUE`、`CORRECT`、`COMPLETE`、`BLOCKED`、`WAIT_AUTH` 或 `BUDGET_EXIT`。只有 `COMPLETE` 可以向用户报告工作完成。
 
 `AGENTS.md` 只是平台 Adapter，不是 Core Truth。若本段与固定的 Protocol 或 Kernel 冲突，以机械校验结果为准并 fail-closed。

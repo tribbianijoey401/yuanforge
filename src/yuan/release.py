@@ -76,15 +76,40 @@ def _resource_payloads() -> list[tuple[str, bytes]]:
     return payloads
 
 
+def _release_manifest(output: Path, entries: list[dict[str, Any]]) -> dict[str, Any]:
+    payload = output.resolve().read_bytes()
+    manifest = {
+        "schema_version": "yuan.release-manifest/v1",
+        "version": __version__,
+        "format": "deterministic-zipapp-stored/v1",
+        "artifact": {"path": output.name, "digest": digest_bytes(payload), "bytes": len(payload)},
+        "entrypoint": {"path": "__main__.py", "digest": digest_bytes(MAIN)},
+        "sources": entries,
+    }
+    manifest["digest"] = digest(manifest, ("digest",))
+    return manifest
+
+
 def build_runtime_zipapp(output: Path) -> dict[str, Any]:
     """从当前已安装 Package 构建项目固定的确定性 Runtime。"""
 
-    entries = _resource_payloads()
-    if not entries:
+    payloads = _resource_payloads()
+    if not payloads:
         raise ValidationError("已安装的 Yuan Package 为空")
-    _write_zipapp(output, entries)
-    payload = output.resolve().read_bytes()
-    return {"path": output.name, "digest": digest_bytes(payload), "bytes": len(payload)}
+    entries = [
+        {
+            "source_path": f"src/{archive_path}",
+            "archive_path": archive_path,
+            "digest": digest_bytes(payload),
+            "bytes": len(payload),
+        }
+        for archive_path, payload in payloads
+    ]
+    _write_zipapp(output, payloads)
+    manifest = _release_manifest(output, entries)
+    manifest["artifact"]["path"] = "yuan.pyz"
+    manifest["digest"] = digest(manifest, ("digest",))
+    return {**manifest["artifact"], "manifest": manifest}
 
 
 def build_zipapp(repo_root: Path, output: Path) -> dict[str, Any]:
@@ -97,21 +122,7 @@ def build_zipapp(repo_root: Path, output: Path) -> dict[str, Any]:
         output,
         [(entry["archive_path"], (repo_root / entry["source_path"]).read_bytes()) for entry in entries],
     )
-    payload = output.read_bytes()
-    manifest = {
-        "schema_version": "yuan.release-manifest/v1",
-        "version": __version__,
-        "format": "deterministic-zipapp-stored/v1",
-        "artifact": {
-            "path": output.name,
-            "digest": digest_bytes(payload),
-            "bytes": len(payload),
-        },
-        "entrypoint": {"path": "__main__.py", "digest": digest_bytes(MAIN)},
-        "sources": entries,
-    }
-    manifest["digest"] = digest(manifest, ("digest",))
-    return manifest
+    return _release_manifest(output, entries)
 
 
 def write_release(repo_root: Path, output: Path, manifest_path: Path) -> dict[str, Any]:
@@ -133,21 +144,37 @@ def verify_release(
         raise ValidationError("Release Manifest 字段不合法")
     if manifest["schema_version"] != "yuan.release-manifest/v1" or not verify_digest(manifest):
         raise IntegrityError("Release Manifest Digest 不匹配")
-    payload = artifact.resolve().read_bytes()
+    artifact_record = manifest["artifact"]
+    entrypoint = manifest["entrypoint"]
+    sources = manifest["sources"]
+    if not isinstance(artifact_record, dict) or set(artifact_record) != {"path", "digest", "bytes"}:
+        raise ValidationError("Release Artifact Binding 不合法")
+    if not isinstance(entrypoint, dict) or set(entrypoint) != {"path", "digest"}:
+        raise ValidationError("Release Entrypoint Binding 不合法")
+    if not isinstance(sources, list) or not sources or any(
+        not isinstance(item, dict)
+        or set(item) != {"source_path", "archive_path", "digest", "bytes"}
+        for item in sources
+    ):
+        raise ValidationError("Release Source Binding 不合法")
+    try:
+        payload = artifact.resolve().read_bytes()
+    except OSError as exc:
+        raise ValidationError("Release Artifact 不可读") from exc
     if (
-        manifest["artifact"].get("digest") != digest_bytes(payload)
-        or manifest["artifact"].get("bytes") != len(payload)
+        artifact_record.get("digest") != digest_bytes(payload)
+        or artifact_record.get("bytes") != len(payload)
     ):
         raise IntegrityError("Release Artifact Digest 或 Size 不匹配")
     try:
         with zipfile.ZipFile(artifact.resolve(), "r") as archive:
             names = archive.namelist()
-            expected = ["__main__.py", *[item["archive_path"] for item in manifest["sources"]]]
+            expected = ["__main__.py", *[item["archive_path"] for item in sources]]
             if names != expected:
                 raise IntegrityError("Zipapp Entry 顺序或集合不匹配")
-            if digest_bytes(archive.read("__main__.py")) != manifest["entrypoint"]["digest"]:
+            if digest_bytes(archive.read("__main__.py")) != entrypoint["digest"]:
                 raise IntegrityError("Zipapp Entrypoint Digest 不匹配")
-            for item in manifest["sources"]:
+            for item in sources:
                 if digest_bytes(archive.read(item["archive_path"])) != item["digest"]:
                     raise IntegrityError(f"Zipapp Source Entry 不匹配: {item['archive_path']}")
     except zipfile.BadZipFile as exc:
@@ -159,8 +186,8 @@ def verify_release(
     return {
         "status": "PASS",
         "version": manifest["version"],
-        "artifact_digest": manifest["artifact"]["digest"],
-        "source_count": len(manifest["sources"]),
+        "artifact_digest": artifact_record["digest"],
+        "source_count": len(sources),
     }
 
 

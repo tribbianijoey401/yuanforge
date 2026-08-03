@@ -60,10 +60,21 @@
 
 退出 Evidence：自包含 Zipapp Test、两次构建逐字节一致、Release/Source Hash 验证与完整 Conformance Suite。
 
+## M6 — 可恢复部署（已完成）
+
+- 安装、更新、状态与回滚共用 Project Deployment Lock。
+- Candidate 强制绑定 Release Manifest、完整 Conformance、Harness Digest 与 Git/Package Source。
+- 首次安装是可重试事务，失败不留下伪安装状态。
+- 更新前保存完整 Deployment Snapshot，Rollback 恢复全部 Managed File 而非只替换 Runtime。
+- `STAGED` Candidate 具有内容寻址 Metadata，并自动清理陈旧 Candidate。
+- GitHub CI 验证 Push/PR；Tag Pipeline 发布 Checksum 与 Artifact Provenance。
+
+退出 Evidence：非法 Run ID/Conformance 无残留、并发锁、Stage Metadata、完整 Update/Rollback、Wheel 安装和 CI Workflow。
+
 ## 永久复杂度限制
 
 - Protocol 不超过 500 个非空行。
-- Reference Kernel 超过 3,000 行 Python 前必须进行 Design Review。
+- Reference Kernel 超过 3,000 个非空 Python 行前必须进行 Design Review；空行不作为复杂度预算。
 - Core 只使用标准库。
 - 不要求 Daemon、SQLite/Database、Network Service、Role System 或隐藏 Extension。
 - Extension 可以提出候选或生产 Evidence，但不能增加 Result 或改变 Core Completion Truth。

@@ -61,14 +61,14 @@ def validate_size_budget() -> dict[str, object]:
     protocol = (ROOT / "src" / "yuan" / "protocol.md").read_text(encoding="utf-8")
     protocol_lines = sum(bool(line.strip()) for line in protocol.splitlines())
     python_lines = sum(
-        len(path.read_text(encoding="utf-8").splitlines())
+        sum(bool(line.strip()) for line in path.read_text(encoding="utf-8").splitlines())
         for path in sorted((ROOT / "src" / "yuan").glob("*.py"))
     )
     if protocol_lines > 500:
         raise RuntimeError(f"Protocol 超出 500 个非空行：{protocol_lines}")
     if python_lines > 3000:
-        raise RuntimeError(f"Reference Kernel 超出 3000 行 Design Review 阈值：{python_lines}")
-    return {"status": "PASS", "protocol_nonempty_lines": protocol_lines, "kernel_python_lines": python_lines}
+        raise RuntimeError(f"Reference Kernel 超出 3000 个非空 Python 行 Design Review 阈值：{python_lines}")
+    return {"status": "PASS", "protocol_nonempty_lines": protocol_lines, "kernel_python_nonempty_lines": python_lines}
 
 
 def validate_bootstrap() -> dict[str, object]:
@@ -80,6 +80,18 @@ def validate_bootstrap() -> dict[str, object]:
     if managed != packaged:
         raise RuntimeError("根 AGENTS.md 与发行包 Agent Bootstrap 不一致")
     return {"status": "PASS", "bootstrap_digest": digest_bytes(bootstrap_bytes())}
+
+
+def validate_automation() -> dict[str, object]:
+    conformance = ROOT / ".github" / "workflows" / "conformance.yml"
+    release = ROOT / ".github" / "workflows" / "release.yml"
+    if not conformance.is_file() or not release.is_file():
+        raise RuntimeError("GitHub Conformance/Release Workflow 缺失")
+    conformance_text = conformance.read_text(encoding="utf-8")
+    release_text = release.read_text(encoding="utf-8")
+    if "scripts/run_conformance.py" not in conformance_text or "scripts/build_zipapp.py" not in release_text:
+        raise RuntimeError("GitHub Workflow 没有绑定 Yuan 验证与发行入口")
+    return {"status": "PASS", "workflows": [conformance.name, release.name]}
 
 
 def validate_reproducible_release() -> dict[str, object]:
@@ -116,6 +128,7 @@ def build_report() -> dict[str, object]:
             "profile": descriptor["profile"],
         },
         "bootstrap": validate_bootstrap(),
+        "automation": validate_automation(),
         "size_budget": validate_size_budget(),
         "reproducible_release": validate_reproducible_release(),
     }

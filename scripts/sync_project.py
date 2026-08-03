@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -11,7 +12,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from yuan.project import install_project, update_project  # noqa: E402
+from yuan.project import (  # noqa: E402
+    install_project,
+    load_release_context,
+    project_status,
+    rollback_project,
+    update_project,
+)
 
 
 class ChineseArgumentParser(argparse.ArgumentParser):
@@ -72,6 +79,24 @@ def _configure_utf8_streams() -> None:
             reconfigure(encoding="utf-8")
 
 
+def _verified_context(report_path: Path | None) -> dict[str, object]:
+    if report_path is None:
+        print("正在运行 Yuan Conformance Suite，请稍候……", file=sys.stderr)
+        completed = subprocess.run(
+            [sys.executable, "-B", str(ROOT / "scripts" / "run_conformance.py")],
+            cwd=ROOT,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+        if completed.returncode != 0:
+            raise RuntimeError("当前 Yuan Source 没有通过 Conformance Suite")
+        print("Conformance PASS，开始同步已验证 Release。", file=sys.stderr)
+        report_path = ROOT / "dist" / "conformance-report.json"
+    return load_release_context(ROOT, report_path)
+
+
 def main() -> int:
     _configure_utf8_streams()
     parser = ChineseArgumentParser(description="安装或更新目标项目的 Yuan Runtime 与 Agent Bootstrap")
@@ -80,15 +105,31 @@ def main() -> int:
     install.add_argument("target", type=Path)
     install.add_argument("--profile", choices=("AUDITED",), default="AUDITED")
     install.add_argument("--run-id")
+    install.add_argument("--conformance-report", type=Path, help="使用已有且匹配当前 Release 的 Conformance Report")
     update = commands.add_parser("update", help="同步当前 Yuan Release")
     update.add_argument("target", type=Path)
+    update.add_argument("--conformance-report", type=Path, help="使用已有且匹配当前 Release 的 Conformance Report")
+    status = commands.add_parser("status", help="检查项目部署与暂存版本")
+    status.add_argument("target", type=Path)
+    rollback = commands.add_parser("rollback", help="恢复完整部署快照")
+    rollback.add_argument("target", type=Path)
+    rollback.add_argument("runtime_digest")
     _localize_parser(parser)
     args = parser.parse_args()
     try:
         if args.command == "install":
-            result = install_project(args.target, profile=args.profile, run_id=args.run_id)
+            result = install_project(
+                args.target,
+                release_context=_verified_context(args.conformance_report),
+                profile=args.profile,
+                run_id=args.run_id,
+            )
+        elif args.command == "update":
+            result = update_project(args.target, release_context=_verified_context(args.conformance_report))
+        elif args.command == "status":
+            result = project_status(args.target)
         else:
-            result = update_project(args.target)
+            result = rollback_project(args.target, args.runtime_digest)
         print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
         _print_agent_guidance(result)
         return 0

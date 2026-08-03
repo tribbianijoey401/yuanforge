@@ -1,0 +1,41 @@
+name: Yuan 确定性发行
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: 校验 Tag 与框架版本
+        run: |
+          PYTHONPATH=src python -c "import os; from yuan import __version__; assert os.environ['GITHUB_REF_NAME'] == f'v{__version__}'"
+      - name: 运行完整 Conformance
+        run: python -B scripts/run_conformance.py
+      - name: 构建确定性 Release Bundle
+        run: python -B scripts/build_zipapp.py
+      - name: 生成 Artifact Provenance
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: dist/yuan.pyz
+      - name: 发布 GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME"
+          dist/yuan.pyz
+          dist/yuan.pyz.sha256
+          dist/release-manifest.json
+          dist/conformance-report.json
+          --verify-tag
+          --generate-notes
