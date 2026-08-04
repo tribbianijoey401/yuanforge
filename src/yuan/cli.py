@@ -26,7 +26,9 @@ from .errors import YuanError
 from .ledger import atomic_write
 from .memory import (
     check_memory_source,
+    checkpoint_memory,
     memory_context,
+    memory_resume,
     memory_show,
     memory_status,
     memory_template,
@@ -371,11 +373,11 @@ def parser() -> argparse.ArgumentParser:
     release_verify.add_argument("manifest", type=Path)
     release_verify.add_argument("--artifact", type=Path, required=True)
     release_verify.add_argument("--check-source", action="store_true")
-    memory = commands.add_parser("memory", help="管理基于 Work/Evidence 的项目长期记忆")
+    memory = commands.add_parser("memory", help="管理项目长期记忆与跨会话连续性")
     memory_sub = memory.add_subparsers(dest="memory_command", required=True)
-    memory_template_parser = memory_sub.add_parser("template", help="生成绑定当前 Work/Evidence 的 Memory Record")
+    memory_template_parser = memory_sub.add_parser("template", help="按类型生成具备相应来源约束的 Memory Record")
     memory_template_parser.add_argument("--memory-id", required=True)
-    memory_template_parser.add_argument("--kind", choices=("feature", "decision", "pitfall", "module", "convention"), required=True)
+    memory_template_parser.add_argument("--kind", choices=("project", "feature", "module", "architecture", "convention", "decision", "pitfall", "incident", "checkpoint", "handoff"), required=True)
     memory_template_parser.add_argument("--title", required=True)
     memory_template_parser.add_argument("--summary", required=True)
     memory_template_parser.add_argument("--details", required=True)
@@ -394,6 +396,17 @@ def parser() -> argparse.ArgumentParser:
     memory_context_parser = memory_sub.add_parser("context", help="为新需求检索相关长期记忆")
     memory_context_parser.add_argument("--request", required=True)
     memory_context_parser.add_argument("--limit", type=int, default=10)
+    memory_checkpoint = memory_sub.add_parser("checkpoint", help="保存当前工作检查点并重建 CURRENT.md")
+    memory_checkpoint.add_argument("--summary", required=True)
+    memory_checkpoint.add_argument("--details", required=True)
+    memory_checkpoint.add_argument("--completed", action="append", default=[])
+    memory_checkpoint.add_argument("--blocker", action="append", default=[])
+    memory_checkpoint.add_argument("--next-step", action="append", default=[])
+    memory_checkpoint.add_argument("--open-question", action="append", default=[])
+    memory_checkpoint.add_argument("--resume-command", action="append", default=[])
+    memory_resume_parser = memory_sub.add_parser("resume", help="恢复最新连续性检查点与相关长期知识")
+    memory_resume_parser.add_argument("--request")
+    memory_resume_parser.add_argument("--limit", type=int, default=10)
     memory_sub.add_parser("rebuild", help="从追加式 Record 重建 JSON/Markdown 索引")
     project = commands.add_parser("project", help="安装或同步目标项目的 Yuan Runtime")
     project_sub = project.add_subparsers(dest="project_command", required=True)
@@ -563,6 +576,19 @@ def execute(args: argparse.Namespace) -> Any:
         return memory_status(root)
     if args.command == "memory" and args.memory_command == "context":
         return memory_context(root, args.request, limit=args.limit)
+    if args.command == "memory" and args.memory_command == "checkpoint":
+        return checkpoint_memory(
+            root,
+            summary=args.summary,
+            details=args.details,
+            completed=args.completed,
+            blockers=args.blocker,
+            next_steps=args.next_step,
+            open_questions=args.open_question,
+            resume_commands=args.resume_command,
+        )
+    if args.command == "memory" and args.memory_command == "resume":
+        return memory_resume(root, args.request, limit=args.limit)
     if args.command == "memory" and args.memory_command == "rebuild":
         return rebuild_memory(root)
     if args.command == "project" and args.project_command == "install":

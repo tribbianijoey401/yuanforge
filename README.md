@@ -134,7 +134,11 @@ yuan verify --criterion AC-001 --attempt ATT-001
 # 对 Routing 中每个角色生成并记录 READY/NEEDS_WORK Handoff：
 yuan handoff template --handoff-id HANDOFF-TEST-001 --agent tester --to user --phase verification --status READY --summary "验证通过" --evidence EVD-001 > handoff.json
 yuan handoff record handoff.json
-# Memory Curator 在最后一个 Handoff 前追加长期记忆，或明确 NO_MEMORY_CHANGE：
+# 每次暂停或交接前保存连续性检查点（不等待 PASS）：
+yuan memory checkpoint --summary "当前进度" --details "可供人类接手的说明" --completed "已完成事项" --next-step "下一动作" --resume-command "yuan status"
+# 新会话优先恢复检查点，再检索相关长期知识：
+yuan memory resume --request "当前需求"
+# 稳定知识在 PASS 后追加；决策和经验使用各自的来源门槛：
 yuan memory template --memory-id MEM-FEATURE-001 --kind feature --title "功能" --summary "已验证事实" --details "Evidence 支持的长期说明" > memory.json
 yuan memory check memory.json
 yuan memory record memory.json
@@ -148,7 +152,9 @@ yuan reduce
 
 ## 项目长期记忆
 
-`.yuan-run/` 保存一次 Run 的不可变事实；`docs/memory/records/` 保存跨会话、可提交 Git 的语义知识。Memory 支持 `feature`、`decision`、`pitfall`、`module` 和 `convention`，同一 ID 通过不可变 Revision 演进并绑定 Work Digest、PASS Evidence、Artifact、Ledger Head 与可选文件 Digest。`yuan memory context --request <需求>` 使用离线确定性的中文二元词片、英文词项、字段权重、稀有词权重和完整短语加分检索相关知识，并返回命中词项；它不上传项目内容或依赖外部 Embedding。`memory status` 标记 Binding 已变化的 stale 记录，`memory rebuild` 可重建 `index.json` 与 `INDEX.md`。
+`.yuan-run/` 保存“发生过什么”的不可变事实；`docs/memory/records/` 保存“以后应记住什么”，`CURRENT.md` 保存“现在从哪里继续”。Memory v2 分为四类：`knowledge`（project/feature/module/architecture/convention）、`decisions`、`experience`（pitfall/incident）和 `continuity`（checkpoint/handoff）。知识要求当前 PASS Evidence，决策要求用户已确认 Work，经验要求 FAIL Evidence 或真实 Attempt，连续性只要求绑定当前 Work/Artifact/Ledger，因此可以在实现尚未通过时保存。首次安装会创建空骨架；JSON Revision 是权威记录，`INDEX.md`、`PROJECT.md`、`CURRENT.md` 与 `views/` 都可重建。v1 Record 保持可读。
+
+`yuan memory context --request <需求>` 使用离线确定性的中文二元词片、英文词项、字段权重、稀有词权重和完整短语加分检索；`memory resume` 把最新检查点、检索结果和 stale 状态合成一次恢复上下文。它们不上传项目内容或依赖外部 Embedding。
 
 ## 信任边界
 

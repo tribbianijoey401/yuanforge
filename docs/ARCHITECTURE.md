@@ -51,7 +51,8 @@ LLM 从来不是上述权威。`AGENTS.md` 只是帮助 LLM 进入协议的 Adap
 | `artifacts.py` | 有界稳定枚举、Manifest 与 Diff |
 | `ledger.py` | 不可变 Event/Blob、Hash Chain、Atomic Head 与恢复 |
 | `runtime.py` | Work/Attempt/Evidence 生命周期与确定性 Replay |
-| `memory.py` | Work/Evidence 绑定的追加式长期记忆、检索与可重建索引 |
+| `memory.py` | 类型化来源策略、不可变 Memory Revision、连续性检查点与检索 |
+| `memory_views.py` | 从权威 Record 生成 CURRENT/PROJECT/分类视图与机器索引 |
 | `reducer.py` | 纯六结果判定 |
 | `identity.py` | 已安装 Protocol、Kernel 与 Environment Binding |
 | `ports.py` | 供受控平台接入的物理副作用中介边界，不计入纯状态 Kernel |
@@ -59,7 +60,7 @@ LLM 从来不是上述权威。`AGENTS.md` 只是帮助 LLM 进入协议的 Adap
 
 Core 只使用 Python 标准库。发行物可以是单个 `yuan.pyz`，不要求 Daemon、Database、Scheduler 或平台服务。
 
-Conformance 对职责层分别设置 Design Review 阈值：纯状态 Core 2,000 行、Deployment/Release 1,000 行、Capability/CLI 1,200 行、Platform Port 250 行、Long-term Memory 400 行；新增模块未归类会直接失败。预算是架构审查门槛，不把平台边界或部署代码混算成 Core。
+Conformance 对职责层分别设置 Design Review 阈值：纯状态 Core 2,000 行、Deployment/Release 1,000 行、Capability/CLI 1,200 行、Platform Port 250 行、Long-term Memory 600 行；新增模块未归类会直接失败。Memory 成为一级子系统后，记录语义与派生视图仍分别成层；预算是架构审查门槛，不把平台边界或部署代码混算成 Core。
 
 项目安装器属于 Deployment Adapter。首次安装仍验证 Candidate Release；`update` 则从 Yuan Source 外部强制重建托管框架，不依赖旧 Runtime、版本、Install Record、Active Work 或 Conformance，也不保留旧框架。更新唯一必须保持的是 `.yuan-run/`、`docs/memory/`、Custom Extension 与项目自有内容；新 Runtime 状态失败只产生诊断，不触发旧 Runtime 回滚。最新 Runtime 读取历史 Schema 是发行兼容性不变量。
 
@@ -89,12 +90,16 @@ Conformance 对职责层分别设置 Design Review 阈值：纯状态 Core 2,000
     head.json                 可恢复的 Hash-chain Pointer
     run-memory.json           一次性 Projection
 docs/memory/
-  records/<kind>/<id>/        不可变 Memory Revision
+  records/<category>/<kind>/<id>/
+                              不可变 Memory Revision
   index.json                  可重建机器索引
-  INDEX.md                    可重建人类视图
+  INDEX.md                    全部 Head 的可重建索引
+  CURRENT.md                  最新连续性检查点
+  PROJECT.md                  长期项目概览
+  views/                      架构、决策、坑与约定视图
 ```
 
-Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact Manifest 与 Tool Receipt 是 Blob。Head 和 Run Memory 是 Projection；丢失它们不会破坏权威历史。长期 Memory 不是 Core Result，而是由 Work/Evidence 支持、可提交 Git 的语义知识；旧 Revision 不覆盖，文件 Binding 变化会标记 stale。
+Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact Manifest 与 Tool Receipt 是 Blob。Head 和 Run Memory 是 Projection；丢失它们不会破坏权威历史。长期 Memory 不是 Core Result，而是可提交 Git 的项目认知层：知识绑定 PASS，决策绑定确认，经验绑定 FAIL/Attempt，连续性绑定当前 Work/Ledger。旧 Revision 不覆盖，文件 Binding 变化会标记 stale；Markdown 只作人类交接视图，不反向成为权威事实。
 
 每个外部状态命令都对当前 Artifact 至少执行一次内容哈希。Runtime 在一次命令内只读取并回放 Ledger 一次，Attempt 转换复用该次审计得到的 Manifest，避免 begin/dispatch/observe 在同一状态转换中重复扫描仓库。Ledger Append Lock 记录持有 PID：已退出进程遗留的锁可自动回收，仍存活的持有者继续受互斥保护。
 
@@ -108,7 +113,7 @@ Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact M
 6. `yuan attempt begin/dispatch/observe` 验证并审计一个有界副作用。
 7. `yuan verify` 运行预绑定只读 Verifier并创建 Evidence。
 8. 每个 Routing 角色通过 `handoff template/record` 记录 `READY` 或 `NEEDS_WORK`。
-9. Memory Curator 追加长期 Memory，或记录有证据理由的 `NO_MEMORY_CHANGE` Handoff。
+9. Memory Curator 在每次交接/暂停前保存 checkpoint，并按知识、决策、经验的来源策略追加长期 Memory；无长期变化时记录 `NO_MEMORY_CHANGE`。
 10. `yuan reduce` 仅在 Evidence、Side Effect 与 Required Handoff 全部满足时派生 `COMPLETE`。
 
 用户中途改变契约时，`run supersede` 关闭旧 Work，Successor 从新 Intake 和两次确认重新开始；历史不被覆盖。

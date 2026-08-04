@@ -1,7 +1,7 @@
 {
   "schema_version": "yuan.capability-source/v1",
   "profile_id": "vibe-coding",
-  "profile_version": "1.3.0",
+  "profile_version": "1.4.0",
   "description": "面向可验证、可恢复 Vibe Coding 的默认工程能力。",
   "required_rules": [
     "rules/00-boundary.md",
@@ -29,7 +29,7 @@
     {"id": "quality-auditor", "path": "agents/quality-auditor.md", "description": "检查维护性、性能与兼容性。", "use_when": ["复杂实现", "性能或可靠性敏感"]},
     {"id": "ux-reviewer", "path": "agents/ux-reviewer.md", "description": "验证真实用户任务与可访问性。", "use_when": ["用户界面行为变化"]},
     {"id": "tester", "path": "agents/tester.md", "description": "独立设计并执行验证矩阵。", "use_when": ["所有行为变更", "发布前"]},
-    {"id": "memory-curator", "path": "agents/memory-curator.md", "description": "把已验证 Work/Evidence 蒸馏为可检索的项目长期记忆。", "use_when": ["每个 Work 收尾", "项目知识变化", "需要检索历史决策"]}
+    {"id": "memory-curator", "path": "agents/memory-curator.md", "description": "维护跨会话连续性，并把知识、决策和经验蒸馏为可检索的项目长期记忆。", "use_when": ["每次交接或暂停", "每个 Work 收尾", "项目知识变化", "需要恢复历史上下文"]}
   ],
   "skills": [
     {"id": "project-lifecycle", "path": "skills/project-lifecycle/SKILL.md", "description": "从初始 BLOCKED 或历史状态启动、继续和结束 Work。", "use_when": ["开始新需求", "继续上次工作", "安装后首次对话"]},
@@ -45,8 +45,8 @@
     {"id": "custom-extension-authoring", "path": "skills/custom-extension-authoring/SKILL.md", "description": "创建可发现、可校验且不改变 Core Truth 的项目扩展。", "use_when": ["新增项目规则", "新增 Agent", "新增 Skill"]},
     {"id": "release-and-handoff", "path": "skills/release-and-handoff/SKILL.md", "description": "验证提交、推送、发布和交接事实。", "use_when": ["提交", "推送", "发布", "交接"]},
     {"id": "runtime-recovery", "path": "skills/runtime-recovery/SKILL.md", "description": "在旧 Runtime 不可信时从外部强制重建框架层并保留项目记忆。", "use_when": ["update 失败", "安装损坏", "Runtime 无法启动"]},
-    {"id": "memory-distillation", "path": "skills/memory-distillation/SKILL.md", "description": "从 Work、Evidence 与 Handoff 创建追加式长期记忆。", "use_when": ["Work 收尾", "形成长期知识"]},
-    {"id": "memory-retrieval", "path": "skills/memory-retrieval/SKILL.md", "description": "在 Intake 前检索并验证相关长期记忆。", "use_when": ["开始新需求", "接手历史项目"]}
+    {"id": "memory-distillation", "path": "skills/memory-distillation/SKILL.md", "description": "按来源强度创建连续性、知识、决策和经验记录。", "use_when": ["交接或暂停", "Work 收尾", "形成长期知识"]},
+    {"id": "memory-retrieval", "path": "skills/memory-retrieval/SKILL.md", "description": "恢复最新检查点并检索、验证相关长期记忆。", "use_when": ["继续未完成工作", "开始新需求", "接手历史项目"]}
   ],
   "workflow": {
     "schema_version": "yuan.workflow/v1",

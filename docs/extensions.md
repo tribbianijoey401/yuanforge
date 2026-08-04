@@ -33,7 +33,7 @@ python -B .yuan/bin/yuan.pyz --root . capability resolve --agent architect --ski
 
 Bundled Workflow 必须覆盖 R0/R1/R2、至少一个 Signal、全部 Agent 的 Skill Assignment，并声明会随 Artifact 变化而失效的 Reviewer。新增 Agent 却没有 Assignment 会使 Profile fail-closed。
 
-默认 Profile 还提供三个能力闭环：`debugging/deployment` Signal 必须路由到 Debugger 与 Runtime Maintainer，不能只有无负责人 Skill；Memory Curator 位于每个 Work 的最终 Handoff，并使用 `memory-retrieval`/`memory-distillation` 维护 `docs/memory/`。
+默认 Profile 还提供三个能力闭环：`debugging/deployment` Signal 必须路由到 Debugger 与 Runtime Maintainer，不能只有无负责人 Skill；Memory Curator 使用 `memory-retrieval`/`memory-distillation` 贯穿交接、暂停与 Work 收尾，维护 `docs/memory/` 的连续性、知识、决策和经验。
 
 ## Project Custom Extension
 

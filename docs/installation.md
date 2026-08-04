@@ -30,7 +30,7 @@ python -B scripts/sync_project.py install <目标项目> --profile AUDITED --cap
     extensions/vibe-coding/        托管的 Rules、Agents 与 Skills
     extensions/custom/             项目自定义能力，更新时保留
   .yuan-run/                       Ledger、Blob 与 Projection，不提交 Git
-  docs/memory/                     Work/Evidence 支持的追加式长期记忆，提交 Git
+  docs/memory/                     长期知识、决策、经验与连续性，提交 Git
 ```
 
 安装器不会覆盖现有 `AGENTS.md`。没有 Yuan 标记时追加 Managed Block；已有且唯一时只替换该 Block；标记缺失、重复或顺序错误时 fail-closed。安装前会完成 Run ID、Managed Block 和 Release Evidence 校验；任一步失败都会恢复所有原文件，因此可以直接重试。
@@ -76,7 +76,9 @@ python -B scripts/sync_project.py status <目标项目>
 
 ## 长期记忆
 
-项目事实分为两层：`.yuan-run/` 保存不可变运行历史，`docs/memory/` 保存跨 Work 的语义知识。Memory Record 以 JSON Revision 追加，绑定来源 Work、PASS Evidence、Artifact、Ledger Head 和可选文件 Digest；`index.json` 与 `INDEX.md` 都可重建。Memory Curator 是每个 Work 的最后角色：有长期影响时记录 Memory，没有影响时在 Handoff 中明确 `NO_MEMORY_CHANGE`。
+项目事实分为三种用途：`.yuan-run/` 证明“发生过什么”，长期 Record 说明“以后应记住什么”，`CURRENT.md` 说明“现在从哪里继续”。首次安装在 `docs/memory/` 不存在或为空时创建骨架，包含 `INDEX.md`、`PROJECT.md`、`CURRENT.md`、`index.json` 和分类 `views/`；已有项目 Memory 不覆盖，后续 `update` 对整个目录逐字节保留。
+
+Memory v2 Record 以 JSON Revision 追加。知识绑定当前 PASS Evidence；决策绑定用户已确认 Work；坑和事故绑定 FAIL Evidence 或 Attempt；checkpoint/handoff 可在 Work 活动期间保存，不需要等待 PASS，但仍绑定 Work、Artifact 和 Ledger Head。`memory resume` 一次返回最新连续性、相关长期知识和 stale 状态。所有 Markdown 都能由 JSON Record 重建，人类可以直接阅读但不应手工修改派生视图。
 
 ## 返回状态
 

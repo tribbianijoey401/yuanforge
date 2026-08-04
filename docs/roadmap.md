@@ -104,10 +104,19 @@
 
 退出 Evidence：损坏 Runtime/Config/Install Record 后强制修复、非终态 Work 立即更新、项目 Memory 字节保持、诊断路由、Memory Revision/Context/Staleness 与端到端 Handoff Gate 测试。
 
+## M10 — 项目连续性与 Memory v2（已完成）
+
+- Memory 升级为一级子系统，区分长期知识、已确认决策、问题经验和活动连续性，且 v1 Record 保持可读。
+- `memory checkpoint` 不依赖 PASS，可在交接、暂停和阻塞时保存已完成事项、阻塞、下一步、问题与恢复命令；`memory resume` 合并检查点、检索结果与 stale 状态。
+- 首次安装创建 `CURRENT.md`、`PROJECT.md`、`INDEX.md`、机器索引和架构/决策/坑/约定视图；Markdown 均由不可变 JSON Revision 重建。
+- Memory Curator 从“Work 最后一步”扩展为贯穿交接生命周期的连续性职责，不同类型使用不同来源强度。
+
+退出 Evidence：空骨架安装、PASS 前决策与 checkpoint、CURRENT/DECISIONS 视图重建、恢复检索、v1 兼容和强制更新逐字节保留测试。
+
 ## 永久复杂度限制
 
 - Protocol 不超过 500 个非空行。
-- 纯状态 Core Kernel 限制为 2,000 个非空 Python 行；Deployment/Release 限制为 1,000 行，Capability/CLI 限制为 1,200 行，Platform Port 物理中介边界限制为 250 行，Long-term Memory 层限制为 400 行，空行不计。新增 Python 模块必须显式归类；职责分层避免一个聚合预算同时冻结互不相关的演进方向。
+- 纯状态 Core Kernel 限制为 2,000 个非空 Python 行；Deployment/Release 限制为 1,000 行，Capability/CLI 限制为 1,200 行，Platform Port 物理中介边界限制为 250 行，Long-term Memory 层限制为 600 行，空行不计。新增 Python 模块必须显式归类；职责分层避免一个聚合预算同时冻结互不相关的演进方向。
 - Core 只使用标准库。
 - 不要求 Daemon、SQLite/Database、Network Service、Role System 或隐藏 Extension。
 - Extension 可以提出候选或生产 Evidence，但不能增加 Result 或改变 Core Completion Truth。

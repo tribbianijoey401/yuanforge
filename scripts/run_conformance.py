@@ -66,7 +66,7 @@ def validate_size_budget() -> dict[str, object]:
         "paths.py", "primitives.py", "reducer.py", "runtime.py", "validate.py", "workflow.py",
     }
     port_names = {"ports.py"}
-    memory_names = {"memory.py"}
+    memory_names = {"memory.py", "memory_views.py"}
     deployment_names = {"project.py", "release.py"}
     interface_names = {"__init__.py", "__main__.py", "adapters.py", "capabilities.py", "cli.py"}
     counts = {
@@ -92,8 +92,8 @@ def validate_size_budget() -> dict[str, object]:
         raise RuntimeError(f"Capability/CLI 层超出 1200 个非空 Python 行 Design Review 阈值：{interface_lines}")
     if port_lines > 250:
         raise RuntimeError(f"Platform Port 边界超出 250 个非空 Python 行 Design Review 阈值：{port_lines}")
-    if memory_lines > 400:
-        raise RuntimeError(f"Long-term Memory 层超出 400 个非空 Python 行 Design Review 阈值：{memory_lines}")
+    if memory_lines > 600:
+        raise RuntimeError(f"Long-term Memory 层超出 600 个非空 Python 行 Design Review 阈值：{memory_lines}")
     return {
         "status": "PASS",
         "protocol_nonempty_lines": protocol_lines,

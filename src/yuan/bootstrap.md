@@ -20,7 +20,7 @@ python -B .yuan/bin/yuan.pyz --root .
 新项目、已完成 Work 后的新请求，以及被 Supersede 后的需求都执行同一流程：
 
 1. 加载 `conductor` 及其 `project-lifecycle`、`requirements-clarification` Assignment。
-2. 运行 `<入口> memory status` 与 `<入口> memory context --request <用户原始请求>`；只把 Binding 未过期的 Memory 作为当前事实，相关 Memory ID/Digest 写入 Intake 依据。
+2. 运行 `<入口> memory resume --request <用户原始请求>`；先读取 `CURRENT.md` 对应的连续性检查点，再使用 Binding 未过期的长期知识。相关 Memory ID/Digest 写入 Intake 依据，`hypothesis` 只能作为待验证线索。
 3. 运行 `<入口> intake template --request <用户原始请求>`，把返回 JSON 保存为 `.yuan/drafts/intake.json`。
 4. 由 Product Analyst 语义检查目标、用户、范围、非目标、失败影响、兼容性、数据/权限和不可逆选择。会改变验收或安全边界的问题标记为 Blocking，并原样询问用户；不得替用户回答。
 5. 把答案、可撤销假设、R0/R1/R2 风险理由和 Routing Signals 写回 Intake；运行 `<入口> seal <file>` 保存重新计算 Digest 的返回值，再运行 `<入口> intake check <sealed-file>`。`NEEDS_INPUT` 时继续提问，`NEEDS_CONFIRMATION` 时向用户展示摘要。
@@ -39,7 +39,7 @@ python -B .yuan/bin/yuan.pyz --root .
 - 平台支持多 Agent 时可以派发；不支持时由同一 LLM 顺序切换角色并如实说明隔离能力。R0/R1 不得伪装成独立 Agent 审查。
 - 每个非 Conductor 角色结束时必须生成并记录 Role Handoff：`READY` 表示该职责完成；`NEEDS_WORK` 表示退回设计或实现并触发 `CORRECT`。
 - 用 `<入口> handoff template ...` 生成绑定当前 Work/Artifact 的 JSON，再运行 `<入口> handoff record <file>`。Artifact Reviewer 必须引用相关 Evidence；Artifact 改变后其旧 Handoff 自动过期。
-- `memory-curator` 是每个 Work 的最后角色：有长期影响时用 `memory template/check/record/status` 追加 verified Memory；没有长期影响时在 Handoff 中明确 `NO_MEMORY_CHANGE` 和理由。
+- `memory-curator` 维护两条时间线：每次角色交接、会话暂停或阻塞前用 `memory checkpoint` 更新连续性；形成稳定知识、已确认决策或问题经验时用 `memory template/check/record/status` 追加相应类型的长期 Memory。知识需要 PASS，决策绑定用户确认，经验绑定 FAIL/Attempt；不得把猜测写成 verified。Work 收尾没有长期变化时仍需保存最终检查点，并在 Handoff 中说明 `NO_MEMORY_CHANGE`。
 - Agent、Skill 和 Handoff 都不能直接产生 Core Result。只有 Reducer 可以判定六种 Result。
 
 ## 4. 一个有副作用的 Tick

@@ -27,7 +27,15 @@ from yuan.cli import attempt_template, init_repository, parser as cli_parser, wo
 from yuan.errors import IntegrityError, ValidationError
 from yuan.identity import harness_digest
 from yuan.ledger import Ledger, atomic_write, exclusive_lock
-from yuan.memory import memory_context, memory_status, memory_template, rebuild_memory, record_memory
+from yuan.memory import (
+    checkpoint_memory,
+    memory_context,
+    memory_resume,
+    memory_status,
+    memory_template,
+    rebuild_memory,
+    record_memory,
+)
 from yuan.ports import ExecutableBinding, ReferencePort
 from yuan.project import (
     BOOTSTRAP_END,
@@ -1094,6 +1102,8 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertTrue((self.root / ".yuan" / "extensions" / "vibe-coding" / "rules" / "01-workflow.md").is_file())
         self.assertTrue((self.root / ".yuan" / "extensions" / "vibe-coding" / "agents" / "conductor.md").is_file())
         self.assertTrue((self.root / ".yuan" / "extensions" / "vibe-coding" / "skills" / "systematic-debugging" / "SKILL.md").is_file())
+        for relative in ("INDEX.md", "CURRENT.md", "PROJECT.md", "views/DECISIONS.md", "views/PITFALLS.md"):
+            self.assertTrue((self.root / "docs" / "memory" / relative).is_file())
         custom = self.root / ".yuan" / "extensions" / "custom" / "project-rule.md"
         custom.write_text("# 项目自定义规则\n", encoding="utf-8")
         agents = (self.root / "AGENTS.md").read_text(encoding="utf-8")
@@ -1127,6 +1137,15 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertTrue(updated["memory_preserved"])
         self.assertFalse((self.root / ".yuan" / "releases" / previous_digest / "snapshot.json").exists())
         self.assertEqual(custom.read_text(encoding="utf-8"), "# 项目自定义规则\n")
+
+    def test_install_never_overwrites_existing_project_memory(self) -> None:
+        memory = self.root / "docs" / "memory" / "CURRENT.md"
+        memory.parent.mkdir(parents=True)
+        memory.write_text("# 人工维护的历史交接\n", encoding="utf-8")
+        installed = install_project(self.root, release_context=self.release_context, run_id="RUN-EXISTING-MEMORY")
+        self.assertFalse(installed["memory_scaffolded"])
+        self.assertEqual(memory.read_text(encoding="utf-8"), "# 人工维护的历史交接\n")
+        self.assertFalse((self.root / "docs" / "memory" / "index.json").exists())
 
     def test_installed_runtime_lists_and_resolves_capabilities(self) -> None:
         install_project(self.root, release_context=self.release_context, run_id="RUN-CAPABILITY-CLI")
@@ -1319,6 +1338,31 @@ class ProjectInstallerTests(unittest.TestCase):
         accepted = accept_work(self.root, work)
         self.assertEqual(accepted["decision"]["result"], "CONTINUE")
 
+        decision = memory_template(
+            self.root,
+            memory_id="MEM-DECISION-001",
+            kind="decision",
+            title="采用追加式项目记忆",
+            summary="用户确认的 Work 可在 PASS 前保存决策。",
+            details="决策事实来源于已确认 Work，而不是伪装成实现验证。",
+        )
+        self.assertEqual(decision["confidence"], "decided")
+        self.assertEqual(decision["source"]["evidence_ids"], [])
+        record_memory(self.root, decision)
+        checkpoint_memory(
+            self.root,
+            summary="已接受 Work，尚未执行实现。",
+            details="该检查点证明项目连续性不依赖 PASS Evidence。",
+            completed=["需求与 Work 已确认"],
+            next_steps=["创建 app.txt"],
+            resume_commands=["python -B .yuan/bin/yuan.pyz --root . status"],
+        )
+        resumed = memory_resume(self.root, "追加式项目记忆")
+        self.assertEqual(resumed["current"]["memory_id"], "CURRENT")
+        self.assertEqual(resumed["current"]["data"]["next_steps"], ["创建 app.txt"])
+        self.assertIn("创建 app.txt", (self.root / "docs" / "memory" / "CURRENT.md").read_text(encoding="utf-8"))
+        self.assertIn("MEM-DECISION-001", (self.root / "docs" / "memory" / "views" / "DECISIONS.md").read_text(encoding="utf-8"))
+
         proposal = attempt_template(
             self.root,
             attempt_id="ATT-FIRST-WORK",
@@ -1359,6 +1403,20 @@ class ProjectInstallerTests(unittest.TestCase):
         )
         self.assertEqual(memory_result["handoff"]["decision"]["result"], "COMPLETE")
         self.assertEqual(record_reduction(self.root)["decision"]["result"], "COMPLETE")
+        legacy = memory_template(
+            self.root,
+            memory_id="MEM-V1-COMPAT",
+            kind="module",
+            title="v1 兼容记录",
+            summary="旧版路径与字段仍然可读。",
+            details="发行升级不能丢弃已有项目 Memory。",
+        )
+        legacy["schema_version"] = "yuan.memory/v1"
+        legacy.pop("data")
+        legacy["source"].pop("attempt_ids")
+        legacy = with_digest(legacy)
+        recorded_legacy = record_memory(self.root, legacy)
+        self.assertEqual(recorded_legacy["record"], "docs/memory/records/module/MEM-V1-COMPAT/000001.json")
         second = memory_template(
             self.root,
             memory_id="MEM-TEST-001",
@@ -1372,7 +1430,8 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertEqual(second["revision"], 2)
         self.assertEqual(second["supersedes"], memory_result["memory"]["digest"])
         record_memory(self.root, second)
-        self.assertEqual(rebuild_memory(self.root, write=False)["heads"][0]["revision"], 2)
+        heads = {item["memory_id"]: item for item in rebuild_memory(self.root, write=False)["heads"]}
+        self.assertEqual(heads["MEM-TEST-001"]["revision"], 2)
         context = memory_context(self.root, "长期 追加 Revision")
         self.assertEqual(context["memories"][0]["record"]["memory_id"], "MEM-TEST-001")
         self.assertTrue({"长期", "追加", "revision"} <= set(context["memories"][0]["matched_terms"]))
@@ -1519,7 +1578,7 @@ class ProjectInstallerTests(unittest.TestCase):
     def test_forced_update_repairs_corrupt_install_and_preserves_memory(self) -> None:
         install_project(self.root, release_context=self.release_context, run_id="RUN-FORCE-REPAIR")
         long_term = self.root / "docs" / "memory" / "keep.txt"
-        long_term.parent.mkdir(parents=True)
+        long_term.parent.mkdir(parents=True, exist_ok=True)
         long_term.write_text("project memory\n", encoding="utf-8")
         custom = self.root / ".yuan" / "extensions" / "custom" / "keep.txt"
         custom.write_text("custom capability\n", encoding="utf-8")

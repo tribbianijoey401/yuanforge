@@ -62,7 +62,7 @@ def agent_guidance(root: Path, capability_profile: str = DEFAULT_PROFILE) -> dic
             "我的需求是：<在这里描述需求>"
         ),
         "continue_prompt": (
-            "请读取项目根目录 AGENTS.md，检查 Yuan 当前状态，并按照 Yuan Agent Bootstrap "
+            "请读取项目根目录 AGENTS.md，运行 memory resume 恢复项目连续性并检查 Yuan 当前状态，然后按照 Yuan Agent Bootstrap "
             "继续未完成的 Work；只有 Reducer 返回 COMPLETE 时才报告完成。"
         ),
     }
@@ -339,7 +339,12 @@ def _deployment_files_for_profile(profile_id: str) -> tuple[str, ...]:
 
 def _transaction_files(*groups: tuple[str, ...]) -> tuple[str, ...]:
     values = [item for group in groups for item in group]
-    values.extend(("AGENTS.md", ".gitignore", ".yuan-run/current.json"))
+    values.extend((
+        "AGENTS.md", ".gitignore", ".yuan-run/current.json", "docs/memory/index.json",
+        "docs/memory/INDEX.md", "docs/memory/CURRENT.md", "docs/memory/PROJECT.md",
+        "docs/memory/views/ARCHITECTURE.md", "docs/memory/views/DECISIONS.md",
+        "docs/memory/views/PITFALLS.md", "docs/memory/views/CONVENTIONS.md",
+    ))
     return tuple(dict.fromkeys(values))
 
 
@@ -648,6 +653,7 @@ def install_project(
         run_root = root / ".yuan-run" / "runs" / run_id
         candidate = root / ".yuan" / "candidates" / f"install-{os.getpid()}.pyz"
         artifact = build_runtime_zipapp(candidate)
+        memory_scaffolded = False
         try:
             proof = _validated_release(candidate, artifact, release_context)
             runtime = root / ".yuan" / "bin" / "yuan.pyz"
@@ -657,6 +663,12 @@ def install_project(
             atomic_write(root / "AGENTS.md", agents)
             atomic_write(root / ".gitignore", ignored)
             initialized = initialize_repository(root, profile, run_id)
+            memory_root = root / "docs" / "memory"
+            if not memory_root.is_dir() or not any(path.is_file() for path in memory_root.rglob("*")):
+                from .memory import rebuild_memory
+
+                rebuild_memory(root)
+                memory_scaffolded = True
             _write_release_evidence(root, artifact, release_context)
             record = _install_record(root, artifact, proof)
             status = _pinned_status(root, runtime)
@@ -676,6 +688,7 @@ def install_project(
             "profile": initialized["profile"],
             "runtime_digest": artifact["digest"],
             "install_digest": record["digest"],
+            "memory_scaffolded": memory_scaffolded,
             "release_proof": proof,
             "decision": status["decision"],
             "agent_guidance": agent_guidance(root, capability_profile),
