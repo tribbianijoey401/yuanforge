@@ -5,39 +5,21 @@ JSON Schema 用于描述交换格式；本模块是不依赖第三方库的规�
 
 from __future__ import annotations
 
-import re
 from typing import Any
 
 from .canonical import digest, verify_digest
-from .errors import ValidationError
 from .paths import normalize_relative, scope_contains
+from .primitives import identifier, require, sha256
 from .workflow import validate_intake, validate_routing, validate_work_confirmation
 
-SHA256 = re.compile(r"^[0-9a-f]{64}$")
-IDENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$")
 ACTION_TYPES = {"file-read", "file-write", "command", "verify", "reconcile"}
 SIDE_EFFECTS = {"none", "filesystem", "process", "network", "external"}
 PROFILES = {"GUIDED", "AUDITED", "ENFORCED"}
 
 
-def require(condition: bool, message: str) -> None:
-    if not condition:
-        raise ValidationError(message)
-
-
 def require_keys(value: dict[str, Any], required: set[str], label: str) -> None:
     missing = sorted(required - set(value))
     require(not missing, f"{label} 缺少字段：{', '.join(missing)}")
-
-
-def identifier(value: Any, label: str) -> str:
-    require(isinstance(value, str) and bool(IDENT.fullmatch(value)), f"{label} 不合法")
-    return value
-
-
-def sha256(value: Any, label: str) -> str:
-    require(isinstance(value, str) and bool(SHA256.fullmatch(value)), f"{label} 不是合法的 SHA-256")
-    return value
 
 
 def binding(value: Any, label: str) -> dict[str, Any]:

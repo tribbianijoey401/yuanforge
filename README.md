@@ -144,11 +144,11 @@ yuan reduce
 
 每条命令只输出一个 JSON Object。失败采用 fail-closed 策略并返回非零 Exit Code。运行时位于 `.yuan-run/`；删除投影不会丢失事实，`yuan rebuild` 可从不可变 Event 重建 Run Memory。
 
-如果进程在写入不可变 Event 后、推进 Ledger Head 前崩溃，运行 `yuan recover`。它会先验证完整 Event Chain，再修复派生 Head。除非操作员显式传入 `--force-stale-lock`，否则不会破坏近期 Append Lock。
+如果进程在写入不可变 Event 后、推进 Ledger Head 前崩溃，运行 `yuan recover`。它会先验证完整 Event Chain，再修复派生 Head。普通 Append 会自动回收 PID 已退出的崩溃锁；仍存活的持有者和近期损坏锁不会被误删。`--force-stale-lock` 只用于操作员确认后的异常恢复。
 
 ## 项目长期记忆
 
-`.yuan-run/` 保存一次 Run 的不可变事实；`docs/memory/records/` 保存跨会话、可提交 Git 的语义知识。Memory 支持 `feature`、`decision`、`pitfall`、`module` 和 `convention`，同一 ID 通过不可变 Revision 演进并绑定 Work Digest、PASS Evidence、Artifact、Ledger Head 与可选文件 Digest。`yuan memory context --request <需求>` 在 Intake 前检索相关知识，`memory status` 标记 Binding 已变化的 stale 记录，`memory rebuild` 可重建 `index.json` 与 `INDEX.md`。
+`.yuan-run/` 保存一次 Run 的不可变事实；`docs/memory/records/` 保存跨会话、可提交 Git 的语义知识。Memory 支持 `feature`、`decision`、`pitfall`、`module` 和 `convention`，同一 ID 通过不可变 Revision 演进并绑定 Work Digest、PASS Evidence、Artifact、Ledger Head 与可选文件 Digest。`yuan memory context --request <需求>` 使用离线确定性的中文二元词片、英文词项、字段权重、稀有词权重和完整短语加分检索相关知识，并返回命中词项；它不上传项目内容或依赖外部 Embedding。`memory status` 标记 Binding 已变化的 stale 记录，`memory rebuild` 可重建 `index.json` 与 `INDEX.md`。
 
 ## 信任边界
 

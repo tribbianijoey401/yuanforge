@@ -8,7 +8,3 @@ class ValidationError(YuanError):
 
 class IntegrityError(YuanError):
     """内容寻址 State 或 Event History 不一致。"""
-
-
-class AuthorizationError(YuanError):
-    """原本有意义的 Action 超出 Active Grant。"""

@@ -23,7 +23,7 @@ from .capabilities import (
     capability_payloads,
 )
 from .errors import IntegrityError, ValidationError, YuanError
-from .identity import environment_binding, harness_digest, protocol_bytes
+from .identity import environment_binding, harness_digest, protocol_bytes, protocol_revision
 from .ledger import Ledger, atomic_write, exclusive_lock
 from .release import build_runtime_zipapp, verify_release
 from .validate import identifier, with_digest
@@ -173,7 +173,7 @@ def initialize_repository(root: Path, profile: str, run_id: str | None) -> dict[
     config = with_digest({
         "schema_version": "yuan.config/v1",
         "profile": profile,
-        "protocol": {"id": "yuan.core", "revision": "0.2", "digest": digest_bytes(protocol)},
+        "protocol": {"id": "yuan.core", "revision": protocol_revision(protocol), "digest": digest_bytes(protocol)},
         "harness": {"id": "yuan.python", "revision": __version__, "digest": harness_digest()},
         "state_root": ".yuan-run",
         "artifact_exclude": [".yuan-run/**", "docs/memory/**", ".git/**", "__pycache__/**", "*.pyc"],
@@ -504,7 +504,7 @@ def _fresh_config(capability_profile: str) -> dict[str, Any]:
     return with_digest({
         "schema_version": "yuan.config/v1",
         "profile": "AUDITED",
-        "protocol": {"id": "yuan.core", "revision": "0.2", "digest": digest_bytes(protocol)},
+        "protocol": {"id": "yuan.core", "revision": protocol_revision(protocol), "digest": digest_bytes(protocol)},
         "harness": {"id": "yuan.python", "revision": __version__, "digest": harness_digest()},
         "state_root": ".yuan-run",
         "artifact_exclude": [".yuan-run/**", "docs/memory/**", ".git/**", "__pycache__/**", "*.pyc"],

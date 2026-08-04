@@ -63,7 +63,7 @@ python -B scripts/sync_project.py update <目标项目>
 
 `update` 的定义就是强制替换框架层，因此没有版本比较、`UNCHANGED`、Active Work Gate、`STAGED`、Deployment Snapshot 或自动回滚。默认部署当前发行包的默认 Profile，也可用 `--capability-profile` 显式选择。即使旧 Runtime、Config、Install Record 或 Managed Block 已损坏，更新仍不依赖它们；只有最新 Runtime 无法构建、目标无法写入或项目 Memory 被改变才会失败。
 
-更新仍使用 `.yuan/.deployment.lock` 避免两个更新进程同时写入。它不修改 `.yuan-run/current.json`、任何 Ledger Event、`docs/memory/` 或 `.yuan/extensions/custom/`。新 Runtime 必须兼容历史 Work/Event/Evidence Schema；兼容性由 Yuan 自身 CI 的历史项目 Fixture 保证，不由目标项目的旧 Runtime 批准。
+更新仍使用 `.yuan/.deployment.lock` 避免两个更新进程同时写入。Ledger Append Lock 会保留活跃 PID 的互斥，并自动回收进程已退出的崩溃锁。更新不修改 `.yuan-run/current.json`、任何 Ledger Event、`docs/memory/` 或 `.yuan/extensions/custom/`。新 Runtime 必须兼容历史 Work/Event/Evidence Schema；兼容性由 Yuan 自身 CI 的历史项目 Fixture 保证，不由目标项目的旧 Runtime 批准。
 
 ## 外部诊断与状态
 

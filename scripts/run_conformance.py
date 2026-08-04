@@ -63,29 +63,45 @@ def validate_size_budget() -> dict[str, object]:
     protocol_lines = sum(bool(line.strip()) for line in protocol.splitlines())
     core_names = {
         "artifacts.py", "canonical.py", "errors.py", "identity.py", "ledger.py",
-        "paths.py", "ports.py", "reducer.py", "runtime.py", "validate.py", "workflow.py",
+        "paths.py", "primitives.py", "reducer.py", "runtime.py", "validate.py", "workflow.py",
     }
+    port_names = {"ports.py"}
     memory_names = {"memory.py"}
+    deployment_names = {"project.py", "release.py"}
+    interface_names = {"__init__.py", "__main__.py", "adapters.py", "capabilities.py", "cli.py"}
     counts = {
         path.name: sum(bool(line.strip()) for line in path.read_text(encoding="utf-8").splitlines())
         for path in sorted((ROOT / "src" / "yuan").glob("*.py"))
     }
     core_lines = sum(count for name, count in counts.items() if name in core_names)
+    port_lines = sum(count for name, count in counts.items() if name in port_names)
     memory_lines = sum(count for name, count in counts.items() if name in memory_names)
-    support_lines = sum(count for name, count in counts.items() if name not in core_names | memory_names)
+    deployment_lines = sum(count for name, count in counts.items() if name in deployment_names)
+    interface_lines = sum(count for name, count in counts.items() if name in interface_names)
+    classified = core_names | port_names | memory_names | deployment_names | interface_names
+    unclassified = sorted(set(counts) - classified)
     if protocol_lines > 500:
         raise RuntimeError(f"Protocol 超出 500 个非空行：{protocol_lines}")
     if core_lines > 2000:
         raise RuntimeError(f"Core Kernel 超出 2000 个非空 Python 行 Design Review 阈值：{core_lines}")
-    if support_lines > 2000:
-        raise RuntimeError(f"Deployment/Capability 支撑层超出 2000 个非空 Python 行 Design Review 阈值：{support_lines}")
+    if unclassified:
+        raise RuntimeError("Python 模块尚未分配 Design Review 预算：" + ", ".join(unclassified))
+    if deployment_lines > 1000:
+        raise RuntimeError(f"Deployment/Release 层超出 1000 个非空 Python 行 Design Review 阈值：{deployment_lines}")
+    if interface_lines > 1200:
+        raise RuntimeError(f"Capability/CLI 层超出 1200 个非空 Python 行 Design Review 阈值：{interface_lines}")
+    if port_lines > 250:
+        raise RuntimeError(f"Platform Port 边界超出 250 个非空 Python 行 Design Review 阈值：{port_lines}")
     if memory_lines > 400:
         raise RuntimeError(f"Long-term Memory 层超出 400 个非空 Python 行 Design Review 阈值：{memory_lines}")
     return {
         "status": "PASS",
         "protocol_nonempty_lines": protocol_lines,
         "core_python_nonempty_lines": core_lines,
-        "support_python_nonempty_lines": support_lines,
+        "support_python_nonempty_lines": deployment_lines + interface_lines,
+        "deployment_python_nonempty_lines": deployment_lines,
+        "interface_python_nonempty_lines": interface_lines,
+        "port_python_nonempty_lines": port_lines,
         "memory_python_nonempty_lines": memory_lines,
     }
 

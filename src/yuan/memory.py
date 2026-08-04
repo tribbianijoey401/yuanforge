@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 import subprocess
 from datetime import datetime, timezone
@@ -303,19 +304,54 @@ def memory_show(root: Path, memory_id: str) -> dict[str, Any]:
     return records[-1]
 
 
+def _search_terms(value: str) -> set[str]:
+    terms: set[str] = set()
+    for token in re.findall(r"[a-z0-9_]+|[\u4e00-\u9fff]+", value.casefold()):
+        terms.add(token)
+        if "\u4e00" <= token[0] <= "\u9fff" and len(token) > 2:
+            terms.update(token[index:index + 2] for index in range(len(token) - 1))
+    return terms
+
+
 def memory_context(root: Path, request: str, *, limit: int = 10) -> dict[str, Any]:
     request = _text(request, "Memory context request")
     _require(isinstance(limit, int) and 1 <= limit <= 100, "Memory context limit 必须在 1..100")
     records = _records(root.resolve())
-    terms = {term for term in re.split(r"[^\w\u4e00-\u9fff]+", request.casefold()) if term}
-    matches = []
+    terms = _search_terms(request)
+    documents = {}
     for memory_id, revisions in records.items():
         head = revisions[-1]
+        fields = {
+            "title": _search_terms(head["title"]),
+            "tags": _search_terms(" ".join(head["tags"])),
+            "summary": _search_terms(head["summary"]),
+            "details": _search_terms(head["details"]),
+        }
+        documents[memory_id] = (head, fields)
+    frequencies = {
+        term: sum(term in set().union(*fields.values()) for _, fields in documents.values())
+        for term in terms
+    }
+    matches = []
+    weights = {"title": 5, "tags": 4, "summary": 3, "details": 1}
+    for memory_id, (head, fields) in documents.items():
+        matched = sorted(term for term in terms if any(term in values for values in fields.values()))
+        score = sum(
+            round(100 * (1 + math.log((len(documents) + 1) / (frequencies[term] + 1))))
+            * max(weights[name] for name, values in fields.items() if term in values)
+            for term in matched
+        )
         haystack = " ".join([head["title"], head["summary"], head["details"], *head["tags"]]).casefold()
-        score = sum(1 for term in terms if term in haystack)
         if request.casefold() in haystack:
-            score += 2
+            score += 1000
         if score:
-            matches.append((score, memory_id, head))
+            matches.append((score, memory_id, head, matched))
     matches.sort(key=lambda item: (-item[0], item[1]))
-    return {"status": "PASS", "request": request, "memories": [{"score": score, "record": record} for score, _, record in matches[:limit]]}
+    return {
+        "status": "PASS",
+        "request": request,
+        "memories": [
+            {"score": score, "matched_terms": matched, "record": record}
+            for score, _, record, matched in matches[:limit]
+        ],
+    }

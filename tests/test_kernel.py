@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import json
 import math
+import os
 import sys
 import subprocess
 import tempfile
@@ -10,6 +11,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import yuan.runtime as runtime_module
 from yuan.artifacts import build_manifest, diff_manifests
 from yuan.adapters import validate_adapter_descriptor
 from yuan.canonical import canonical_bytes, digest, digest_bytes
@@ -333,6 +335,43 @@ class RuntimeCase(unittest.TestCase):
         self.assertEqual(result["event"]["type"], "BUDGET_EXHAUSTED")
         self.assertEqual(rebuild(self.root)["attempt_order"], [])
 
+    def test_replay_rejects_prepared_attempt_over_budget(self) -> None:
+        _, ledger = active_ledger(self.root)
+        projection = rebuild(self.root, write=False)
+        manifest = runtime_module.artifact_for(self.root, self.work)
+        proposal = self.proposal()
+        proposal["budget_charge"]["tool_calls"] = self.work["budgets"]["tool_calls"] + 1
+        blob = ledger.put_blob(canonical_bytes(manifest))
+        ledger.append(
+            "ATTEMPT_PREPARED",
+            {
+                "attempt_id": proposal["attempt_id"],
+                "sequence": 1,
+                "work_digest": self.work["digest"],
+                "strategy_fingerprint": digest({"strategy": proposal["strategy"], "inputs": proposal["relevant_inputs"]}),
+                "artifact_before": manifest["digest"],
+                "manifest_before_blob": blob,
+                "proposal": proposal,
+            },
+            expected_head=projection["source_head"],
+        )
+        invalid = rebuild(self.root)
+        self.assertEqual(invalid["decision"]["result"], "BLOCKED")
+        self.assertIn("Attempt Budget Charge 超出 Work Maximum", " ".join(invalid["errors"]))
+
+    def test_attempt_transitions_scan_artifact_once_each(self) -> None:
+        original = runtime_module.artifact_for
+        with mock.patch.object(runtime_module, "artifact_for", wraps=original) as scan:
+            begin_attempt(self.root, self.proposal())
+            self.assertEqual(scan.call_count, 1)
+        with mock.patch.object(runtime_module, "artifact_for", wraps=original) as scan:
+            dispatch_attempt(self.root, "ATT-001")
+            self.assertEqual(scan.call_count, 1)
+        (self.root / "src" / "app.py").write_text("VALUE = 2\n", encoding="utf-8")
+        with mock.patch.object(runtime_module, "artifact_for", wraps=original) as scan:
+            observe_attempt(self.root, "ATT-001", {"kind": "agent-platform", "status": "OK"})
+            self.assertEqual(scan.call_count, 1)
+
     def test_relevant_input_must_match_current_bytes(self) -> None:
         proposal = self.proposal()
         proposal["relevant_inputs"][0]["digest"] = "9" * 64
@@ -495,6 +534,12 @@ class RuntimeCase(unittest.TestCase):
         with self.assertRaises(IntegrityError):
             run_verifier(self.root, "AC-VALUE", "ATT-001")
 
+    def test_verifier_timeout_fails_closed(self) -> None:
+        self.commit_change()
+        with mock.patch("yuan.runtime.subprocess.run", side_effect=subprocess.TimeoutExpired(["python"], 10)):
+            with self.assertRaisesRegex(IntegrityError, "Verifier 执行超时"):
+                run_verifier(self.root, "AC-VALUE", "ATT-001")
+
     def test_work_rejects_unbound_verifier_closure(self) -> None:
         work = copy.deepcopy(self.work)
         work["acceptance_criteria"][0]["verifier"]["files"][0]["digest"] = "9" * 64
@@ -540,6 +585,14 @@ class RuntimeCase(unittest.TestCase):
         (self.root / ".yuan" / "protocol.md").write_text("tampered\n", encoding="utf-8")
         with self.assertRaises(IntegrityError):
             rebuild(self.root)
+
+    def test_selected_protocol_revision_is_verified(self) -> None:
+        config_path = self.root / ".yuan" / "config.json"
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+        config["protocol"]["revision"] = "0.2"
+        atomic_write(config_path, canonical_bytes(with_digest(config)))
+        with self.assertRaisesRegex(IntegrityError, "Protocol revision"):
+            load_config(self.root)
 
     def test_wait_auth_can_continue_in_bound_successor_work_revision(self) -> None:
         proposal = self.proposal(path="README.md")
@@ -718,6 +771,17 @@ class PureKernelTests(unittest.TestCase):
         projection["latest_handoff"] = projection["agent_handoffs"]["tester"]
         self.assertEqual(reduce_projection(projection)["result"], "CORRECT")
 
+    def test_six_role_handoff_chain_requires_every_predecessor(self) -> None:
+        agents = [f"agent-{index}" for index in range(6)]
+        work = {"routing": {"handoff_agents": agents, "artifact_review_agents": agents[2:5]}}
+        projection = {"agent_handoffs": {}}
+        for agent_id in agents:
+            runtime_module._validate_handoff_order(projection, work, {"agent_id": agent_id})
+            projection["agent_handoffs"][agent_id] = {"status": "READY", "current": True}
+        projection["agent_handoffs"]["agent-3"]["current"] = False
+        with self.assertRaisesRegex(ValidationError, "agent-3"):
+            runtime_module._validate_handoff_order(projection, work, {"agent_id": "agent-5"})
+
     def test_canonical_json_is_stable_and_rejects_nan(self) -> None:
         self.assertEqual(canonical_bytes({"b": 2, "a": "元"}), b'{"a":"\xe5\x85\x83","b":2}')
         with self.assertRaises(ValidationError):
@@ -832,6 +896,68 @@ class PortAndAdapterTests(unittest.TestCase):
         false_claim = with_digest(false_claim)
         with self.assertRaises(ValidationError):
             validate_adapter_descriptor(false_claim, repo)
+
+    def test_stale_process_lock_is_recovered_and_live_process_lock_is_respected(self) -> None:
+        lock = self.root / "ledger.lock"
+        lock.write_text("99999999", encoding="ascii")
+        with exclusive_lock(lock, timeout=0.1):
+            self.assertTrue(lock.exists())
+        self.assertFalse(lock.exists())
+
+        repo = Path(__file__).resolve().parents[1]
+        environment = dict(os.environ)
+        environment["PYTHONPATH"] = str(repo / "src")
+        script = (
+            "import sys,time\n"
+            "from pathlib import Path\n"
+            "from yuan.ledger import exclusive_lock\n"
+            "with exclusive_lock(Path(sys.argv[1])):\n"
+            " print('READY', flush=True)\n"
+            " time.sleep(1)\n"
+        )
+        process = subprocess.Popen(
+            [sys.executable, "-B", "-c", script, str(lock)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            env=environment,
+        )
+        try:
+            self.assertEqual(process.stdout.readline().strip(), "READY")
+            with self.assertRaisesRegex(IntegrityError, "Lock 超时"):
+                with exclusive_lock(lock, timeout=0.1):
+                    pass
+        finally:
+            process.communicate(timeout=5)
+
+    def test_adapter_check_and_seal_work_through_cli(self) -> None:
+        repo = Path(__file__).resolve().parents[1]
+        environment = dict(os.environ)
+        environment["PYTHONPATH"] = str(repo / "src")
+        adapter = subprocess.run(
+            [sys.executable, "-B", "-m", "yuan", "--root", str(repo), "adapter", "check", "adapters/codex-audited.json"],
+            cwd=repo,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=10,
+        )
+        self.assertEqual(adapter.returncode, 0, adapter.stderr.decode(errors="replace"))
+        self.assertEqual(json.loads(adapter.stdout)["status"], "PASS")
+        draft = self.root / "draft.json"
+        draft.write_text('{"value":1}', encoding="utf-8")
+        sealed = subprocess.run(
+            [sys.executable, "-B", "-m", "yuan", "--root", str(self.root), "seal", str(draft)],
+            cwd=repo,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=10,
+        )
+        self.assertEqual(sealed.returncode, 0, sealed.stderr.decode(errors="replace"))
+        self.assertEqual(json.loads(sealed.stdout)["digest"], digest({"value": 1}))
 
 
 class ReleaseTests(unittest.TestCase):
@@ -960,6 +1086,8 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertIn("继续未完成的 Work", installed["agent_guidance"]["continue_prompt"])
         runtime = self.root / ".yuan" / "bin" / "yuan.pyz"
         self.assertTrue(runtime.is_file())
+        config = json.loads((self.root / ".yuan" / "config.json").read_text(encoding="utf-8"))
+        self.assertEqual(config["protocol"]["revision"], "0.3")
         manifest = json.loads((self.root / ".yuan" / "extensions" / "manifest.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["profile_id"], "vibe-coding")
         self.assertEqual(manifest["schema_version"], "yuan.capability-profile/v2")
@@ -1073,15 +1201,31 @@ class ProjectInstallerTests(unittest.TestCase):
     def test_custom_extension_can_be_bound_discovered_and_isolated(self) -> None:
         install_project(self.root, release_context=self.release_context, run_id="RUN-CUSTOM-EXTENSION")
         extension = self.root / ".yuan" / "extensions" / "custom" / "team"
+        rule = extension / "rules" / "release.md"
+        agent = extension / "agents" / "release-owner.md"
         skill = extension / "skills" / "deploy-review" / "SKILL.md"
+        rule.parent.mkdir(parents=True)
+        agent.parent.mkdir(parents=True)
         skill.parent.mkdir(parents=True)
+        rule.write_text("# 团队发布规则\n", encoding="utf-8")
+        agent.write_text("# 团队发布负责人\n", encoding="utf-8")
         skill.write_text("# 团队发布审查\n", encoding="utf-8")
         draft = {
             "schema_version": "yuan.custom-extension/v1",
             "extension_id": "team",
             "description": "团队工程规则。",
-            "rules": [],
-            "agents": [],
+            "rules": [{
+                "id": "release-rule",
+                "path": "rules/release.md",
+                "description": "团队发布规则。",
+                "use_when": ["发布前"],
+            }],
+            "agents": [{
+                "id": "release-owner",
+                "path": "agents/release-owner.md",
+                "description": "团队发布负责人。",
+                "use_when": ["发布前"],
+            }],
             "skills": [{
                 "id": "deploy-review",
                 "path": "skills/deploy-review/SKILL.md",
@@ -1105,8 +1249,17 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertEqual(json.loads(bound.stdout)["status"], "CUSTOM_BOUND")
         catalog = installed_catalog(self.root)
         self.assertEqual(catalog["custom_errors"], [])
+        self.assertIn("team:release-rule", {item["id"] for item in catalog["custom_rules"]})
+        self.assertIn("team:release-owner", {item["id"] for item in catalog["agents"]})
         self.assertIn("team:deploy-review", {item["id"] for item in catalog["skills"]})
-        selection = resolve_capabilities(self.root, rules=[], agents=[], skills=["team:deploy-review"])
+        selection = resolve_capabilities(
+            self.root,
+            rules=["team:release-rule"],
+            agents=["team:release-owner"],
+            skills=["team:deploy-review"],
+        )
+        self.assertEqual(selection["rules"][-1]["source"], "custom")
+        self.assertEqual(selection["agents"][-1]["source"], "custom")
         self.assertEqual(selection["skills"][0]["source"], "custom")
         skill.write_text("tampered\n", encoding="utf-8")
         catalog = installed_catalog(self.root)
@@ -1220,7 +1373,9 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertEqual(second["supersedes"], memory_result["memory"]["digest"])
         record_memory(self.root, second)
         self.assertEqual(rebuild_memory(self.root, write=False)["heads"][0]["revision"], 2)
-        self.assertEqual(memory_context(self.root, "追加 Revision")["memories"][0]["record"]["memory_id"], "MEM-TEST-001")
+        context = memory_context(self.root, "长期 追加 Revision")
+        self.assertEqual(context["memories"][0]["record"]["memory_id"], "MEM-TEST-001")
+        self.assertTrue({"长期", "追加", "revision"} <= set(context["memories"][0]["matched_terms"]))
         self.assertEqual(memory_status(self.root)["stale"], 0)
         (self.root / "app.txt").write_text("changed\n", encoding="utf-8")
         self.assertEqual(memory_status(self.root)["stale"], 1)

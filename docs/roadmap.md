@@ -107,7 +107,7 @@
 ## 永久复杂度限制
 
 - Protocol 不超过 500 个非空行。
-- Core Kernel 与 Deployment/Capability 支撑层分别限制为 2,000 个非空 Python 行；M9 Design Review 为独立 Long-term Memory 层设置 400 行预算，空行不计。
+- 纯状态 Core Kernel 限制为 2,000 个非空 Python 行；Deployment/Release 限制为 1,000 行，Capability/CLI 限制为 1,200 行，Platform Port 物理中介边界限制为 250 行，Long-term Memory 层限制为 400 行，空行不计。新增 Python 模块必须显式归类；职责分层避免一个聚合预算同时冻结互不相关的演进方向。
 - Core 只使用标准库。
 - 不要求 Daemon、SQLite/Database、Network Service、Role System 或隐藏 Extension。
 - Extension 可以提出候选或生产 Evidence，但不能增加 Result 或改变 Core Completion Truth。

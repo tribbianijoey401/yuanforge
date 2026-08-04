@@ -31,8 +31,45 @@ def atomic_write(path: Path, payload: bytes) -> None:
     os.replace(temporary, path)
 
 
+def _process_alive(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    if pid == os.getpid():
+        return True
+    if os.name == "nt":
+        import ctypes
+
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.OpenProcess(0x1000, False, pid)
+        if not handle:
+            return kernel32.GetLastError() != 87
+        exit_code = ctypes.c_ulong()
+        try:
+            return bool(kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code))) and exit_code.value == 259
+        finally:
+            kernel32.CloseHandle(handle)
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def _lock_is_stale(path: Path, stale_lock_seconds: float) -> bool:
+    try:
+        pid = int(path.read_text(encoding="ascii").strip())
+    except (OSError, UnicodeError, ValueError):
+        try:
+            return time.time() - path.stat().st_mtime >= stale_lock_seconds
+        except FileNotFoundError:
+            return False
+    return not _process_alive(pid)
+
+
 @contextmanager
-def exclusive_lock(path: Path, timeout: float = 5.0) -> Iterator[None]:
+def exclusive_lock(path: Path, timeout: float = 5.0, stale_lock_seconds: float = 60.0) -> Iterator[None]:
     deadline = time.monotonic() + timeout
     path.parent.mkdir(parents=True, exist_ok=True)
     while True:
@@ -40,6 +77,12 @@ def exclusive_lock(path: Path, timeout: float = 5.0) -> Iterator[None]:
             descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
             break
         except FileExistsError:
+            if _lock_is_stale(path, stale_lock_seconds):
+                try:
+                    path.unlink()
+                except FileNotFoundError:
+                    pass
+                continue
             if time.monotonic() >= deadline:
                 raise IntegrityError("Ledger Lock 超时")
             time.sleep(0.02)

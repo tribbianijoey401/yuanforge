@@ -19,6 +19,20 @@ def protocol_bytes() -> bytes:
         raise IntegrityError("发行包缺少 Core Protocol") from exc
 
 
+def protocol_revision(payload: bytes | None = None) -> str:
+    """从规范标题读取版本，避免安装元数据与协议文件分别硬编码。"""
+
+    try:
+        heading = (protocol_bytes() if payload is None else payload).splitlines()[0].decode("utf-8")
+    except (IndexError, UnicodeError) as exc:
+        raise IntegrityError("Core Protocol 标题不合法") from exc
+    prefix = "# Yuan Core Protocol "
+    revision = heading.removeprefix(prefix) if heading.startswith(prefix) else ""
+    if not revision or any(character not in "0123456789." for character in revision):
+        raise IntegrityError("Core Protocol 标题缺少合法版本")
+    return revision
+
+
 def harness_digest() -> str:
     files = []
     try:

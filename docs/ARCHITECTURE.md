@@ -44,6 +44,7 @@ LLM 从来不是上述权威。`AGENTS.md` 只是帮助 LLM 进入协议的 Adap
 | Module | 机械职责 |
 |---|---|
 | `canonical.py` | 唯一 Canonical JSON 编码与 SHA-256 Identity |
+| `primitives.py` | Identifier、SHA-256 与断言的唯一共享校验原语 |
 | `paths.py` | Relative Path 约束与 Scope 匹配 |
 | `validate.py` | Work、Proposal、Evidence、Grant 与 Binding 语义 |
 | `workflow.py` | Intake/Work Confirmation、Routing 与 Role Handoff 语义 |
@@ -53,9 +54,12 @@ LLM 从来不是上述权威。`AGENTS.md` 只是帮助 LLM 进入协议的 Adap
 | `memory.py` | Work/Evidence 绑定的追加式长期记忆、检索与可重建索引 |
 | `reducer.py` | 纯六结果判定 |
 | `identity.py` | 已安装 Protocol、Kernel 与 Environment Binding |
+| `ports.py` | 供受控平台接入的物理副作用中介边界，不计入纯状态 Kernel |
 | `cli.py` | 只做 JSON Adapter，不引入第二套语义 |
 
 Core 只使用 Python 标准库。发行物可以是单个 `yuan.pyz`，不要求 Daemon、Database、Scheduler 或平台服务。
+
+Conformance 对职责层分别设置 Design Review 阈值：纯状态 Core 2,000 行、Deployment/Release 1,000 行、Capability/CLI 1,200 行、Platform Port 250 行、Long-term Memory 400 行；新增模块未归类会直接失败。预算是架构审查门槛，不把平台边界或部署代码混算成 Core。
 
 项目安装器属于 Deployment Adapter。首次安装仍验证 Candidate Release；`update` 则从 Yuan Source 外部强制重建托管框架，不依赖旧 Runtime、版本、Install Record、Active Work 或 Conformance，也不保留旧框架。更新唯一必须保持的是 `.yuan-run/`、`docs/memory/`、Custom Extension 与项目自有内容；新 Runtime 状态失败只产生诊断，不触发旧 Runtime 回滚。最新 Runtime 读取历史 Schema 是发行兼容性不变量。
 
@@ -92,6 +96,8 @@ docs/memory/
 
 Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact Manifest 与 Tool Receipt 是 Blob。Head 和 Run Memory 是 Projection；丢失它们不会破坏权威历史。长期 Memory 不是 Core Result，而是由 Work/Evidence 支持、可提交 Git 的语义知识；旧 Revision 不覆盖，文件 Binding 变化会标记 stale。
 
+每个外部状态命令都对当前 Artifact 至少执行一次内容哈希。Runtime 在一次命令内只读取并回放 Ledger 一次，Attempt 转换复用该次审计得到的 Manifest，避免 begin/dispatch/observe 在同一状态转换中重复扫描仓库。Ledger Append Lock 记录持有 PID：已退出进程遗留的锁可自动回收，仍存活的持有者继续受互斥保护。
+
 ## 标准 AUDITED 生命周期
 
 1. `yuan init` 固定 Protocol、Kernel、Environment 与 Profile。
@@ -109,7 +115,7 @@ Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact M
 
 ## 安全声明
 
-`AUDITED` 是开放 Agent 平台上的 Detective/Corrective Harness。它能检测 Out-of-band Artifact 修改并使陈旧 Evidence 失效，但不能认证 `.yuan-run` 是否被拥有任意写权限的恶意进程重写。`ENFORCED` 需要平台或 OS 隔离；它是更强的部署 Profile，不是 Prompt 声明。
+`AUDITED` 是开放 Agent 平台上的 Detective/Corrective Harness。它能检测 Out-of-band Artifact 修改并使陈旧 Evidence 失效，但 Verifier 审计钩子不是恶意代码沙箱，也不能认证 `.yuan-run` 是否被拥有任意写权限的恶意进程重写。`ENFORCED` 需要平台或 OS 隔离；它是更强的部署 Profile，不是 Prompt 声明。
 
 ## 工程能力层
 

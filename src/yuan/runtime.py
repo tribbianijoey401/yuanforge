@@ -12,7 +12,7 @@ from typing import Any
 from .artifacts import build_manifest, changed_paths, diff_manifests
 from .canonical import canonical_bytes, digest, digest_bytes, verify_digest
 from .errors import IntegrityError, ValidationError
-from .identity import harness_digest
+from .identity import harness_digest, protocol_revision
 from .ledger import Ledger, atomic_write, exclusive_lock
 from .paths import scope_contains
 from .reducer import reduce_projection
@@ -48,6 +48,8 @@ def load_config(root: Path) -> dict[str, Any]:
         raise IntegrityError("已选择的 Protocol 不存在") from exc
     if protocol_digest != value["protocol"].get("digest"):
         raise IntegrityError("已选择的 Protocol digest 不匹配")
+    if protocol_revision(protocol_path.read_bytes()) != value["protocol"].get("revision"):
+        raise IntegrityError("已选择的 Protocol revision 不匹配")
     if harness_digest() != value["harness"].get("digest"):
         raise IntegrityError("当前 Kernel 与固定的 Harness 不匹配")
     capability = value["capability"]
@@ -110,7 +112,12 @@ def _manifest_from_blob(ledger: Ledger, blob: str) -> dict[str, Any]:
     return value
 
 
-def replay(ledger: Ledger, *, current_artifact_digest: str | None = None) -> dict[str, Any]:
+def replay(
+    ledger: Ledger,
+    *,
+    current_artifact_digest: str | None = None,
+    _events: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     projection: dict[str, Any] = {
         "schema_version": "yuan.run-memory/v1",
         "run_id": ledger.run_id,
@@ -130,7 +137,7 @@ def replay(ledger: Ledger, *, current_artifact_digest: str | None = None) -> dic
         "legal_next_step": True,
         "expected_artifact": None,
     }
-    events = ledger.events()
+    events = ledger.events() if _events is None else _events
     for event in events:
         kind = event["type"]
         payload = event["payload"]
@@ -193,6 +200,11 @@ def replay(ledger: Ledger, *, current_artifact_digest: str | None = None) -> dic
                 projection["attempt_order"].append(attempt_id)
                 for name, charge in payload["proposal"]["budget_charge"].items():
                     projection["budgets_used"][name] += charge
+                if any(
+                    projection["budgets_used"][name] > maximum
+                    for name, maximum in work["budgets"].items()
+                ):
+                    raise IntegrityError("Attempt Budget Charge 超出 Work Maximum")
             elif kind == "ATTEMPT_DISPATCHED":
                 attempt = projection["attempts"].get(payload.get("attempt_id"))
                 if not attempt or attempt["state"] != "PREPARED":
@@ -361,15 +373,36 @@ def replay(ledger: Ledger, *, current_artifact_digest: str | None = None) -> dic
     return projection
 
 
-def rebuild(root: Path, *, write: bool = True) -> dict[str, Any]:
+def _snapshot(root: Path, *, write: bool) -> tuple[dict[str, Any], dict[str, Any] | None]:
     _, ledger = active_ledger(root)
-    preliminary = replay(ledger)
-    work = preliminary["work"]
-    artifact_digest = artifact_for(root, work)["digest"] if work else None
-    projection = replay(ledger, current_artifact_digest=artifact_digest)
+    events = ledger.events()
+    work = None
+    for event in events:
+        if event["type"] == "WORK_ACCEPTED":
+            try:
+                work = validate_work(event["payload"], require_confirmation=True)
+            except (ValidationError, IntegrityError, KeyError, TypeError):
+                pass
+            break
+    manifest = artifact_for(root, work) if work else None
+    projection = replay(
+        ledger,
+        current_artifact_digest=None if manifest is None else manifest["digest"],
+        _events=events,
+    )
     if write:
         atomic_write(ledger.run_root / "run-memory.json", canonical_bytes(projection))
+    return projection, manifest
+
+
+def _refresh(ledger: Ledger, artifact_digest: str | None) -> dict[str, Any]:
+    projection = replay(ledger, current_artifact_digest=artifact_digest, _events=ledger.events())
+    atomic_write(ledger.run_root / "run-memory.json", canonical_bytes(projection))
     return projection
+
+
+def rebuild(root: Path, *, write: bool = True) -> dict[str, Any]:
+    return _snapshot(root, write=write)[0]
 
 
 def accept_work(root: Path, work: dict[str, Any]) -> dict[str, Any]:
@@ -514,7 +547,7 @@ def verify_work_verifiers(root: Path, work: dict[str, Any]) -> None:
 def begin_attempt(root: Path, proposal: dict[str, Any]) -> dict[str, Any]:
     validate_proposal(proposal)
     _, ledger = active_ledger(root)
-    projection = rebuild(root, write=False)
+    projection, manifest = _snapshot(root, write=False)
     work = projection["work"]
     if work is None or projection["errors"]:
         raise IntegrityError("没有合法 Work，不能启动 Attempt")
@@ -564,7 +597,8 @@ def begin_attempt(root: Path, proposal: dict[str, Any]) -> dict[str, Any]:
             expected_head=projection["source_head"],
         )
         return {"event": event, "decision": rebuild(root)["decision"]}
-    manifest = artifact_for(root, work)
+    if manifest is None:
+        raise IntegrityError("没有可审计的 Artifact Manifest")
     manifest_blob = ledger.put_blob(canonical_bytes(manifest))
     event = ledger.append(
         "ATTEMPT_PREPARED",
@@ -579,37 +613,39 @@ def begin_attempt(root: Path, proposal: dict[str, Any]) -> dict[str, Any]:
         },
         expected_head=projection["source_head"],
     )
-    return {"event": event, "decision": rebuild(root)["decision"]}
+    return {"event": event, "decision": _refresh(ledger, manifest["digest"])["decision"]}
 
 
 def dispatch_attempt(root: Path, attempt_id: str) -> dict[str, Any]:
     _, ledger = active_ledger(root)
-    projection = rebuild(root, write=False)
+    projection, current = _snapshot(root, write=False)
     attempt = projection["attempts"].get(attempt_id)
     if not attempt or attempt["state"] != "PREPARED":
         raise ValidationError("Attempt 不处于 PREPARED 状态")
     work = projection["work"]
-    current = artifact_for(root, work)
+    if current is None:
+        raise IntegrityError("没有可审计的 Artifact Manifest")
     if current["digest"] != attempt["artifact_before"]:
         event = ledger.append(
             "ATTEMPT_UNKNOWN",
             {"attempt_id": attempt_id, "reason": "Artifact 在 Dispatch 前已改变"},
             expected_head=projection["source_head"],
         )
-        return {"event": event, "decision": rebuild(root)["decision"]}
+        return {"event": event, "decision": _refresh(ledger, current["digest"])["decision"]}
     event = ledger.append("ATTEMPT_DISPATCHED", {"attempt_id": attempt_id}, expected_head=projection["source_head"])
-    return {"event": event, "decision": rebuild(root)["decision"]}
+    return {"event": event, "decision": _refresh(ledger, current["digest"])["decision"]}
 
 
 def observe_attempt(root: Path, attempt_id: str, receipt: dict[str, Any]) -> dict[str, Any]:
     _, ledger = active_ledger(root)
-    projection = rebuild(root, write=False)
+    projection, after = _snapshot(root, write=False)
     attempt = projection["attempts"].get(attempt_id)
     if not attempt or attempt["state"] != "DISPATCHED":
         raise ValidationError("Attempt 不处于 DISPATCHED 状态")
     work = projection["work"]
     before = _manifest_from_blob(ledger, attempt["manifest_before_blob"])
-    after = artifact_for(root, work)
+    if after is None:
+        raise IntegrityError("没有可审计的 Artifact Manifest")
     difference = diff_manifests(before, after)
     changed = changed_paths(difference)
     action_paths = attempt["proposal"]["action"]["paths"]
@@ -622,7 +658,7 @@ def observe_attempt(root: Path, attempt_id: str, receipt: dict[str, Any]) -> dic
             {"attempt_id": attempt_id, "reason": "存在未声明的 Artifact 修改", "unexpected_paths": unexpected, "receipt_blob": receipt_blob},
             expected_head=projection["source_head"],
         )
-        return {"event": event, "decision": rebuild(root)["decision"]}
+        return {"event": event, "decision": _refresh(ledger, after["digest"])["decision"]}
     observed = ledger.append(
         "ATTEMPT_OBSERVED",
         {
@@ -640,7 +676,7 @@ def observe_attempt(root: Path, attempt_id: str, receipt: dict[str, Any]) -> dic
         {"attempt_id": attempt_id, "artifact_after": after["digest"], "receipt_digest": digest(receipt)},
         expected_head=observed["digest"],
     )
-    return {"events": [observed, committed], "decision": rebuild(root)["decision"]}
+    return {"events": [observed, committed], "decision": _refresh(ledger, after["digest"])["decision"]}
 
 
 def mark_attempt_unknown(root: Path, attempt_id: str, reason: str) -> dict[str, Any]:

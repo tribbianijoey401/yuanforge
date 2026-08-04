@@ -7,36 +7,15 @@ from datetime import datetime, timezone
 from typing import Any
 
 from .canonical import digest, verify_digest
-from .errors import ValidationError
+from .primitives import identifier as _identifier, require as _require, sha256 as _sha256
 
 
 RISK_LEVELS = {"R0", "R1", "R2"}
 PHASES = {"intake", "design", "implementation", "review", "verification", "handoff"}
 
 
-def _require(condition: bool, message: str) -> None:
-    if not condition:
-        raise ValidationError(message)
-
-
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-
-
-def _identifier(value: Any, label: str) -> str:
-    _require(isinstance(value, str) and value and len(value) <= 128, f"{label} 不合法")
-    _require(all(character.isalnum() or character in "._:-" for character in value), f"{label} 不合法")
-    return value
-
-
-def _sha256(value: Any, label: str) -> str:
-    _require(
-        isinstance(value, str)
-        and len(value) == 64
-        and all(character in "0123456789abcdef" for character in value),
-        f"{label} 不是合法 SHA-256",
-    )
-    return value
 
 
 def intake_subject(value: dict[str, Any]) -> dict[str, Any]:
