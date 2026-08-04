@@ -13,18 +13,22 @@ python -B .yuan/bin/yuan.pyz --root .
 3. 不得直接编辑 `.yuan/config.json`、`.yuan/protocol.md`、`.yuan/bin/`、`.yuan/install.json`、托管 Profile 或 `.yuan-run/`。`.yuan/drafts/` 仅保存 Work 接受前草稿；项目扩展写入 `.yuan/extensions/custom/`。
 4. `BLOCKED` 且唯一原因是“没有 Active Work”表示正常空 Run，应进入需求 Intake；其他 `BLOCKED` 必须按机械原因恢复。
 
+固定 Runtime 无法启动或安装记录损坏时，不能要求旧 Runtime 自证。改由 Yuan Source 外部入口 `python -B scripts/sync_project.py update <项目根目录>` 强制重建托管框架；该动作必须保持 `.yuan-run/`、`docs/memory/`、`.yuan/extensions/custom/` 与项目自有内容不变。更新后再恢复事实，诊断警告不触发旧 Runtime 回滚。
+
 ## 2. 新需求：必须两次确认
 
 新项目、已完成 Work 后的新请求，以及被 Supersede 后的需求都执行同一流程：
 
-1. 加载 `conductor` 及其 `project-lifecycle`、`requirements-clarification` Assignment。运行 `<入口> intake template --request <用户原始请求>`，把返回 JSON 保存为 `.yuan/drafts/intake.json`。
-2. 由 Product Analyst 语义检查目标、用户、范围、非目标、失败影响、兼容性、数据/权限和不可逆选择。会改变验收或安全边界的问题标记为 Blocking，并原样询问用户；不得替用户回答。
-3. 把答案、可撤销假设、R0/R1/R2 风险理由和 Routing Signals 写回 Intake；运行 `<入口> seal <file>` 保存重新计算 Digest 的返回值，再运行 `<入口> intake check <sealed-file>`。`NEEDS_INPUT` 时继续提问，`NEEDS_CONFIRMATION` 时向用户展示摘要。
-4. 用户明确确认需求、答案、假设与风险后，运行 `<入口> intake confirm <file> --statement <真实确认摘要>`，保存返回的已确认 Intake。开放平台中的 Confirmation 是可审计对话回执，不冒充密码学签名。
-5. 运行 `<入口> capability route --risk <level> [--signal <signal>]`。使用返回的完整 `routing`、`assignments`、Rules、Agents 与 Skills；不得手工降级风险、删除角色或凭 `use_when` 另造路由。
-6. 运行 `<入口> work template --intake <confirmed-intake>`（继任时加 `--successor`）。加载 `work-authoring` 与 `verifier-authoring`，编辑 Goal、Artifact Scope、Grant、Budget、至少一个 Required Criterion 和 Safety Invariant。
-7. Verifier 只能先写入 `.yuan/drafts/verifiers/`，从 `sys.argv[1]` 读取项目根目录，只读验证 Artifact，并输出一个 JSON Object：`{"status":"PASS|FAIL","assertions":[...]}`。用 `work bind-verifier` 固定 Closure。
-8. 向用户展示完整 Work：Goal、范围/非目标、Criterion、Grant、Budget、Risk、Agent/Skill Assignment。用户明确确认后运行 `<入口> work confirm <file> --statement <真实确认摘要>`；最后才运行 `work accept`，继任 Work 则运行 `run successor`。
+1. 加载 `conductor` 及其 `project-lifecycle`、`requirements-clarification` Assignment。
+2. 运行 `<入口> memory status` 与 `<入口> memory context --request <用户原始请求>`；只把 Binding 未过期的 Memory 作为当前事实，相关 Memory ID/Digest 写入 Intake 依据。
+3. 运行 `<入口> intake template --request <用户原始请求>`，把返回 JSON 保存为 `.yuan/drafts/intake.json`。
+4. 由 Product Analyst 语义检查目标、用户、范围、非目标、失败影响、兼容性、数据/权限和不可逆选择。会改变验收或安全边界的问题标记为 Blocking，并原样询问用户；不得替用户回答。
+5. 把答案、可撤销假设、R0/R1/R2 风险理由和 Routing Signals 写回 Intake；运行 `<入口> seal <file>` 保存重新计算 Digest 的返回值，再运行 `<入口> intake check <sealed-file>`。`NEEDS_INPUT` 时继续提问，`NEEDS_CONFIRMATION` 时向用户展示摘要。
+6. 用户明确确认需求、答案、假设与风险后，运行 `<入口> intake confirm <file> --statement <真实确认摘要>`，保存返回的已确认 Intake。开放平台中的 Confirmation 是可审计对话回执，不冒充密码学签名。
+7. 运行 `<入口> capability route --risk <level> [--signal <signal>]`。使用返回的完整 `routing`、`assignments`、Rules、Agents 与 Skills；不得手工降级风险、删除角色或凭 `use_when` 另造路由。
+8. 运行 `<入口> work template --intake <confirmed-intake>`（继任时加 `--successor`）。加载 `work-authoring` 与 `verifier-authoring`，编辑 Goal、Artifact Scope、Grant、Budget、至少一个 Required Criterion 和 Safety Invariant。
+9. Verifier 只能先写入 `.yuan/drafts/verifiers/`，从 `sys.argv[1]` 读取项目根目录，只读验证 Artifact，并输出一个 JSON Object：`{"status":"PASS|FAIL","assertions":[...]}`。用 `work bind-verifier` 固定 Closure。
+10. 向用户展示完整 Work：Goal、范围/非目标、Criterion、Grant、Budget、Risk、Agent/Skill Assignment。用户明确确认后运行 `<入口> work confirm <file> --statement <真实确认摘要>`；最后才运行 `work accept`，继任 Work 则运行 `run successor`。
 
 任何已确认字段发生变化，原 Confirmation 自动失效，必须重新展示和确认。
 
@@ -35,6 +39,7 @@ python -B .yuan/bin/yuan.pyz --root .
 - 平台支持多 Agent 时可以派发；不支持时由同一 LLM 顺序切换角色并如实说明隔离能力。R0/R1 不得伪装成独立 Agent 审查。
 - 每个非 Conductor 角色结束时必须生成并记录 Role Handoff：`READY` 表示该职责完成；`NEEDS_WORK` 表示退回设计或实现并触发 `CORRECT`。
 - 用 `<入口> handoff template ...` 生成绑定当前 Work/Artifact 的 JSON，再运行 `<入口> handoff record <file>`。Artifact Reviewer 必须引用相关 Evidence；Artifact 改变后其旧 Handoff 自动过期。
+- `memory-curator` 是每个 Work 的最后角色：有长期影响时用 `memory template/check/record/status` 追加 verified Memory；没有长期影响时在 Handoff 中明确 `NO_MEMORY_CHANGE` 和理由。
 - Agent、Skill 和 Handoff 都不能直接产生 Core Result。只有 Reducer 可以判定六种 Result。
 
 ## 4. 一个有副作用的 Tick

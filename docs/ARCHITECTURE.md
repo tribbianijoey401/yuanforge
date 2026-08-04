@@ -50,13 +50,14 @@ LLM 从来不是上述权威。`AGENTS.md` 只是帮助 LLM 进入协议的 Adap
 | `artifacts.py` | 有界稳定枚举、Manifest 与 Diff |
 | `ledger.py` | 不可变 Event/Blob、Hash Chain、Atomic Head 与恢复 |
 | `runtime.py` | Work/Attempt/Evidence 生命周期与确定性 Replay |
+| `memory.py` | Work/Evidence 绑定的追加式长期记忆、检索与可重建索引 |
 | `reducer.py` | 纯六结果判定 |
 | `identity.py` | 已安装 Protocol、Kernel 与 Environment Binding |
 | `cli.py` | 只做 JSON Adapter，不引入第二套语义 |
 
 Core 只使用 Python 标准库。发行物可以是单个 `yuan.pyz`，不要求 Daemon、Database、Scheduler 或平台服务。
 
-项目安装器属于 Deployment Adapter。它把 `yuan.pyz` 固定到 `.yuan/bin/`，以 Managed Block 合并 `AGENTS.md`，并通过外部同步命令更新；它不能修改 Core Result。Candidate 必须绑定 Release Manifest、Conformance 与 Source，所有部署动作通过项目锁串行化。Runtime 更新只在没有 Active Work 或当前 Work 已 `COMPLETE` 时激活，非终态只 Stage Candidate；更新前的完整部署快照允许在相同 Work Binding 边界安全回滚。
+项目安装器属于 Deployment Adapter。首次安装仍验证 Candidate Release；`update` 则从 Yuan Source 外部强制重建托管框架，不依赖旧 Runtime、版本、Install Record、Active Work 或 Conformance，也不保留旧框架。更新唯一必须保持的是 `.yuan-run/`、`docs/memory/`、Custom Extension 与项目自有内容；新 Runtime 状态失败只产生诊断，不触发旧 Runtime 回滚。最新 Runtime 读取历史 Schema 是发行兼容性不变量。
 
 ## Profile 保证等级
 
@@ -83,9 +84,13 @@ Core 只使用 Python 标准库。发行物可以是单个 `yuan.pyz`，不要�
     events/00000001-<sha>.json
     head.json                 可恢复的 Hash-chain Pointer
     run-memory.json           一次性 Projection
+docs/memory/
+  records/<kind>/<id>/        不可变 Memory Revision
+  index.json                  可重建机器索引
+  INDEX.md                    可重建人类视图
 ```
 
-Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact Manifest 与 Tool Receipt 是 Blob。Head 和 Run Memory 是 Projection；丢失它们不会破坏权威历史。
+Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact Manifest 与 Tool Receipt 是 Blob。Head 和 Run Memory 是 Projection；丢失它们不会破坏权威历史。长期 Memory 不是 Core Result，而是由 Work/Evidence 支持、可提交 Git 的语义知识；旧 Revision 不覆盖，文件 Binding 变化会标记 stale。
 
 ## 标准 AUDITED 生命周期
 
@@ -97,7 +102,8 @@ Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact M
 6. `yuan attempt begin/dispatch/observe` 验证并审计一个有界副作用。
 7. `yuan verify` 运行预绑定只读 Verifier并创建 Evidence。
 8. 每个 Routing 角色通过 `handoff template/record` 记录 `READY` 或 `NEEDS_WORK`。
-9. `yuan reduce` 仅在 Evidence、Side Effect 与 Required Handoff 全部满足时派生 `COMPLETE`。
+9. Memory Curator 追加长期 Memory，或记录有证据理由的 `NO_MEMORY_CHANGE` Handoff。
+10. `yuan reduce` 仅在 Evidence、Side Effect 与 Required Handoff 全部满足时派生 `COMPLETE`。
 
 用户中途改变契约时，`run supersede` 关闭旧 Work，Successor 从新 Intake 和两次确认重新开始；历史不被覆盖。
 
@@ -109,6 +115,6 @@ Work、Attempt Transition、Evidence 与 Result 都是 Ledger Event。Artifact M
 
 Core 只定义确定性语义，不承担全部软件工程知识。发行包默认携带 `vibe-coding` Capability Profile：Rules 约束工作纪律，Agents 隔离职责，Skills 提供按需流程。它们只能帮助编写 Work/Proposal、指导动作或生成 Evidence，不能增加 Primitive、Result 或修改 `COMPLETE` 谓词。
 
-托管能力逐文件绑定到 Capability Manifest 和 Install Record，并参与安装事务、更新、完整性检查与回滚。每个 Bundled Profile 通过 `profile.json` 自描述；其 Workflow 同时定义 Risk Route、Signal Route、Agent→Skill Assignment 和 Artifact Reviewer。Runtime 的 `capability route` 机械生成唯一 Work Routing，`list/resolve` 负责发现与按需加载。
+托管能力逐文件绑定到 Capability Manifest 和 Install Record；强制更新直接用当前发行包替换该托管集合。每个 Bundled Profile 通过 `profile.json` 自描述；其 Workflow 同时定义 Risk Route、Signal Route、Agent→Skill Assignment 和 Artifact Reviewer。Runtime 的 `capability route` 机械生成唯一 Work Routing，`list/resolve` 负责发现与按需加载。
 
 项目能力位于 `.yuan/extensions/custom/<extension-id>/`，不进入框架托管集合。Custom Descriptor 自绑定逐文件 Digest；损坏的自定义扩展被隔离并报告，不会使 Core 或托管 Profile 成为隐藏依赖。

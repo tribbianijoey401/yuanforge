@@ -25,6 +25,7 @@ from yuan.cli import attempt_template, init_repository, parser as cli_parser, wo
 from yuan.errors import IntegrityError, ValidationError
 from yuan.identity import harness_digest
 from yuan.ledger import Ledger, atomic_write, exclusive_lock
+from yuan.memory import memory_context, memory_status, memory_template, rebuild_memory, record_memory
 from yuan.ports import ExecutableBinding, ReferencePort
 from yuan.project import (
     BOOTSTRAP_END,
@@ -32,7 +33,6 @@ from yuan.project import (
     agent_guidance,
     install_project,
     project_status,
-    rollback_project,
     update_project,
 )
 from yuan.release import build_runtime_zipapp, build_zipapp, verify_release
@@ -889,6 +889,37 @@ class ProjectInstallerTests(unittest.TestCase):
     def tearDown(self) -> None:
         self.temp.cleanup()
 
+    def record_memory_and_handoff(
+        self,
+        evidence_id: str,
+        *,
+        memory_id: str = "MEM-TEST-001",
+        bind_paths: list[str] | None = None,
+    ) -> dict:
+        memory = memory_template(
+            self.root,
+            memory_id=memory_id,
+            kind="feature",
+            title="测试长期记忆",
+            summary="当前 Work 已由 PASS Evidence 验证。",
+            details="该记录用于证明 Memory 与 Work/Evidence/Handoff 闭环。",
+            tags=["test"],
+            bind_paths=bind_paths,
+        )
+        recorded = record_memory(self.root, memory)
+        handoff = handoff_template(
+            self.root,
+            handoff_id=f"HO-MEMORY-{memory_id}",
+            agent_id="memory-curator",
+            to_agent_id="conductor",
+            phase="handoff",
+            status="READY",
+            summary=f"Memory Curator 已记录 {memory_id}。",
+            evidence_ids=[evidence_id],
+        )
+        result = record_handoff(self.root, handoff)
+        return {"memory": memory, "recorded": recorded, "handoff": result}
+
     def test_sync_script_prints_machine_result_and_agent_guidance(self) -> None:
         repo = Path(__file__).resolve().parents[1]
         with tempfile.TemporaryDirectory() as evidence:
@@ -953,34 +984,20 @@ class ProjectInstallerTests(unittest.TestCase):
         )
         self.assertEqual(status.returncode, 0, status.stderr.decode(errors="replace"))
         self.assertIsNone(json.loads(status.stdout)["work"])
-        unchanged = update_project(self.root, release_context=self.release_context)
-        self.assertEqual(unchanged["status"], "UNCHANGED")
+        forced = update_project(self.root, release_context=self.release_context)
+        self.assertEqual(forced["status"], "UPDATED")
+        self.assertTrue(forced["memory_preserved"])
         self.assertEqual((self.root / "AGENTS.md").read_text(encoding="utf-8").count(BOOTSTRAP_START), 1)
 
         previous_bytes = runtime.read_bytes()
         previous_digest = digest_bytes(previous_bytes)
-        deployment_paths = [
-            ".yuan/config.json",
-            ".yuan/protocol.md",
-            ".yuan/install.json",
-            ".yuan/adapters/codex-audited.json",
-            ".yuan/release-manifest.json",
-            ".yuan/conformance-report.json",
-        ]
-        previous_deployment = {path: (self.root / path).read_bytes() for path in deployment_paths}
         next_context, builder = altered_candidate(b"next-release")
         with mock.patch("yuan.project.build_runtime_zipapp", side_effect=builder):
             updated = update_project(self.root, release_context=next_context)
         self.assertEqual(updated["status"], "UPDATED")
         self.assertNotEqual(digest_bytes(runtime.read_bytes()), previous_digest)
-        snapshot = self.root / ".yuan" / "releases" / previous_digest / "snapshot.json"
-        self.assertTrue(snapshot.is_file())
-        rolled_back = rollback_project(self.root, previous_digest)
-        self.assertEqual(rolled_back["status"], "ROLLED_BACK")
-        self.assertEqual(runtime.read_bytes(), previous_bytes)
-        for path, payload in previous_deployment.items():
-            self.assertEqual((self.root / path).read_bytes(), payload)
-        self.assertEqual(project_status(self.root)["runtime_digest"], previous_digest)
+        self.assertTrue(updated["memory_preserved"])
+        self.assertFalse((self.root / ".yuan" / "releases" / previous_digest / "snapshot.json").exists())
         self.assertEqual(custom.read_text(encoding="utf-8"), "# 项目自定义规则\n")
 
     def test_installed_runtime_lists_and_resolves_capabilities(self) -> None:
@@ -1028,7 +1045,7 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertEqual(route["status"], "ROUTED")
         self.assertEqual(
             route["routing"]["agents"],
-            ["conductor", "backend-developer", "spec-reviewer", "tester"],
+            ["conductor", "backend-developer", "spec-reviewer", "tester", "memory-curator"],
         )
         assignments = {item["agent_id"]: item["skills"] for item in route["assignments"]}
         self.assertIn("test-driven-development", assignments["backend-developer"])
@@ -1037,6 +1054,11 @@ class ProjectInstallerTests(unittest.TestCase):
             set(route["routing"]["skills"]),
             {skill_id for skill_ids in assignments.values() for skill_id in skill_ids},
         )
+        debugging = route_capabilities(self.root, risk="R2", signals=["debugging"])
+        self.assertIn("debugger", debugging["routing"]["agents"])
+        self.assertIn("runtime-maintainer", debugging["routing"]["agents"])
+        self.assertIn("systematic-debugging", debugging["routing"]["skills"])
+        self.assertIn("runtime-recovery", debugging["routing"]["skills"])
         signal_ids = list(catalog["workflow"]["signal_routes"])
         for risk in ("R0", "R1", "R2"):
             for signals in [[], *[[signal_id] for signal_id in signal_ids]]:
@@ -1105,9 +1127,11 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertEqual(initial["decision"], {"result": "BLOCKED", "reasons": ["没有 Active Work"]})
         selection = route_capabilities(self.root, risk="R2", signals=[])
         self.assertEqual(selection["status"], "ROUTED")
-        self.assertEqual(selection["routing"]["agents"], ["conductor", "tester"])
+        self.assertEqual(selection["routing"]["agents"], ["conductor", "tester", "memory-curator"])
 
         work = work_template(self.root, intake=confirmed_intake("创建内容为 hello 的 app.txt。"))
+        # 模拟由旧 Runtime 创建、尚未声明长期记忆排除项的历史 Work。
+        work["artifact"]["exclude"].remove("docs/memory/**")
         verifier_path = self.root / work["acceptance_criteria"][0]["verifier"]["entrypoint"]
         verifier_path.parent.mkdir(parents=True)
         verifier_path.write_text(
@@ -1175,8 +1199,31 @@ class ProjectInstallerTests(unittest.TestCase):
             summary="Tester 已验证 app.txt 的当前 Artifact。",
             evidence_ids=[verified["event"]["payload"]["evidence_id"]],
         )
-        self.assertEqual(record_handoff(self.root, handoff)["decision"]["result"], "COMPLETE")
+        self.assertEqual(record_handoff(self.root, handoff)["decision"]["result"], "CONTINUE")
+        memory_result = self.record_memory_and_handoff(
+            verified["event"]["payload"]["evidence_id"],
+            bind_paths=["app.txt"],
+        )
+        self.assertEqual(memory_result["handoff"]["decision"]["result"], "COMPLETE")
         self.assertEqual(record_reduction(self.root)["decision"]["result"], "COMPLETE")
+        second = memory_template(
+            self.root,
+            memory_id="MEM-TEST-001",
+            kind="feature",
+            title="测试长期记忆第二版",
+            summary="同一 Memory ID 通过追加 Revision 演进。",
+            details="旧 Revision 保持不变，新 Revision 绑定当前 Work/Evidence。",
+            tags=["test", "revision"],
+            bind_paths=["app.txt"],
+        )
+        self.assertEqual(second["revision"], 2)
+        self.assertEqual(second["supersedes"], memory_result["memory"]["digest"])
+        record_memory(self.root, second)
+        self.assertEqual(rebuild_memory(self.root, write=False)["heads"][0]["revision"], 2)
+        self.assertEqual(memory_context(self.root, "追加 Revision")["memories"][0]["record"]["memory_id"], "MEM-TEST-001")
+        self.assertEqual(memory_status(self.root)["stale"], 0)
+        (self.root / "app.txt").write_text("changed\n", encoding="utf-8")
+        self.assertEqual(memory_status(self.root)["stale"], 1)
 
     def test_capability_tamper_fails_installation_verification(self) -> None:
         install_project(self.root, release_context=self.release_context, run_id="RUN-CAPABILITY-TAMPER")
@@ -1194,7 +1241,7 @@ class ProjectInstallerTests(unittest.TestCase):
         with self.assertRaisesRegex(IntegrityError, "Capability Profile Binding 不匹配"):
             load_config(self.root)
 
-    def test_update_stages_candidate_while_work_is_nonterminal(self) -> None:
+    def test_update_force_activates_candidate_while_work_is_nonterminal(self) -> None:
         install_project(self.root, release_context=self.release_context, run_id="RUN-STAGE-TEST")
         (self.root / "tests").mkdir()
         verifier_path = self.root / "tests" / "verify.py"
@@ -1248,29 +1295,17 @@ class ProjectInstallerTests(unittest.TestCase):
         work = confirm_work(work, "用户确认 Candidate Staging 测试契约")
         accept_work(self.root, work)
         current = (self.root / ".yuan" / "bin" / "yuan.pyz").read_bytes()
+        memory_before = {path.relative_to(self.root).as_posix(): path.read_bytes() for path in (self.root / ".yuan-run").rglob("*") if path.is_file()}
         next_context, builder = altered_candidate(b"candidate-release")
-        with mock.patch("yuan.project.build_runtime_zipapp", side_effect=builder):
-            staged = update_project(self.root, release_context=next_context)
-        self.assertEqual(staged["status"], "STAGED")
-        self.assertEqual(staged["agent_guidance"], agent_guidance(self.root))
-        self.assertEqual(staged["blocked_by_result"], "CONTINUE")
-        self.assertEqual((self.root / ".yuan" / "bin" / "yuan.pyz").read_bytes(), current)
-        staged_path = self.root / staged["candidate"]
-        self.assertTrue(staged_path.is_file())
-        self.assertEqual(len(project_status(self.root)["staged"]), 1)
-        staged_path.write_bytes(staged_path.read_bytes() + b"tampered")
-        with self.assertRaises(IntegrityError):
-            project_status(self.root)
-        superseded = supersede_work(
-            self.root,
-            reason="用户关闭旧范围并准备新需求",
-            request="使用新框架开始继任需求。",
-        )
-        self.assertEqual(superseded["decision"]["reason_code"], "WORK_SUPERSEDED")
         with mock.patch("yuan.project.build_runtime_zipapp", side_effect=builder):
             updated = update_project(self.root, release_context=next_context)
         self.assertEqual(updated["status"], "UPDATED")
-        self.assertEqual(updated["decision"]["reason_code"], "WORK_SUPERSEDED")
+        self.assertEqual(updated["agent_guidance"], agent_guidance(self.root))
+        self.assertNotEqual((self.root / ".yuan" / "bin" / "yuan.pyz").read_bytes(), current)
+        self.assertTrue(updated["memory_preserved"])
+        self.assertEqual(project_status(self.root)["staged"], [])
+        memory_after = {path.relative_to(self.root).as_posix(): path.read_bytes() for path in (self.root / ".yuan-run").rglob("*") if path.is_file()}
+        self.assertEqual(memory_after, memory_before)
 
     def test_complete_work_allows_verified_update(self) -> None:
         (self.root / "src").mkdir()
@@ -1318,12 +1353,52 @@ class ProjectInstallerTests(unittest.TestCase):
             evidence_ids=[verified["event"]["payload"]["evidence_id"]],
         )
         record_handoff(self.root, handoff)
+        self.record_memory_and_handoff(verified["event"]["payload"]["evidence_id"], memory_id="MEM-UPDATE-001")
         self.assertEqual(record_reduction(self.root)["decision"]["result"], "COMPLETE")
         next_context, builder = altered_candidate(b"complete-update")
         with mock.patch("yuan.project.build_runtime_zipapp", side_effect=builder):
             updated = update_project(self.root, release_context=next_context)
         self.assertEqual(updated["status"], "UPDATED")
-        self.assertEqual(updated["decision"]["result"], "COMPLETE")
+        self.assertEqual(updated["diagnostics"]["decision"]["result"], "COMPLETE")
+
+    def test_forced_update_repairs_corrupt_install_and_preserves_memory(self) -> None:
+        install_project(self.root, release_context=self.release_context, run_id="RUN-FORCE-REPAIR")
+        long_term = self.root / "docs" / "memory" / "keep.txt"
+        long_term.parent.mkdir(parents=True)
+        long_term.write_text("project memory\n", encoding="utf-8")
+        custom = self.root / ".yuan" / "extensions" / "custom" / "keep.txt"
+        custom.write_text("custom capability\n", encoding="utf-8")
+        ledger_before = {
+            path.relative_to(self.root).as_posix(): path.read_bytes()
+            for path in (self.root / ".yuan-run").rglob("*") if path.is_file()
+        }
+        (self.root / ".yuan" / "bin" / "yuan.pyz").write_bytes(b"broken runtime")
+        (self.root / ".yuan" / "config.json").write_text("not-json", encoding="utf-8")
+        (self.root / ".yuan" / "install.json").write_text("not-json", encoding="utf-8")
+        agents = (self.root / "AGENTS.md").read_text(encoding="utf-8").replace(BOOTSTRAP_END, "")
+        (self.root / "AGENTS.md").write_text(agents, encoding="utf-8")
+
+        updated = update_project(self.root)
+
+        self.assertEqual(updated["status"], "UPDATED")
+        self.assertTrue(updated["memory_preserved"])
+        self.assertEqual(long_term.read_text(encoding="utf-8"), "project memory\n")
+        self.assertEqual(custom.read_text(encoding="utf-8"), "custom capability\n")
+        ledger_after = {
+            path.relative_to(self.root).as_posix(): path.read_bytes()
+            for path in (self.root / ".yuan-run").rglob("*") if path.is_file()
+        }
+        self.assertEqual(ledger_after, ledger_before)
+        self.assertEqual((self.root / "AGENTS.md").read_text(encoding="utf-8").count(BOOTSTRAP_START), 1)
+        self.assertEqual(project_status(self.root)["status"], "PASS")
+
+    def test_forced_update_bootstraps_project_without_old_install(self) -> None:
+        updated = update_project(self.root)
+        self.assertEqual(updated["status"], "UPDATED")
+        self.assertTrue(updated["memory_preserved"])
+        self.assertIsNotNone(updated["memory_initialized_run"])
+        self.assertTrue((self.root / ".yuan" / "bin" / "yuan.pyz").is_file())
+        self.assertEqual(project_status(self.root)["decision"], {"result": "BLOCKED", "reasons": ["没有 Active Work"]})
 
     def test_failed_install_restores_original_project(self) -> None:
         original_agents = (self.root / "AGENTS.md").read_bytes()

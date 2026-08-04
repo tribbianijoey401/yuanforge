@@ -90,10 +90,13 @@ def active_ledger(root: Path) -> tuple[dict[str, Any], Ledger]:
 
 
 def artifact_for(root: Path, work: dict[str, Any]) -> dict[str, Any]:
+    # Long-term Memory 是 Work/Evidence 的派生语义记录，不属于被验证 Artifact。
+    # 运行时强制排除可让新 Runtime 在旧 Work 尚未声明该路径时仍保持兼容。
+    exclude = list(dict.fromkeys([*work["artifact"]["exclude"], "docs/memory/**"]))
     return build_manifest(
         root,
         include=work["artifact"]["include"],
-        exclude=work["artifact"]["exclude"],
+        exclude=exclude,
     )
 
 

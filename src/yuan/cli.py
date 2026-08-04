@@ -24,13 +24,22 @@ from .capabilities import (
 )
 from .errors import YuanError
 from .ledger import atomic_write
+from .memory import (
+    check_memory_source,
+    memory_context,
+    memory_show,
+    memory_status,
+    memory_template,
+    rebuild_memory,
+    record_memory,
+)
 from .paths import resolve_inside
 from .project import (
+    diagnose_project,
     initialize_repository,
     install_project,
     load_release_context,
     project_status,
-    rollback_project,
     update_project,
 )
 from .release import read_manifest, verify_release
@@ -362,6 +371,30 @@ def parser() -> argparse.ArgumentParser:
     release_verify.add_argument("manifest", type=Path)
     release_verify.add_argument("--artifact", type=Path, required=True)
     release_verify.add_argument("--check-source", action="store_true")
+    memory = commands.add_parser("memory", help="管理基于 Work/Evidence 的项目长期记忆")
+    memory_sub = memory.add_subparsers(dest="memory_command", required=True)
+    memory_template_parser = memory_sub.add_parser("template", help="生成绑定当前 Work/Evidence 的 Memory Record")
+    memory_template_parser.add_argument("--memory-id", required=True)
+    memory_template_parser.add_argument("--kind", choices=("feature", "decision", "pitfall", "module", "convention"), required=True)
+    memory_template_parser.add_argument("--title", required=True)
+    memory_template_parser.add_argument("--summary", required=True)
+    memory_template_parser.add_argument("--details", required=True)
+    memory_template_parser.add_argument("--status", choices=("active", "resolved", "superseded", "deprecated"), default="active")
+    memory_template_parser.add_argument("--tag", action="append", default=[])
+    memory_template_parser.add_argument("--relation", action="append", default=[])
+    memory_template_parser.add_argument("--bind", action="append", default=[])
+    memory_check = memory_sub.add_parser("check", help="验证 Memory Record 与当前 Work/Evidence Binding")
+    memory_check.add_argument("file", type=Path)
+    memory_record = memory_sub.add_parser("record", help="追加不可变 Memory Revision 并重建索引")
+    memory_record.add_argument("file", type=Path)
+    memory_sub.add_parser("list", help="列出当前 Memory Heads")
+    memory_show_parser = memory_sub.add_parser("show", help="显示指定 Memory 的最新 Revision")
+    memory_show_parser.add_argument("memory_id")
+    memory_sub.add_parser("status", help="检查 Memory Binding 是否过期")
+    memory_context_parser = memory_sub.add_parser("context", help="为新需求检索相关长期记忆")
+    memory_context_parser.add_argument("--request", required=True)
+    memory_context_parser.add_argument("--limit", type=int, default=10)
+    memory_sub.add_parser("rebuild", help="从追加式 Record 重建 JSON/Markdown 索引")
     project = commands.add_parser("project", help="安装或同步目标项目的 Yuan Runtime")
     project_sub = project.add_subparsers(dest="project_command", required=True)
     project_install = project_sub.add_parser("install", help="向目标项目安装固定 Runtime 与 Agent Bootstrap")
@@ -371,16 +404,13 @@ def parser() -> argparse.ArgumentParser:
     project_install.add_argument("--run-id")
     project_install.add_argument("--release-root", type=Path, default=Path.cwd(), help="Yuan Source/Release 根目录")
     project_install.add_argument("--conformance-report", type=Path, default=Path("dist/conformance-report.json"), help="相对 Release Root 的验证报告")
-    project_update = project_sub.add_parser("update", help="安全同步当前 Yuan Release")
+    project_update = project_sub.add_parser("update", help="强制激活当前 Yuan Source")
     project_update.add_argument("target", type=Path)
-    project_update.add_argument("--release-root", type=Path, default=Path.cwd(), help="Yuan Source/Release 根目录")
-    project_update.add_argument("--conformance-report", type=Path, default=Path("dist/conformance-report.json"), help="相对 Release Root 的验证报告")
-    project_update.add_argument("--capability-profile", choices=available_profiles(), help="在安全激活边界切换能力 Profile")
+    project_update.add_argument("--capability-profile", choices=available_profiles(), help="选择要强制部署的 Capability Profile")
     project_status_parser = project_sub.add_parser("status", help="检查项目部署与暂存版本")
     project_status_parser.add_argument("target", type=Path)
-    project_rollback = project_sub.add_parser("rollback", help="恢复完整部署快照")
-    project_rollback.add_argument("target", type=Path)
-    project_rollback.add_argument("runtime_digest")
+    project_diagnose = project_sub.add_parser("diagnose", help="不依赖旧 Runtime 收集完整部署诊断")
+    project_diagnose.add_argument("target", type=Path)
     capability = commands.add_parser("capability", help="发现并解析 Rules、Agents 与 Skills")
     capability_sub = capability.add_subparsers(dest="capability_command", required=True)
     capability_sub.add_parser("list", help="列出已安装能力及触发条件")
@@ -508,6 +538,33 @@ def execute(args: argparse.Namespace) -> Any:
             args.artifact,
             repo_root=root if args.check_source else None,
         )
+    if args.command == "memory" and args.memory_command == "template":
+        return memory_template(
+            root,
+            memory_id=args.memory_id,
+            kind=args.kind,
+            title=args.title,
+            summary=args.summary,
+            details=args.details,
+            status=args.status,
+            tags=args.tag,
+            relations=args.relation,
+            bind_paths=args.bind,
+        )
+    if args.command == "memory" and args.memory_command == "check":
+        return check_memory_source(root, read_json(args.file))
+    if args.command == "memory" and args.memory_command == "record":
+        return record_memory(root, read_json(args.file))
+    if args.command == "memory" and args.memory_command == "list":
+        return rebuild_memory(root, write=False)
+    if args.command == "memory" and args.memory_command == "show":
+        return memory_show(root, args.memory_id)
+    if args.command == "memory" and args.memory_command == "status":
+        return memory_status(root)
+    if args.command == "memory" and args.memory_command == "context":
+        return memory_context(root, args.request, limit=args.limit)
+    if args.command == "memory" and args.memory_command == "rebuild":
+        return rebuild_memory(root)
     if args.command == "project" and args.project_command == "install":
         context = load_release_context(args.release_root, args.release_root / args.conformance_report)
         return install_project(
@@ -518,12 +575,11 @@ def execute(args: argparse.Namespace) -> Any:
             run_id=args.run_id,
         )
     if args.command == "project" and args.project_command == "update":
-        context = load_release_context(args.release_root, args.release_root / args.conformance_report)
-        return update_project(args.target, release_context=context, capability_profile=args.capability_profile)
+        return update_project(args.target, capability_profile=args.capability_profile)
     if args.command == "project" and args.project_command == "status":
         return project_status(args.target)
-    if args.command == "project" and args.project_command == "rollback":
-        return rollback_project(args.target, args.runtime_digest)
+    if args.command == "project" and args.project_command == "diagnose":
+        return diagnose_project(args.target)
     if args.command == "capability" and args.capability_command == "list":
         return installed_catalog(root)
     if args.command == "capability" and args.capability_command == "resolve":

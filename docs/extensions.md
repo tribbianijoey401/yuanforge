@@ -15,7 +15,7 @@
 python -B scripts/sync_project.py install <项目> --capability-profile vibe-coding
 ```
 
-项目更新默认继续使用 Install Record 固定的 Profile；如果新发行包不再提供该 Profile，更新 fail-closed，不会静默切换。在空 Run 或 `COMPLETE` 安全边界可显式切换：
+项目更新默认强制部署当前发行包的默认 Profile，不读取旧 Install Record，也不受 Active Work 状态约束；可显式选择其他已发布 Profile：
 
 ```powershell
 python -B scripts/sync_project.py update <项目> --capability-profile <新-profile-id>
@@ -32,6 +32,8 @@ python -B .yuan/bin/yuan.pyz --root . capability resolve --agent architect --ski
 `list` 返回 Catalog 与 Workflow。`route` 从已确认 Risk/Signal 生成唯一 Routing、Agent→Skill `assignments` 和所有需要读取的路径/Digest；它是 Work 接受时 Kernel 重算的路由来源。`resolve` 仅用于显式加载自定义能力或诊断。文件被篡改时命令失败。
 
 Bundled Workflow 必须覆盖 R0/R1/R2、至少一个 Signal、全部 Agent 的 Skill Assignment，并声明会随 Artifact 变化而失效的 Reviewer。新增 Agent 却没有 Assignment 会使 Profile fail-closed。
+
+默认 Profile 还提供三个能力闭环：`debugging/deployment` Signal 必须路由到 Debugger 与 Runtime Maintainer，不能只有无负责人 Skill；Memory Curator 位于每个 Work 的最终 Handoff，并使用 `memory-retrieval`/`memory-distillation` 维护 `docs/memory/`。
 
 ## Project Custom Extension
 

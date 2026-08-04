@@ -176,7 +176,7 @@ def initialize_repository(root: Path, profile: str, run_id: str | None) -> dict[
         "protocol": {"id": "yuan.core", "revision": "0.2", "digest": digest_bytes(protocol)},
         "harness": {"id": "yuan.python", "revision": __version__, "digest": harness_digest()},
         "state_root": ".yuan-run",
-        "artifact_exclude": [".yuan-run/**", ".git/**", "__pycache__/**", "*.pyc"],
+        "artifact_exclude": [".yuan-run/**", "docs/memory/**", ".git/**", "__pycache__/**", "*.pyc"],
         "environment": environment_binding(),
         "capability": capability,
     })
@@ -207,8 +207,31 @@ def _merged_marked(path: Path, content: str, start: str, end: str) -> bytes:
     return merged.encode("utf-8")
 
 
-def _merge_marked(path: Path, content: str, start: str, end: str) -> None:
-    atomic_write(path, _merged_marked(path, content, start, end))
+def _force_merged_marked(path: Path, content: str, start: str, end: str) -> bytes:
+    """替换所有可识别的托管块；损坏的旧标记不能阻止框架修复。"""
+
+    block = f"{start}\n{content.strip()}\n{end}\n"
+    if not path.exists():
+        return block.encode("utf-8")
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+    except (OSError, UnicodeError) as exc:
+        raise ValidationError(f"不能读取 UTF-8 文件：{path}") from exc
+    preserved: list[str] = []
+    inside = False
+    for line in lines:
+        marker = line.strip()
+        if marker == start:
+            inside = True
+            continue
+        if marker == end:
+            inside = False
+            continue
+        if not inside:
+            preserved.append(line)
+    prefix = "".join(preserved).rstrip()
+    merged = (prefix + "\n\n" if prefix else "") + block
+    return merged.encode("utf-8")
 
 
 def _managed_bytes(path: Path, start: str, end: str) -> bytes:
@@ -220,21 +243,6 @@ def _managed_bytes(path: Path, start: str, end: str) -> bytes:
         raise IntegrityError(f"Managed Block 缺失、重复或顺序错误：{path}")
     content = current.split(start, 1)[1].split(end, 1)[0].strip()
     return (content + "\n").encode("utf-8")
-
-
-def _install_bootstrap(root: Path) -> None:
-    _merge_marked(
-        root / "AGENTS.md",
-        bootstrap_bytes().decode("utf-8"),
-        BOOTSTRAP_START,
-        BOOTSTRAP_END,
-    )
-    _merge_marked(
-        root / ".gitignore",
-        GITIGNORE_CONTENT,
-        GITIGNORE_START,
-        GITIGNORE_END,
-    )
 
 
 def _validated_release(
@@ -325,34 +333,6 @@ def _write_capabilities(root: Path, profile_id: str) -> dict[str, Any]:
     return manifest
 
 
-def _capability_profile_id(record: dict[str, Any]) -> str:
-    profile = record.get("capability_profile")
-    if not isinstance(profile, dict) or not isinstance(profile.get("id"), str):
-        return DEFAULT_PROFILE
-    return profile["id"]
-
-
-def _deployment_files_for_record(record: dict[str, Any]) -> tuple[str, ...]:
-    values = list(CORE_DEPLOYMENT_FILES)
-    profile = record.get("capability_profile")
-    if isinstance(profile, dict):
-        files = profile.get("files")
-        if not isinstance(files, list):
-            raise IntegrityError("Install Record Capability File Set 不合法")
-        values.append(CAPABILITY_MANIFEST_PATH)
-        for item in files:
-            path = item.get("path") if isinstance(item, dict) else None
-            if (
-                not isinstance(path, str)
-                or not path.startswith(".yuan/extensions/")
-                or path.startswith(".yuan/extensions/custom/")
-                or ".." in Path(path).parts
-            ):
-                raise IntegrityError("Install Record 包含不安全的 Capability Path")
-            values.append(path)
-    return tuple(dict.fromkeys(values))
-
-
 def _deployment_files_for_profile(profile_id: str) -> tuple[str, ...]:
     return CORE_DEPLOYMENT_FILES + capability_paths(profile_id)
 
@@ -361,19 +341,6 @@ def _transaction_files(*groups: tuple[str, ...]) -> tuple[str, ...]:
     values = [item for group in groups for item in group]
     values.extend(("AGENTS.md", ".gitignore", ".yuan-run/current.json"))
     return tuple(dict.fromkeys(values))
-
-
-def _remove_obsolete_capabilities(root: Path, current: tuple[str, ...], target: tuple[str, ...]) -> None:
-    target_set = set(target)
-    for relative in current:
-        if (
-            relative not in target_set
-            and relative.startswith(".yuan/extensions/")
-            and not relative.startswith(".yuan/extensions/custom/")
-        ):
-            path = root / relative
-            if path.is_file():
-                path.unlink()
 
 
 def _read_object(path: Path, label: str) -> dict[str, Any]:
@@ -461,84 +428,6 @@ def _restore(root: Path, captured: dict[str, bytes | None]) -> None:
             atomic_write(path, payload)
 
 
-def _snapshot_deployment(root: Path) -> dict[str, Any]:
-    record = _verify_installation(root)
-    deployment_files = _deployment_files_for_record(record)
-    runtime_digest = record["runtime"]["digest"]
-    target = root / ".yuan" / "releases" / runtime_digest
-    manifest_path = target / "snapshot.json"
-    if manifest_path.is_file():
-        return _load_snapshot(root, runtime_digest)
-    files = []
-    for relative in deployment_files:
-        source = root / relative
-        if source.is_file():
-            payload = source.read_bytes()
-            atomic_write(target / "files" / relative, payload)
-            files.append({"path": relative, "digest": digest_bytes(payload), "bytes": len(payload)})
-    blocks = {
-        "bootstrap": _managed_bytes(root / "AGENTS.md", BOOTSTRAP_START, BOOTSTRAP_END),
-        "gitignore": _managed_bytes(root / ".gitignore", GITIGNORE_START, GITIGNORE_END),
-    }
-    for name, payload in blocks.items():
-        atomic_write(target / f"{name}.txt", payload)
-    manifest = with_digest({
-        "schema_version": "yuan.deployment-snapshot/v1",
-        "runtime_digest": runtime_digest,
-        "framework_version": record["framework_version"],
-        "files": files,
-        "blocks": {name: digest_bytes(payload) for name, payload in blocks.items()},
-    })
-    atomic_write(manifest_path, canonical_bytes(manifest))
-    return manifest
-
-
-def _load_snapshot(root: Path, runtime_digest: str) -> dict[str, Any]:
-    if len(runtime_digest) != 64 or any(character not in "0123456789abcdef" for character in runtime_digest):
-        raise ValidationError("Rollback Digest 必须是 SHA-256")
-    target = root / ".yuan" / "releases" / runtime_digest
-    manifest = _read_object(target / "snapshot.json", "Deployment Snapshot")
-    if manifest.get("schema_version") != "yuan.deployment-snapshot/v1" or not verify_digest(manifest):
-        raise IntegrityError("Deployment Snapshot Digest 不合法")
-    if manifest.get("runtime_digest") != runtime_digest:
-        raise IntegrityError("Deployment Snapshot Identity 不匹配")
-    files = manifest.get("files")
-    blocks = manifest.get("blocks")
-    if not isinstance(files, list) or not isinstance(blocks, dict):
-        raise IntegrityError("Deployment Snapshot 结构不合法")
-    paths = []
-    for item in files:
-        path_value = item.get("path") if isinstance(item, dict) else None
-        if (
-            not isinstance(path_value, str)
-            or (
-                path_value not in CORE_DEPLOYMENT_FILES
-                and path_value != CAPABILITY_MANIFEST_PATH
-                and not path_value.startswith(".yuan/extensions/")
-            )
-            or path_value.startswith(".yuan/extensions/custom/")
-            or ".." in Path(path_value).parts
-        ):
-            raise IntegrityError("Deployment Snapshot 包含未知路径")
-        paths.append(item["path"])
-        source = target / "files" / item["path"]
-        if not source.is_file():
-            raise IntegrityError("Deployment Snapshot 文件缺失")
-        payload = source.read_bytes()
-        if digest_bytes(payload) != item.get("digest") or len(payload) != item.get("bytes"):
-            raise IntegrityError("Deployment Snapshot 文件损坏")
-    required = set(CORE_DEPLOYMENT_FILES[:5])
-    if len(paths) != len(set(paths)) or not required <= set(paths):
-        raise IntegrityError("Deployment Snapshot 文件集合不完整或重复")
-    if set(blocks) != {"bootstrap", "gitignore"}:
-        raise IntegrityError("Deployment Snapshot Managed Block 集合不合法")
-    for name, expected in blocks.items():
-        block = target / f"{name}.txt"
-        if not block.is_file() or digest_bytes(block.read_bytes()) != expected:
-            raise IntegrityError("Deployment Snapshot Managed Block 损坏")
-    return manifest
-
-
 def _cleanup_candidates(root: Path, keep_digest: str | None = None) -> None:
     candidates = root / ".yuan" / "candidates"
     if not candidates.is_dir():
@@ -546,6 +435,110 @@ def _cleanup_candidates(root: Path, keep_digest: str | None = None) -> None:
     for path in candidates.iterdir():
         if path.is_file() and path.suffix in {".pyz", ".json"} and (keep_digest is None or not path.name.startswith(keep_digest)):
             path.unlink()
+
+
+def _memory_identity(root: Path) -> dict[str, Any]:
+    """计算更新必须逐字节保留的项目记忆指纹。"""
+
+    values: dict[str, Any] = {}
+    for label, memory_root in (
+        ("run_ledger", root / ".yuan-run"),
+        ("long_term", root / "docs" / "memory"),
+    ):
+        if not memory_root.exists():
+            values[label] = {"exists": False, "files": 0, "digest": None}
+            continue
+        files = []
+        if memory_root.is_file() or memory_root.is_symlink():
+            paths = [memory_root]
+        else:
+            paths = sorted(path for path in memory_root.rglob("*") if path.is_file() or path.is_symlink())
+        for path in paths:
+            relative = path.relative_to(root).as_posix()
+            if path.is_symlink():
+                payload = os.readlink(path).encode("utf-8")
+                kind = "symlink"
+            else:
+                payload = path.read_bytes()
+                kind = "file"
+            files.append({"path": relative, "kind": kind, "bytes": len(payload), "digest": digest_bytes(payload)})
+        values[label] = {
+            "exists": True,
+            "files": len(files),
+            "digest": digest_bytes(canonical_bytes(files)),
+        }
+    return values
+
+
+def _forced_release_context(root: Path, artifact: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """为无门禁更新记录来源事实；该记录不是 Conformance 声明。"""
+
+    source = with_digest({
+        "schema_version": "yuan.release-source/v1",
+        "kind": "forced-update",
+        "revision": __version__,
+        "dirty": True,
+    })
+    report = {
+        "schema_version": "yuan.conformance-report/v1",
+        "status": "SKIPPED",
+        "harness_digest": harness_digest(),
+        "checks": {},
+        "reason": "project update 强制激活当前 Yuan Source，不使用 Conformance 准入",
+    }
+    context = {"report": report, "source": source}
+    proof = with_digest({
+        "schema_version": "yuan.deployment-proof/v1",
+        "manifest_digest": artifact["manifest"]["digest"],
+        "conformance_digest": digest_bytes(canonical_bytes(report)),
+        "conformance_harness_digest": report["harness_digest"],
+        "source": source,
+        "activation": "FORCED_UPDATE",
+    })
+    return context, proof
+
+
+def _fresh_config(capability_profile: str) -> dict[str, Any]:
+    protocol = protocol_bytes()
+    capability = capability_manifest(capability_profile)
+    return with_digest({
+        "schema_version": "yuan.config/v1",
+        "profile": "AUDITED",
+        "protocol": {"id": "yuan.core", "revision": "0.2", "digest": digest_bytes(protocol)},
+        "harness": {"id": "yuan.python", "revision": __version__, "digest": harness_digest()},
+        "state_root": ".yuan-run",
+        "artifact_exclude": [".yuan-run/**", "docs/memory/**", ".git/**", "__pycache__/**", "*.pyc"],
+        "environment": environment_binding(),
+        "capability": {
+            "id": capability["profile_id"],
+            "revision": capability["profile_version"],
+            "digest": capability["digest"],
+        },
+    })
+
+
+def _remove_managed_capabilities(root: Path) -> None:
+    extensions = root / ".yuan" / "extensions"
+    if not extensions.is_dir():
+        return
+    for path in extensions.iterdir():
+        if path.name == "custom":
+            continue
+        if path.is_dir() and not path.is_symlink():
+            shutil.rmtree(path)
+        elif path.exists() or path.is_symlink():
+            path.unlink()
+
+
+def _initialize_run_ledger_if_missing(root: Path) -> str | None:
+    state = root / ".yuan-run"
+    if state.exists():
+        return None
+    run_id = _resolved_run_id(None)
+    ledger = Ledger(state, run_id)
+    ledger.run_root.mkdir(parents=True, exist_ok=False)
+    atomic_write(state / "current.json", canonical_bytes({"run_id": run_id}))
+    return run_id
 
 
 def _pinned_status(root: Path, runtime: Path) -> dict[str, Any]:
@@ -562,13 +555,70 @@ def _pinned_status(root: Path, runtime: Path) -> dict[str, Any]:
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise IntegrityError("项目固定 Runtime 无法执行") from exc
+    stdout = completed.stdout.decode("utf-8", errors="replace")
+    stderr = completed.stderr.decode("utf-8", errors="replace")
     try:
-        value = json.loads(completed.stdout.decode("utf-8"))
-    except (UnicodeError, json.JSONDecodeError) as exc:
-        raise IntegrityError("项目固定 Runtime 没有返回合法 JSON") from exc
+        value = json.loads(stdout)
+    except json.JSONDecodeError as exc:
+        raise IntegrityError(
+            f"项目 Runtime 没有返回合法 JSON；exit_code={completed.returncode}；"
+            f"stdout={stdout[-4000:]!r}；stderr={stderr[-4000:]!r}"
+        ) from exc
     if completed.returncode != 0 or not isinstance(value, dict):
-        raise IntegrityError(f"项目固定 Runtime 状态检查失败：{value}")
+        raise IntegrityError(
+            f"项目 Runtime 状态检查失败；exit_code={completed.returncode}；"
+            f"stdout={stdout[-4000:]!r}；stderr={stderr[-4000:]!r}"
+        )
     return value
+
+
+def diagnose_project(root: Path) -> dict[str, Any]:
+    """不信任旧安装的外部只读诊断；失败细节用于 Runtime Maintainer。"""
+
+    root = root.resolve()
+    if not root.is_dir():
+        return {"status": "ERROR", "stage": "target", "root": str(root), "error": "目标项目目录不存在"}
+    runtime = root / ".yuan" / "bin" / "yuan.pyz"
+    managed = {
+        relative: {"exists": (root / relative).is_file()}
+        for relative in CORE_DEPLOYMENT_FILES
+    }
+    runtime_check: dict[str, Any]
+    if not runtime.is_file():
+        runtime_check = {"status": "MISSING", "command": "python -B .yuan/bin/yuan.pyz --root . status"}
+    else:
+        try:
+            completed = subprocess.run(
+                [sys.executable, "-B", str(runtime), "--root", str(root), "status"],
+                cwd=root,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=60,
+                check=False,
+                shell=False,
+            )
+            runtime_check = {
+                "status": "PASS" if completed.returncode == 0 else "FAIL",
+                "command": "python -B .yuan/bin/yuan.pyz --root . status",
+                "exit_code": completed.returncode,
+                "stdout": completed.stdout.decode("utf-8", errors="replace"),
+                "stderr": completed.stderr.decode("utf-8", errors="replace"),
+            }
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            runtime_check = {"status": "FAIL", "command": "python -B .yuan/bin/yuan.pyz --root . status", "error": str(exc)}
+    return {
+        "status": "PASS",
+        "stage": "diagnose",
+        "root": str(root),
+        "writable": os.access(root, os.W_OK),
+        "managed": managed,
+        "memory": _memory_identity(root),
+        "runtime": runtime_check,
+        "recommended_agent": "runtime-maintainer",
+        "recommended_skill": "runtime-recovery",
+        "recovery_command": f"python -B scripts/sync_project.py update {root}",
+    }
 
 
 def install_project(
@@ -632,198 +682,79 @@ def install_project(
         }
 
 
-def _read_install_config(root: Path) -> dict[str, Any]:
-    path = root / ".yuan" / "config.json"
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-        raise IntegrityError("目标项目 Yuan Config 不合法") from exc
-    if not isinstance(value, dict) or not verify_digest(value):
-        raise IntegrityError("目标项目 Yuan Config Digest 不匹配")
-    return value
-
-
 def update_project(
     root: Path,
     *,
-    release_context: dict[str, Any],
+    release_context: dict[str, Any] | None = None,
     capability_profile: str | None = None,
 ) -> dict[str, Any]:
+    """用当前 Yuan Source 强制重建托管框架层。
+
+    更新不依赖旧 Runtime、Install Record、Active Work 或 Conformance；项目
+    Ledger 与长期记忆必须保持逐字节不变。逐文件原子写入用于避免半个文件，
+    但不会把失败回滚成旧框架。
+    """
+
     root = root.resolve()
+    if not root.is_dir():
+        raise ValidationError(f"目标项目目录不存在：{root}")
     runtime = root / ".yuan" / "bin" / "yuan.pyz"
     with exclusive_lock(root / ".yuan" / ".deployment.lock", timeout=DEPLOYMENT_LOCK_TIMEOUT):
-        if not (root / ".yuan" / "config.json").is_file() or not runtime.is_file():
-            raise ValidationError("目标项目没有可更新的 Yuan 安装")
-        current_record = _verify_installation(root)
-        current_capability_profile = _capability_profile_id(current_record)
-        capability_profile = capability_profile or current_capability_profile
+        capability_profile = capability_profile or DEFAULT_PROFILE
         if capability_profile not in available_profiles():
             raise ValidationError(f"新发行包不提供目标 Capability Profile：{capability_profile}")
-        current_digest = current_record["runtime"]["digest"]
+        memory_before = _memory_identity(root)
         candidate = root / ".yuan" / "candidates" / f"yuan-{os.getpid()}.pyz"
         artifact = build_runtime_zipapp(candidate)
         try:
-            proof = _validated_release(candidate, artifact, release_context)
-            if artifact["digest"] == current_digest and capability_profile == current_capability_profile:
-                _cleanup_candidates(root)
-                return {
-                    "status": "UNCHANGED",
-                    "root": str(root),
-                    "runtime_digest": current_digest,
-                    "install_digest": current_record["digest"],
-                    "release_proof": current_record.get("release"),
-                    "agent_guidance": agent_guidance(root, capability_profile),
-                }
-            # 状态检查必须在「候选 Kernel + 迁移后 config」下执行：
-            # 固定旧 Runtime 可能携带已修复的 Artifact 枚举缺陷（如缺少
-            # node_modules 排除），而候选 Kernel 又无法通过旧 config 的
-            # Harness 绑定校验。因此先事务化迁移部署，再用新 Runtime
-            # 检查状态；不安全则回滚整个事务并暂存候选 Release。
-            snapshot = _snapshot_deployment(root)
-            current_files = _deployment_files_for_record(current_record)
-            next_files = _deployment_files_for_profile(capability_profile)
-            captured = _capture(root, _transaction_files(current_files, next_files))
-            try:
-                atomic_write(runtime, candidate.read_bytes())
-                _remove_obsolete_capabilities(root, current_files, next_files)
-                config = _read_install_config(root)
-                protocol = protocol_bytes()
-                config["protocol"] = {"id": "yuan.core", "revision": "0.2", "digest": digest_bytes(protocol)}
-                config["harness"] = {"id": "yuan.python", "revision": __version__, "digest": harness_digest()}
-                config["environment"] = environment_binding()
-                next_capability = capability_manifest(capability_profile)
-                config["capability"] = {
-                    "id": next_capability["profile_id"],
-                    "revision": next_capability["profile_version"],
-                    "digest": next_capability["digest"],
-                }
-                atomic_write(root / ".yuan" / "protocol.md", protocol)
-                atomic_write(root / ".yuan" / "config.json", canonical_bytes(with_digest(config)))
-                _write_adapter(root)
-                _write_capabilities(root, capability_profile)
-                _install_bootstrap(root)
-                _write_release_evidence(root, artifact, release_context)
-                record = _install_record(root, artifact, proof)
-                verified = _pinned_status(root, runtime)
-            except Exception:
-                _restore(root, captured)
-                raise
-            work = verified.get("work")
-            result = verified.get("decision", {}).get("result")
-            errors = verified.get("errors")
-            safe_empty = work is None and errors == [] and verified.get("source_count") == 0
-            safe_terminal = work is not None and errors == [] and (
-                result == "COMPLETE" or verified.get("decision", {}).get("reason_code") == "WORK_SUPERSEDED"
+            context, proof = _forced_release_context(root, artifact)
+            atomic_write(runtime, candidate.read_bytes())
+            _remove_managed_capabilities(root)
+            _write_capabilities(root, capability_profile)
+            protocol = protocol_bytes()
+            atomic_write(root / ".yuan" / "protocol.md", protocol)
+            atomic_write(root / ".yuan" / "config.json", canonical_bytes(_fresh_config(capability_profile)))
+            _write_adapter(root)
+            atomic_write(
+                root / "AGENTS.md",
+                _force_merged_marked(root / "AGENTS.md", bootstrap_bytes().decode("utf-8"), BOOTSTRAP_START, BOOTSTRAP_END),
             )
-            if not (safe_empty or safe_terminal):
-                _restore(root, captured)
-                staged = candidate.with_name(f"{artifact['digest']}.pyz")
-                os.replace(candidate, staged)
-                metadata = with_digest({
-                    "schema_version": "yuan.staged-release/v1",
-                    "artifact": {key: artifact[key] for key in ("path", "digest", "bytes")},
-                    "manifest": artifact["manifest"],
-                    "proof": proof,
-                    "blocked_by_result": result,
-                })
-                atomic_write(staged.with_suffix(".json"), canonical_bytes(metadata))
-                _cleanup_candidates(root, artifact["digest"])
-                return {
-                    "status": "STAGED",
-                    "root": str(root),
-                    "runtime_digest": artifact["digest"],
-                    "candidate": str(staged.relative_to(root)),
-                    "blocked_by_result": result,
-                    "agent_guidance": agent_guidance(root, capability_profile),
-                }
+            atomic_write(
+                root / ".gitignore",
+                _force_merged_marked(root / ".gitignore", GITIGNORE_CONTENT, GITIGNORE_START, GITIGNORE_END),
+            )
+            _write_release_evidence(root, artifact, context)
+            record = _install_record(root, artifact, proof)
+            initialized_run = _initialize_run_ledger_if_missing(root)
             _cleanup_candidates(root)
+            diagnostics: dict[str, Any]
+            try:
+                verified = _pinned_status(root, runtime)
+                diagnostics = {"status": "PASS", "decision": verified.get("decision")}
+            except Exception as exc:
+                diagnostics = {"status": "WARNING", "error": str(exc)}
+            memory_after = _memory_identity(root)
+            changed_memory = [
+                label for label, before in memory_before.items()
+                if before["exists"] and memory_after[label] != before
+            ]
+            if changed_memory:
+                raise IntegrityError("强制更新意外修改了项目 Memory：" + ", ".join(changed_memory))
             return {
                 "status": "UPDATED",
                 "root": str(root),
-                "previous_runtime_digest": current_digest,
-                "snapshot_digest": snapshot["runtime_digest"],
                 "runtime_digest": artifact["digest"],
                 "install_digest": record["digest"],
                 "release_proof": proof,
-                "decision": verified["decision"],
+                "memory_preserved": True,
+                "memory_initialized_run": initialized_run,
+                "memory": memory_after,
+                "diagnostics": diagnostics,
                 "agent_guidance": agent_guidance(root, capability_profile),
             }
         finally:
             if candidate.is_file():
                 candidate.unlink()
-
-
-def rollback_project(root: Path, runtime_digest: str) -> dict[str, Any]:
-    """在安全终态恢复完整部署快照，不改写任何 Run Event。"""
-
-    root = root.resolve()
-    runtime = root / ".yuan" / "bin" / "yuan.pyz"
-    if not runtime.is_file():
-        raise ValidationError("目标项目没有可回滚的 Yuan 安装")
-    with exclusive_lock(root / ".yuan" / ".deployment.lock", timeout=DEPLOYMENT_LOCK_TIMEOUT):
-        current = _pinned_status(root, runtime)
-        current_record = _verify_installation(root)
-        current_digest = current_record["runtime"]["digest"]
-        if runtime_digest == current_digest:
-            return {"status": "UNCHANGED", "root": str(root), "runtime_digest": current_digest}
-        target = _load_snapshot(root, runtime_digest)
-        work = current.get("work")
-        errors = current.get("errors")
-        result = current.get("decision", {}).get("result")
-        safe_empty = work is None and errors == [] and current.get("source_count") == 0
-        safe_terminal = work is not None and errors == [] and (
-            result == "COMPLETE" or current.get("decision", {}).get("reason_code") == "WORK_SUPERSEDED"
-        )
-        snapshot_root = root / ".yuan" / "releases" / runtime_digest
-        target_config = _read_object(snapshot_root / "files" / ".yuan/config.json", "Snapshot Config")
-        bindings_match = work is None or (
-            work.get("profile") == target_config.get("profile")
-            and work.get("protocol") == target_config.get("protocol")
-            and work.get("harness") == target_config.get("harness")
-            and work.get("artifact", {}).get("environment") == target_config.get("environment")
-        )
-        if not (safe_empty or safe_terminal) or not bindings_match:
-            raise ValidationError("当前 Run 或 Work Binding 不允许恢复该部署快照")
-        _snapshot_deployment(root)
-        current_files = _deployment_files_for_record(current_record)
-        target_files = tuple(item["path"] for item in target["files"])
-        deployment_union = tuple(dict.fromkeys(current_files + target_files))
-        captured = _capture(root, _transaction_files(deployment_union))
-        try:
-            available = {item["path"] for item in target["files"]}
-            for relative in deployment_union:
-                destination = root / relative
-                if relative in available:
-                    atomic_write(destination, (snapshot_root / "files" / relative).read_bytes())
-                elif destination.is_file():
-                    destination.unlink()
-            _merge_marked(
-                root / "AGENTS.md",
-                (snapshot_root / "bootstrap.txt").read_text(encoding="utf-8"),
-                BOOTSTRAP_START,
-                BOOTSTRAP_END,
-            )
-            _merge_marked(
-                root / ".gitignore",
-                (snapshot_root / "gitignore.txt").read_text(encoding="utf-8"),
-                GITIGNORE_START,
-                GITIGNORE_END,
-            )
-            restored_record = _verify_installation(root)
-            verified = _pinned_status(root, runtime)
-        except Exception:
-            _restore(root, captured)
-            raise
-        _cleanup_candidates(root)
-        return {
-            "status": "ROLLED_BACK",
-            "root": str(root),
-            "previous_runtime_digest": current_digest,
-            "runtime_digest": runtime_digest,
-            "install_digest": restored_record["digest"],
-            "decision": verified["decision"],
-            "agent_guidance": agent_guidance(root, _capability_profile_id(restored_record)),
-        }
 
 
 def project_status(root: Path) -> dict[str, Any]:
@@ -834,25 +765,6 @@ def project_status(root: Path) -> dict[str, Any]:
     with exclusive_lock(root / ".yuan" / ".deployment.lock", timeout=DEPLOYMENT_LOCK_TIMEOUT):
         record = _verify_installation(root)
         projection = _pinned_status(root, runtime)
-        candidates = []
-        candidate_root = root / ".yuan" / "candidates"
-        if candidate_root.is_dir():
-            for path in sorted(candidate_root.glob("*.json")):
-                value = _read_object(path, "Staged Release")
-                if value.get("schema_version") != "yuan.staged-release/v1" or not verify_digest(value):
-                    raise IntegrityError("Staged Release Metadata 不合法")
-                artifact = value.get("artifact")
-                proof = value.get("proof")
-                if not isinstance(artifact, dict) or not isinstance(proof, dict) or not verify_digest(proof):
-                    raise IntegrityError("Staged Release Binding 不合法")
-                staged = candidate_root / f"{artifact.get('digest')}.pyz"
-                if not staged.is_file() or digest_bytes(staged.read_bytes()) != artifact.get("digest"):
-                    raise IntegrityError("Staged Release Artifact 不存在或损坏")
-                verify_release(value.get("manifest"), staged)
-                candidates.append({
-                    "runtime_digest": artifact["digest"],
-                    "blocked_by_result": value["blocked_by_result"],
-                })
         return {
             "status": "PASS",
             "root": str(root),
@@ -860,6 +772,6 @@ def project_status(root: Path) -> dict[str, Any]:
             "runtime_digest": record["runtime"]["digest"],
             "source": record.get("release", {}).get("source"),
             "capability_profile": record.get("capability_profile"),
-            "staged": candidates,
+            "staged": [],
             "decision": projection["decision"],
         }

@@ -56,11 +56,13 @@
 - 在全新环境运行完整 Conformance Suite。
 - 旧规则无权批准或否决新 Release。
 - 本次暴力重构不再实现旧框架数据迁移。
-- 轻量项目安装器固定 `yuan.pyz`、合并 Agent Bootstrap，并支持安全 Stage/Update/Rollback。
+- 轻量项目安装器固定 `yuan.pyz`、合并 Agent Bootstrap；当时实现的 Stage/Update/Rollback 语义已由 M9 的强制更新取代。
 
 退出 Evidence：自包含 Zipapp Test、两次构建逐字节一致、Release/Source Hash 验证与完整 Conformance Suite。
 
 ## M6 — 可恢复部署（已完成）
+
+本节记录当时退出 Evidence；其中 Update/Stage/Rollback 的产品语义已由 M9 取代，首次安装与发行验证仍保留。
 
 - 安装、更新、状态与回滚共用 Project Deployment Lock。
 - Candidate 强制绑定 Release Manifest、完整 Conformance、Harness Digest 与 Git/Package Source。
@@ -92,10 +94,20 @@
 
 退出 Evidence：未回答 Intake/未确认 Work 拒绝、确定性 Routing、Required/Stale/Negative Handoff Gate、未解析 Attempt 禁止 Supersede，以及确认后的 Successor 端到端测试。
 
+## M9 — 强制 Runtime 更新、诊断能力与长期记忆（已完成）
+
+- `update` 不再调用旧 Runtime，不检查版本、Install Record、Active Work 或 Conformance，不产生 `UNCHANGED/STAGED`，不保存或回滚旧框架。
+- 更新重建全部托管框架，并对 `.yuan-run/` 与 `docs/memory/` 做前后内容指纹校验；Custom Extension 与项目自有 Managed Block 外内容保持不变。
+- 外部 `diagnose` 输出 Runtime 命令、Exit Code、stdout/stderr、Memory 指纹和明确恢复路由。
+- `debugging/deployment` Signal 确定性选择 Debugger、Runtime Maintainer 与完整 Skill；每个 Work 最终选择 Memory Curator。
+- `yuan.memory/v1` 提供追加 Revision、Work/Evidence/Artifact/Ledger Binding、文件 stale 检测、上下文检索及 JSON/Markdown 索引重建。
+
+退出 Evidence：损坏 Runtime/Config/Install Record 后强制修复、非终态 Work 立即更新、项目 Memory 字节保持、诊断路由、Memory Revision/Context/Staleness 与端到端 Handoff Gate 测试。
+
 ## 永久复杂度限制
 
 - Protocol 不超过 500 个非空行。
-- Core Kernel 与 Deployment/Capability 支撑层分别限制为 2,000 个非空 Python 行；超限前必须进行 Design Review，空行不计。
+- Core Kernel 与 Deployment/Capability 支撑层分别限制为 2,000 个非空 Python 行；M9 Design Review 为独立 Long-term Memory 层设置 400 行预算，空行不计。
 - Core 只使用标准库。
 - 不要求 Daemon、SQLite/Database、Network Service、Role System 或隐藏 Extension。
 - Extension 可以提出候选或生产 Evidence，但不能增加 Result 或改变 Core Completion Truth。

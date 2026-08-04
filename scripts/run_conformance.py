@@ -65,23 +65,28 @@ def validate_size_budget() -> dict[str, object]:
         "artifacts.py", "canonical.py", "errors.py", "identity.py", "ledger.py",
         "paths.py", "ports.py", "reducer.py", "runtime.py", "validate.py", "workflow.py",
     }
+    memory_names = {"memory.py"}
     counts = {
         path.name: sum(bool(line.strip()) for line in path.read_text(encoding="utf-8").splitlines())
         for path in sorted((ROOT / "src" / "yuan").glob("*.py"))
     }
     core_lines = sum(count for name, count in counts.items() if name in core_names)
-    support_lines = sum(count for name, count in counts.items() if name not in core_names)
+    memory_lines = sum(count for name, count in counts.items() if name in memory_names)
+    support_lines = sum(count for name, count in counts.items() if name not in core_names | memory_names)
     if protocol_lines > 500:
         raise RuntimeError(f"Protocol 超出 500 个非空行：{protocol_lines}")
     if core_lines > 2000:
         raise RuntimeError(f"Core Kernel 超出 2000 个非空 Python 行 Design Review 阈值：{core_lines}")
     if support_lines > 2000:
         raise RuntimeError(f"Deployment/Capability 支撑层超出 2000 个非空 Python 行 Design Review 阈值：{support_lines}")
+    if memory_lines > 400:
+        raise RuntimeError(f"Long-term Memory 层超出 400 个非空 Python 行 Design Review 阈值：{memory_lines}")
     return {
         "status": "PASS",
         "protocol_nonempty_lines": protocol_lines,
         "core_python_nonempty_lines": core_lines,
         "support_python_nonempty_lines": support_lines,
+        "memory_python_nonempty_lines": memory_lines,
     }
 
 

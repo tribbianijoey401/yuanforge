@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuan.local/schemas/memory.schema.json",
+  "title": "Yuan Long-term Memory Record",
+  "type": "object",
+  "required": ["schema_version", "memory_id", "revision", "kind", "title", "summary", "details", "status", "confidence", "tags", "relations", "bindings", "source", "supersedes", "created_at", "digest"],
+  "properties": {
+    "schema_version": {"const": "yuan.memory/v1"},
+    "memory_id": {"type": "string", "minLength": 1},
+    "revision": {"type": "integer", "minimum": 1},
+    "kind": {"enum": ["feature", "decision", "pitfall", "module", "convention"]},
+    "title": {"type": "string", "minLength": 1},
+    "summary": {"type": "string", "minLength": 1},
+    "details": {"type": "string", "minLength": 1},
+    "status": {"enum": ["active", "resolved", "superseded", "deprecated"]},
+    "confidence": {"enum": ["verified", "stale", "deprecated"]},
+    "tags": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "relations": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "bindings": {"type": "array", "items": {"type": "object"}},
+    "source": {"type": "object"},
+    "supersedes": {"type": ["string", "null"]},
+    "created_at": {"type": "string", "minLength": 1},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

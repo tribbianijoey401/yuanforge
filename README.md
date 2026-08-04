@@ -8,6 +8,7 @@ Yuan 是一个协议优先、面向持久化 LLM 软件工程的 Harness。它�
 - Python 标准库微内核提供确定性锚点。
 - JSON Event 不可变并使用内容寻址。
 - Run Memory 是可由 Ledger 重建的一次性投影。
+- `docs/memory/` 是由 Work/Evidence 支持、可提交 Git 的追加式项目长期记忆。
 - 开放 Agent 平台默认使用 `AUDITED` Profile；受控平台可以安装 `ENFORCED` Adapter。
 - 默认安装 `vibe-coding` 能力 Profile，提供具体的 Rules、Agents 与 Skills；它们指导 LLM 工作，但不重定义 Core Truth。
 - 新需求通过 Intake 与完整 Work 两次用户确认；Risk/Signal 机械生成 Agent→Skill Assignment，角色以可重放 Handoff 闭环。
@@ -69,8 +70,8 @@ LLM 会先读取 Bootstrap，通过项目内固定 Runtime 恢复状态。没有
 默认能力层包含：
 
 - `rules/`：边界、工作流、Evidence、风险审查、计划、测试与交付规则。
-- `agents/`：Conductor、Product Analyst、Architect、前后端开发、设计、规格、安全、质量、UX、Tester 和 Documentation Engineer。
-- `skills/`：项目生命周期、需求澄清、仓库审计、Work/Verifier 编写、计划、TDD、系统化调试、代码审查、多 Agent 开发、Custom Extension 和发布交接。
+- `agents/`：除工程实现与审查角色外，还包含 Runtime Maintainer、Debugger 和每个 Work 必经的 Memory Curator。
+- `skills/`：除既有工程流程外，还包含 Runtime Recovery、Memory Retrieval 与 Memory Distillation。
 
 框架更新会原子更新这些托管能力。项目专属规则或 Skill 放入 `.yuan/extensions/custom/<extension-id>/`，使用 Custom Extension Descriptor 绑定后会进入同一 Catalog；安装器不会覆盖它们。完整扩展协议见 [Capability Profile 与 Custom Extension](docs/extensions.md)。
 
@@ -89,33 +90,21 @@ python -B scripts/sync_project.py update G:\projects\my-project
 
 ```powershell
 python -m pip install --upgrade .
-python -B scripts/run_conformance.py
-yuan project update G:\projects\my-project --release-root .
+yuan project update G:\projects\my-project
 ```
 
-更新不会删除 `.yuan-run/`，不会覆盖 `AGENTS.md` 的项目自有内容或 `.yuan/extensions/custom/`。安装、更新和回滚共用项目级 Deployment Lock。没有 Active Work、当前结果为 `COMPLETE`，或 Work 已通过 `WORK_SUPERSEDED` 明确关闭时，新 Runtime 原子激活并保存包含 Runtime、Config、Protocol、Bootstrap、Adapter、能力 Profile 和 Release Evidence 的完整旧部署快照；其他非终态会返回 `STAGED`，需要在安全边界后再次运行更新命令。
+`update` 强制激活当前 Yuan Source，不调用旧 Runtime，也不检查旧版本、Install Record、Active Work 或 Conformance，不产生 `UNCHANGED/STAGED`，不保存或回滚旧框架。它重建 Runtime、Config、Protocol、Bootstrap、Adapter 与 Bundled Profile；`.yuan-run/`、`docs/memory/`、`.yuan/extensions/custom/` 和 `AGENTS.md` 项目自有内容必须逐字节保留。更新后的 `status` 只作为诊断；失败返回 Warning，不恢复旧 Runtime。
 
-检查当前部署和暂存 Candidate：
+旧 Runtime 无法启动时，可先运行不依赖目标 Runtime 的外部诊断：
 
 ```powershell
-python -B scripts/sync_project.py status G:\projects\my-project
+python -B scripts/sync_project.py diagnose G:\projects\my-project
 ```
-
-更新成功后如需恢复旧部署，使用 `status` 或更新返回值中的 SHA-256：
-
-```powershell
-python -B scripts/sync_project.py rollback G:\projects\my-project <runtime-digest>
-```
-
-Rollback 只在没有 Work，或当前 Work 已 `COMPLETE` 且仍绑定目标快照的 Profile/Protocol/Harness/Environment 时执行。它不修改任何 `.yuan-run` Event。
 
 脚本结果含义：
 
 - `INSTALLED`：安装完成，可以使用上面的“开始新工作”提示。
-- `UNCHANGED`：目标项目已经是当前版本，可直接开始或继续 Work。
-- `UPDATED`：新 Runtime 已激活，可让 LLM 继续读取当前状态。
-- `STAGED`：当前 Work 未完成；先使用“继续未完成工作”提示，达到 `COMPLETE` 后再次执行 `update`。
-- `ROLLED_BACK`：目标完整部署快照已经恢复并通过其固定 Runtime 自检。
+- `UPDATED`：当前 Yuan Source 已强制激活；`memory_preserved` 必须为 `true`，Runtime 诊断可能是 `PASS` 或 `WARNING`。
 
 ## 手动 Core 流程
 
@@ -145,12 +134,21 @@ yuan verify --criterion AC-001 --attempt ATT-001
 # 对 Routing 中每个角色生成并记录 READY/NEEDS_WORK Handoff：
 yuan handoff template --handoff-id HANDOFF-TEST-001 --agent tester --to user --phase verification --status READY --summary "验证通过" --evidence EVD-001 > handoff.json
 yuan handoff record handoff.json
+# Memory Curator 在最后一个 Handoff 前追加长期记忆，或明确 NO_MEMORY_CHANGE：
+yuan memory template --memory-id MEM-FEATURE-001 --kind feature --title "功能" --summary "已验证事实" --details "Evidence 支持的长期说明" > memory.json
+yuan memory check memory.json
+yuan memory record memory.json
+yuan memory status
 yuan reduce
 ```
 
 每条命令只输出一个 JSON Object。失败采用 fail-closed 策略并返回非零 Exit Code。运行时位于 `.yuan-run/`；删除投影不会丢失事实，`yuan rebuild` 可从不可变 Event 重建 Run Memory。
 
 如果进程在写入不可变 Event 后、推进 Ledger Head 前崩溃，运行 `yuan recover`。它会先验证完整 Event Chain，再修复派生 Head。除非操作员显式传入 `--force-stale-lock`，否则不会破坏近期 Append Lock。
+
+## 项目长期记忆
+
+`.yuan-run/` 保存一次 Run 的不可变事实；`docs/memory/records/` 保存跨会话、可提交 Git 的语义知识。Memory 支持 `feature`、`decision`、`pitfall`、`module` 和 `convention`，同一 ID 通过不可变 Revision 演进并绑定 Work Digest、PASS Evidence、Artifact、Ledger Head 与可选文件 Digest。`yuan memory context --request <需求>` 在 Intake 前检索相关知识，`memory status` 标记 Binding 已变化的 stale 记录，`memory rebuild` 可重建 `index.json` 与 `INDEX.md`。
 
 ## 信任边界
 

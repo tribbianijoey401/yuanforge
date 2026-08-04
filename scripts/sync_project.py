@@ -13,10 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from yuan.project import (  # noqa: E402
+    diagnose_project,
     install_project,
     load_release_context,
     project_status,
-    rollback_project,
     update_project,
 )
 from yuan.capabilities import DEFAULT_PROFILE, available_profiles  # noqa: E402
@@ -55,19 +55,12 @@ def _print_agent_guidance(result: dict[str, object]) -> None:
     guidance = result.get("agent_guidance")
     if not isinstance(guidance, dict):
         return
-    status = result.get("status")
     print("\nYuan 下一步：", file=sys.stderr)
-    if status == "STAGED":
-        print("1. 当前 Work 尚未完成，新 Runtime 仅已暂存。", file=sys.stderr)
-        print("2. 继续当前 Work 时发送：", file=sys.stderr)
-        print(f"   {guidance['continue_prompt']}", file=sys.stderr)
-        print("3. Reducer 返回 COMPLETE 后，重新运行 update。", file=sys.stderr)
-    else:
-        print(f"1. 使用 Codex、Claude Code 等 Agent 打开项目：{guidance['project_root']}", file=sys.stderr)
-        print("2. 开始新工作时发送：", file=sys.stderr)
-        print(f"   {guidance['start_prompt']}", file=sys.stderr)
-        print("3. 继续未完成工作时发送：", file=sys.stderr)
-        print(f"   {guidance['continue_prompt']}", file=sys.stderr)
+    print(f"1. 使用 Codex、Claude Code 等 Agent 打开项目：{guidance['project_root']}", file=sys.stderr)
+    print("2. 开始新工作时发送：", file=sys.stderr)
+    print(f"   {guidance['start_prompt']}", file=sys.stderr)
+    print("3. 继续未完成工作时发送：", file=sys.stderr)
+    print(f"   {guidance['continue_prompt']}", file=sys.stderr)
     print(f"固定 Runtime 状态命令：{guidance['status_command']}", file=sys.stderr)
 
 
@@ -92,7 +85,12 @@ def _verified_context(report_path: Path | None) -> dict[str, object]:
             check=False,
         )
         if completed.returncode != 0:
-            raise RuntimeError("当前 Yuan Source 没有通过 Conformance Suite")
+            stdout = completed.stdout.decode("utf-8", errors="replace")
+            stderr = completed.stderr.decode("utf-8", errors="replace")
+            raise RuntimeError(
+                f"当前 Yuan Source 没有通过 Conformance Suite；exit_code={completed.returncode}；"
+                f"stdout={stdout[-4000:]!r}；stderr={stderr[-4000:]!r}"
+            )
         print("Conformance PASS，开始同步已验证 Release。", file=sys.stderr)
         report_path = ROOT / "dist" / "conformance-report.json"
     return load_release_context(ROOT, report_path)
@@ -108,15 +106,13 @@ def main() -> int:
     install.add_argument("--capability-profile", choices=available_profiles(), default=DEFAULT_PROFILE)
     install.add_argument("--run-id")
     install.add_argument("--conformance-report", type=Path, help="使用已有且匹配当前 Release 的 Conformance Report")
-    update = commands.add_parser("update", help="同步当前 Yuan Release")
+    update = commands.add_parser("update", help="强制激活当前 Yuan Source")
     update.add_argument("target", type=Path)
-    update.add_argument("--capability-profile", choices=available_profiles(), help="在安全激活边界切换能力 Profile")
-    update.add_argument("--conformance-report", type=Path, help="使用已有且匹配当前 Release 的 Conformance Report")
+    update.add_argument("--capability-profile", choices=available_profiles(), help="选择要强制部署的 Capability Profile")
     status = commands.add_parser("status", help="检查项目部署与暂存版本")
     status.add_argument("target", type=Path)
-    rollback = commands.add_parser("rollback", help="恢复完整部署快照")
-    rollback.add_argument("target", type=Path)
-    rollback.add_argument("runtime_digest")
+    diagnose = commands.add_parser("diagnose", help="不依赖旧 Runtime 收集完整部署诊断")
+    diagnose.add_argument("target", type=Path)
     _localize_parser(parser)
     args = parser.parse_args()
     try:
@@ -131,18 +127,27 @@ def main() -> int:
         elif args.command == "update":
             result = update_project(
                 args.target,
-                release_context=_verified_context(args.conformance_report),
                 capability_profile=args.capability_profile,
             )
         elif args.command == "status":
             result = project_status(args.target)
+        elif args.command == "diagnose":
+            result = diagnose_project(args.target)
         else:
-            result = rollback_project(args.target, args.runtime_digest)
+            raise AssertionError("到达不可达的 sync_project 命令分支")
         print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
         _print_agent_guidance(result)
         return 0
     except Exception as exc:
-        print(json.dumps({"status": "ERROR", "error": str(exc)}, ensure_ascii=False, separators=(",", ":")), file=sys.stderr)
+        print(json.dumps({
+            "status": "ERROR",
+            "stage": f"sync_project.{getattr(args, 'command', 'parse')}",
+            "target": str(getattr(args, "target", "")),
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+            "recommended_agent": "runtime-maintainer",
+            "recommended_skill": "runtime-recovery",
+        }, ensure_ascii=False, separators=(",", ":")), file=sys.stderr)
         return 1
 
 

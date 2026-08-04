@@ -29,8 +29,8 @@ python -B scripts/sync_project.py install <目标项目> --profile AUDITED --cap
     extensions/manifest.json       默认能力 Profile 的版本与逐文件 Digest
     extensions/vibe-coding/        托管的 Rules、Agents 与 Skills
     extensions/custom/             项目自定义能力，更新时保留
-    releases/<runtime-digest>/     可校验的完整旧部署快照
   .yuan-run/                       Ledger、Blob 与 Projection，不提交 Git
+  docs/memory/                     Work/Evidence 支持的追加式长期记忆，提交 Git
 ```
 
 安装器不会覆盖现有 `AGENTS.md`。没有 Yuan 标记时追加 Managed Block；已有且唯一时只替换该 Block；标记缺失、重复或顺序错误时 fail-closed。安装前会完成 Run ID、Managed Block 和 Release Evidence 校验；任一步失败都会恢复所有原文件，因此可以直接重试。
@@ -55,31 +55,31 @@ python -B scripts/sync_project.py update <目标项目>
 
 更新过程：
 
-1. 使用旧的项目固定 Runtime 验证当前 Run。
-2. 从当前 Yuan Release 构建新的确定性 Candidate，并验证 Manifest、Conformance 与 Source Binding。
-3. Candidate 与当前 Runtime 相同则返回 `UNCHANGED`，仅校准 Managed Bootstrap。
-4. Active Work 非终态时返回 `STAGED`，Candidate 与带 Digest 的 Metadata 写入被忽略的 `.yuan/candidates/`，旧 Candidate 自动清理，不切换当前 Runtime。
-5. 没有 Work、当前结果为 `COMPLETE`，或 Work 已通过 `WORK_SUPERSEDED` 明确关闭时，保存完整旧部署快照，更新 Protocol/Config/Bootstrap/能力 Profile/Release Evidence 并原子切换。
-6. 使用新固定 Runtime 重新执行 `status`；失败时恢复全部 Managed File。
+1. 计算 `.yuan-run/` 与 `docs/memory/` 的逐文件内容指纹。
+2. 直接从当前 Yuan Source 构建最新 Runtime；不运行旧 Runtime，不读取旧 Install Record，也不执行 Conformance 准入。
+3. 清理旧 Bundled Profile（保留 `extensions/custom/`），重建 Runtime、Protocol、Config、Adapter、Profile、Install Record 和两个 Managed Block。
+4. 再次计算项目 Memory 指纹；任何变化都作为更新错误报告。
+5. 使用新 Runtime 执行 `status`。失败只写入 `diagnostics: WARNING`，已激活的新 Runtime 不回滚。
 
-项目更新默认保持原 Install Record 中选择的 Capability Profile，不会静默切换；可用 `--capability-profile` 在空 Run 或 `COMPLETE` 安全边界显式切换。若新发行包不提供目标 Profile，更新在写入前失败。Profile 内删除的托管文件会在事务中移除，失败时恢复；`.yuan/extensions/custom/` 始终不参与框架覆盖或删除。
+`update` 的定义就是强制替换框架层，因此没有版本比较、`UNCHANGED`、Active Work Gate、`STAGED`、Deployment Snapshot 或自动回滚。默认部署当前发行包的默认 Profile，也可用 `--capability-profile` 显式选择。即使旧 Runtime、Config、Install Record 或 Managed Block 已损坏，更新仍不依赖它们；只有最新 Runtime 无法构建、目标无法写入或项目 Memory 被改变才会失败。
 
-安装、更新、状态检查和回滚共用 `.yuan/.deployment.lock`。旧部署快照位于 `.yuan/releases/<digest>/`，包含 Runtime、Config、Protocol、Install Record、Adapter、托管能力、Release Evidence 和两个 Managed Block，供本地恢复，不提交 Git。更新不修改 `.yuan-run/current.json`、任何不可变 Event 或 `.yuan/extensions/custom/`；下一个 Successor Work 会绑定新的 Protocol、Harness 和 Environment。
+更新仍使用 `.yuan/.deployment.lock` 避免两个更新进程同时写入。它不修改 `.yuan-run/current.json`、任何 Ledger Event、`docs/memory/` 或 `.yuan/extensions/custom/`。新 Runtime 必须兼容历史 Work/Event/Evidence Schema；兼容性由 Yuan 自身 CI 的历史项目 Fixture 保证，不由目标项目的旧 Runtime 批准。
 
-## 状态与回滚
+## 外部诊断与状态
 
 ```powershell
+python -B scripts/sync_project.py diagnose <目标项目>
 python -B scripts/sync_project.py status <目标项目>
-python -B scripts/sync_project.py rollback <目标项目> <runtime-digest>
 ```
 
-Rollback 会先验证 Snapshot 内每个文件和 Managed Block，再保存当前部署快照。只有空 Run，或当前 Work 为 `COMPLETE` 且绑定目标 Snapshot 的 Profile、Protocol、Harness 与 Environment 时才允许恢复；失败时同样恢复操作前状态。
+`diagnose` 不依赖目标 Runtime，返回托管文件存在性、Memory 指纹、写权限、Runtime 命令、Exit Code、stdout/stderr，以及建议的 `runtime-maintainer`/`runtime-recovery` 路由。`status` 则由已经激活的新 Runtime 重建当前 Run。
+
+## 长期记忆
+
+项目事实分为两层：`.yuan-run/` 保存不可变运行历史，`docs/memory/` 保存跨 Work 的语义知识。Memory Record 以 JSON Revision 追加，绑定来源 Work、PASS Evidence、Artifact、Ledger Head 和可选文件 Digest；`index.json` 与 `INDEX.md` 都可重建。Memory Curator 是每个 Work 的最后角色：有长期影响时记录 Memory，没有影响时在 Handoff 中明确 `NO_MEMORY_CHANGE`。
 
 ## 返回状态
 
 - `INSTALLED`：首次安装完成。
-- `UNCHANGED`：目标项目已使用同一 Release。
-- `STAGED`：当前 Work 未终结，候选未激活。
-- `UPDATED`：新 Release 已激活并通过固定 Runtime 自检。
-- `ROLLED_BACK`：完整旧部署已恢复并通过旧固定 Runtime 自检。
-- `ERROR`：安装内容、Managed Block 或 Runtime 状态不合法，未宣称成功。
+- `UPDATED`：当前 Yuan Source 已强制激活且项目 Memory 指纹保持不变；诊断可以为 `PASS` 或 `WARNING`。
+- `ERROR`：构建、写入或 Memory 保持失败；错误包含阶段、类型和 Runtime Maintainer 路由建议。
