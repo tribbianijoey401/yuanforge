@@ -112,13 +112,38 @@ def intake_template(request: str) -> dict[str, Any]:
     return value
 
 
+def intake_summary(value: dict[str, Any]) -> dict[str, Any]:
+    validate_intake(value)
+    return {
+        "request": value["request"],
+        "questions": [
+            {
+                "id": item["id"],
+                "question": item["question"],
+                "blocking": item["blocking"],
+                "answer": item["answer"],
+            }
+            for item in value["questions"]
+        ],
+        "assumptions": copy.deepcopy(value["assumptions"]),
+        "risk": copy.deepcopy(value["risk"]),
+        "signals": copy.deepcopy(value["signals"]),
+        "subject_digest": digest(intake_subject(value)),
+    }
+
+
 def intake_decision(value: dict[str, Any]) -> dict[str, Any]:
     validate_intake(value)
     unanswered = [item["id"] for item in value["questions"] if item["blocking"] and not (item["answer"] or "").strip()]
     if unanswered:
         return {"result": "BLOCKED", "reason_code": "NEEDS_INPUT", "questions": unanswered}
     if value["confirmation"] is None:
-        return {"result": "BLOCKED", "reason_code": "NEEDS_CONFIRMATION"}
+        return {
+            "result": "BLOCKED",
+            "reason_code": "NEEDS_CONFIRMATION",
+            "confirmation_required": "intake",
+            "summary": intake_summary(value),
+        }
     validate_intake(value, require_confirmation=True)
     return {"result": "CONTINUE", "reason_code": "INTAKE_CONFIRMED", "intake_digest": value["digest"]}
 

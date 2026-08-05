@@ -1,7 +1,7 @@
 {
   "schema_version": "yuan.capability-source/v1",
   "profile_id": "vibe-coding",
-  "profile_version": "1.4.0",
+  "profile_version": "1.4.1",
   "description": "面向可验证、可恢复 Vibe Coding 的默认工程能力。",
   "required_rules": [
     "rules/00-boundary.md",

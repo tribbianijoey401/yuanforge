@@ -50,18 +50,18 @@ def _localize_parser(parser: argparse.ArgumentParser) -> None:
 
 
 def _print_agent_guidance(result: dict[str, object]) -> None:
-    """在不污染 JSON 标准输出的前提下显示 Agent 下一步。"""
+    """在不污染 JSON 标准输出的前提下面向用户显示入口提示。"""
 
     guidance = result.get("agent_guidance")
     if not isinstance(guidance, dict):
         return
-    print("\nYuan 下一步：", file=sys.stderr)
+    print("\nYuan 已就绪：", file=sys.stderr)
     print(f"1. 使用 Codex、Claude Code 等 Agent 打开项目：{guidance['project_root']}", file=sys.stderr)
-    print("2. 开始新工作时发送：", file=sys.stderr)
+    print("2. 开始新需求时，直接描述目标、范围和限制，例如：", file=sys.stderr)
     print(f"   {guidance['start_prompt']}", file=sys.stderr)
-    print("3. 继续未完成工作时发送：", file=sys.stderr)
+    print("3. 恢复中断工作时，直接说明继续即可，例如：", file=sys.stderr)
     print(f"   {guidance['continue_prompt']}", file=sys.stderr)
-    print(f"固定 Runtime 状态命令：{guidance['status_command']}", file=sys.stderr)
+    print("Yuan 会从 AGENTS.md 和项目固定 Runtime 自动恢复状态、检索记忆、路由 Agent/Skill 并进入确认节点。", file=sys.stderr)
 
 
 def _configure_utf8_streams() -> None:

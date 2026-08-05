@@ -4,12 +4,13 @@
 
 ## 加载顺序
 
-1. 新需求先完成 Intake 与用户确认。
-2. 运行 `capability route`；始终读取返回的全部 Required Rules，Agent 与 Skill 只能来自 `routing/assignments`。
-3. 每个角色只加载 Assignment 中与当前阶段相关的 `skills/*/SKILL.md`，不要一次加载全部内容。
-4. 项目自定义能力写入 `.yuan/extensions/custom/`，不得修改本目录中的托管文件。
+1. 用户自然语言只表达需求或“继续”；Conductor 根据状态自动进入 Intake、恢复或继任流程。
+2. 新需求先完成 Intake 与用户确认。
+3. 运行 `capability route`；始终读取返回的全部 Required Rules，Agent 与 Skill 只能来自 `routing/assignments`。
+4. 每个角色只加载 Assignment 中与当前阶段相关的 `skills/*/SKILL.md`，不要一次加载全部内容。
+5. 项目自定义能力写入 `.yuan/extensions/custom/`，不得修改本目录中的托管文件。
 
-Catalog 与 Workflow 已由 `.yuan/extensions/manifest.json` 暴露。使用固定 Runtime 的 `capability list` 查看能力，使用 `capability route --risk ... --signal ...` 获得本 Work 的路径、Digest 和 Agent→Skill Assignment。
+Catalog 与 Workflow 已由 `.yuan/extensions/manifest.json` 暴露。使用固定 Runtime 的 `capability list` 查看能力，使用 `capability route --risk ... --signal ...` 获得本 Work 的路径、Digest 和 Agent→Skill Assignment。Catalog 的 `use_when` 用于解释和诊断，不是绕过 Routing 的手动触发开关。
 
 ## 能力边界
 

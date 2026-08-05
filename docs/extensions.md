@@ -29,7 +29,7 @@ python -B .yuan/bin/yuan.pyz --root . capability route --risk R1 --signal backen
 python -B .yuan/bin/yuan.pyz --root . capability resolve --agent architect --skill writing-plans
 ```
 
-`list` 返回 Catalog 与 Workflow。`route` 从已确认 Risk/Signal 生成唯一 Routing、Agent→Skill `assignments` 和所有需要读取的路径/Digest；它是 Work 接受时 Kernel 重算的路由来源。`resolve` 仅用于显式加载自定义能力或诊断。文件被篡改时命令失败。
+`list` 返回 Catalog 与 Workflow。`route` 从已确认 Risk/Signal 生成唯一 Routing、Agent→Skill `assignments` 和所有需要读取的路径/Digest；它是 Work 接受时 Kernel 重算的路由来源。Catalog 的 `use_when` 只解释适用场景，不是用户或 LLM 手动触发 Agent/Skill 的控制面。`resolve` 仅用于显式加载自定义能力或诊断。文件被篡改时命令失败。
 
 Bundled Workflow 必须覆盖 R0/R1/R2、至少一个 Signal、全部 Agent 的 Skill Assignment，并声明会随 Artifact 变化而失效的 Reviewer。新增 Agent 却没有 Assignment 会使 Profile fail-closed。
 

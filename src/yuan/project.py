@@ -50,20 +50,18 @@ REQUIRED_CONFORMANCE_CHECKS = {
 
 
 def agent_guidance(root: Path, capability_profile: str = DEFAULT_PROFILE) -> dict[str, str]:
-    """返回安装后可直接交给 Agent 的开始与继续提示。"""
+    """返回安装后面向用户的自然语言入口提示。"""
 
     return {
         "project_root": str(root.resolve()),
         "status_command": "python -B .yuan/bin/yuan.pyz --root . status",
         "capability_profile": capability_profile,
         "start_prompt": (
-            "请读取项目根目录 AGENTS.md，并按照 Yuan Agent Bootstrap 从 Intake 开始新需求；"
-            "需要时向我提问，并在需求摘要和完整 Work 两个节点等待我确认。"
-            "我的需求是：<在这里描述需求>"
+            "请在这个项目里按 Yuan 流程处理我的需求；需要我确认或补充时再问我。"
+            "我的需求是：<直接描述你想完成的结果、范围和限制>"
         ),
         "continue_prompt": (
-            "请读取项目根目录 AGENTS.md，运行 memory resume 恢复项目连续性并检查 Yuan 当前状态，然后按照 Yuan Agent Bootstrap "
-            "继续未完成的 Work；只有 Reducer 返回 COMPLETE 时才报告完成。"
+            "请继续这个项目里尚未完成的 Yuan 工作；需要我确认或补充时再问我。"
         ),
     }
 

@@ -40,7 +40,7 @@ yuan project install G:\projects\my-project --profile AUDITED --capability-profi
 - 在 `.gitignore` 中维护 `.yuan-run/`、Draft、Candidate 和本地 Release Backup。
 - 初始化首个空 Run；之后由 Agent 根据用户意图 Author Work。
 
-安装完成后，用户只需要在目标项目中向 Codex 等 Agent 描述需求。Agent 通过项目固定入口运行 Yuan：
+安装完成后，用户只需要在目标项目中向 Codex 等 Agent 描述需求。Agent 会读取 `AGENTS.md`，并通过项目固定入口运行 Yuan：
 
 ```powershell
 python -B .yuan/bin/yuan.pyz --root . status
@@ -49,19 +49,19 @@ python -B .yuan/bin/yuan.pyz --root . status
 推荐流程：
 
 1. 使用 Codex、Claude Code 等 Agent 打开目标项目根目录。
-2. 开始一个新项目或新需求时，直接向 LLM 发送：
+2. 开始一个新项目或新需求时，直接描述目标、范围和限制：
 
    ```text
-   请读取项目根目录 AGENTS.md，并按照 Yuan Agent Bootstrap 从 Intake 开始新需求；需要时向我提问，并在需求摘要和完整 Work 两个节点等待我确认。我的需求是：<在这里描述需求>
+   我需要：<描述想完成的结果、范围、限制和已知背景>
    ```
 
-3. 会话中断、切换平台或稍后恢复时，向 LLM 发送：
+3. 会话中断、切换平台或稍后恢复时，直接说明继续：
 
    ```text
-   请读取项目根目录 AGENTS.md，检查 Yuan 当前状态，并按照 Yuan Agent Bootstrap 继续未完成的 Work；只有 Reducer 返回 COMPLETE 时才报告完成。
+   继续这个项目里尚未完成的工作。
    ```
 
-LLM 会先读取 Bootstrap，通过项目内固定 Runtime 恢复状态。没有 Active Work 时，它先创建 Intake：只询问会改变验收或安全边界的问题，把答案、假设、风险和 Signals 展示给用户确认；随后由 `capability route` 生成不可删减的 Agent→Skill Assignment。完整 Work、Verifier、授权和预算会再次展示给用户确认，之后才开始修改。用户不需要手工重述此前过程。安装脚本成功后也会显示以上提示；机器可解析的单个 JSON 保留在标准输出，提示写入标准错误流。
+LLM 会由 `AGENTS.md` 触发 Bootstrap，通过项目内固定 Runtime 恢复状态、检索 Memory、创建或继续 Work。没有 Active Work 时，它先创建 Intake：只询问会改变验收或安全边界的问题，把答案、假设、风险和 Signals 展示给用户确认；随后由 `capability route` 生成不可删减的 Agent→Skill Assignment。完整 Work、Verifier、授权和预算会再次展示给用户确认，之后才开始修改。用户不需要在提示词里指定 Intake、Agent 或 Skill；这些节点由 Yuan 状态机和路由自动触发。安装脚本成功后也会显示自然语言入口提示；机器可解析的单个 JSON 保留在标准输出，提示写入标准错误流。
 
 执行期间，每个路由角色都必须记录 `READY` 或 `NEEDS_WORK` Handoff。审查角色的 Handoff 绑定当前 Artifact，代码变化会让旧审查自动过期。Required Evidence 和 Required Handoff 都成立，Reducer 才会返回 `COMPLETE`。
 
@@ -146,9 +146,9 @@ yuan memory status
 yuan reduce
 ```
 
-每条命令只输出一个 JSON Object。失败采用 fail-closed 策略并返回非零 Exit Code。运行时位于 `.yuan-run/`；删除投影不会丢失事实，`yuan rebuild` 可从不可变 Event 重建 Run Memory。
+每条命令只输出一个 JSON Object。失败采用 fail-closed 策略并返回非零 Exit Code。`intake check` 在 `NEEDS_CONFIRMATION` 时返回可直接展示给用户的 `summary`，Agent 不能只问“是否确认”而不展示内容。运行时位于 `.yuan-run/`；删除投影不会丢失事实，操作员可在派生投影损坏时用 `yuan rebuild` 从不可变 Event 重建 Run Memory。
 
-如果进程在写入不可变 Event 后、推进 Ledger Head 前崩溃，运行 `yuan recover`。它会先验证完整 Event Chain，再修复派生 Head。普通 Append 会自动回收 PID 已退出的崩溃锁；仍存活的持有者和近期损坏锁不会被误删。`--force-stale-lock` 只用于操作员确认后的异常恢复。
+如果进程在写入不可变 Event 后、推进 Ledger Head 前崩溃，操作员可运行 `yuan recover`。它会先验证完整 Event Chain，再修复派生 Head。普通 Append 会自动回收 PID 已退出的崩溃锁；仍存活的持有者和近期损坏锁不会被误删。`--force-stale-lock` 只用于操作员确认后的异常恢复。正常需求流转不调用 `recover`、`rebuild` 或 `memory rebuild`。
 
 ## 项目长期记忆
 

@@ -7,6 +7,7 @@ import os
 import sys
 import subprocess
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -26,7 +27,7 @@ from yuan.capabilities import (
 from yuan.cli import attempt_template, init_repository, parser as cli_parser, work_template
 from yuan.errors import IntegrityError, ValidationError
 from yuan.identity import harness_digest
-from yuan.ledger import Ledger, atomic_write, exclusive_lock
+from yuan.ledger import Ledger, atomic_write, exclusive_lock, _process_alive
 from yuan.memory import (
     checkpoint_memory,
     memory_context,
@@ -71,7 +72,7 @@ from yuan.runtime import (
     verify_work_verifiers,
 )
 from yuan.validate import validate_evidence, validate_work, with_digest
-from yuan.workflow import confirm_intake, confirm_work, intake_decision, intake_template
+from yuan.workflow import confirm_intake, confirm_work, intake_decision, intake_subject, intake_template
 
 
 ZERO = "0" * 64
@@ -544,8 +545,9 @@ class RuntimeCase(unittest.TestCase):
 
     def test_verifier_timeout_fails_closed(self) -> None:
         self.commit_change()
-        with mock.patch("yuan.runtime.subprocess.run", side_effect=subprocess.TimeoutExpired(["python"], 10)):
-            with self.assertRaisesRegex(IntegrityError, "Verifier 执行超时"):
+        timed_out = (subprocess.CompletedProcess(["python"], None, b"", b""), True)
+        with mock.patch("yuan.runtime.run_process_tree", return_value=timed_out):
+            with self.assertRaisesRegex(IntegrityError, "已终止其进程树"):
                 run_verifier(self.root, "AC-VALUE", "ATT-001")
 
     def test_work_rejects_unbound_verifier_closure(self) -> None:
@@ -758,7 +760,12 @@ class PureKernelTests(unittest.TestCase):
             confirm_intake(intake, "确认")
         intake["questions"][0]["answer"] = "仅管理员。"
         intake = with_digest(intake)
-        self.assertEqual(intake_decision(intake)["reason_code"], "NEEDS_CONFIRMATION")
+        decision = intake_decision(intake)
+        self.assertEqual(decision["reason_code"], "NEEDS_CONFIRMATION")
+        self.assertEqual(decision["summary"]["request"], intake["request"])
+        self.assertEqual(decision["summary"]["questions"][0]["answer"], "仅管理员。")
+        self.assertEqual(decision["summary"]["risk"], intake["risk"])
+        self.assertEqual(decision["summary"]["subject_digest"], digest(intake_subject(intake)))
         confirmed = confirm_intake(intake, "用户确认需求、答案、假设和风险")
         self.assertEqual(intake_decision(confirmed)["reason_code"], "INTAKE_CONFIRMED")
 
@@ -889,6 +896,24 @@ class PortAndAdapterTests(unittest.TestCase):
         )
         self.assertEqual(receipt["status"], "TIMEOUT")
         self.assertIsNone(receipt["exit_code"])
+
+    def test_bounded_command_timeout_kills_child_process_tree(self) -> None:
+        script = (
+            "import os,pathlib,subprocess,sys,time\n"
+            "child_code = 'import os,pathlib,time; pathlib.Path(\"child.pid\").write_text(str(os.getpid()), encoding=\"ascii\"); time.sleep(30)'\n"
+            "child = subprocess.Popen([sys.executable, '-c', child_code])\n"
+            "pid = pathlib.Path('child.pid')\n"
+            "while not pid.exists():\n"
+            " time.sleep(0.01)\n"
+            "time.sleep(30)\n"
+        )
+        receipt = self.port.run_command("python", ["-I", "-B", "-c", script], timeout_seconds=1)
+        self.assertEqual(receipt["status"], "TIMEOUT")
+        child_pid = int((self.root / "child.pid").read_text(encoding="ascii"))
+        deadline = time.monotonic() + 3
+        while _process_alive(child_pid) and time.monotonic() < deadline:
+            time.sleep(0.05)
+        self.assertFalse(_process_alive(child_pid))
 
     def test_llm_proposal_is_receipt_only(self) -> None:
         receipt = self.port.propose({"goal": "检查"})
@@ -1082,16 +1107,23 @@ class ProjectInstallerTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, guidance)
         self.assertEqual(result["status"], "INSTALLED")
         self.assertIn("agent_guidance", result)
-        self.assertIn("Yuan 下一步", guidance)
-        self.assertIn("开始新工作时发送", guidance)
-        self.assertIn("继续未完成工作时发送", guidance)
+        self.assertIn("Yuan 已就绪", guidance)
+        self.assertIn("开始新需求时，直接描述目标、范围和限制", guidance)
+        self.assertIn("恢复中断工作时，直接说明继续", guidance)
+        self.assertIn("自动恢复状态、检索记忆、路由 Agent/Skill", guidance)
+        self.assertNotIn("Yuan Agent Bootstrap", guidance)
+        self.assertNotIn("从 Intake 开始", guidance)
+        self.assertNotIn("memory resume", guidance)
 
     def test_install_pins_runtime_merges_bootstrap_and_updates(self) -> None:
         installed = install_project(self.root, release_context=self.release_context, run_id="RUN-INSTALL-TEST")
         self.assertEqual(installed["status"], "INSTALLED")
         self.assertEqual(installed["agent_guidance"], agent_guidance(self.root))
-        self.assertIn("AGENTS.md", installed["agent_guidance"]["start_prompt"])
-        self.assertIn("继续未完成的 Work", installed["agent_guidance"]["continue_prompt"])
+        self.assertIn("直接描述你想完成的结果", installed["agent_guidance"]["start_prompt"])
+        self.assertIn("尚未完成的 Yuan 工作", installed["agent_guidance"]["continue_prompt"])
+        self.assertNotIn("Yuan Agent Bootstrap", installed["agent_guidance"]["start_prompt"])
+        self.assertNotIn("从 Intake 开始", installed["agent_guidance"]["start_prompt"])
+        self.assertNotIn("memory resume", installed["agent_guidance"]["continue_prompt"])
         runtime = self.root / ".yuan" / "bin" / "yuan.pyz"
         self.assertTrue(runtime.is_file())
         config = json.loads((self.root / ".yuan" / "config.json").read_text(encoding="utf-8"))

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import signal
 import subprocess
 import time
 from dataclasses import dataclass
@@ -14,6 +15,56 @@ from .canonical import canonical_bytes, digest, digest_bytes
 from .errors import IntegrityError, ValidationError
 from .ledger import atomic_write
 from .paths import normalize_relative, resolve_inside
+
+
+def run_process_tree(
+    argv: list[str],
+    *,
+    cwd: Path,
+    timeout_seconds: int,
+) -> tuple[subprocess.CompletedProcess[bytes], bool]:
+    """Run a process with a timeout and terminate descendants on timeout."""
+
+    kwargs: dict[str, Any] = {
+        "cwd": cwd,
+        "stdin": subprocess.DEVNULL,
+        "stdout": subprocess.PIPE,
+        "stderr": subprocess.PIPE,
+        "shell": False,
+    }
+    if os.name == "nt":
+        kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+    else:
+        kwargs["start_new_session"] = True
+    process = subprocess.Popen(argv, **kwargs)
+    try:
+        stdout, stderr = process.communicate(timeout=timeout_seconds)
+        return subprocess.CompletedProcess(argv, process.returncode, stdout, stderr), False
+    except subprocess.TimeoutExpired:
+        _kill_process_tree(process)
+        try:
+            stdout, stderr = process.communicate(timeout=5)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            stdout, stderr = process.communicate()
+        return subprocess.CompletedProcess(argv, None, stdout or b"", stderr or b""), True
+
+
+def _kill_process_tree(process: subprocess.Popen[bytes]) -> None:
+    if os.name == "nt":
+        subprocess.run(
+            ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+            shell=False,
+        )
+        return
+    try:
+        os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+    except ProcessLookupError:
+        return
 
 
 @dataclass(frozen=True)
@@ -125,21 +176,11 @@ class ReferencePort:
                 except ValueError as exc:
                     raise ValidationError("Command argv 包含 Root 外 Absolute Path") from exc
         started = time.monotonic()
-        try:
-            result = subprocess.run(
-                [str(executable), *args],
-                cwd=self.root,
-                stdin=subprocess.DEVNULL,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                timeout=timeout_seconds,
-                check=False,
-                shell=False,
-            )
-            timed_out = False
-        except subprocess.TimeoutExpired as exc:
-            result = exc
-            timed_out = True
+        result, timed_out = run_process_tree(
+            [str(executable), *args],
+            cwd=self.root,
+            timeout_seconds=timeout_seconds,
+        )
         duration_ms = int((time.monotonic() - started) * 1000)
         stdout = (result.stdout or b"")[:max_output_bytes]
         stderr = (result.stderr or b"")[:max_output_bytes]

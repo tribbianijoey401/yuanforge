@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -15,6 +14,7 @@ from .errors import IntegrityError, ValidationError
 from .identity import harness_digest, protocol_revision
 from .ledger import Ledger, atomic_write, exclusive_lock
 from .paths import scope_contains
+from .ports import run_process_tree
 from .reducer import reduce_projection
 from .validate import action_authorized, identifier, validate_evidence, validate_proposal, validate_work
 from .workflow import validate_handoff
@@ -434,7 +434,7 @@ def accept_work(root: Path, work: dict[str, Any]) -> dict[str, Any]:
         {"artifact_digest": manifest["digest"], "manifest_blob": manifest_blob},
         expected_head=accepted["digest"],
     )
-    return rebuild(root)
+    return _refresh(ledger, manifest["digest"])
 
 
 def predecessor_binding(ledger: Ledger, projection: dict[str, Any]) -> dict[str, Any]:
@@ -503,7 +503,7 @@ def start_successor(root: Path, work: dict[str, Any], run_id: str) -> dict[str, 
         "status": "SUCCESSOR_ACTIVE",
         "run_id": run_id,
         "predecessor": expected_predecessor,
-        "projection": rebuild(root),
+        "projection": _refresh(successor, manifest["digest"]),
     }
 
 
@@ -585,7 +585,7 @@ def begin_attempt(root: Path, proposal: dict[str, Any]) -> dict[str, Any]:
             {"attempt_id": proposal["attempt_id"], "action": proposal["action"]},
             expected_head=projection["source_head"],
         )
-        projection = rebuild(root)
+        projection = _refresh(ledger, None if manifest is None else manifest["digest"])
         return {"event": event, "decision": projection["decision"]}
     if any(
         projection["budgets_used"].get(name, 0) + proposal["budget_charge"].get(name, 0) > maximum
@@ -596,7 +596,7 @@ def begin_attempt(root: Path, proposal: dict[str, Any]) -> dict[str, Any]:
             {"attempt_id": proposal["attempt_id"], "budget_charge": proposal["budget_charge"]},
             expected_head=projection["source_head"],
         )
-        return {"event": event, "decision": rebuild(root)["decision"]}
+        return {"event": event, "decision": _refresh(ledger, None if manifest is None else manifest["digest"])["decision"]}
     if manifest is None:
         raise IntegrityError("没有可审计的 Artifact Manifest")
     manifest_blob = ledger.put_blob(canonical_bytes(manifest))
@@ -684,7 +684,7 @@ def mark_attempt_unknown(root: Path, attempt_id: str, reason: str) -> dict[str, 
     if not isinstance(reason, str) or not reason.strip():
         raise ValidationError("UNKNOWN Reason 不能为空")
     _, ledger = active_ledger(root)
-    projection = rebuild(root, write=False)
+    projection, manifest = _snapshot(root, write=False)
     attempt = projection["attempts"].get(attempt_id)
     if not attempt or attempt["state"] not in {"DISPATCHED", "OBSERVED"}:
         raise ValidationError("只有 DISPATCHED 或 OBSERVED Attempt 可以转为 UNKNOWN")
@@ -693,7 +693,7 @@ def mark_attempt_unknown(root: Path, attempt_id: str, reason: str) -> dict[str, 
         {"attempt_id": attempt_id, "reason": reason.strip()},
         expected_head=projection["source_head"],
     )
-    return {"event": event, "decision": rebuild(root)["decision"]}
+    return {"event": event, "decision": _refresh(ledger, None if manifest is None else manifest["digest"])["decision"]}
 
 
 def resolve_attempt(
@@ -754,7 +754,7 @@ def resolve_attempt(
         },
         expected_head=projection["source_head"],
     )
-    return {"event": event, "decision": rebuild(root)["decision"]}
+    return {"event": event, "decision": _refresh(ledger, manifest["digest"])["decision"]}
 
 
 def add_evidence(root: Path, evidence: dict[str, Any]) -> dict[str, Any]:
@@ -772,7 +772,7 @@ def add_evidence(root: Path, evidence: dict[str, Any]) -> dict[str, Any]:
     if evidence["artifact"]["digest"] != source_artifact:
         raise ValidationError("Evidence Artifact 与来源 Attempt 不匹配")
     event = ledger.append("EVIDENCE_RECORDED", evidence, expected_head=projection["source_head"])
-    return {"event": event, "decision": rebuild(root)["decision"]}
+    return {"event": event, "decision": _refresh(ledger, artifact["digest"])["decision"]}
 
 
 def handoff_template(
@@ -847,7 +847,7 @@ def record_handoff(root: Path, handoff: dict[str, Any]) -> dict[str, Any]:
         if not evidence or evidence.get("current") is not True:
             raise ValidationError("Role Handoff 引用了不存在或过期的 Evidence")
     event = ledger.append("ROLE_HANDOFF_RECORDED", handoff, expected_head=projection["source_head"])
-    return {"event": event, "decision": rebuild(root)["decision"]}
+    return {"event": event, "decision": _refresh(ledger, artifact["digest"])["decision"]}
 
 
 def supersede_work(root: Path, *, reason: str, request: str) -> dict[str, Any]:
@@ -856,7 +856,7 @@ def supersede_work(root: Path, *, reason: str, request: str) -> dict[str, Any]:
     if not isinstance(reason, str) or not reason.strip() or not isinstance(request, str) or not request.strip():
         raise ValidationError("Supersede reason 与新 request 不能为空")
     _, ledger = active_ledger(root)
-    projection = rebuild(root, write=False)
+    projection, manifest = _snapshot(root, write=False)
     if projection["work"] is None or projection["errors"] or projection.get("superseded") is not None:
         raise IntegrityError("当前没有可 Supersede 的合法 Work")
     if projection["decision"]["result"] not in {"CONTINUE", "CORRECT"}:
@@ -870,7 +870,7 @@ def supersede_work(root: Path, *, reason: str, request: str) -> dict[str, Any]:
         "request_digest": digest_bytes(request.strip().encode("utf-8")),
     }
     event = ledger.append("WORK_SUPERSEDED", payload, expected_head=projection["source_head"])
-    return {"event": event, "decision": rebuild(root)["decision"], "successor_required": True}
+    return {"event": event, "decision": _refresh(ledger, None if manifest is None else manifest["digest"])["decision"], "successor_required": True}
 
 
 _VERIFIER_WRAPPER = r'''
@@ -936,19 +936,9 @@ def run_verifier(root: Path, criterion_id: str, attempt_id: str) -> dict[str, An
     if before["digest"] != source_artifact:
         raise IntegrityError("当前 Artifact 与 Verifier 来源 Attempt 不一致")
     argv = [sys.executable, "-I", "-B", "-c", _VERIFIER_WRAPPER, str(script), str(root.resolve())]
-    try:
-        completed = subprocess.run(
-            argv,
-            cwd=root.resolve(),
-            stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            timeout=timeout,
-            check=False,
-            shell=False,
-        )
-    except subprocess.TimeoutExpired as exc:
-        raise IntegrityError("Verifier 执行超时") from exc
+    completed, timed_out = run_process_tree(argv, cwd=root.resolve(), timeout_seconds=timeout)
+    if timed_out:
+        raise IntegrityError("Verifier 执行超时，已终止其进程树")
     after = artifact_for(root, work)
     if after["digest"] != before["digest"]:
         raise IntegrityError("Verifier 修改了 Artifact")

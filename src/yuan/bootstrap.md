@@ -15,15 +15,19 @@ python -B .yuan/bin/yuan.pyz --root .
 
 固定 Runtime 无法启动或安装记录损坏时，不能要求旧 Runtime 自证。改由 Yuan Source 外部入口 `python -B scripts/sync_project.py update <项目根目录>` 强制重建托管框架；该动作必须保持 `.yuan-run/`、`docs/memory/`、`.yuan/extensions/custom/` 与项目自有内容不变。更新后再恢复事实，诊断警告不触发旧 Runtime 回滚。
 
+用户入口只表达意图、范围、限制或“继续”。不得要求用户用提示词指定从 Intake、某个 Agent 或某个 Skill 开始；这些节点只能由本 Bootstrap、固定 Runtime 状态、Memory 恢复结果和 `capability route` 自动触发。
+
+`recover`、`rebuild` 与 `memory rebuild` 是操作员恢复命令，不属于正常需求流转；只有 Ledger Head、派生 Run Memory 或 Memory 派生索引损坏时才可使用，并应在结果中说明恢复原因。
+
 ## 2. 新需求：必须两次确认
 
 新项目、已完成 Work 后的新请求，以及被 Supersede 后的需求都执行同一流程：
 
-1. 加载 `conductor` 及其 `project-lifecycle`、`requirements-clarification` Assignment。
+1. 用户用自然语言提出新需求时，Conductor 自动加载 `project-lifecycle` 与 `requirements-clarification` Assignment；不得要求用户点名内部阶段、Agent 或 Skill。
 2. 运行 `<入口> memory resume --request <用户原始请求>`；先读取 `CURRENT.md` 对应的连续性检查点，再使用 Binding 未过期的长期知识。相关 Memory ID/Digest 写入 Intake 依据，`hypothesis` 只能作为待验证线索。
 3. 运行 `<入口> intake template --request <用户原始请求>`，把返回 JSON 保存为 `.yuan/drafts/intake.json`。
 4. 由 Product Analyst 语义检查目标、用户、范围、非目标、失败影响、兼容性、数据/权限和不可逆选择。会改变验收或安全边界的问题标记为 Blocking，并原样询问用户；不得替用户回答。
-5. 把答案、可撤销假设、R0/R1/R2 风险理由和 Routing Signals 写回 Intake；运行 `<入口> seal <file>` 保存重新计算 Digest 的返回值，再运行 `<入口> intake check <sealed-file>`。`NEEDS_INPUT` 时继续提问，`NEEDS_CONFIRMATION` 时向用户展示摘要。
+5. 把答案、可撤销假设、R0/R1/R2 风险理由和 Routing Signals 写回 Intake；运行 `<入口> seal <file>` 保存重新计算 Digest 的返回值，再运行 `<入口> intake check <sealed-file>`。`NEEDS_INPUT` 时继续提问；`NEEDS_CONFIRMATION` 时必须展示返回的 `summary`，至少包含需求、问题答案、假设、风险、Signals 与 Subject Digest，不能只询问“是否确认”。
 6. 用户明确确认需求、答案、假设与风险后，运行 `<入口> intake confirm <file> --statement <真实确认摘要>`，保存返回的已确认 Intake。开放平台中的 Confirmation 是可审计对话回执，不冒充密码学签名。
 7. 运行 `<入口> capability route --risk <level> [--signal <signal>]`。使用返回的完整 `routing`、`assignments`、Rules、Agents 与 Skills；不得手工降级风险、删除角色或凭 `use_when` 另造路由。
 8. 运行 `<入口> work template --intake <confirmed-intake>`（继任时加 `--successor`）。加载 `work-authoring` 与 `verifier-authoring`，编辑 Goal、Artifact Scope、Grant、Budget、至少一个 Required Criterion 和 Safety Invariant。
