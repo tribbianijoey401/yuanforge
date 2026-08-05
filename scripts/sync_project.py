@@ -20,6 +20,9 @@ from yuan.project import (  # noqa: E402
     update_project,
 )
 from yuan.capabilities import DEFAULT_PROFILE, available_profiles  # noqa: E402
+from yuan.canonical import digest_bytes  # noqa: E402
+from yuan.identity import protocol_bytes  # noqa: E402
+from yuan import __version__  # noqa: E402
 
 
 class ChineseArgumentParser(argparse.ArgumentParser):
@@ -96,6 +99,49 @@ def _verified_context(report_path: Path | None) -> dict[str, object]:
     return load_release_context(ROOT, report_path)
 
 
+def _self_check(target: Path) -> dict[str, object]:
+    """比较执行这份 sync_project 的源码拷贝与目标项目固定 Runtime 的代际。"""
+
+    record_path = target.resolve() / ".yuan" / "install.json"
+    source_protocol_digest = digest_bytes(protocol_bytes())
+    if not record_path.is_file():
+        return {
+            "status": "UNINSTALLED",
+            "source_version": __version__,
+            "message": "目标项目没有 Yuan 安装记录；使用 install 而不是 update。",
+        }
+    try:
+        record = json.loads(record_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        return {
+            "status": "CORRUPT",
+            "source_version": __version__,
+            "error": str(exc),
+            "message": "Install Record 不可读；update 是强制重建路径，无需先修复记录。",
+            "recommended_command": f"python -B scripts/sync_project.py update {target}",
+        }
+    framework_version = record.get("framework_version")
+    protocol_digest = record.get("protocol_digest")
+    warnings = []
+    if framework_version != __version__:
+        warnings.append(f"框架版本不同：源码 {__version__}，项目 {framework_version}")
+    if protocol_digest != source_protocol_digest:
+        warnings.append("Protocol Digest 不同：目标项目 Runtime 与这份源码不同代")
+    if warnings:
+        return {
+            "status": "GENERATION_DRIFT",
+            "source_version": __version__,
+            "project_version": framework_version,
+            "warnings": warnings,
+            "message": (
+                "执行这份 sync_project 的源码拷贝与目标项目的固定 Runtime 不同代。"
+                "请确认这份源码就是你想要激活的版本，再用 update 强制重建；"
+                "update 不依赖旧 Runtime 自证，旧状态不一致由新 Runtime 前向消化。"
+            ),
+        }
+    return {"status": "SAME_GENERATION", "source_version": __version__, "message": "源码拷贝与目标项目 Runtime 同代。"}
+
+
 def main() -> int:
     _configure_utf8_streams()
     parser = ChineseArgumentParser(description="安装或更新目标项目的 Yuan Runtime 与 Agent Bootstrap")
@@ -109,10 +155,13 @@ def main() -> int:
     update = commands.add_parser("update", help="强制激活当前 Yuan Source")
     update.add_argument("target", type=Path)
     update.add_argument("--capability-profile", choices=available_profiles(), help="选择要强制部署的 Capability Profile")
+    update.add_argument("--conformance-report", type=Path, help="用已有且匹配当前 Source 的 Conformance Report 走签名验证路径")
     status = commands.add_parser("status", help="检查项目部署与暂存版本")
     status.add_argument("target", type=Path)
     diagnose = commands.add_parser("diagnose", help="不依赖旧 Runtime 收集完整部署诊断")
     diagnose.add_argument("target", type=Path)
+    self_check = commands.add_parser("self-check", help="比较这份源码拷贝与目标项目 Runtime 的代际")
+    self_check.add_argument("target", type=Path)
     _localize_parser(parser)
     args = parser.parse_args()
     try:
@@ -128,11 +177,14 @@ def main() -> int:
             result = update_project(
                 args.target,
                 capability_profile=args.capability_profile,
+                release_context=_verified_context(args.conformance_report) if args.conformance_report else None,
             )
         elif args.command == "status":
             result = project_status(args.target)
         elif args.command == "diagnose":
             result = diagnose_project(args.target)
+        elif args.command == "self-check":
+            result = _self_check(args.target)
         else:
             raise AssertionError("到达不可达的 sync_project 命令分支")
         print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))

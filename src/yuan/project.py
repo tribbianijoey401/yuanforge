@@ -7,6 +7,7 @@ import os
 import shutil
 import subprocess
 import sys
+import zipfile
 from datetime import datetime, timezone
 from importlib import resources
 from pathlib import Path
@@ -43,7 +44,7 @@ CORE_DEPLOYMENT_FILES = (
     ".yuan/release-manifest.json",
     ".yuan/conformance-report.json",
 )
-GITIGNORE_CONTENT = ".yuan-run/\n.yuan/drafts/\n.yuan/candidates/\n.yuan/releases/"
+GITIGNORE_CONTENT = ".yuan-run/\n.yuan/drafts/\n.yuan/candidates/\n.yuan/releases/\n.yuan/cache/"
 REQUIRED_CONFORMANCE_CHECKS = {
     "unit_tests", "schemas", "adapter", "bootstrap", "capability_profile", "automation", "size_budget", "reproducible_release"
 }
@@ -501,6 +502,24 @@ def _forced_release_context(root: Path, artifact: dict[str, Any]) -> tuple[dict[
     return context, proof
 
 
+def _expand_source_cache(root: Path, runtime: Path, artifact: dict[str, Any]) -> None:
+    """把固定 Runtime 的源码展开成可 grep 的只读副本，省去掏 zip 诊断。"""
+
+    manifest = artifact.get("manifest")
+    if not isinstance(manifest, dict):
+        raise IntegrityError("Candidate 缺少 Release Manifest")
+    cache_root = (root / ".yuan" / "cache" / "src").resolve()
+    try:
+        with zipfile.ZipFile(runtime.resolve(), "r") as archive:
+            for entry in manifest["sources"]:
+                target = (cache_root / entry["archive_path"]).resolve()
+                if not target.is_relative_to(cache_root):
+                    raise IntegrityError(f"Release Source 路径逃逸源码缓存：{entry['archive_path']}")
+                atomic_write(target, archive.read(entry["archive_path"]))
+    except zipfile.BadZipFile as exc:
+        raise IntegrityError("固定 Runtime 不是有效 Zipapp，无法展开源码缓存") from exc
+
+
 def _fresh_config(capability_profile: str) -> dict[str, Any]:
     protocol = protocol_bytes()
     capability = capability_manifest(capability_profile)
@@ -669,6 +688,7 @@ def install_project(
                 memory_scaffolded = True
             _write_release_evidence(root, artifact, release_context)
             record = _install_record(root, artifact, proof)
+            _expand_source_cache(root, runtime, artifact)
             status = _pinned_status(root, runtime)
         except Exception:
             _restore(root, captured)
@@ -718,7 +738,11 @@ def update_project(
         candidate = root / ".yuan" / "candidates" / f"yuan-{os.getpid()}.pyz"
         artifact = build_runtime_zipapp(candidate)
         try:
-            context, proof = _forced_release_context(root, artifact)
+            if release_context is not None:
+                context = release_context
+                proof = _validated_release(candidate, artifact, context)
+            else:
+                context, proof = _forced_release_context(root, artifact)
             atomic_write(runtime, candidate.read_bytes())
             _remove_managed_capabilities(root)
             _write_capabilities(root, capability_profile)

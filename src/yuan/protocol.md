@@ -1,4 +1,4 @@
-# Yuan Core Protocol 0.3
+# Yuan Core Protocol 0.4
 
 状态：Normative。参考 Kernel 实现本文中的确定性条款；每个 Run 固定 Protocol 与 Kernel 的 SHA-256。
 
@@ -119,6 +119,8 @@ Projection 只保存有界 Pointer，可删除并重建。Replay 绝不能从已
 ## 11. 升级权威
 
 运行中的 Core 不批准或否决继任者。框架源码是普通 Version-controlled Project；维护者或 CI 在 Active Run 外构建并验证 Candidate，发布 Hash/Signature，并为下一个 Run 显式选择它。已有 Run 保持固定。Migration Adapter 只能把旧不可变 Record 转换为新版本 Record，不能重写历史。
+
+Install/Update/Diagnose 是外部控制面操作：只能从框架源码外部发起，绝不依赖被替换 Runtime 的自证、旧 Install Record、Active Work 或旧 Conformance 作为放行门禁。控制面失败必须输出 Exit Code、stdout/stderr 尾部与涉及路径等完整取证。旧状态不一致不是控制面错误，而是新 Runtime 激活后的前向 Reconciliation 任务；Conformance 在 Release 构建期执行并以证据绑定 Artifact，部署期只验证证据。
 
 ## 12. Conformance
 

@@ -1127,7 +1127,7 @@ class ProjectInstallerTests(unittest.TestCase):
         runtime = self.root / ".yuan" / "bin" / "yuan.pyz"
         self.assertTrue(runtime.is_file())
         config = json.loads((self.root / ".yuan" / "config.json").read_text(encoding="utf-8"))
-        self.assertEqual(config["protocol"]["revision"], "0.3")
+        self.assertEqual(config["protocol"]["revision"], "0.4")
         manifest = json.loads((self.root / ".yuan" / "extensions" / "manifest.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["profile_id"], "vibe-coding")
         self.assertEqual(manifest["schema_version"], "yuan.capability-profile/v2")
@@ -1672,6 +1672,55 @@ class ProjectInstallerTests(unittest.TestCase):
             with mock.patch("yuan.project.DEPLOYMENT_LOCK_TIMEOUT", 0.01):
                 with self.assertRaises(IntegrityError):
                     install_project(self.root, release_context=self.release_context, run_id="RUN-LOCKED")
+
+    def test_install_expands_source_cache_for_grep(self) -> None:
+        install_project(self.root, release_context=self.release_context, run_id="RUN-SOURCE-CACHE")
+        cache = self.root / ".yuan" / "cache" / "src"
+        self.assertTrue((cache / "yuan" / "project.py").is_file())
+        self.assertTrue((cache / "yuan" / "cli.py").is_file())
+        from yuan.release import build_runtime_zipapp
+
+        with tempfile.TemporaryDirectory() as temporary:
+            artifact = build_runtime_zipapp(Path(temporary) / "yuan.pyz")
+        expected = {entry["archive_path"] for entry in artifact["manifest"]["sources"]}
+        actual = {path.relative_to(cache).as_posix() for path in cache.rglob("*") if path.is_file()}
+        self.assertEqual(actual, expected)
+        self.assertIn("强制重建托管框架层", (cache / "yuan" / "project.py").read_text(encoding="utf-8"))
+
+    def test_sync_self_check_detects_generation_drift(self) -> None:
+        repo = Path(__file__).resolve().parents[1]
+        install_project(self.root, release_context=self.release_context, run_id="RUN-SELF-CHECK")
+        completed = subprocess.run(
+            [sys.executable, "-B", str(repo / "scripts" / "sync_project.py"), "self-check", str(self.root)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=60,
+        )
+        result = json.loads(completed.stdout.decode("utf-8"))
+        self.assertEqual(completed.returncode, 0, completed.stderr.decode(errors="replace"))
+        self.assertEqual(result["status"], "SAME_GENERATION")
+        record_path = self.root / ".yuan" / "install.json"
+        record = json.loads(record_path.read_text(encoding="utf-8"))
+        record["framework_version"] = "0.0.0-drift"
+        record_path.write_text(json.dumps(record), encoding="utf-8")
+        drifted = subprocess.run(
+            [sys.executable, "-B", str(repo / "scripts" / "sync_project.py"), "self-check", str(self.root)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=60,
+        )
+        self.assertEqual(drifted.returncode, 0, drifted.stderr.decode(errors="replace"))
+        self.assertEqual(json.loads(drifted.stdout.decode("utf-8"))["status"], "GENERATION_DRIFT")
+        uninstalled = subprocess.run(
+            [sys.executable, "-B", str(repo / "scripts" / "sync_project.py"), "self-check", str(repo / "tests")],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=60,
+        )
+        self.assertEqual(json.loads(uninstalled.stdout.decode("utf-8"))["status"], "UNINSTALLED")
 
 
 if __name__ == "__main__":
