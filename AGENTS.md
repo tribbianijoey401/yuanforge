@@ -11,8 +11,8 @@ python -B .yuan/bin/yuan.pyz --root .
 
 ## 1. 每次对话先恢复事实
 
-1. 运行 `<入口> status` 和 `<入口> capability list`。命令失败、Integrity 校验失败、JSON 不可解析或能力 Digest 不匹配时返回 `BLOCKED`。
-2. 读取 `.yuan/protocol.md`。Protocol、Kernel、Active Work 和 Reducer 的机械结果高于 Rule、Agent、Skill 与聊天摘要。
+1. 运行 `<入口> status` 和 `<入口> capability list --brief`。命令失败、Integrity 校验失败、JSON 不可解析或能力 Digest 不匹配时返回 `BLOCKED`。只有需要完整能力元数据时才运行不带 `--brief` 的 `capability list`。
+2. 不要每次会话全文读取 `.yuan/protocol.md`：Protocol 已由 Runtime 完成 Digest 绑定校验。只有当命中本 Bootstrap 未覆盖的决策条款（确认有效性、副作用类别、Result 语义、Replay 与恢复）时，才读取 `.yuan/protocol.md` 的对应章节。Protocol、Kernel、Active Work 和 Reducer 的机械结果高于 Rule、Agent、Skill 与聊天摘要。
 3. 不得直接编辑 `.yuan/config.json`、`.yuan/protocol.md`、`.yuan/bin/`、`.yuan/install.json`、托管 Profile 或 `.yuan-run/`。`.yuan/drafts/` 仅保存 Work 接受前草稿；项目扩展写入 `.yuan/extensions/custom/`。
 4. `BLOCKED` 且唯一原因是“没有 Active Work”表示正常空 Run，应进入需求 Intake；其他 `BLOCKED` 必须按机械原因恢复。
 
@@ -22,22 +22,20 @@ python -B .yuan/bin/yuan.pyz --root .
 
 `recover`、`rebuild` 与 `memory rebuild` 是操作员恢复命令，不属于正常需求流转；只有 Ledger Head、派生 Run Memory 或 Memory 派生索引损坏时才可使用，并应在结果中说明恢复原因。
 
-## 2. 新需求：必须两次确认
+## 2. 新需求：按风险确认
 
-新项目、已完成 Work 后的新请求，以及被 Supersede 后的需求都执行同一流程：
+新项目、已完成 Work 后的新请求，以及被 Supersede 后的需求都执行同一流程。确认级别与风险和不可逆性挂钩：确认保护的是不可逆动作前的意图对齐，可逆的低风险任务只付轻量确认。
 
 1. 用户用自然语言提出新需求时，Conductor 自动加载 `project-lifecycle` 与 `requirements-clarification` Assignment；不得要求用户点名内部阶段、Agent 或 Skill。
 2. 运行 `<入口> memory resume --request <用户原始请求>`；先读取 `CURRENT.md` 对应的连续性检查点，再使用 Binding 未过期的长期知识。相关 Memory ID/Digest 写入 Intake 依据，`hypothesis` 只能作为待验证线索。
-3. 运行 `<入口> intake template --request <用户原始请求>`，把返回 JSON 保存为 `.yuan/drafts/intake.json`。
-4. 由 Product Analyst 语义检查目标、用户、范围、非目标、失败影响、兼容性、数据/权限和不可逆选择。会改变验收或安全边界的问题标记为 Blocking，并原样询问用户；不得替用户回答。
-5. 把答案、可撤销假设、R0/R1/R2 风险理由和 Routing Signals 写回 Intake；运行 `<入口> seal <file>` 保存重新计算 Digest 的返回值，再运行 `<入口> intake check <sealed-file>`。`NEEDS_INPUT` 时继续提问；`NEEDS_CONFIRMATION` 时必须展示返回的 `summary`，至少包含需求、问题答案、假设、风险、Signals 与 Subject Digest，不能只询问“是否确认”。
-6. 用户明确确认需求、答案、假设与风险后，运行 `<入口> intake confirm <file> --statement <真实确认摘要>`，保存返回的已确认 Intake。开放平台中的 Confirmation 是可审计对话回执，不冒充密码学签名。
-7. 运行 `<入口> capability route --risk <level> [--signal <signal>]`。使用返回的完整 `routing`、`assignments`、Rules、Agents 与 Skills；不得手工降级风险、删除角色或凭 `use_when` 另造路由。
-8. 运行 `<入口> work template --intake <confirmed-intake>`（继任时加 `--successor`）。加载 `work-authoring` 与 `verifier-authoring`，编辑 Goal、Artifact Scope、Grant、Budget、至少一个 Required Criterion 和 Safety Invariant。
-9. Verifier 只能先写入 `.yuan/drafts/verifiers/`，从 `sys.argv[1]` 读取项目根目录，只读验证 Artifact，并输出一个 JSON Object：`{"status":"PASS|FAIL","assertions":[...]}`。用 `work bind-verifier` 固定 Closure。
-10. 向用户展示完整 Work：Goal、范围/非目标、Criterion、Grant、Budget、Risk、Agent/Skill Assignment。用户明确确认后运行 `<入口> work confirm <file> --statement <真实确认摘要>`；最后才运行 `work accept`，继任 Work 则运行 `run successor`。
-
-任何已确认字段发生变化，原 Confirmation 自动失效，必须重新展示和确认。
+3. 风险预检：在生成 Intake 前，按 `rules/03-risk-and-review.md` 把请求归类为 R0/R1/R2——认证、权限、支付、密钥、数据删除、迁移、生产发布归 R0；常规功能、API、持久化、依赖升级归 R1；文档、小型样式、非行为配置归 R2。存疑时升一级，绝不降级；Intake 语义检查中发现 Blocking 问题时同样只能升级风险。
+4. 运行 `<入口> intake template --request <用户原始请求>`，保存为 `.yuan/drafts/intake.json`，并把预检的风险等级与理由写入 `risk`。由 Product Analyst 语义检查目标、范围、失败影响与不可逆选择；会改变验收或安全边界的问题标记为 Blocking 并原样询问用户，不得替用户回答。R2 需求允许合并检查步骤、省略与风险无关的维度。
+5. 运行 `<入口> seal <file>` 保存重新计算 Digest 的返回值，再运行 `<入口> intake check <sealed-file>`。`NEEDS_INPUT` 时继续提问。
+6. R2 轻量泳道：`intake check` 返回 `NEEDS_CONFIRMATION` 时展示返回的 `summary`（需求、问题答案、假设、风险、Signals），取得用户一次确认；然后用同一确认声明依次运行 `intake confirm`、起草 Work（`work template` + `bind-verifier`）、`work confirm` 与 `work accept`，不再就 Work 单独询问用户。低风险任务的 Work 形态由风险路由与 Verifier、Reducer 机械兜底；起草结果明显偏离用户请求时必须停下来说明。
+7. R0/R1 完整泳道：先展示需求摘要（至少包含需求、问题答案、假设、风险、Signals 与 Subject Digest，不能只询问“是否确认”），用户确认后运行 `<入口> intake confirm <file> --statement <真实确认摘要>`；再起草 Work 并单独展示完整 Work，用户第二次确认后运行 `work confirm`，最后 `work accept`。
+8. 运行 `<入口> capability route --risk <level> [--signal <signal>] --brief`。Routing 是 Agent、Skill 与审查要求的唯一来源；不得手工降级风险、删除角色或凭 `use_when` 另造路由。只读取当前阶段要派发角色对应的 Agents/Skills 文件（`assignments` 已指明每个角色加载哪些 Skill），不得预读全部路由引用的全文。
+9. 运行 `<入口> work template --intake <confirmed-intake>`（继任时加 `--successor`）。加载 `work-authoring` 与 `verifier-authoring`，编辑 Goal、Artifact Scope、Grant、Budget、至少一个 Required Criterion 和 Safety Invariant。Verifier 只能先写入 `.yuan/drafts/verifiers/`，从 `sys.argv[1]` 读取项目根目录，只读验证 Artifact，并输出一个 JSON Object：`{"status":"PASS|FAIL","assertions":[...]}`。用 `work bind-verifier` 固定 Closure。
+10. 开放平台中的 Confirmation 是可审计对话回执，不冒充密码学签名。任何已确认字段发生变化，原 Confirmation 自动失效，必须重新展示和确认。
 
 ## 3. Agent → Skill → Handoff
 
@@ -66,7 +64,7 @@ Reviewer 不修改被审对象。`NEEDS_WORK` 或可信 FAIL Evidence 由实现�
 
 1. 停止创建普通 Attempt；确认所有 `PREPARED`、`DISPATCHED`、`OBSERVED`、`UNKNOWN` Attempt 已被解析。
 2. 对 `CONTINUE` 或 `CORRECT` Work 运行 `<入口> run supersede --reason <变更原因> --request <新原始请求>`。旧 Work、Attempt、Evidence 与 Handoff 保持不可变。
-3. 从新请求重新执行 Intake → 用户确认 → Capability Route → Work Authoring → 用户最终确认。
+3. 从新请求重新执行风险预检、Intake、按风险确认、Capability Route、Work Authoring 与用户最终确认。
 4. 新 Work 保持 `work_id`、Revision 加一并绑定前任 Ledger Head；运行 `<入口> run successor <confirmed-work> --run-id <id>`。
 
 不得把新需求直接写进旧 Work，也不得把 `WAIT_AUTH` 当作需求澄清通道。

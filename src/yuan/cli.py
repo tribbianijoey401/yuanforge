@@ -99,6 +99,39 @@ def emit(value: Any) -> None:
     sys.stdout.buffer.write(canonical_bytes(value) + b"\n")
 
 
+def brief_projection(args: argparse.Namespace, value: Any) -> Any:
+    """把大输出投影成决定与下一步所需的最小形状；完整记录仍可用全量命令获取。"""
+
+    if args.command != "capability" or not isinstance(value, dict):
+        return value
+    if args.capability_command == "list" and value.get("status") == "PASS":
+        return {
+            "mode": "brief",
+            "profile_id": value.get("profile_id"),
+            "profile_version": value.get("profile_version"),
+            "required_rules": value.get("required_rules", []),
+            "agents": [{"id": item["id"], "use_when": item.get("use_when", [])} for item in value.get("agents", [])],
+            "skills": [{"id": item["id"], "use_when": item.get("use_when", [])} for item in value.get("skills", [])],
+            "custom_errors": value.get("custom_errors", []),
+            "full_command": "capability list",
+        }
+    if args.capability_command == "route" and value.get("status") == "ROUTED":
+        routing = value.get("routing", {})
+        return {
+            "mode": "brief",
+            "risk": routing.get("risk"),
+            "signals": routing.get("signals", []),
+            "routing_digest": routing.get("digest"),
+            "handoff_agents": routing.get("handoff_agents", []),
+            "assignments": value.get("assignments", []),
+            "rule_paths": [item["path"] for item in value.get("rules", [])],
+            "agent_paths": {item["id"]: item["path"] for item in value.get("agents", [])},
+            "skill_paths": {item["id"]: item["path"] for item in value.get("skills", [])},
+            "full_command": f"capability route --risk {routing.get('risk')}",
+        }
+    return value
+
+
 def configure_utf8_streams() -> None:
     """确保 Windows 终端中的中文 Help 与错误信息使用 UTF-8。"""
 
@@ -426,7 +459,8 @@ def parser() -> argparse.ArgumentParser:
     project_diagnose.add_argument("target", type=Path)
     capability = commands.add_parser("capability", help="发现并解析 Rules、Agents 与 Skills")
     capability_sub = capability.add_subparsers(dest="capability_command", required=True)
-    capability_sub.add_parser("list", help="列出已安装能力及触发条件")
+    capability_list = capability_sub.add_parser("list", help="列出已安装能力及触发条件")
+    capability_list.add_argument("--brief", action="store_true", help="只输出决定与下一步所需的最小字段")
     capability_resolve = capability_sub.add_parser("resolve", help="解析本 Tick 要加载的能力文件")
     capability_resolve.add_argument("--rule", action="append", default=[])
     capability_resolve.add_argument("--agent", action="append", default=[])
@@ -434,6 +468,7 @@ def parser() -> argparse.ArgumentParser:
     capability_route = capability_sub.add_parser("route", help="根据 Risk 与 Signal 生成确定性 Agent/Skill 路由")
     capability_route.add_argument("--risk", choices=("R0", "R1", "R2"), required=True)
     capability_route.add_argument("--signal", action="append", default=[])
+    capability_route.add_argument("--brief", action="store_true", help="只输出决定与下一步所需的最小字段")
     capability_bind = capability_sub.add_parser("bind-custom", help="绑定 Custom Extension 文件与 Descriptor Digest")
     capability_bind.add_argument("directory", type=Path)
     capability_bind.add_argument("--write", action="store_true", help="原子更新扩展的 extension.json")
@@ -641,7 +676,10 @@ def main(argv: list[str] | None = None) -> int:
     configure_utf8_streams()
     try:
         args = parser().parse_args(argv)
-        emit(execute(args))
+        result = execute(args)
+        if getattr(args, "brief", False):
+            result = brief_projection(args, result)
+        emit(result)
         return 0
     except YuanError as exc:
         emit({"status": "ERROR", "error": str(exc), "result": "BLOCKED"})

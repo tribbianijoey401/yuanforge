@@ -21,5 +21,5 @@
 
 1. 用户修改已确认的目标、范围、验收、授权或风险时，不得直接编辑 Active Work。
 2. 先解析所有 `PREPARED`、`DISPATCHED`、`OBSERVED` 或 `UNKNOWN` Attempt。
-3. 对 `CONTINUE/CORRECT` Work 记录 `WORK_SUPERSEDED`，保留旧历史；重新创建 Intake、取得两次确认、生成 Routing，再启动绑定前任 Head 的 Successor。
+3. 对 `CONTINUE/CORRECT` Work 记录 `WORK_SUPERSEDED`，保留旧历史；重新创建 Intake、按风险取得确认、生成 Routing，再启动绑定前任 Head 的 Successor。
 4. 仅补充不改变契约的上下文可写入下一次派发包；是否改变契约有疑义时按需求变更处理。
