@@ -2,7 +2,7 @@
 
 > **vNext Scope：** Agent Contract 必须包含 Activation、Skill Assignment、Reference Boundary 与 Focused Output。是否调用 Agent 由 `routing.md` 决定；Agent 不直接读取 Reference。下文旧 Gate / Defensive Injection 格式仅在 Routing 选择相关 Policy 时适用。
 
-> 本文件只承载「跨 agent 不变」的词汇与要求。各 agent 的**具体规则**（执行权限、冻结基准、对抗目标、输出列、门禁阈值、路由条目）写在各自合约里，**创建时定下**（见 `templates/role-contract.md`）。
+> 本文件只承载「跨 agent 不变」的词汇与要求。各 agent 的**具体规则**（执行权限、冻结基准、对抗目标、输出列、门禁阈值、路由条目）写在各自合约里，**创建时定下**（见 `agents/contract-template.md`）。
 > 各 agent 合约**引用**本文件，不重抄正文。修改须走原子提交。
 
 ## 三档门禁词汇（统一含义，所有 agent 共用）

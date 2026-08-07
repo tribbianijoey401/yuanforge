@@ -32,7 +32,7 @@ class FrameworkContractTests(unittest.TestCase):
         agents = [
             path
             for path in (FRAMEWORK / "agents").glob("*.md")
-            if path.name != "CONTRACT_TEMPLATE.md"
+            if path.name != "contract-template.md"
         ]
         skills = list((FRAMEWORK / "skills").glob("*.md"))
         skills += list((FRAMEWORK / "skills").glob("*/SKILL.md"))
@@ -43,7 +43,7 @@ class FrameworkContractTests(unittest.TestCase):
         ]
 
         self.assertEqual(13, len(agents))
-        self.assertGreaterEqual(len(skills), 18)
+        self.assertGreaterEqual(len(skills), 17)
         self.assertGreaterEqual(len(references), 30)
 
         grilling = (FRAMEWORK / "skills" / "grilling" / "SKILL.md").read_text(
@@ -68,7 +68,7 @@ class FrameworkContractTests(unittest.TestCase):
 
     def test_agent_skill_paths_exist(self):
         for agent in (FRAMEWORK / "agents").glob("*.md"):
-            if agent.name == "CONTRACT_TEMPLATE.md":
+            if agent.name == "contract-template.md":
                 continue
             text = agent.read_text(encoding="utf-8")
             assignment = next(

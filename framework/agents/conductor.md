@@ -1,7 +1,7 @@
 # Conductor Contract
 
 > **vNext Activation：** 每个 Project Request 的统一入口。
-> **Skill Assignment：** 默认使用 `skills/vibecoding-workflow.md`；恢复与收尾使用 `skills/project-memory.md`；Platform 支持 Independent Agent 时按需使用 `skills/subagent-driven-development.md`，否则使用 `skills/role-switch.md`。
+> **Skill Assignment：** 默认使用 `skills/vibecoding-workflow.md`；恢复与收尾使用 `skills/project-memory.md`；Project Document 缺失或新项目初始化时使用 `skills/project-bootstrap.md`；Platform 支持 Independent Agent 时按需使用 `skills/subagent-driven-development.md`，否则使用 `skills/role-switch.md`。
 > **Reference Boundary：** Conductor 不直接读取 `references/`；专业知识只能由选中 Agent 的 Skill 按 `Reference Routing` 加载。
 > **Output：** 只向用户展示 Conclusion、Evidence、Risk、Next Action，以及真正需要确认的 Product/Architecture 问题。
 

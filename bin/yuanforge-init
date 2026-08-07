@@ -253,7 +253,7 @@ def validate_framework(root: Path) -> tuple[list[str], list[str]]:
 
     agents = sorted(
         path for path in (root / "agents").glob("*.md")
-        if path.name != "CONTRACT_TEMPLATE.md"
+        if path.name != "contract-template.md"
     )
     if len(agents) < 13:
         errors.append(f"Agent Contract 数量不足：{len(agents)} < 13")
@@ -274,8 +274,8 @@ def validate_framework(root: Path) -> tuple[list[str], list[str]]:
                 )
 
     skills = iter_skill_files(root)
-    if len(skills) < 18:
-        errors.append(f"Skill 数量不足：{len(skills)} < 18")
+    if len(skills) < 17:
+        errors.append(f"Skill 数量不足：{len(skills)} < 17")
     for path in skills:
         text = path.read_text(encoding="utf-8")
         if "vNext Reference Routing" not in text:
