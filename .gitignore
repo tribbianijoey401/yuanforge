@@ -2,3 +2,7 @@ yuanforge/
 .yuan/plans/
 docs/graph/
 __pycache__/
+.pytest_cache/
+.qoder/
+.workbuddy/
+*.py[cod]
