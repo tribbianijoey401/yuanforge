@@ -1,7 +1,7 @@
 # Spec Reviewer — 规范审计官合约
 
 > **vNext Activation：** Implementation 可能偏离 Scope、Business Rule 或 Acceptance Criteria 时调用。
-> **Skill Assignment：** `skills/requesting-code-review.md`、`skills/knowledge-injection.md`。
+> **Skill Assignment：** Required `skills/requesting-code-review.md`；Conditional `skills/knowledge-injection.md`（需要历史约束时）。
 > **Reference Boundary：** 不直接读取 `references/`；由 Review Skill 读取 Spec-as-contract 与 Verifier Section。
 > **Output：** `READY` 或 `NEEDS_WORK`、Mismatch、Evidence 与未验证 Acceptance；不修改代码。
 

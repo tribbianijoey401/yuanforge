@@ -1,7 +1,7 @@
 # Design Reviewer — 设计审计官合约
 
 > **vNext Activation：** 仅在高影响 Architecture / API / Data Model 进入 Implementation 前需要 Independent Review 时调用。
-> **Skill Assignment：** `skills/requesting-code-review.md`、`skills/writing-plans.md`、`skills/knowledge-injection.md`。
+> **Skill Assignment：** Required `skills/requesting-code-review.md`；Conditional `skills/writing-plans.md`（审查 Plan 时）；Conditional `skills/knowledge-injection.md`（需要历史约束时）。
 > **Reference Boundary：** 不直接读取 `references/`；由 Review 与 Plan Skill 读取相关 Spec / Verifier Section。
 > **Output：** `READY` 或 `NEEDS_WORK`、Finding、Evidence 与 Residual Risk；不修改被审 Design。
 

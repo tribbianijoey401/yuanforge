@@ -2,59 +2,75 @@
 
 ## Goal
 
-在 `main@b8fc389` 的成熟 Yuan 内容基础上完成 vNext 内容保留式迁移，使 Repository、Installer 和 Project 使用方式符合《Yuan vNext 需求共识与产品蓝图》，并落实 `Routing → Agent → Skill → References`。
+按 `yuan-insight.plan` 完成 Phase 1：Yuan Core 语义增强（WORK/STATUS/Focused Result/Conductor/verdict），使 Work State、Agent Handoff、Focused Result、Context、Skill、Finding、Distillation 成为清晰的工程语义；为 Yuan Insight 提供只读可观察的事实基础。原则：Yuan First, Insight Follows——每个字段必须通过"删除 Insight 后仍改善 Yuan"测试。
 
 ## Scope
 
-- 将 Agent、Skill、Reference、Policy 和 Adapter 收敛到 `framework/`，保留其专业正文与 Git History。
-- 建立 Dynamic Routing、四类 Primary Workflow、Risk-driven Review 和 Focused Output。
-- 将 Project Memory 收敛为七类 Document，并迁移有效 Decision、Pitfall、Anti-pattern 和 Progress。
-- 将 Installer 改为最新官方快照强制 Update，保护 Project Document、Override 和业务内容。
-- 增加 Contract、Dangling Reference、Content Preservation 和 Installer Regression Test。
+- [x] Workflow 结构化（required/optional_agents + required_skills frontmatter）— 已完成
+- [x] STATUS.md Recovery Index + stable frontmatter — 已完成
+- [x] WORK Contract + Active Workspace 四段（Current Task / Latest Result / Open Findings / Work Learnings）— 已完成
+- [x] Manager Model / Conductor state ownership 显式化 — 已完成
+- [x] Handoff minimal contract（Task + Goal + Done + Constraints + Context Refs）— 已完成
+- [x] Focused Result contract（outcome 四态 + skills_applied）— 已完成
+- [x] verdict-protocol Finding Category 七分类 — 已完成
+- [x] Skill Assignment 统一 required/recommended/available 三档 — 已完成
+- [ ] test_contracts 静态规则同步 — 进行中
 
 ## Non-goals
 
-- 不实现 Runtime、Ledger、Reducer、Gateway、Authority Chain 或 Daemon。
-- 不重新创作已有 Agent、Skill 和 Reference 的专业知识。
-- 不在本 Work 中完成真实大型 Project 的 Complex Bug MVP。
+- 不实现 Insight（Phase 2+）
+- 不为 UI 给 Core 增加无工程价值字段
+- 不重新建立 Event Ledger / Action Gateway / Checkpoint Runtime
+- 不为了 Insight 重构 Workflow schema——只优化对 Yuan 自身流程有价值的语义
 
 ## Acceptance
 
-- [x] Source Repository 顶层只保留清晰的人类入口、Framework、Installer/Test 和七类 Project Document。
-- [x] 13 个现有 Agent Contract、18 个 Skill 与原有 Reference 的有效专业内容被保留，并补入迁移经验。
-- [x] 每个 Agent 都声明 Activation、Skill Assignment、Reference Boundary 和 Focused Output。
-- [x] 每个 Skill 都声明 Reference Routing；Agent 不存在直接读取 Reference 的指令。
-- [x] Dynamic Routing 能区分 Small Change、Complex Bug、New Feature 和 Large Project。
-- [x] `update` 无旧版本/旧 Runtime Gate，且保留 `docs/`、`.yuan/overrides/` 和 Project 自有内容。
-- [x] Installer 提示用户自然描述需求，由 Yuan 自动 Routing，不要求用户点名 Agent 或 Skill。
-- [x] Contract Test、Installer Test、Dangling Reference Check 和 `git diff --check` 通过。
+- [ ] 每个新字段通过"删除 Insight 后仍改善 Yuan"测试
+- [ ] 删除 `.yuan/insight` 不影响 Yuan 任何流程
+- [ ] installer check PASS、全部测试 PASS
+- [ ] 项目层 docs/WORK.md 与 docs/STATUS.md 使用新格式
 
-## Migration Matrix
+## Assumptions and Risks
 
-| main Asset | vNext Disposition | Content Strategy |
-|---|---|---|
-| `contracts/` | `framework/agents/` | 完整保留正文，新增 vNext Header |
-| `.yuan/skills/` | `framework/skills/` | 完整保留方法，新增 Reference Routing |
-| `references/` | `framework/references/` | 完整保留，由 Skill 按 Section 加载 |
-| `.yuan/rules/` | `framework/policies/` | Core 精简；其余按 Signal 激活 |
-| `.yuan/platforms/` | `framework/adapters/` | 保留并改为 Platform Mapping |
-| 固定 Phase / Gate | `framework/workflows/` + Risk Policy | 专业方法保留，固定全流程退出 Core |
-| `TASK_BOARD` | `WORK.md` 可选 Section | 只在 Complex Work 使用 |
-| `PROGRESS` / `SESSION` | `WORK.md` + `STATUS.md` | 合并恢复职责 |
-| Knowledge / Pitfall | `MEMORY.md` | 去重并保留可复用经验 |
-| Graph / Event / Proposal | 退出 vNext MVP | 不迁移 Runtime State；Git History 可追溯 |
-| v3 Specs / Runtime | 退出 vNext MVP | 在 Decision 中记录 Supersede 原因 |
+- 风险：为 Insight 反向加字段 → 用 Yuan-First 测试拦截
+- 风险：STATUS 膨胀成万能状态文件 → 硬约束不放 Skill/Context/Memory/Trace
 
-## Progress
+## Plan
 
-- [x] 恢复 `main@b8fc389` 作为内容基线，撤回空骨架方案。
-- [x] 保留式迁移 Agent、Skill、Reference、Policy 与 Adapter。
-- [x] 建立 Dynamic Routing、Primary Workflow 和 Reference Routing。
-- [x] 建立七类 Project Document，并吸收现有长期知识。
-- [x] 完成 Source Root、Installer、Override 和 Validation。
+1. Workflow frontmatter 结构化 ✅
+2. STATUS Recovery Index + frontmatter ✅
+3. WORK Active Workspace 四段
+4. Conductor Manager Model / State Owner
+5. Focused Result contract（focused-output.md）
+6. verdict Finding Category
+7. Skill Assignment 三档标注
+8. test_contracts 同步 + 全量验证
 
-## Verification
+---
 
-- `python -B bin/yuanforge-init . --check`：PASS，0 warning。
-- `python -B -m unittest discover -s tests -v`：7/7 PASS。
-- `git diff --check`：PASS。
+# Active Workspace
+
+> Active Workspace 是 State，不是 History。Current Task 与 Latest Result 每次覆盖；Open Findings 只保存未解决义务；Work Learnings 只保存后续仍需的当前认知。完成时 Distill 后全部清空，回到 no active work。
+
+## Current Task
+
+实现 WORK.md 模板的 Active Workspace 四段结构，并同步项目层 docs/WORK.md 为当前 Phase 1 Work。Agent：Conductor（当前会话）。Done Conditions：模板四段齐全 + 项目层 WORK.md 更新 + test_contracts 通过。
+
+## Latest Result
+
+- Outcome: partial
+- Summary: Workflow 结构化与 STATUS frontmatter 已完成并提交（c72638a + STATUS 模板更新）；WORK 模板 Active Workspace 四段已落盘
+- skills_applied: N/A（本会话为框架实施）
+- Verification: installer check PASS，8/8 测试 PASS
+- Risks: 项目层 docs/WORK.md 覆盖旧 vNext Migration 记录——其成果已体现于仓库状态，无信息损失
+- Next: 完成 WORK 模板后，转向 conductor.md Manager Model 显式化
+
+## Open Findings
+
+- 无
+
+## Work Learnings
+
+- Yuan-First 测试："删除 Insight 后这个字段是否仍改善 Yuan"是 Core 字段的唯一准入标准
+- STATUS 是 Session Recovery Index（覆盖不追加），不是状态历史；WORK 是 Active Work Authority
+- frontmatter 列表解析需同时支持内联 `[a, b]` 与展开 `- item` 两种 YAML 形式

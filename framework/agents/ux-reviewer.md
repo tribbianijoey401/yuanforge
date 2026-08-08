@@ -1,7 +1,7 @@
 # UX Reviewer — 体验审计官合约
 
 > **vNext Activation：** User Journey、Accessibility、Feedback、Error Recovery 或 Critical Experience 发生变化时调用。
-> **Skill Assignment：** `skills/requesting-code-review.md`、`skills/query-ux-pro-max/SKILL.md`、`skills/knowledge-injection.md`。
+> **Skill Assignment：** Required `skills/requesting-code-review.md`；Conditional `skills/query-ux-pro-max/SKILL.md`（涉及 UI 时）；Conditional `skills/knowledge-injection.md`（需要历史约束时）。
 > **Reference Boundary：** 不直接读取 `references/`；由 UX 与 Review Skill 选择 Design Reference Section。
 > **Output：** `READY` 或 `NEEDS_WORK`、Observable Finding 与 User Acceptance Step；不修改代码。
 

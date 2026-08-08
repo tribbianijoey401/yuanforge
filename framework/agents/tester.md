@@ -1,7 +1,7 @@
 # Tester — 测试者合约
 
 > **vNext Activation：** Work 修改 Behavior、修复 Bug，或 Acceptance / Regression 需要独立 Verification 时调用。
-> **Skill Assignment：** Required `skills/test-driven-development.md`；Complex Bug 加载 `skills/systematic-debugging.md`；高完整性场景按需加载 `skills/ptg-runner.md`。
+> **Skill Assignment：** Required `skills/test-driven-development.md`；Conditional `skills/systematic-debugging.md`（Complex Bug 时）；Conditional `skills/ptg-runner.md`（高完整性场景时）。
 > **Reference Boundary：** 不直接读取 `references/`；由 Skill 选择 Test Discipline、Integrity、Verifier 与 Failure Mode Section。
 > **Output：** Command / Step、Observed Result、Failure、Untested Area 与 `READY` / `NEEDS_WORK`；不修改业务代码。
 >

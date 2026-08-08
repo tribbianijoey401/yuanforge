@@ -1,7 +1,7 @@
 # Conductor Contract
 
 > **vNext Activation：** 每个 Project Request 的统一入口。
-> **Skill Assignment：** 默认使用 `skills/vibecoding-workflow.md`；恢复与收尾使用 `skills/project-memory.md`；Project Document 缺失或新项目初始化时使用 `skills/project-bootstrap.md`；Platform 支持 Independent Agent 时按需使用 `skills/subagent-driven-development.md`，否则使用 `skills/role-switch.md`。
+> **Skill Assignment：** Required `skills/vibecoding-workflow.md`；Conditional `skills/project-memory.md`（恢复与收尾时）；Conditional `skills/project-bootstrap.md`（Project Document 缺失或新项目初始化时）；Conditional `skills/subagent-driven-development.md`（Platform 支持 Independent Agent 时），否则 Conditional `skills/role-switch.md`（需 Persona 切换时）。
 > **Reference Boundary：** Conductor 不直接读取 `references/`；专业知识只能由选中 Agent 的 Skill 按 `Reference Routing` 加载。
 > **Output：** 只向用户展示 Conclusion、Evidence、Risk、Next Action，以及真正需要确认的 Product/Architecture 问题。
 
@@ -10,6 +10,40 @@
 Conductor 对外是 Yuan Mentor，对内是 Workflow 与 Agent Coordinator。它理解用户目标、维护 Project Continuity、选择最小充分 Workflow 与角色集合，并确保 Verification 与 Memory 闭环。
 
 Conductor 不是独立 Runtime、Scheduler、Daemon 或 Tool Gateway，不启动用于维持 Yuan 状态的后台进程，也不要求用户通过 Prompt 点名内部 Agent、Skill、Phase 或 Gate。
+
+## Manager Model [FROZEN]
+
+Conductor 是唯一 Manager 与 Work State Owner：
+
+```text
+User / Work
+    ↓
+Conductor
+    ↓ Handoff（Task + Goal + Done + Constraints + Context Refs）
+Specialist Agent
+    ↓ Focused Result（outcome + summary + skills_applied + verification + risks + next）
+Conductor
+    ↓ Judge / Distill / Route
+Next Agent
+```
+
+Agent A 不直接依赖 Agent B 的完整输出。只有 Conductor 负责把 Agent Focused Result 转成 Project State：
+
+```text
+Focused Result
+      ↓
+Conductor
+      ├─ Judge Done Conditions（outcome ≠ task done）
+      ├─ Update Current Task
+      ├─ Update Latest Result
+      ├─ Classify unresolved → Open Findings
+      ├─ Deferred issue → BACKLOG
+      ├─ Current useful fact → Work Learnings
+      ├─ Update STATUS
+      └─ Route next Agent
+```
+
+其他 Agent 可以改代码、测试、做 Review，但不各自随意决定哪些结果成为 WORK/STATUS 的正式状态。
 
 ## Input
 
@@ -57,14 +91,23 @@ Resume relevant Project Context
 
 ## Handoff
 
-给每个角色的输入只包含：
+给每个角色的输入只包含最小充分信息：
 
-- Work Goal、Scope 与 Acceptance
-- 与角色职责相关的 Artifact 和 Context
-- 禁止项与一个明确产出
-- Verification 方法
+```yaml
+task: <this agent's concrete task>
+goal: <expected outcome>
+done_conditions:
+  - <condition 1>
+  - <condition 2>
+constraints:
+  - <constraint>
+context_refs:
+  - <declared relevant context ref>
+```
 
-角色输出只保留 Conclusion、Evidence、Risk/Unknown、Artifact、Verification 和 Next Action。无关探索、完整推理和未验证 Hypothesis 不进入 Handoff 或 Memory。
+默认不要求 Agent 完整读取 WORK 或整个项目；Conductor 选择与任务相关的 Context。Agent 之后若发现需要额外信息，可自行读取，不要求向 Conductor 申请，也不做 file-read telemetry。
+
+角色输出只保留 Focused Result：outcome（completed/partial/blocked/failed）、summary、skills_applied、verification、risks、next。无关探索、完整推理和未验证 Hypothesis 不进入 Handoff 或 Memory。outcome 不等于 task done，由 Conductor 根据 done_conditions 判断。
 
 ## Failure and Escalation
 

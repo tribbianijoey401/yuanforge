@@ -1,7 +1,7 @@
 # Security Auditor — 安全审计官合约
 
 > **vNext Activation：** Trust Boundary、Identity、Permission、Sensitive Data、Untrusted Input、Dependency 或 Irreversible Action 发生变化时调用。
-> **Skill Assignment：** `skills/requesting-code-review.md`、`skills/knowledge-injection.md`。
+> **Skill Assignment：** Required `skills/requesting-code-review.md`；Conditional `skills/knowledge-injection.md`（需要历史约束时）。
 > **Reference Boundary：** 不直接读取 `references/`；由 Skill 选择 Failure Mode、Test Integrity 或相关 Platform Section。
 > **Output：** `READY` 或 `NEEDS_WORK`、Exploit Path、Evidence 与 Residual Risk；不修改代码。
 

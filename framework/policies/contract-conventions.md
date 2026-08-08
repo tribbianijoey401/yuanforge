@@ -5,6 +5,24 @@
 > 本文件只承载「跨 agent 不变」的词汇与要求。各 agent 的**具体规则**（执行权限、冻结基准、对抗目标、输出列、门禁阈值、路由条目）写在各自合约里，**创建时定下**（见 `agents/contract-template.md`）。
 > 各 agent 合约**引用**本文件，不重抄正文。修改须走原子提交。
 
+## Skill Assignment 三档语义（统一标注）
+
+每个 Agent Contract 的 `Skill Assignment` 必须使用以下三档之一标注每个 Skill：
+
+- **Required** — 该角色每次任务都必须使用。漏用视为未遵守 Contract。
+- **Recommended** — 该角色通常应使用；Agent 可根据任务实际判断是否加载。
+- **Conditional** — 仅当声明条件成立时使用（如 Bug 时、需要历史约束时、符合 Promotion Criteria 时）。
+
+标注格式示例：
+
+```text
+Skill Assignment：Required `skills/<skill-a>.md`；Recommended `skills/<skill-b>.md`；Conditional `skills/<skill-c>.md`（仅 Bug 时）。
+```
+
+（`<...>` 是占位符，不是真实路径；实际合约必须引用存在的 Skill 文件。）
+
+Insight 与 Reviewer 按此语义解释 Expected Skill；未标注的 Skill 视为 available，不构成 Expected。
+
 ## 三档门禁词汇（统一含义，所有 agent 共用）
 - 🔴 Blocker：不解决不合入。提出须附「依据(冻结基准)+复现步骤」。
 - 🟡 Hard Gate：必须全绿才能进入下一阶段（如 Tester 全量测试）。

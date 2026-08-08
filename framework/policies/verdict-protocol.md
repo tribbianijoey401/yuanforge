@@ -56,6 +56,22 @@ evidence:
 
 ---
 
+## Finding Category
+
+Reviewer / Tester Finding 使用稳定的少量分类，支持跨 Review Round 的确定性统计：
+
+```text
+requirement-miss   — 未满足需求 / 验收标准
+correctness        — 实现错误 / 逻辑缺陷
+regression         — 破坏既有行为 / 回归
+test-gap           — 测试覆盖缺口 / 缺少关键验证
+security           — 安全 / 权限 / 数据保护问题
+architecture       — 架构 / 结构 / 边界问题
+maintainability    — 可维护性 / 性能 / 兼容性
+```
+
+每个 blocking Finding 必须标注一个 Category。Repeated Finding 只报告事实（如 `test-gap × 3 rounds`），不自动解释根因。
+
 ## 过度设计护栏
 
 审查官**只标三类阻断**：

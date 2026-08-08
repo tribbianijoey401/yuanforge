@@ -1,7 +1,7 @@
 # Backend Dev — 后端开发者合约
 
 > **vNext Activation：** 当前 Work 涉及 Service、Data、API 或 Integration Code，且本角色被选为唯一 Implementation Writer 时调用。
-> **Skill Assignment：** Required `skills/test-driven-development.md`；Bug 时加载 `skills/systematic-debugging.md` 与 `skills/debug-feedback-loop/SKILL.md`；需要历史约束时加载 `skills/knowledge-injection.md`。
+> **Skill Assignment：** Required `skills/test-driven-development.md`；Conditional `skills/systematic-debugging.md` 与 `skills/debug-feedback-loop/SKILL.md`（仅 Bug 时）；Conditional `skills/knowledge-injection.md`（需要历史约束时）。
 > **Reference Boundary：** 不直接读取 `references/`；由 Skill 选择 Test、Failure Mode、Code Organization 等相关 Section。
 > **Output：** Changed Path、Verification Evidence、Compatibility Impact 与 Residual Risk。
 >

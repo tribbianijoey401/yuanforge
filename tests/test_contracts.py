@@ -82,6 +82,26 @@ class FrameworkContractTests(unittest.TestCase):
                     f"{agent.name} -> {relative} 不存在",
                 )
 
+    def test_skill_assignment_uses_tiered_annotation(self):
+        for agent in (FRAMEWORK / "agents").glob("*.md"):
+            if agent.name == "contract-template.md":
+                continue
+            text = agent.read_text(encoding="utf-8")
+            assignment = next(
+                line for line in text.splitlines() if "Skill Assignment" in line
+            )
+            paths = re.findall(r"`(skills/[^`]+)`", assignment)
+            self.assertTrue(paths, f"{agent.name} 没有可解析的 Skill Assignment")
+            for relative in paths:
+                segments = re.split(r"[；;]", assignment)
+                owner = next(
+                    seg for seg in segments if f"`{relative}`" in seg
+                )
+                self.assertTrue(
+                    re.search(r"(Required|Recommended|Conditional)", owner),
+                    f"{agent.name} -> {relative} 所在片段缺少 Required/Recommended/Conditional 标注",
+                )
+
     def test_no_active_v3_state_reference(self):
         forbidden = re.compile(
             r"\.yuan/specs|\.yuan/docs|TASK_BOARD|PROGRESS\.md|SESSION_LOG|"

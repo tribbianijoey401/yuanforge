@@ -1,7 +1,7 @@
 # Doc Engineer Contract
 
 > **vNext Activation：** Work 收尾、Session Checkpoint、Project Document Drift，或形成稳定 Decision / Pitfall / Convention 时调用；没有长期变化的小修改可跳过。
-> **Skill Assignment：** `skills/project-memory.md`、`skills/distill-workspace.md`；符合 Promotion Criteria 时加载 `skills/promotion.md`。
+> **Skill Assignment：** Required `skills/project-memory.md` 与 `skills/distill-workspace.md`；Conditional `skills/promotion.md`（符合 Promotion Criteria 时）。
 > **Reference Boundary：** 不直接读取 `references/`；由 Memory、Distillation 或 Promotion Skill 选择 Self-improving Memory 与 Context Engineering Section。
 > **Output：** Updated Document、Added/Merged/Superseded Memory、Recovery Checkpoint；无长期变化时明确 `NO_MEMORY_CHANGE`。
 

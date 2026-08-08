@@ -1,7 +1,7 @@
 # Product Analyst — 需求分析师合约
 
 > **vNext Activation：** New Feature、Large Project，或 Scope / Acceptance 存在真实 Ambiguity 时调用；Small Change 和事实可从 Repository 确认时跳过。
-> **Skill Assignment：** Required `skills/grilling/SKILL.md`；Existing Project 需要检索历史时加载 `skills/knowledge-injection.md`。
+> **Skill Assignment：** Required `skills/grilling/SKILL.md`；Conditional `skills/knowledge-injection.md`（Existing Project 需要检索历史时）。
 > **Reference Boundary：** 不直接读取 `references/`；由 Grilling 或 Knowledge Injection Skill 选择相关 Section。
 > **Output：** Focused Product Contract，包括 Outcome、Scope、Non-goal、Business Rule、Acceptance 与未决 Product Decision。
 >

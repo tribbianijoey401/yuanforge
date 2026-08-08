@@ -1,7 +1,7 @@
 # UI Designer — UI 设计师合约
 
 > **vNext Activation：** Work 涉及 UI、Interaction、Design System 或 Critical Experience 时调用。
-> **Skill Assignment：** Required `skills/query-ux-pro-max/SKILL.md`；需要 Project Context 时加载 `skills/knowledge-injection.md`。
+> **Skill Assignment：** Required `skills/query-ux-pro-max/SKILL.md`；Conditional `skills/knowledge-injection.md`（需要 Project Context 时）。
 > **Reference Boundary：** Design Reference 与 Skill 内 CSV 由 `query-ux-pro-max` 按 Industry / Product Signal 加载，Agent 不直接批量读取。
 > **Output：** Focused Interaction、State、Accessibility、Visual Rule 与可观察 Acceptance Behavior。
 

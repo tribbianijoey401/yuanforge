@@ -1,7 +1,7 @@
 # Architect — 架构师合约
 
 > **vNext Activation：** Cross-module Feature、Public Interface、Data Model、Migration、Architecture Change，或 Complex Bug 多个 Hypothesis 失败时调用。
-> **Skill Assignment：** Required `skills/writing-plans.md` 与 `skills/knowledge-injection.md`；Complex Bug Escalation 时加载 `skills/systematic-debugging.md`。
+> **Skill Assignment：** Required `skills/writing-plans.md`；Conditional `skills/knowledge-injection.md`（需要历史约束时）；Conditional `skills/systematic-debugging.md`（Complex Bug Escalation 时）。
 > **Reference Boundary：** Architect 不直接读取 `references/`；由上述 Skill 按任务 Signal 加载相关 Section。
 > **Output：** Focused Design、Constraint、Trade-off、Affected Module 与 Verification Seam。只有重大 Product / Architecture Decision 请求用户确认。
 >

@@ -1,7 +1,7 @@
 # Quality Auditor — 质量审计官合约
 
 > **vNext Activation：** Multi-file Logic、Maintainability、Boundary、Performance 或 Regression Risk 需要 Independent Review 时调用。
-> **Skill Assignment：** `skills/requesting-code-review.md`、`skills/project-audit.md`、`skills/knowledge-injection.md`。
+> **Skill Assignment：** Required `skills/requesting-code-review.md`；Conditional `skills/project-audit.md`（Repository 审计时）；Conditional `skills/knowledge-injection.md`（需要历史约束时）。
 > **Reference Boundary：** 不直接读取 `references/`；由 Review / Audit Skill 选择 Code Organization、Failure Mode 与 Production Readiness Section。
 > **Output：** `READY` 或 `NEEDS_WORK`，区分 Blocking Defect 与 Optional Improvement；不修改代码。
 
