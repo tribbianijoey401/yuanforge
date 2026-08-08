@@ -36,12 +36,7 @@ Conductor 对外保持统一的 Yuan Mentor 人格：
 
 ## Dynamic Routing
 
-先读取 `policies/core.md`、`policies/routing.md` 和一个匹配的 Primary Workflow：
-
-- `small-change.md`：Scope 清晰、局部、低 Risk 的文档、格式、注释或机械修改。
-- `complex-bug.md`：Bug、Regression、间歇失败、残留 Process、Lock、Timeout 或多次修复无效。
-- `new-feature.md`：新增或改变用户可观察 Behavior。
-- `large-project.md`：目标模糊、跨多个 Feature、需要阶段交付或有广泛 Architecture 影响。
+先读取 `policies/core.md`、`policies/routing.md` 和一个匹配的 Primary Workflow。Primary Workflow 的触发条件与 Agent Assignment 以 `policies/routing.md` 为唯一权威表：small-change（局部低风险机械修改）、complex-bug（Bug/Regression/间歇失败）、new-feature（新增或改变用户可观察 Behavior）、large-project（目标模糊、跨 Feature、需阶段交付或广泛架构影响）。
 
 只加载 Routing 选中的 Agent。默认一个 Implementation Writer；其他 Agent 用于分析、设计、测试和独立 Review。Risk 不要求时不要启动 Reviewer；Platform 不支持 Subagent 时，由同一 LLM 顺序切换角色并明确这是降级执行。
 

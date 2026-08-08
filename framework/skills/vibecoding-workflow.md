@@ -30,14 +30,7 @@ version: 4.0.0
 
 ### 3. Route
 
-从以下 Workflow 中选择一个：
-
-- `workflows/small-change.md`
-- `workflows/complex-bug.md`
-- `workflows/new-feature.md`
-- `workflows/large-project.md`
-
-然后按 `policies/routing.md` 选择最小充分 Agent 集合，并指定唯一 Implementation Writer。
+按 `policies/routing.md` 的 Primary Workflow 表选择唯一 Workflow，然后按同一文件的 Agent Assignment 选择最小充分 Agent 集合，并指定唯一 Implementation Writer。Routing 只决定"当前需要谁"，不承载方法内容。
 
 ### 4. Load Capability
 

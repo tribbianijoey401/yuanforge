@@ -111,6 +111,48 @@ class FrameworkContractTests(unittest.TestCase):
         }
         self.assertEqual(expected, actual)
 
+    def test_workflow_frontmatter_declares_agents_and_skills(self):
+        required_fields = {"workflow", "required_agents", "optional_agents", "required_skills"}
+        agent_ids = {
+            path.stem
+            for path in (FRAMEWORK / "agents").glob("*.md")
+            if path.name != "contract-template.md"
+        }
+        skill_ids = {
+            path.parent.name if path.name == "SKILL.md" else path.stem
+            for path in list((FRAMEWORK / "skills").glob("*.md"))
+            + list((FRAMEWORK / "skills").glob("*/SKILL.md"))
+        }
+        workflows = sorted((FRAMEWORK / "workflows").glob("*.md"))
+        self.assertGreaterEqual(len(workflows), 4)
+        for path in workflows:
+            text = path.read_text(encoding="utf-8")
+            self.assertTrue(text.startswith("---"), f"{path.name} 缺少 Frontmatter")
+            body = text.split("---", 2)
+            self.assertEqual(len(body), 3, f"{path.name} Frontmatter 不完整")
+            frontmatter = body[1]
+            declared_fields = set(re.findall(r"^(\w+):", frontmatter, re.M))
+            self.assertTrue(
+                required_fields <= declared_fields,
+                f"{path.name} 缺少字段：{sorted(required_fields - declared_fields)}",
+            )
+            declared = load_installer().parse_frontmatter_lists(frontmatter)
+            for field in ("required_agents", "optional_agents"):
+                declared_ids = set(declared.get(field, []))
+                self.assertTrue(
+                    declared_ids <= agent_ids,
+                    f"{path.name} {field} 声明了不存在的 Agent：{sorted(declared_ids - agent_ids)}",
+                )
+            declared_skills = set(declared.get("required_skills", []))
+            self.assertTrue(
+                declared_skills <= skill_ids,
+                f"{path.name} required_skills 声明了不存在的 Skill：{sorted(declared_skills - skill_ids)}",
+            )
+            self.assertIn(
+                "conductor", set(declared.get("required_agents", [])),
+                f"{path.name} required_agents 必须包含 conductor",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

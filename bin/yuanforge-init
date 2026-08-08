@@ -235,6 +235,28 @@ def iter_skill_files(root: Path) -> list[Path]:
     return sorted(files)
 
 
+def parse_frontmatter_lists(frontmatter: str) -> dict[str, list[str]]:
+    """解析 YAML Frontmatter 的列表字段，同时支持内联 [a, b] 与展开 - item 两种形式。"""
+
+    result: dict[str, list[str]] = {}
+    current_field: str | None = None
+    current_items: list[str] = []
+    for line in frontmatter.splitlines():
+        match = re.match(r"^(\w+):\s*(.*)$", line)
+        if match:
+            if current_field is not None:
+                result[current_field] = current_items
+            current_field, rest = match.group(1), match.group(2).strip()
+            current_items = []
+            if rest.startswith("[") and rest.endswith("]"):
+                current_items = [item.strip() for item in rest[1:-1].split(",") if item.strip()]
+        elif current_field is not None and re.match(r"^\s*-\s+\S", line):
+            current_items.append(re.sub(r"^\s*-\s+", "", line).strip())
+    if current_field is not None:
+        result[current_field] = current_items
+    return result
+
+
 def validate_framework(root: Path) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
@@ -287,6 +309,38 @@ def validate_framework(root: Path) -> tuple[list[str], list[str]]:
     ]
     if len(references) < 30:
         errors.append(f"Reference 内容数量异常：{len(references)} < 30")
+
+    agent_ids = {path.stem for path in agents}
+    skill_ids = {
+        path.parent.name if path.name == "SKILL.md" else path.stem
+        for path in skills
+    }
+    workflows = sorted((root / "workflows").glob("*.md"))
+    if len(workflows) < 4:
+        errors.append(f"Primary Workflow 数量不足：{len(workflows)} < 4")
+    for path in workflows:
+        text = path.read_text(encoding="utf-8")
+        if not text.startswith("---"):
+            errors.append(f"{path.relative_to(root)} 缺少 YAML Frontmatter")
+            continue
+        body = text.split("---", 2)
+        if len(body) < 3:
+            errors.append(f"{path.relative_to(root)} Frontmatter 不完整")
+            continue
+        frontmatter = body[1]
+        declared = parse_frontmatter_lists(frontmatter)
+        for field in ("required_agents", "optional_agents"):
+            declared_ids = set(declared.get(field, []))
+            unknown = sorted(declared_ids - agent_ids)
+            if unknown:
+                errors.append(
+                    f"{path.relative_to(root)} 声明了不存在的 Agent：{', '.join(unknown)}"
+                )
+        unknown_skills = sorted(set(declared.get("required_skills", [])) - skill_ids)
+        if unknown_skills:
+            errors.append(
+                f"{path.relative_to(root)} 声明了不存在的 Skill：{', '.join(unknown_skills)}"
+            )
 
     path_pattern = re.compile(
         r"`((?:agents|skills|references|policies|workflows|adapters)/[^`]+)`"
