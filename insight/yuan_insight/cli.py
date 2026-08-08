@@ -18,7 +18,14 @@ from .diff import diff_snapshots, to_transition
 from .loader import build_snapshot
 from .registry import load_registry
 from .signals.aggregate import compute_signals
-from .trace import append_transition, ensure_insight_dir, record_gap, start_session
+from .trace import (
+    append_transition,
+    archive_trace,
+    ensure_insight_dir,
+    prune_traces,
+    record_gap,
+    start_session,
+)
 from .watcher import DebouncedWatcher
 
 
@@ -71,12 +78,23 @@ def _run_watch(root: Path, poll_interval: float, debounce: float) -> int:
     watcher = DebouncedWatcher(root, poll_interval=poll_interval, debounce_window=debounce)
     previous = baseline
     transition_index = 0
+    previous_work_id: str | None = None
     try:
         while True:
             event = watcher.tick()
             if event is None:
                 time.sleep(poll_interval)
                 continue
+            # Work 变化时归档当前 Trace（方案 §42/§43）
+            current_work_id = (event.snapshot.work or {}).get("has_active_work") and (event.snapshot.status or {}).get("work")
+            if current_work_id and current_work_id != previous_work_id:
+                archived = archive_trace(insight_dir, previous_work_id)
+                if archived:
+                    _emit({"status": "ARCHIVED", "work": previous_work_id, "path": str(archived)})
+                pruned = prune_traces(insight_dir, keep=50)
+                if pruned:
+                    _emit({"status": "PRUNED", "removed": pruned})
+                previous_work_id = current_work_id
             transition_index += 1
             facts = diff_snapshots(previous, event.snapshot)
             transition = to_transition(

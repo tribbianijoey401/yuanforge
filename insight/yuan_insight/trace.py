@@ -56,6 +56,41 @@ def append_transition(
     return trace_path
 
 
+def archive_trace(insight_dir: Path, work_id: str | None) -> Path | None:
+    """Work 变化时把 current.jsonl 归档到 traces/<work>.jsonl（方案 §43）。
+
+    返回归档路径；无当前 Trace 或 work_id 为空时返回 None。
+    """
+    if not work_id:
+        return None
+    traces = insight_dir / "traces"
+    current = traces / "current.jsonl"
+    if not current.is_file() or current.stat().st_size == 0:
+        return None
+    archive_path = traces / f"{work_id}.jsonl"
+    if archive_path.exists():
+        archive_path.unlink()  # 同一 Work 重新激活时覆盖旧 Trace
+    current.rename(archive_path)
+    return archive_path
+
+
+def prune_traces(insight_dir: Path, keep: int = 50) -> list[str]:
+    """Trace retention：只保留最近 N 个 Work 的归档 Trace（方案 §42.1）。"""
+    traces = insight_dir / "traces"
+    if not traces.is_dir():
+        return []
+    archived = sorted(
+        (path for path in traces.glob("*.jsonl") if path.name != "current.jsonl"),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+    removed: list[str] = []
+    for stale in archived[keep:]:
+        stale.unlink()
+        removed.append(stale.name)
+    return removed
+
+
 def record_gap(insight_dir: Path, session_id: str, gap_start: str, gap_end: str) -> Path:
     """记录 Observation Gap（Sidecar 中断再恢复）。"""
     gaps = insight_dir / "gaps"

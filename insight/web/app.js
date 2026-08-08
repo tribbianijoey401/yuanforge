@@ -146,5 +146,34 @@ function renderFootprint(fp) {
     .join("");
 }
 
+async function renderHistory() {
+  const box = document.getElementById("history");
+  try {
+    const res = await fetch("/api/history");
+    const data = await res.json();
+    const works = data.works || [];
+    if (!works.length) {
+      box.innerHTML = '<div class="empty">无历史（Work 完成后自动归档）</div>';
+      return;
+    }
+    box.innerHTML = works
+      .map((w) =>
+        '<div class="history-item" style="padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;font-size:12px">' +
+        "<b>" + w.work_id + "</b>" +
+        '<span class="tag" style="float:right">' + w.transition_count + " transitions</span>" +
+        '<div class="tag">stages: ' + (w.stages.join(" → ") || "—") + "</div>" +
+        '<div class="tag">agents: ' + (w.agents.join(", ") || "—") + "</div>" +
+        '<div class="tag">skills: ' + (w.skills.join(", ") || "—") + "</div>" +
+        '<div class="tag">' + (w.last_observed_at ? "最后观察 " + w.last_observed_at : "") + "</div>" +
+        "</div>"
+      )
+      .join("");
+  } catch (err) {
+    box.innerHTML = '<div class="empty">历史加载失败</div>';
+  }
+}
+
 poll();
 setInterval(poll, POLL_MS);
+setInterval(renderHistory, 5000);
+renderHistory();

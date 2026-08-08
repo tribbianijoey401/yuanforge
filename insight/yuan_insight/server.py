@@ -18,6 +18,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from .footprint import extract_context_refs
+from .history import get_work_summary, list_work_summaries
 from .loader import build_snapshot
 from .registry import load_registry
 from .signals.aggregate import compute_signals
@@ -82,6 +83,19 @@ class InsightHandler(BaseHTTPRequestHandler):
                 self._send_json(self._current_state())
             except Exception as exc:  # Insight 失败不阻塞 Dashboard 显示错误
                 self._send_json({"error": str(exc)})
+            return
+        if self.path == "/api/history":
+            insight_dir = self.root / ".yuan" / "insight"
+            self._send_json({"works": list_work_summaries(insight_dir)})
+            return
+        if self.path.startswith("/api/history/"):
+            work_id = self.path.removeprefix("/api/history/")
+            insight_dir = self.root / ".yuan" / "insight"
+            summary = get_work_summary(insight_dir, work_id)
+            if summary is None:
+                self.send_error(404)
+                return
+            self._send_json(summary)
             return
         if self.path == "/" or self.path == "/index.html":
             self._send_file(self.web_dir / "index.html")
