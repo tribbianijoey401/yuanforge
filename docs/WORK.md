@@ -14,7 +14,12 @@
 - [x] Focused Result contract（outcome 四态 + skills_applied）— 已完成
 - [x] verdict-protocol Finding Category 七分类 — 已完成
 - [x] Skill Assignment 统一 required/recommended/available 三档 — 已完成
-- [ ] test_contracts 静态规则同步 — 进行中
+- [x] test_contracts 静态规则同步 — 已完成（Phase 1 完成）
+- [x] Phase 2 Insight Headless Collector（yuan-observe + watcher + diff + JSONL）— 已完成
+- [x] Phase 3 Expected vs Observed Engine（registry + Missing + Why）— 已完成
+- [ ] Phase 4 First Signals（Missing Agent/Skill、Repeated Review、Bug Recurrence、Memory）— 进行中
+- [ ] Phase 5 Dashboard MVP（Execution Map + Agent/Skill Matrix + Signals + Why）
+- [ ] Phase 6 History（Work history + Summary + Trace retention）
 
 ## Non-goals
 

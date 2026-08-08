@@ -44,11 +44,12 @@ def parse_workflow(text: str) -> WorkflowDefinition:
     body = text.split("---", 2)
     if len(body) < 3:
         return WorkflowDefinition(workflow_id="unknown")
-    lists = parse_frontmatter_lists(body[1])
+    frontmatter = body[1]
+    lists = parse_frontmatter_lists(frontmatter)
+    workflow_match = re.search(r"^workflow:\s*(\S+)", frontmatter, re.M)
+    workflow_id = workflow_match.group(1) if workflow_match else "unknown"
     return WorkflowDefinition(
-        workflow_id=lists.get("workflow", ["unknown"])[0]
-        if isinstance(lists.get("workflow"), list) and lists["workflow"]
-        else "unknown",
+        workflow_id=workflow_id,
         required_agents=list(lists.get("required_agents", [])),
         optional_agents=list(lists.get("optional_agents", [])),
         required_skills=list(lists.get("required_skills", [])),

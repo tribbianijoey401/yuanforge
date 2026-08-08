@@ -24,6 +24,13 @@ class Snapshot:
         payload = "|".join(f"{path}:{digest}" for path, digest in sorted(self.files.items()))
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "work": self.work,
+            "status": self.status,
+            "workflow": self.workflow,
+        }
+
 
 def _content_hash(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
