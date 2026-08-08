@@ -13,21 +13,22 @@ quality:
 
 # Current Situation
 
-Yuan vNext 迁移实施与验证完成，`main` 已回滚到 `b8fc389`（MVP 专家团基线），vNext 全部成果保留在 `next` 分支。当前在 `main` 上推进 yuan-insight.plan 的 Phase 1（Core 语义增强）：Workflow 结构化已完成，STATUS/WORK/Focused Result/Conductor 语义加固进行中。
+yuan-insight.plan Phase 0-6 全部完成并提交。Yuan Core 语义增强（STATUS frontmatter、WORK Active Workspace、Focused Result 四态、Manager Model、Finding Category、Skill Assignment 三档）与 Yuan Insight 全链路（observe/collector、Expected vs Observed Engine、5 Signals、Context Footprint、Dashboard MVP、History）均已落地。仓库处于可交付状态。
 
 ## Last Completed
 
-- vNext Migration：成熟 Agent/Skill/Reference 保留式迁入 `framework/`，Dynamic Routing、七类 Document、强制 Update、Override 与 Regression Test 已建立
-- main 回滚 b8fc389 + next 分支保留全部 vNext 成果
-- Workflow frontmatter 结构化（required/optional_agents + required_skills）与机械校验
-- 链路完整性修复：contract-template 改名、graph-query 死资产删除、断链修复
+- Phase 1 Core 语义增强（50d111a）：STATUS/WORK/focused-output/conductor/verdict/Skill 三档 + test 守护
+- Phase 2 Headless Collector（19e17f5）：yuan-observe + watcher + debounce + JSONL trace
+- Phase 3 Expected vs Observed（09b2f73）：registry + Missing + Why provenance
+- Phase 4 First Signals（6473290）：Repeated Review / Bug Recurrence / Memory / Footprint
+- Phase 5 Dashboard MVP（d4cc327）：Execution Map + Matrix + Signals + Why drawer
+- Phase 6 History（6680329）：Work Summary + 归档 + retention
+- 收尾：insight/README 完整版、docs Distill（MEMORY M-008/009/010）、46/46 测试 PASS
 
 ## Next
 
-- WORK.md 模板加 Active Workspace 四段（Current Task / Latest Result / Open Findings / Work Learnings）
-- focused-output.md 补 outcome 四态 + skills_applied + done_conditions
-- conductor.md 显式 Manager Model 与 Work State Owner
-- verdict-protocol.md 补 Finding Category 七分类
+- 推远程存档
+- 可选：Phase 7 Later 项（Compare Works、richer trends、export diagnostic bundle）
 
 ## Blocker
 

@@ -19,7 +19,7 @@
 - [x] Phase 3 Expected vs Observed Engine（registry + Missing + Why）— 已完成
 - [x] Phase 4 First Signals（Missing Agent/Skill、Repeated Review、Bug Recurrence、Memory）— 已完成
 - [x] Phase 5 Dashboard MVP（Execution Map + Agent/Skill Matrix + Signals + Why）— 已完成
-- [ ] Phase 6 History（Work history + Summary + Trace retention）
+- [x] Phase 6 History（Work history + Summary + Trace retention）— 已完成
 
 ## Non-goals
 
@@ -44,12 +44,13 @@
 
 1. Workflow frontmatter 结构化 ✅
 2. STATUS Recovery Index + frontmatter ✅
-3. WORK Active Workspace 四段
-4. Conductor Manager Model / State Owner
-5. Focused Result contract（focused-output.md）
-6. verdict Finding Category
-7. Skill Assignment 三档标注
-8. test_contracts 同步 + 全量验证
+3. WORK Active Workspace 四段 ✅
+4. Conductor Manager Model / State Owner ✅
+5. Focused Result contract（focused-output.md）✅
+6. verdict Finding Category ✅
+7. Skill Assignment 三档标注 ✅
+8. test_contracts 同步 + 全量验证 ✅
+9. Insight Phase 2-6（Collector / Signals / Dashboard / History）✅
 
 ---
 
@@ -59,16 +60,16 @@
 
 ## Current Task
 
-实现 WORK.md 模板的 Active Workspace 四段结构，并同步项目层 docs/WORK.md 为当前 Phase 1 Work。Agent：Conductor（当前会话）。Done Conditions：模板四段齐全 + 项目层 WORK.md 更新 + test_contracts 通过。
+（无——本 Work 已完成）
 
 ## Latest Result
 
-- Outcome: partial
-- Summary: Workflow 结构化与 STATUS frontmatter 已完成并提交（c72638a + STATUS 模板更新）；WORK 模板 Active Workspace 四段已落盘
-- skills_applied: N/A（本会话为框架实施）
-- Verification: installer check PASS，8/8 测试 PASS
-- Risks: 项目层 docs/WORK.md 覆盖旧 vNext Migration 记录——其成果已体现于仓库状态，无信息损失
-- Next: 完成 WORK 模板后，转向 conductor.md Manager Model 显式化
+- Outcome: completed
+- Summary: yuan-insight.plan Phase 0-6 全部完成：Core 语义增强（STATUS frontmatter、WORK Active Workspace、Focused Result、Manager Model、Finding Category、Skill 三档）+ Insight 全链路（observe/collector、Expected vs Observed、5 Signals、Dashboard、History）
+- skills_applied: N/A（框架自身实施）
+- Verification: 46/46 测试 PASS，installer check PASS，端到端验证（watch→transition→signals→history）通过
+- Risks: 无
+- Next: 可选 Phase 7 Later 项（Compare Works、richer trends、export bundle）
 
 ## Open Findings
 
@@ -76,6 +77,5 @@
 
 ## Work Learnings
 
-- Yuan-First 测试："删除 Insight 后这个字段是否仍改善 Yuan"是 Core 字段的唯一准入标准
-- STATUS 是 Session Recovery Index（覆盖不追加），不是状态历史；WORK 是 Active Work Authority
-- frontmatter 列表解析需同时支持内联 `[a, b]` 与展开 `- item` 两种 YAML 形式
+- 已蒸馏进 docs/MEMORY.md（M-008 Yuan First 测试、M-009 Observability 不重塑 Core、M-010 Frontmatter 双格式）
+

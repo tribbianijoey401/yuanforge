@@ -1,6 +1,6 @@
 # Yuan Insight
 
-只读、自包含、旁路运行的 Yuan Framework 自省与调优模块。观察 Yuan 正常工作时已经产生的 Framework Assets 与 Project State，重建一次 Work 的语义执行路径。
+只读、自包含、旁路运行的 Yuan Framework 自省与调优模块。观察 Yuan 正常工作时已经产生的 Framework Assets 与 Project State，重建一次 Work 的语义执行路径，将 Framework Expected Behavior 与 Observed Behavior 进行比较，帮助 Framework 开发者发现 Agent、Skill、Workflow、Memory、Context 和 Quality 机制中的缺失、重复、失效与优化机会。
 
 **定位：** Yuan 官方能力，但工程上可选、隔离。Insight 失败/删除不影响 Yuan。
 
@@ -12,24 +12,75 @@
 - Expected 来自现有 Framework Definition，不复制规则
 - 不做 Event Ledger、不依赖平台 telemetry、不做 exact token、不常驻 LLM
 - Trace 与 Signal 分离：Trace 只保存 What Changed，Signal 动态计算 What It Means
+- Semantic Real-Time：只在语义状态变化时反映，不做 Heartbeat
 
 ## 用法
 
 ```bash
-pip install -e insight/
-yuan-observe <project-root>
+# 从源码直接运行（无需安装）
+PYTHONPATH=insight python3 -B -m yuan_insight.cli <project-root> --once    # 一次性 Snapshot
+PYTHONPATH=insight python3 -B -m yuan_insight.cli <project-root> --signals # 输出 Signals
+PYTHONPATH=insight python3 -B -m yuan_insight.cli <project-root>           # watch 模式（JSONL Trace）
+PYTHONPATH=insight python3 -B -m yuan_insight.cli <project-root> --web     # Dashboard（默认 :8765）
 ```
+
+## Dashboard
+
+打开 `http://127.0.0.1:8765/`，3s 轮询 `/api/state`，零依赖静态 UI：
+
+- **Work / Execution Map**：Work 状态、Stage Timeline、当前 Agent
+- **Agent Matrix**：ACTIVE / COMPLETED / MISSING / NOT REQUIRED
+- **Skill Matrix**：REPORTED / MISSING / AVAILABLE
+- **Signals**：Missing Agent/Skill、Repeated Review、Bug Recurrence、Memory；点击展开 Why（expected/observed/derived/check）
+- **Context Footprint**：References / Docs / Sections / Chars / Bytes / Memory
+- **Work History**：归档 Work 的 Summary（stages/agents/skills/transitions）
+
+## Signals（v0）
+
+| Signal | 判定条件 | 纪律 |
+|---|---|---|
+| Missing Agent | Expected 明确 + FULL coverage + 未观察到 | 否则 NOT_OBSERVED/UNKNOWN |
+| Missing Skill | Expected 明确 + skills_applied 有事实 | 缺一不判 |
+| Repeated Review | Finding 分类跨轮重复 ≥2 | 只报事实不猜根因 |
+| Bug Recurrence | 需 Bug identity / Memory linkage | v0 无则 UNAVAILABLE |
+| Memory Effectiveness | selected + reported used | 无 usage 证据则 UNAVAILABLE |
+
+## 存储
+
+```text
+.yuan/insight/
+├── sessions/<session>.json     # Observation Session + Baseline
+├── traces/<work>.jsonl         # 归档 Work Trace（保留最近 N=50）
+├── traces/current.jsonl        # 活跃 Work 的 Trace
+└── gaps/<session>.jsonl        # Observation Gap
+```
+
+全部是 Observation Data，`rm -rf .yuan/insight` 不影响 Yuan。
 
 ## 目录
 
 ```text
-yuan_insight/
-├── cli.py          # yuan-observe 入口
-├── watcher.py      # file watcher + debounce
-├── loader.py       # 读取 Project State 文件
-├── parsers/        # status/work/framework 语义解析
-├── snapshot.py     # 可观察语义状态快照
-├── diff.py         # snapshot diff → transition → facts
-├── coverage.py     # observation session / coverage / gap
-└── trace.py        # JSONL trace 落盘
+insight/
+├── pyproject.toml
+├── yuan_insight/
+│   ├── cli.py          # 入口：--once / --signals / watch / --web
+│   ├── watcher.py      # DebouncedWatcher（hash 检测 + debounce）
+│   ├── loader.py       # collect → build_snapshot（含 Expected workflow）
+│   ├── registry.py     # Agent/Skill/Workflow 注册表（直读 Framework）
+│   ├── parsers/        # status/work/framework frontmatter 解析
+│   ├── diff.py         # snapshot diff → facts → Transition
+│   ├── footprint.py    # Declared Context Footprint
+│   ├── history.py      # Work Summary 聚合 + 归档
+│   ├── trace.py        # JSONL Trace / archive / prune / gap
+│   ├── server.py       # Dashboard HTTP Server（标准库）
+│   └── signals/        # expected_observed / repeated_review / bug_recurrence / memory_effectiveness
+└── web/                # 静态 Dashboard（index.html + app.js）
 ```
+
+## 测试
+
+```bash
+python3 -B -m unittest tests.test_insight tests.test_insight_signals tests.test_insight_phase4 tests.test_insight_web tests.test_insight_history
+```
+
+设计依据：`yuan-insight.plan`（Phase 2-6 已实施，Phase 7 Compare Works / richer trends 为非 MVP Later 项）。

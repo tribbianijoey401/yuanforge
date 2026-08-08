@@ -1,3 +1,9 @@
+---
+name: memory
+title: Yuan Long-term Memory
+description: 可复用的 Verified Finding、Pitfall、Preference 和 Convention
+---
+
 # Yuan Long-term Memory
 
 本文件保存可复用的 Verified Finding、Pitfall、Preference 和 Convention，不保存完整聊天、角色推理或逐步事件。
@@ -51,6 +57,21 @@
 
 - **Symptom**：HTTPS 443 Timeout，或 `gh` 下载极慢。
 - **Rule**：先区分 Repository 问题与 Network Transport；可使用已配置 SSH Remote 或可信 Mirror，但不得把网络失败误诊为 Framework Logic Failure。
+
+### M-008：Insight 字段必须通过 "Yuan First" 测试
+
+- **Symptom**：为 Dashboard 增加字段，Core 变重，删除 Insight 后字段无工程价值。
+- **Rule**：任何新字段先回答"删除 Yuan Insight 后，这个字段是否仍明显改善 Yuan 自己？"——YES 进 Core，NO 只进 Insight，UNKNOWN 不加入并显示 Unknown。
+
+### M-009：Observability 不得反向重塑 Core
+
+- **Symptom**：为可视化设计 Memory 生命周期、Skill 状态或 Event Ledger，导致 Core 语义被 UI 需求污染。
+- **Rule**：Projection follows Core semantics；UI never invents Core semantics。STATUS 是 Session Recovery Index（覆盖不追加），WORK 是 Active Work Authority（State 不是 History）；Insight 只读观察，不引入第二状态系统。
+
+### M-010：YAML Frontmatter 列表解析须兼容两种形式
+
+- **Symptom**：解析器只支持内联 `[a, b]`，遇到展开 `- item` 列表静默丢字段（如 workflow_id 恒为 unknown），校验形同虚设。
+- **Rule**：任何解析 Frontmatter 列表的代码必须同时支持内联与展开两种形式，并用"注入不存在的 id 应报错"的负向测试验证校验真实生效。
 
 ## Engineering Conventions
 
