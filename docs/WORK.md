@@ -17,8 +17,8 @@
 - [x] test_contracts 静态规则同步 — 已完成（Phase 1 完成）
 - [x] Phase 2 Insight Headless Collector（yuan-observe + watcher + diff + JSONL）— 已完成
 - [x] Phase 3 Expected vs Observed Engine（registry + Missing + Why）— 已完成
-- [ ] Phase 4 First Signals（Missing Agent/Skill、Repeated Review、Bug Recurrence、Memory）— 进行中
-- [ ] Phase 5 Dashboard MVP（Execution Map + Agent/Skill Matrix + Signals + Why）
+- [x] Phase 4 First Signals（Missing Agent/Skill、Repeated Review、Bug Recurrence、Memory）— 已完成
+- [x] Phase 5 Dashboard MVP（Execution Map + Agent/Skill Matrix + Signals + Why）— 已完成
 - [ ] Phase 6 History（Work history + Summary + Trace retention）
 
 ## Non-goals

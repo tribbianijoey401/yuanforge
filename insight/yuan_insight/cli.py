@@ -102,6 +102,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--once", action="store_true", help="生成 Baseline Snapshot 后退出")
     parser.add_argument("--diff", action="store_true", help="输出 Baseline 到当前状态的 Facts")
     parser.add_argument("--signals", action="store_true", help="计算并输出 Signals（Expected vs Observed）")
+    parser.add_argument("--web", action="store_true", help="启动 Dashboard Server（/api/state + 静态 UI）")
+    parser.add_argument("--port", type=int, default=8765, help="Dashboard 端口（默认 8765）")
     parser.add_argument("--poll", type=float, default=0.5, help="轮询间隔秒数（默认 0.5）")
     parser.add_argument("--debounce", type=float, default=0.4, help="debounce 窗口秒数（默认 0.4）")
     args = parser.parse_args(argv)
@@ -112,6 +114,14 @@ def main(argv: list[str] | None = None) -> int:
             return _run_diff(args.root)
         if args.signals:
             return _run_signals(args.root)
+        if args.web:
+            from .server import serve
+
+            server = serve(args.root, port=args.port)
+            try:
+                server.serve_forever()
+            except KeyboardInterrupt:
+                return 0
         return _run_watch(args.root, args.poll, args.debounce)
     except KeyboardInterrupt:
         return 0
