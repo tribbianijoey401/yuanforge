@@ -106,8 +106,13 @@ class AggregateTests(unittest.TestCase):
             },
         }
         report = compute_signals(snapshot, Registry(), coverage="UNKNOWN")
-        self.assertEqual(report.signals, [])
         self.assertEqual(report.coverage, "UNKNOWN")
+        # UNKNOWN coverage 不触发 Missing 类信号
+        missing = [s for s in report.signals if s.level in ("MISSING", "REPEATED")]
+        self.assertEqual(missing, [])
+        # 但 unavailable 类 INFO 信号（Bug Recurrence）合法存在
+        levels = {s.level for s in report.signals}
+        self.assertIn("INFO", levels)
 
     def test_aggregate_full_coverage_missing_signal(self):
         snapshot = {

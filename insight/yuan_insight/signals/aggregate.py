@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from ..registry import Registry
+from .bug_recurrence import BugIdentityEvidence, compute_bug_recurrence
 from .expected_observed import (
     Signal,
     WhyProvenance,
@@ -14,6 +15,11 @@ from .expected_observed import (
     expected_from_workflow,
     observed_from_snapshot,
 )
+from .memory_effectiveness import (
+    compute_memory_effectiveness,
+    extract_memory_selection,
+)
+from .repeated_review import compute_repeated_review, extract_findings
 
 
 @dataclass
@@ -72,6 +78,19 @@ def compute_signals(
     report.signals.extend(
         compute_missing_skills(expected_skills, observed_skills, coverage=coverage)
     )
+
+    # Repeated Reviewer Finding（不依赖 coverage——Open Findings 是持久化事实）
+    findings = extract_findings(snapshot.get("work") or {})
+    report.signals.extend(compute_repeated_review(findings))
+
+    # Known Bug Recurrence：v0 无可靠 Bug identity，显示 unavailable 不猜
+    report.signals.extend(
+        compute_bug_recurrence(BugIdentityEvidence(work_id=(snapshot.get("work") or {}).get("id")))
+    )
+
+    # Memory Effectiveness：selected 有事实则显示，usage evidence 无则 UNAVAILABLE
+    memory_selection = extract_memory_selection(snapshot.get("work") or {})
+    report.signals.extend(compute_memory_effectiveness(memory_selection))
     return report
 
 
