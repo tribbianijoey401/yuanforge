@@ -170,7 +170,6 @@ class AggregateTests(unittest.TestCase):
                 "workflow_id": "complex-bug",
                 "required_agents": ["tester"],
                 "optional_agents": [],
-                "required_skills": [],
             },
         }
         report = compute_signals(snapshot, Registry(), coverage="UNKNOWN")
@@ -193,7 +192,6 @@ class AggregateTests(unittest.TestCase):
                 "workflow_id": "complex-bug",
                 "required_agents": ["tester"],
                 "optional_agents": [],
-                "required_skills": [],
             },
         }
         report = compute_signals(snapshot, Registry(), coverage="FULL")
@@ -206,6 +204,38 @@ class AggregateTests(unittest.TestCase):
         self.assertTrue(why.observed)
         self.assertTrue(why.derived)
         self.assertTrue(why.check)
+
+    def test_aggregate_expected_skill_comes_from_observed_agent_contract(self):
+        snapshot = {
+            "work": {
+                "has_active_work": True,
+                "latest_result": "outcome: completed\nskills_applied: [test-driven-development]",
+            },
+            "status": {
+                "work": "bug-1",
+                "work_state": "completed",
+                "agent": {"id": "backend-dev", "state": "completed"},
+            },
+            "workflow": {
+                "workflow_id": "complex-bug",
+                "stages": ["diagnose", "distill"],
+                "required_agents": ["conductor", "backend-dev"],
+                "optional_agents": [],
+                "required_skills": ["workflow-must-not-select-this"],
+            },
+        }
+        registry = Registry(
+            agents={
+                "backend-dev": AgentContract(
+                    agent_id="backend-dev",
+                    required_skills=["systematic-debugging"],
+                )
+            }
+        )
+        report = compute_signals(snapshot, registry, coverage="FULL")
+        signal_ids = {signal.signal_id for signal in report.signals}
+        self.assertIn("MISSING-SKILL-systematic-debugging", signal_ids)
+        self.assertNotIn("MISSING-SKILL-workflow-must-not-select-this", signal_ids)
 
 
 if __name__ == "__main__":

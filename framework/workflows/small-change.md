@@ -10,7 +10,6 @@ optional_agents:
   - spec-reviewer
   - security-auditor
   - quality-auditor
-required_skills: []
 ---
 
 # Workflow：Small Change

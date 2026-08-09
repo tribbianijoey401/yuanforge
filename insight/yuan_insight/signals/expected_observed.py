@@ -195,7 +195,7 @@ def compute_missing_agents(
 
 
 def compute_missing_skills(
-    expected_workflow_skills: list[str],
+    expected_required_skills: list[str],
     observed_skills: list[str],
     coverage: str,
 ) -> list[Signal]:
@@ -208,7 +208,7 @@ def compute_missing_skills(
     if coverage != "FULL" or not observed_skills:
         return signals
     observed_set = set(observed_skills)
-    for skill_id in expected_workflow_skills:
+    for skill_id in expected_required_skills:
         if skill_id in observed_set:
             continue
         signals.append(
@@ -218,10 +218,10 @@ def compute_missing_skills(
                 entity=skill_id,
                 summary=f"Expected Skill {skill_id} 未被报告使用",
                 why=WhyProvenance(
-                    expected_rule=f"Workflow required_skills 声明 {skill_id}",
+                    expected_rule=f"Observed Agent Contract 将 {skill_id} 声明为 Required Skill",
                     observed=f"Reported skills_applied={sorted(observed_set)}",
-                    derived=f"{skill_id} 应在当前 Workflow 中被使用但未报告",
-                    check="检查 Agent Skill 选择与 Workflow 规则",
+                    derived=f"{skill_id} 应由已观察到的 Agent 使用但未报告",
+                    check="检查 Agent 是否遵守自己的 Skill Assignment",
                 ),
             )
         )

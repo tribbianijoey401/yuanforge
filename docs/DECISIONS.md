@@ -18,7 +18,7 @@
 ## D-003：唯一依赖方向为 Agent → Skill → References
 
 - **Status**：Confirmed
-- **Decision**：Conductor Routing 选择 Agent；Agent 选择 Contract 声明的 Skill；Skill 根据 Retrieval Signal 选择 Reference Section。Agent 和 Conductor 不直接加载 References。
+- **Decision**：Conductor Routing 与 Workflow 只选择 Agent，不声明或指定 Skill；Agent 根据 Contract 与当前 Signal 选择 Skill；Skill 根据 Retrieval Signal 选择 Reference Section。Agent 和 Conductor 不直接加载 References。
 - **Reason**：让职责、方法和知识分层，避免误用能力、全量注入和 Token 膨胀。
 
 ## D-004：采用七类 Project Document
@@ -44,6 +44,18 @@
 - **Status**：Confirmed
 - **Decision**：官方资产安装到 `.yuan/framework/`；Project 自定义写入 `.yuan/overrides/`，采用相同相对路径并具有更高优先级。
 - **Reason**：Update 可以整体替换官方快照，同时不覆盖本地经验和项目特化。
+
+## D-008：Requirement Discovery 与 Spec Clarification 由同一 Product Analyst 串联
+
+- **Status**：Confirmed
+- **Decision**：模糊、高影响、高不确定或 Solution 先于 Outcome 的需求，先完整执行 `deep-requirement-discovery`，再由同一 Product Analyst 使用 `grilling` 形成具体 Spec。前者不拆分 References，不删减规则；后者继承 Discovery Result，不重复访谈。
+- **Reason**：Discovery 负责确认是否在解决正确的问题，Grilling 负责把正确问题定义成可开发、可验证的 Product Contract；保持同一 Agent Ownership 可以避免语义丢失、重复提问和双 Truth Source。
+
+## D-009：Update 只检查 Work 状态，不迁移 Project 内容
+
+- **Status**：Confirmed
+- **Decision**：Update 继续只替换官方受管资产并原样保留 Project-owned 文件；写入前仅检查 `STATUS.work_state`，只允许 `idle` / `paused`。未完成 Work 可保存 Checkpoint 后标记为 `paused`，下次 Session 原地恢复。
+- **Reason**：Update 不应猜测或重写项目事实，但也不能在 Active Work 尚未形成可恢复点时改变 Framework Contract。
 
 ## Historical Decision
 

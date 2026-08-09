@@ -13,7 +13,7 @@ Routing 只决定“当前需要谁”。专业方法由 Agent 选择的 Skill �
 
 ## Agent Assignment
 
-> 权威源：每个 Primary Workflow 文件（`workflows/*.md`）的 frontmatter 声明 `required_agents / optional_agents / required_skills`。下表是快速参考，供 Conductor 开场恢复与人工浏览；发生冲突时以 workflow 文件为准。
+> 权威源：每个 Primary Workflow 文件（`workflows/*.md`）的 frontmatter 只声明 `required_agents / required_agent_groups / optional_agents`。下表是快速参考，供 Conductor 开场恢复与人工浏览；发生冲突时以 Workflow 文件为准。Workflow 和 Routing 不选择 Skill。
 
 | Workflow | Required Agent | Conditional Agent |
 |---|---|---|
@@ -41,4 +41,4 @@ Frontend 与 Backend 同时涉及代码时仍保持一个 Writer，按可验证 
 
 ## Dependency Enforcement
 
-Conductor 派发 Agent 时只提供 Work、相关 Context 和 Agent Contract。Agent 读取其 `vNext Skill Assignment`，Skill 再按自身 `Reference Routing` 读取 Reference。任何 Agent Contract 中遗留的直接 Reference 指令均不得执行，必须通过对应 Skill。
+Conductor 派发 Agent 时只提供 Work、相关 Context 和 Agent Contract，不选择或指定 Skill。Agent 根据自己的 `Skill Assignment` 和当前任务 Signal 判断需要的 Skill，Skill 再按自身 `Reference Routing` 读取 Reference。任何 Agent Contract 中遗留的直接 Reference 指令均不得执行，必须通过对应 Skill。

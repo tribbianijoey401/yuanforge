@@ -119,6 +119,112 @@ class InstallerTests(unittest.TestCase):
             self.assertEqual(0, checked.returncode, checked.stdout + checked.stderr)
             self.assertIn("PASS", checked.stdout)
 
+    def test_update_blocks_active_work_before_changing_managed_files(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-active-update-") as parent:
+            project = Path(parent) / "project"
+            docs = project / "docs"
+            docs.mkdir(parents=True)
+            status = docs / "STATUS.md"
+            status.write_text(
+                """---
+work: FEATURE-1
+work_state: active
+workflow: new-feature
+stage: implement
+---
+
+# Current Situation
+
+正在实现。
+""",
+                encoding="utf-8",
+            )
+            work = docs / "WORK.md"
+            work.write_text("# Active Work\n\n## Goal\n\n完成 FEATURE-1。\n", encoding="utf-8")
+            stale = project / ".yuan" / "framework" / "stale.txt"
+            stale.parent.mkdir(parents=True)
+            stale.write_text("must remain until update is allowed\n", encoding="utf-8")
+
+            result = self.run_command(str(SYNC), "update", str(project))
+
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn("UPDATE_BLOCKED_ACTIVE_WORK", result.stdout + result.stderr)
+            self.assertTrue(stale.is_file())
+            self.assertEqual(
+                "# Active Work\n\n## Goal\n\n完成 FEATURE-1。\n",
+                work.read_text(encoding="utf-8"),
+            )
+
+    def test_update_allows_paused_work_and_preserves_checkpoint(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-paused-update-") as parent:
+            project = Path(parent) / "project"
+            docs = project / "docs"
+            docs.mkdir(parents=True)
+            status = docs / "STATUS.md"
+            status_payload = """---
+work: FEATURE-2
+work_state: paused
+workflow: new-feature
+stage: implement
+---
+
+# Current Situation
+
+Work 已暂停，等待下次 Session 恢复。
+"""
+            status.write_text(status_payload, encoding="utf-8")
+            work = docs / "WORK.md"
+            work_payload = "# Active Work\n\n## Goal\n\n完成 FEATURE-2。\n\n## Current Task\n\n从断点继续。\n"
+            work.write_text(work_payload, encoding="utf-8")
+
+            result = self.run_command(str(SYNC), "update", str(project))
+
+            self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+            self.assertEqual(status_payload, status.read_text(encoding="utf-8"))
+            self.assertEqual(work_payload, work.read_text(encoding="utf-8"))
+            self.assertTrue((project / ".yuan" / "framework" / "VERSION").is_file())
+
+    def test_update_blocks_unstructured_existing_work_state(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-unknown-update-") as parent:
+            project = Path(parent) / "project"
+            docs = project / "docs"
+            docs.mkdir(parents=True)
+            (docs / "STATUS.md").write_text(
+                "# Status\n\n- **State**: Completed\n",
+                encoding="utf-8",
+            )
+            (docs / "WORK.md").write_text(
+                "# Active Work\n\n## Goal\n\n遗留 Work。\n",
+                encoding="utf-8",
+            )
+
+            result = self.run_command(str(SYNC), "update", str(project))
+
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn("UPDATE_BLOCKED_UNKNOWN_WORK_STATE", result.stdout + result.stderr)
+            self.assertFalse((project / ".yuan" / "framework").exists())
+
+    def test_existing_install_does_not_interpret_project_documents(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-existing-install-") as parent:
+            project = Path(parent) / "project"
+            docs = project / "docs"
+            docs.mkdir(parents=True)
+            status = docs / "STATUS.md"
+            status_payload = "# Project Status\n\nThis file belongs to the project.\n"
+            status.write_text(status_payload, encoding="utf-8")
+            work = docs / "WORK.md"
+            work_payload = "# Work Notes\n\nThis is not Yuan state.\n"
+            work.write_text(work_payload, encoding="utf-8")
+
+            result = self.run_command(
+                str(INSTALLER), str(project), "--mode", "existing", "--force"
+            )
+
+            self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+            self.assertEqual(status_payload, status.read_text(encoding="utf-8"))
+            self.assertEqual(work_payload, work.read_text(encoding="utf-8"))
+            self.assertTrue((project / ".yuan" / "framework" / "VERSION").is_file())
+
 
 if __name__ == "__main__":
     unittest.main()

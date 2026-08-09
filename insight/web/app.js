@@ -100,8 +100,14 @@ function renderAgents(snapshot, signals, registry, observation, coverage) {
 function renderSkills(snapshot, signals, registry, observation, coverage) {
   const box = document.getElementById("skill-matrix");
   box.innerHTML = "";
-  const workflow = snapshot.workflow || {};
-  const required = workflow.required_skills || [];
+  const currentAgent = (((snapshot || {}).status || {}).agent || {}).id;
+  const observedAgents = Array.from(new Set([
+    ...((observation || {}).agents || []),
+    currentAgent,
+  ].filter(Boolean)));
+  const required = Array.from(new Set(observedAgents.flatMap((agentId) =>
+    (((registry.agent_skills || {})[agentId] || {}).required || [])
+  )));
   const observed = Array.from(new Set([...((observation || {}).skills || []), ...extractObservedSkills(snapshot)]));
   (registry.skills || []).forEach((id) => {
     const tile = document.createElement("div");

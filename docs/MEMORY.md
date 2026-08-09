@@ -79,6 +79,23 @@ description: 可复用的 Verified Finding、Pitfall、Preference 和 Convention
 - **Cause**：测试只覆盖局部计算，没有覆盖启动、状态变化、停止、恢复、完成归档和安装后执行。
 - **Rule**：Observability 变更必须至少验证一次生产入口的端到端生命周期；Completion Transition 的 `from` 与 `to` 都是证据，清空 Active State 不得丢失最后 Agent 或 `skills_applied`。
 
+### M-013：Framework Update 前必须先稳定 Work Checkpoint
+
+- **Symptom**：Active Work 中途更新 Framework，下一 Session 无法判断旧 Work 做到哪里，或 Update 为了兼容而开始改写 Project Memory。
+- **Rule**：Update 不迁移 Project 内容，只在写入前检查 `STATUS.work_state`；仅 `idle` / `paused` 放行。Pause 保留 `WORK.md` 全文并写清唯一 Next Action，既不归档也不清空。
+
+### M-012：Requirement Discovery 与 Spec Clarification 不得混为一个 Gate
+
+- **Symptom**：用户提出一个 Solution 后，Agent 立即追问字段、异常和实现细节，最终得到完整但解决错问题的 Spec；或两个 Agent 重复询问同一 Product 语义。
+- **Cause**：没有区分“是否在解决正确的问题”和“正确问题是否定义完整”。
+- **Rule**：同一 Product Analyst 在 Signal 命中时先完整执行 `deep-requirement-discovery`，再让 `grilling` 继承 Discovery Result 补齐 Spec；不得拆分前者规则、不得重复已有 Evidence。
+
+### M-014：Routing 与 Workflow 不得越级选择 Skill
+
+- **Symptom**：Workflow Frontmatter 或 Routing Policy 声明 `required_skills`，造成 Conductor 绕过 Agent Contract 直接决定专业方法。
+- **Cause**：把 Workflow 编排与 Agent 内部能力选择混成同一层，破坏单向依赖并形成重复 Truth Source。
+- **Rule**：Routing 与 Workflow 只选择 Agent；Agent 根据自己的 Contract 和当前 Signal 选择 Skill；Skill 再选择 References。Insight 的 Expected Skill 也只能从已观察 Agent 的 Contract 推导。
+
 ## Engineering Conventions
 
 - 任何新机制先回答是否直接改善非技术用户的软件交付质量，是否减少 Token、确认和维护成本。

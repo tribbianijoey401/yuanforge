@@ -61,12 +61,54 @@ REQUIRED_AGENT_HEADINGS = (
     "Output",
 )
 
+UPDATE_SAFE_WORK_STATES = {"idle", "paused"}
+
 
 def framework_version() -> str:
     version_file = SOURCE_FRAMEWORK / "VERSION"
     if not version_file.is_file():
         raise RuntimeError(f"Framework Version 缺失：{version_file}")
     return version_file.read_text(encoding="utf-8").strip()
+
+
+def read_update_work_state(target: Path) -> str | None:
+    """只读取 STATUS frontmatter 的 work_state，不解释或迁移 Project 内容。"""
+    status = target / "docs" / "STATUS.md"
+    work = target / "docs" / "WORK.md"
+    if not status.is_file():
+        return "unknown" if work.is_file() else None
+    try:
+        text = status.read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        return "unknown"
+    if not text.startswith("---"):
+        return "unknown"
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        return "unknown"
+    match = re.search(r"^work_state:\s*([^#\r\n]+)", parts[1], re.MULTILINE)
+    if not match:
+        return "unknown"
+    value = match.group(1).strip().strip("'\"").lower()
+    return value or "unknown"
+
+
+def check_update_work_precondition(target: Path) -> tuple[bool, str | None]:
+    """Update 只在没有 Active Work，或 Work 已显式暂停时继续。"""
+    state = read_update_work_state(target)
+    if state is None or state in UPDATE_SAFE_WORK_STATES:
+        return True, state
+    if state == "unknown":
+        return False, (
+            "UPDATE_BLOCKED_UNKNOWN_WORK_STATE: 无法从 docs/STATUS.md 的 YAML "
+            "frontmatter 确认 Work 状态。请先让 Yuan 完成并 Distill 当前 Work，"
+            "或将其显式暂停为 work_state: paused。"
+        )
+    return False, (
+        f"UPDATE_BLOCKED_ACTIVE_WORK: 当前 work_state={state}。"
+        "请先让 Yuan 完成并 Distill 当前 Work，或将其显式暂停为 "
+        "work_state: paused。"
+    )
 
 
 def within(path: Path, parent: Path) -> bool:
@@ -362,10 +404,6 @@ def validate_framework(root: Path) -> tuple[list[str], list[str]]:
         errors.append(f"Reference 内容数量异常：{len(references)} < 30")
 
     agent_ids = {path.stem for path in agents}
-    skill_ids = {
-        path.parent.name if path.name == "SKILL.md" else path.stem
-        for path in skills
-    }
     workflows = sorted((root / "workflows").glob("*.md"))
     if len(workflows) < 4:
         errors.append(f"Primary Workflow 数量不足：{len(workflows)} < 4")
@@ -400,10 +438,9 @@ def validate_framework(root: Path) -> tuple[list[str], list[str]]:
                 errors.append(
                     f"{path.relative_to(root)} required_agent_groups 声明了不存在的 Agent：{', '.join(unknown)}"
                 )
-        unknown_skills = sorted(set(declared.get("required_skills", [])) - skill_ids)
-        if unknown_skills:
+        if "required_skills" in declared:
             errors.append(
-                f"{path.relative_to(root)} 声明了不存在的 Skill：{', '.join(unknown_skills)}"
+                f"{path.relative_to(root)} Workflow 不得越级声明 required_skills；Skill 由 Agent Contract 选择"
             )
 
     path_pattern = re.compile(
@@ -484,6 +521,12 @@ def install_or_update(target: Path, mode: str, update: bool, dry_run: bool) -> i
     if (mode == "existing" or update) and not target.is_dir():
         print(f"ERROR existing/update 模式要求 Project 已存在：{target}", file=sys.stderr)
         return 1
+
+    if update:
+        allowed, message = check_update_work_precondition(target)
+        if not allowed:
+            print(f"ERROR {message}", file=sys.stderr)
+            return 1
 
     if not dry_run:
         target.mkdir(parents=True, exist_ok=True)

@@ -43,7 +43,7 @@ class FrameworkContractTests(unittest.TestCase):
         ]
 
         self.assertEqual(13, len(agents))
-        self.assertGreaterEqual(len(skills), 17)
+        self.assertGreaterEqual(len(skills), 18)
         self.assertGreaterEqual(len(references), 30)
 
         grilling = (FRAMEWORK / "skills" / "grilling" / "SKILL.md").read_text(
@@ -65,6 +65,48 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertIn(f"Phase {phase}", debugging)
         self.assertIn("作弊行为目录", test_integrity)
         self.assertIn("验证手段", test_integrity)
+
+    def test_deep_requirement_discovery_is_complete_and_two_stage(self):
+        discovery_path = (
+            FRAMEWORK / "skills" / "deep-requirement-discovery" / "SKILL.md"
+        )
+        discovery = discovery_path.read_text(encoding="utf-8")
+        self.assertIn("name: deep-requirement-discovery", discovery)
+        self.assertGreaterEqual(len(discovery.splitlines()), 1000)
+        for section in (
+            "第一性原理",
+            "证据纪律",
+            "竞争性假设",
+            "Reframe",
+            "Cognitive Flow Design",
+            "Depth Gate",
+            "Decision Trail",
+            "什么时候停止",
+        ):
+            self.assertIn(section, discovery)
+
+        analyst = (FRAMEWORK / "agents" / "product-analyst.md").read_text(
+            encoding="utf-8"
+        )
+        assignment = next(
+            line for line in analyst.splitlines() if "Skill Assignment" in line
+        )
+        self.assertRegex(
+            assignment,
+            r"Conditional `skills/deep-requirement-discovery/SKILL\.md`.*"
+            r"Required `skills/grilling/SKILL\.md`",
+        )
+        self.assertIn("deep-requirement-discovery → grilling", analyst)
+        self.assertIn("不得从零重新访谈", analyst)
+
+        large_project = (FRAMEWORK / "workflows" / "large-project.md").read_text(
+            encoding="utf-8"
+        )
+        new_feature = (FRAMEWORK / "workflows" / "new-feature.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("deep-requirement-discovery", large_project)
+        self.assertNotIn("deep-requirement-discovery", new_feature)
 
     def test_agent_skill_paths_exist(self):
         for agent in (FRAMEWORK / "agents").glob("*.md"):
@@ -131,24 +173,18 @@ class FrameworkContractTests(unittest.TestCase):
         }
         self.assertEqual(expected, actual)
 
-    def test_workflow_frontmatter_declares_agents_and_skills(self):
+    def test_workflow_frontmatter_declares_agents_only(self):
         required_fields = {
             "workflow",
             "stages",
             "required_agents",
             "required_agent_groups",
             "optional_agents",
-            "required_skills",
         }
         agent_ids = {
             path.stem
             for path in (FRAMEWORK / "agents").glob("*.md")
             if path.name != "contract-template.md"
-        }
-        skill_ids = {
-            path.parent.name if path.name == "SKILL.md" else path.stem
-            for path in list((FRAMEWORK / "skills").glob("*.md"))
-            + list((FRAMEWORK / "skills").glob("*/SKILL.md"))
         }
         workflows = sorted((FRAMEWORK / "workflows").glob("*.md"))
         self.assertGreaterEqual(len(workflows), 4)
@@ -177,10 +213,10 @@ class FrameworkContractTests(unittest.TestCase):
                     members <= agent_ids,
                     f"{path.name} required_agent_groups 存在未知 Agent：{sorted(members - agent_ids)}",
                 )
-            declared_skills = set(declared.get("required_skills", []))
-            self.assertTrue(
-                declared_skills <= skill_ids,
-                f"{path.name} required_skills 声明了不存在的 Skill：{sorted(declared_skills - skill_ids)}",
+            self.assertNotIn(
+                "required_skills",
+                declared_fields,
+                f"{path.name} 不得越级选择 Skill",
             )
             self.assertIn(
                 "conductor", set(declared.get("required_agents", [])),
@@ -196,6 +232,24 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertIn("WORK.md", text)
             self.assertIn("STATUS.md", text)
             self.assertIn("no active work", text)
+
+    def test_pause_contract_preserves_work_and_is_resumable(self):
+        core = (FRAMEWORK / "policies" / "core.md").read_text(encoding="utf-8")
+        documents = (FRAMEWORK / "policies" / "documents.md").read_text(encoding="utf-8")
+        status_template = (FRAMEWORK / "templates" / "project" / "STATUS.md").read_text(
+            encoding="utf-8"
+        )
+        work_template = (FRAMEWORK / "templates" / "project" / "WORK.md").read_text(
+            encoding="utf-8"
+        )
+        adapter = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+
+        for text in (core, documents, status_template, adapter):
+            self.assertIn("paused", text)
+        self.assertIn("暂停时保留全文", work_template)
+        self.assertIn("不得归档", documents)
+        self.assertIn("不得归档或清空", adapter)
+        self.assertIn("Next Action", documents)
 
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ Yuan 不替代 Agent Platform。LLM 负责推理，Platform 负责文件、命�
 
 首要目标只有一个：提高 Vibe Coding 的代码质量。五项核心能力均服务于这个目标：
 
-- `GUIDE`：把模糊想法转为清晰 Scope 和 Acceptance，并主动纠正高风险或不合理需求。
+- `GUIDE`：通过 `deep-requirement-discovery → grilling` 两段式能力链，先判断真正应该解决的问题，再把确认后的 Product Direction 转成清晰 Scope 和 Acceptance。
 - `MEMORY`：跨 Session 保存稳定事实、Decision、Progress、失败经验和 Pitfall。
 - `CONTEXT`：只加载当前 Work 相关的 Project Document、Agent、Skill 和 Reference Section。
 - `ORCHESTRATION`：由 Conductor 动态选择必要角色，不默认启动完整专家团。

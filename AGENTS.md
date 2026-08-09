@@ -17,9 +17,10 @@ Framework 内所有路径都相对 Framework Root。若 `.yuan/overrides/<relati
 
 1. 读取 `docs/STATUS.md`，确认当前恢复点。
 2. `docs/WORK.md` 有 Active Work 时读取其 Goal、Scope、Acceptance 和 Next Action。
-3. 只读取与当前 Request 相关的 `PRODUCT.md`、`ARCHITECTURE.md`、`DECISIONS.md`、`MEMORY.md` Section。
-4. 新 Request 与 Active Work 无关时写入 `BACKLOG.md`；只有紧急 Bug 可先保存 Checkpoint 后中断。
-5. 缺失 Project Document 时，由 `project-bootstrap` Skill 补齐，不因文档缺失阻止正常诊断。
+3. `work_state: paused` 表示可恢复 Checkpoint；用户继续原 Work 时改回 `active` 并从 Next Action 继续，不把 Pause 当作 Completion 或 Archive。
+4. 只读取与当前 Request 相关的 `PRODUCT.md`、`ARCHITECTURE.md`、`DECISIONS.md`、`MEMORY.md` Section。
+5. 新 Request 与 Active Work 无关时写入 `BACKLOG.md`；只有紧急 Bug 可先保存 Checkpoint 后中断。
+6. 缺失 Project Document 时，由 `project-bootstrap` Skill 补齐，不因文档缺失阻止正常诊断。
 
 不要默认读取全部历史 Work、全部 Memory、全部 Agent、全部 Skill 或全部 References。
 
@@ -33,6 +34,7 @@ Conductor 对外保持统一的 Yuan Mentor 人格：
 4. 用户多次无法回答时，给出推荐假设并明确标注；只有关键 Product/Architecture Decision 才等待确认。
 5. Intake 摘要必须先完整展示 Goal、Scope、Non-goal、Acceptance、Assumption 和 Risk，再询问是否确认；不能只问“是否确认”而隐藏内容。
 6. 小且清晰的 Request 可以直接进入相称的 Workflow，不机械执行两次确认或完整团队流程。
+7. 需求模糊、高影响、高不确定，或用户先提出 Solution 但 Outcome 不清时，Routing 只选择 Product Analyst；具体使用哪些 Skill、以什么顺序使用，由 Product Analyst 根据自己的 Agent Contract 和当前 Signal 判断。
 
 ## Dynamic Routing
 
@@ -57,6 +59,7 @@ Conductor Routing → Agent Contract → Skill → Reference Section
 ## Work and Verification
 
 - 一个 Project 默认只有一个 Active Work，记录在 `docs/WORK.md`。
+- Work 未完成但需要退出或更新 Framework 时，覆盖 Current Task / Latest Result 保存可恢复 Checkpoint，将 `STATUS.work_state` 设为 `paused`；不得归档或清空 `WORK.md`。
 - 实现前先定义自动 Test 或 Manual Verification；Bug 先复现，Refactor 先确认 Baseline Test。
 - 只执行当前 Scope 内的修改，保留用户已有变更。
 - 发现 Scope 或 Risk 明显增长时，更新 Work 并升级 Workflow；改变重大 Acceptance 或不可逆选择时向用户确认。
@@ -99,7 +102,7 @@ Framework 损坏或需要升级时，从 Yuan Source Repository 外部运行：
 python -B scripts/sync_project.py update <project-root>
 ```
 
-`update` 强制采用最新官方 Snapshot，不要求旧 Framework、旧 Runtime、Version 或 Integrity 先通过检查；必须保留 `docs/`、`.yuan/overrides/` 和 Project-owned 内容。更新后的 Check 只报告问题，不自动回滚。
+`update` 强制采用最新官方 Snapshot，不要求旧 Framework、旧 Runtime、Version 或 Integrity 先通过检查；必须保留 `docs/`、`.yuan/overrides/` 和 Project-owned 内容。Update 不解释或迁移 Project Document，只检查 `STATUS.work_state`：仅 `idle` / `paused` 允许更新；其他或无法判定的状态必须先完成并 Distill，或显式 Pause。更新后的 Check 只报告问题，不自动回滚。
 
 ## Precedence
 

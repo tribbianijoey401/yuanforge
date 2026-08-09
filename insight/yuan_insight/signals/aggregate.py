@@ -90,7 +90,16 @@ def compute_signals(
             compute_missing_agents(expected, observed, coverage=coverage)
         )
 
-    expected_skills = snapshot_workflow.get("required_skills", [])
+    # Skill Expected 只能来自已选 Agent 的 Contract，不能由 Workflow 越级声明。
+    expected_skills = sorted(
+        {
+            skill_id
+            for agent_id in observed.observed_ids
+            for skill_id in getattr(
+                getattr(registry, "agents", {}).get(agent_id), "required_skills", []
+            )
+        }
+    )
     latest_result = (snapshot.get("work") or {}).get("latest_result") or ""
     observed_skills = sorted(
         set(observed.reported_skills + _extract_skills_applied(latest_result))

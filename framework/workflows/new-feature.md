@@ -14,16 +14,15 @@ optional_agents:
   - security-auditor
   - quality-auditor
   - ux-reviewer
-required_skills:
-  - grilling
-  - test-driven-development
 ---
 
 # Workflow：New Feature
 
 ```text
 Mentor 式 Requirement Discovery
-→ Product Analyst 使用 Grilling Skill 动态检查关键维度
+→ Product Analyst 判断用户提出的是 Goal、Problem 还是 Current Solution
+→ 必要时确认真正 Outcome、关键 Evidence 与 Product Direction
+→ 在已确认方向上补齐具体、可验证的 Product Contract
 → Yuan 给 Recommendation 与 Trade-off
 → 用户确认 Scope 与 Acceptance
 → Architecture / UI 按需设计

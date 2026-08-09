@@ -17,6 +17,8 @@ User Request
   → Project Document Update
 ```
 
+Product Analyst 在同一职责边界内使用两段式 Skill Chain：模糊、高影响或高不确定需求先完整加载 `deep-requirement-discovery`，形成真正 Outcome 与 Product Direction；随后 `grilling` 继承该结果并补齐可开发、可验证的 Spec。两段不拆成不同 Agent，也不建立第二份 Product Truth Source。
+
 ## Canonical Source Structure
 
 ```text
@@ -104,5 +106,7 @@ Override 优先级为 `Project Override > Vendored Official Asset > Yuan Default
 - `docs/`
 - `.yuan/overrides/`
 - Project Source、Test、Config 和其他业务文件
+
+Update 不迁移或解释 Project-owned 内容。它只在任何写入前读取 `STATUS.work_state`：`idle` / `paused` 放行，其他或无法判定的状态停止。Pause 本身只保存 `WORK.md` Checkpoint 并标记状态，不引入 Runtime、Archive 或第二状态系统。
 
 安装和更新后的 `check` 只报告当前布局、Dangling Reference 和 Contract 问题，不回滚最新版本。

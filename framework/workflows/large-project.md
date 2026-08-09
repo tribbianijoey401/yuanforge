@@ -15,17 +15,14 @@ optional_agents:
   - security-auditor
   - quality-auditor
   - ux-reviewer
-required_skills:
-  - grilling
-  - writing-plans
-  - test-driven-development
 ---
 
 # Workflow：Large Project
 
 ```text
-Discover
-→ Clarify
+Product Analyst 建立 Problem Model
+→ 确认真正 Outcome、Problem、Facts、Constraints、Assumptions 与 Reframe
+→ 同一 Product Analyst 将已确认方向转成具体 Product Contract
 → Recommend
 → Confirm Product Contract
 → Plan by Slice

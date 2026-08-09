@@ -102,6 +102,5 @@ def build_snapshot(root: Path, observed_at: str) -> Snapshot:
         "required_agents": definition.required_agents,
         "required_agent_groups": definition.required_agent_groups,
         "optional_agents": definition.optional_agents,
-        "required_skills": definition.required_skills,
     }
     return snapshot

@@ -213,7 +213,6 @@ class AggregatePhase4Tests(unittest.TestCase):
                 "workflow_id": "complex-bug",
                 "required_agents": ["tester"],
                 "optional_agents": [],
-                "required_skills": [],
             },
         }
         report = compute_signals(snapshot, object(), coverage="FULL")  # type: ignore[arg-type]

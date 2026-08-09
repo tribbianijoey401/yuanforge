@@ -8,10 +8,9 @@ Yuan 的首要目标是提高 Vibe Coding 的代码质量，不是建设独立 R
 
 ```text
 自然语言 Request
-  → Yuan Mentor 澄清关键 Product 问题并给出推荐
   → Dynamic Routing 选择一个 Primary Workflow
   → 只加载需要的 Agent
-  → Agent 调用需要的 Skill
+  → Agent 根据自己的 Contract 与当前 Signal 调用需要的 Skill
   → Skill 按 Signal 读取相关 Reference Section
   → 一个 Writer 实施，Test / Reviewer 按 Risk 验证
   → 更新 Status 与长期 Memory
@@ -46,6 +45,8 @@ UI Designer 和 Reviewer 都按任务 Signal 与 Risk 加载，不固定启动�
 
 `TASK_BOARD` 只在复杂 Work 中按需嵌入 `WORK.md`；`SESSION` 默认取消；`PROGRESS` 合并到 `WORK.md` 与 `STATUS.md`。
 
+Work 未完成但需要退出时，Yuan 会先把可恢复 Checkpoint 写回 `WORK.md`，再将 `STATUS.work_state` 设为 `paused`。Pause 不归档、不清空 Work；下次 Session 从 Next Action 恢复。
+
 ## Yuan Insight
 
 Yuan Insight 是 Yuan 官方的只读 Sidecar，通过 File Watch 观察 `WORK.md`、`STATUS.md` 与 Framework Definition，生成 Coverage、Trace、Work Summary、Expected vs Observed Signal 和 Dashboard。它不修改 Yuan Core State，失败时不影响 Agent Routing 与 Project Memory。
@@ -77,7 +78,7 @@ python -B bin/yuanforge-init C:\path\to\project --mode existing --force
 python -B bin/yuanforge-init C:\path\to\new-project --force
 ```
 
-安装完成后，直接在 Agent Platform 中描述你的 Product Goal、Bug 或修改需求。Yuan 会自动恢复 Project Context、选择 Workflow、Agent、Skill 和必要 References；不需要在 Prompt 中指定 Phase、Agent 或 Skill。
+安装完成后，直接在 Agent Platform 中描述你的 Product Goal、Bug 或修改需求。Yuan 会自动恢复 Project Context；Routing 选择 Workflow 和 Agent，Agent 根据自己的 Contract 选择 Skill，Skill 再选择必要 References。用户不需要在 Prompt 中指定 Phase、Agent 或 Skill。
 
 ## 强制更新
 
@@ -90,6 +91,8 @@ python -B scripts/sync_project.py update C:\path\to\project
 - `docs/` Project Memory
 - `.yuan/overrides/` Project Override
 - Project Source、Test、Config 与其他业务内容
+
+Update 不迁移或解释这些 Project-owned 文件，只读取 `STATUS.work_state` 做最小安全检查：`idle` 或 `paused` 才允许更新。其他状态必须先完成并 Distill，或显式 Pause；无法判定旧格式状态时会停止并给出处理提示。
 
 需要检查安装结果时运行：
 

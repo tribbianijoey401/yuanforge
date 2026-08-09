@@ -20,7 +20,7 @@
 
 # Active Workspace
 
-> Active Workspace 是 State，不是 History。Current Task 与 Latest Result 每次覆盖；Open Findings 只保存未解决义务；Work Learnings 只保存后续仍需的当前认知。完成时 Distill 后全部清空，回到 no active work。
+> Active Workspace 是 State，不是 History。Current Task 与 Latest Result 每次覆盖；Open Findings 只保存未解决义务；Work Learnings 只保存后续仍需的当前认知。暂停时保留全文，并把 Current Task / Latest Result 更新为可直接恢复的 Checkpoint；完成时 Distill 后全部清空，回到 no active work。
 
 ## Current Task
 

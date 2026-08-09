@@ -1,4 +1,4 @@
-"""解析 Framework Definition：workflow frontmatter 的 Expected Agent/Skill。"""
+"""解析 Framework Definition：workflow frontmatter 的 Expected Agent。"""
 
 from __future__ import annotations
 
@@ -15,7 +15,6 @@ class WorkflowDefinition:
     required_agents: list[str] = field(default_factory=list)
     required_agent_groups: list[list[str]] = field(default_factory=list)
     optional_agents: list[str] = field(default_factory=list)
-    required_skills: list[str] = field(default_factory=list)
     raw: dict[str, Any] = field(default_factory=dict)
 
 
@@ -60,7 +59,6 @@ def parse_workflow(text: str) -> WorkflowDefinition:
             if "|" in group
         ],
         optional_agents=list(lists.get("optional_agents", [])),
-        required_skills=list(lists.get("required_skills", [])),
         raw=lists,
     )
 

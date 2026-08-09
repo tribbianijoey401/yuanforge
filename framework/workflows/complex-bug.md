@@ -12,9 +12,6 @@ optional_agents:
   - security-auditor
   - quality-auditor
   - ux-reviewer
-required_skills:
-  - systematic-debugging
-  - test-driven-development
 ---
 
 # Workflow：Complex Bug
@@ -22,7 +19,6 @@ required_skills:
 ```text
 读取 Status、Work 与相关 Memory
 → 用普通语言确认 Observed / Expected Behavior
-→ 加载 Systematic Debugging Skill
 → 建立 Failing Test 或可重复 Reproduction
 → 区分 Observation、Hypothesis 与 Verified Fact
 → 一个 Implementation Agent 完成 Root-cause Fix
