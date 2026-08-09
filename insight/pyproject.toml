@@ -1,11 +1,15 @@
 [project]
 name = "yuan-insight"
-version = "0.1.0"
+version = "0.2.0"
 description = "Yuan Insight — read-only sidecar observability for Yuan Framework (optional, never a Core dependency)"
 requires-python = ">=3.10"
 
 [project.scripts]
 yuan-observe = "yuan_insight.cli:main"
+yuan = "yuan_insight.cli:yuan_main"
 
 [tool.setuptools]
 packages = ["yuan_insight", "yuan_insight.parsers", "yuan_insight.signals"]
+
+[tool.setuptools.data-files]
+"yuan_insight_web" = ["web/index.html", "web/app.js"]

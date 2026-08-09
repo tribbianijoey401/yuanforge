@@ -6,3 +6,5 @@ __pycache__/
 .qoder/
 .workbuddy/
 *.py[cod]
+build/
+*.egg-info/

@@ -61,7 +61,8 @@ Conductor Routing → Agent Contract → Skill → Reference Section
 - 只执行当前 Scope 内的修改，保留用户已有变更。
 - 发现 Scope 或 Risk 明显增长时，更新 Work 并升级 Workflow；改变重大 Acceptance 或不可逆选择时向用户确认。
 - Reviewer 不修改被审对象；发现问题后交回唯一 Writer 修正，并重跑受影响验证。
-- 只有 Acceptance、必要 Verification、Risk-driven Review、已知问题披露和 Project Document 更新全部满足时，才报告完成。
+- 只有 Acceptance、必要 Verification、Risk-driven Review、已知问题披露和 `Open Findings = 0` 全部满足时，才进入 Distill。
+- Distill 是 Completion 的一部分；长期信息归位后，将 `WORK.md` / `STATUS.md` 同时清为 no active work，最后才报告完成。
 
 ## Focused Handoff
 

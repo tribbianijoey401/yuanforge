@@ -36,13 +36,14 @@ Checkpoint 保持短小，只写 Current State、Last Verified Result、Next Act
 
 ## Distill
 
-Work 结束时：
+Work 收尾且尚未报告完成时：
 
 1. 更新真实 Project Fact，而不是保留过时描述。
 2. 合并重复 Memory；保留最小 Reproduction、Verified Cause 和 Prevention Rule。
 3. 重大 Decision 写入 `DECISIONS.md`，并标记被 Supersede 的旧 Decision。
 4. 未完成且不属于 Active Work 的 Item 写入 `BACKLOG.md`。
 5. 只有有长期价值的完成摘要才进入 `docs/work/archive/`。
+6. 在 `Open Findings = 0` 且上述信息已归位后，将 `WORK.md` 和 `STATUS.md` 同时清为 no active work。
 
 ## Exclusions
 

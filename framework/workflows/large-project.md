@@ -1,12 +1,13 @@
 ---
 workflow: large-project
+stages: [discover, clarify, confirm, plan, build, verify, review, distill]
 required_agents:
   - conductor
   - product-analyst
   - architect
-  - frontend-dev
-  - backend-dev
   - tester
+required_agent_groups:
+  - frontend-dev|backend-dev
 optional_agents:
   - ui-designer
   - design-reviewer

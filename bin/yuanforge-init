@@ -31,6 +31,7 @@ if hasattr(sys.stderr, "reconfigure"):
 SCRIPT_DIR = Path(__file__).resolve().parent
 SOURCE_ROOT = SCRIPT_DIR.parent
 SOURCE_FRAMEWORK = SOURCE_ROOT / "framework"
+SOURCE_INSIGHT = SOURCE_ROOT / "insight"
 
 PROJECT_DOCUMENTS = (
     "PRODUCT.md",
@@ -117,6 +118,54 @@ def copy_framework_snapshot(target: Path, dry_run: bool = False) -> None:
         remove_scoped(retired, yuan_dir)
 
 
+def copy_insight_tool(target: Path, dry_run: bool = False) -> None:
+    """更新官方 Insight Tool，保留 `.yuan/insight/` 中的 Trace/Summary/Session。"""
+    insight_root = target / ".yuan" / "insight"
+    managed = insight_root / "tool"
+    incoming = insight_root / f".tool-incoming-{os.getpid()}"
+    retired = insight_root / f".tool-retired-{os.getpid()}"
+    if dry_run:
+        print(f"  replace {managed} <- {SOURCE_INSIGHT}")
+        return
+    insight_root.mkdir(parents=True, exist_ok=True)
+    remove_scoped(incoming, insight_root)
+    remove_scoped(retired, insight_root)
+    shutil.copytree(
+        SOURCE_INSIGHT,
+        incoming,
+        ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo", "build", "dist", "*.egg-info"),
+    )
+    try:
+        if managed.exists():
+            managed.replace(retired)
+        incoming.replace(managed)
+    except BaseException:
+        if not managed.exists() and retired.exists():
+            retired.replace(managed)
+        raise
+    finally:
+        remove_scoped(incoming, insight_root)
+        remove_scoped(retired, insight_root)
+
+
+def write_insight_launcher(target: Path, dry_run: bool = False) -> None:
+    destination = target / ".yuan" / "insight" / "yuan.py"
+    if dry_run:
+        print(f"  write {destination}")
+        return
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(
+        "from pathlib import Path\n"
+        "import sys\n\n"
+        "tool = Path(__file__).resolve().parent / 'tool'\n"
+        "sys.path.insert(0, str(tool))\n"
+        "from yuan_insight.cli import yuan_main\n\n"
+        "if __name__ == '__main__':\n"
+        "    raise SystemExit(yuan_main())\n",
+        encoding="utf-8",
+    )
+
+
 def migrate_legacy_custom_skills(target: Path, dry_run: bool = False) -> list[str]:
     """将 v3 的 user-* Skill 保留为 vNext Project Override。"""
     legacy = target / ".yuan" / "skills"
@@ -201,6 +250,8 @@ def write_install_record(target: Path, dry_run: bool = False) -> None:
         "version": framework_version(),
         "layout": ".yuan/framework",
         "override": ".yuan/overrides",
+        "insight_tool": ".yuan/insight/tool",
+        "insight_data": ".yuan/insight",
         "project_documents": [f"docs/{name}" for name in PROJECT_DOCUMENTS],
     }
     if dry_run:
@@ -329,12 +380,25 @@ def validate_framework(root: Path) -> tuple[list[str], list[str]]:
             continue
         frontmatter = body[1]
         declared = parse_frontmatter_lists(frontmatter)
+        if not declared.get("stages"):
+            errors.append(f"{path.relative_to(root)} 未声明 stable stages")
         for field in ("required_agents", "optional_agents"):
             declared_ids = set(declared.get(field, []))
             unknown = sorted(declared_ids - agent_ids)
             if unknown:
                 errors.append(
                     f"{path.relative_to(root)} 声明了不存在的 Agent：{', '.join(unknown)}"
+                )
+        for group in declared.get("required_agent_groups", []):
+            members = {member for member in group.split("|") if member}
+            if len(members) < 2:
+                errors.append(
+                    f"{path.relative_to(root)} required_agent_groups 至少需要两个 Agent"
+                )
+            unknown = sorted(members - agent_ids)
+            if unknown:
+                errors.append(
+                    f"{path.relative_to(root)} required_agent_groups 声明了不存在的 Agent：{', '.join(unknown)}"
                 )
         unknown_skills = sorted(set(declared.get("required_skills", [])) - skill_ids)
         if unknown_skills:
@@ -377,6 +441,11 @@ def check_project(target: Path) -> int:
         errors.extend(framework_errors)
         warnings.extend(framework_warnings)
 
+    installed_insight = target / ".yuan" / "insight" / "tool" / "yuan_insight" / "cli.py"
+    source_insight = target / "insight" / "yuan_insight" / "cli.py"
+    if not installed_insight.is_file() and not source_insight.is_file():
+        errors.append("缺少 Yuan Insight Tool")
+
     for name in PROJECT_DOCUMENTS:
         if not (target / "docs" / name).is_file():
             warnings.append(f"缺少 Project Document：docs/{name}")
@@ -399,6 +468,9 @@ def install_or_update(target: Path, mode: str, update: bool, dry_run: bool) -> i
     if not SOURCE_FRAMEWORK.is_dir():
         print(f"ERROR Source Framework 缺失：{SOURCE_FRAMEWORK}", file=sys.stderr)
         return 1
+    if not (SOURCE_INSIGHT / "yuan_insight" / "cli.py").is_file():
+        print(f"ERROR Source Insight 缺失：{SOURCE_INSIGHT}", file=sys.stderr)
+        return 1
     source_errors, _ = validate_framework(SOURCE_FRAMEWORK)
     if source_errors:
         print("ERROR Source Framework Contract Check 失败：", file=sys.stderr)
@@ -418,6 +490,8 @@ def install_or_update(target: Path, mode: str, update: bool, dry_run: bool) -> i
 
     migrated = migrate_legacy_custom_skills(target, dry_run)
     copy_framework_snapshot(target, dry_run)
+    copy_insight_tool(target, dry_run)
+    write_insight_launcher(target, dry_run)
     write_project_adapter(target, dry_run)
     removed = cleanup_legacy_managed_layout(target, dry_run)
     created_docs = [] if update else ensure_project_documents(target, dry_run)
@@ -430,6 +504,7 @@ def install_or_update(target: Path, mode: str, update: bool, dry_run: bool) -> i
     print(f"  Project：{target}")
     print("  Official Snapshot：.yuan/framework/")
     print("  Project Override：.yuan/overrides/")
+    print("  Insight Tool：.yuan/insight/tool/")
     if migrated:
         print(f"  Migrated Override：{len(migrated)}")
     if removed:

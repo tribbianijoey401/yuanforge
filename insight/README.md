@@ -7,7 +7,7 @@
 ## 设计铁律
 
 - 只读：不修改 WORK/STATUS/MEMORY，不参与 Routing，不阻塞 Agent
-- 可选：删除 `.yuan/insight` 不影响 Yuan 任何流程
+- 可选：Insight 停止或 Observation Data 缺失不影响 Yuan Core 任何流程
 - Fact First：没有事实来源的字段必须 Unknown，禁止假精度
 - Expected 来自现有 Framework Definition，不复制规则
 - 不做 Event Ledger、不依赖平台 telemetry、不做 exact token、不常驻 LLM
@@ -22,11 +22,17 @@ PYTHONPATH=insight python3 -B -m yuan_insight.cli <project-root> --once    # 一
 PYTHONPATH=insight python3 -B -m yuan_insight.cli <project-root> --signals # 输出 Signals
 PYTHONPATH=insight python3 -B -m yuan_insight.cli <project-root>           # watch 模式（JSONL Trace）
 PYTHONPATH=insight python3 -B -m yuan_insight.cli <project-root> --web     # Dashboard（默认 :8765）
+
+# Package 安装后
+yuan observe <project-root> --web
+
+# Yuan Installer 安装到 Project 后
+python -B .yuan/insight/yuan.py observe . --web
 ```
 
 ## Dashboard
 
-打开 `http://127.0.0.1:8765/`，3s 轮询 `/api/state`，零依赖静态 UI：
+打开 `http://127.0.0.1:8765/`。`--web` 在同一进程启动 Observation Service，后台完成 File Watch / Debounce / Trace / Gap / Summary，UI 每 3s 轮询 `/api/state`：
 
 - **Work / Execution Map**：Work 状态、Stage Timeline、当前 Agent
 - **Agent Matrix**：ACTIVE / COMPLETED / MISSING / NOT REQUIRED
@@ -52,10 +58,11 @@ PYTHONPATH=insight python3 -B -m yuan_insight.cli <project-root> --web     # Das
 ├── sessions/<session>.json     # Observation Session + Baseline
 ├── traces/<work>.jsonl         # 归档 Work Trace（保留最近 N=50）
 ├── traces/current.jsonl        # 活跃 Work 的 Trace
+├── summaries/<work>.json       # 长期 Work Summary，不随 Trace Retention 删除
 └── gaps/<session>.jsonl        # Observation Gap
 ```
 
-全部是 Observation Data，`rm -rf .yuan/insight` 不影响 Yuan。
+`.yuan/insight/tool/` 是 Installer 管理的官方 Tool；其余目录是 Observation Data。删除 Observation Data 不影响 Yuan Core，但会丢失 Insight History。
 
 ## 目录
 
@@ -65,6 +72,7 @@ insight/
 ├── yuan_insight/
 │   ├── cli.py          # 入口：--once / --signals / watch / --web
 │   ├── watcher.py      # DebouncedWatcher（hash 检测 + debounce）
+│   ├── observer.py     # CLI/Web 共用的 Observation Service 与 Coverage/Gap 生命周期
 │   ├── loader.py       # collect → build_snapshot（含 Expected workflow）
 │   ├── registry.py     # Agent/Skill/Workflow 注册表（直读 Framework）
 │   ├── parsers/        # status/work/framework frontmatter 解析

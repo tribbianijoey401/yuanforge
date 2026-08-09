@@ -12,4 +12,4 @@
 
 `STATUS` 的恢复信息进入 Status，`PROGRESS` 进入 Work / Status，复杂 Task Board 按需嵌入 Work。Event、Graph 和完整 Role Output 不进入 vNext 默认 Memory。
 
-重大 Product 与 Architecture Decision 写入前需要用户确认。普通 Status 和已验证技术结论由 Yuan 自动维护。Work 完成时先更新 Status，再去重、合并 Memory；只有有价值的精炼摘要才进入 `docs/work/archive/`。
+重大 Product 与 Architecture Decision 写入前需要用户确认。普通 Status 和已验证技术结论由 Yuan 自动维护。Work 收尾时先 Distill 并去重合并长期信息，再将 `WORK.md` / `STATUS.md` 同时清为 no active work，最后才报告完成；只有有价值的精炼摘要才进入 `docs/work/archive/`。

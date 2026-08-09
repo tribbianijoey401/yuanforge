@@ -4,6 +4,8 @@
 
 Yuan 是运行在 Codex、Hermes 等现有 Agent Platform 上的、Markdown 驱动的 AI 软件工程 Mentor、长期 Project Memory 与多角色协作 Framework。
 
+Yuan Insight 是官方但可选的只读 Sidecar，用于观察 Framework Expected Behavior 与 Project Observed Behavior；它不是 Control Plane，不修改 Core State，不参与 Routing。
+
 Yuan 不替代 Agent Platform。LLM 负责推理，Platform 负责文件、命令与 Agent 能力，Yuan 负责 Mentor、Memory、Context、Orchestration 和 Quality 方法。
 
 ## Target User

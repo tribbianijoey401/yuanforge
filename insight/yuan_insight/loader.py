@@ -98,7 +98,9 @@ def build_snapshot(root: Path, observed_at: str) -> Snapshot:
     definition = load_workflow_by_id(framework_root, workflow_id)
     snapshot.workflow = {
         "workflow_id": definition.workflow_id,
+        "stages": definition.stages,
         "required_agents": definition.required_agents,
+        "required_agent_groups": definition.required_agent_groups,
         "optional_agents": definition.optional_agents,
         "required_skills": definition.required_skills,
     }

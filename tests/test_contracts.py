@@ -132,7 +132,14 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_workflow_frontmatter_declares_agents_and_skills(self):
-        required_fields = {"workflow", "required_agents", "optional_agents", "required_skills"}
+        required_fields = {
+            "workflow",
+            "stages",
+            "required_agents",
+            "required_agent_groups",
+            "optional_agents",
+            "required_skills",
+        }
         agent_ids = {
             path.stem
             for path in (FRAMEWORK / "agents").glob("*.md")
@@ -163,6 +170,13 @@ class FrameworkContractTests(unittest.TestCase):
                     declared_ids <= agent_ids,
                     f"{path.name} {field} 声明了不存在的 Agent：{sorted(declared_ids - agent_ids)}",
                 )
+            for group in declared.get("required_agent_groups", []):
+                members = {item for item in group.split("|") if item}
+                self.assertGreaterEqual(len(members), 2, f"{path.name} one-of Group 至少两个 Agent")
+                self.assertTrue(
+                    members <= agent_ids,
+                    f"{path.name} required_agent_groups 存在未知 Agent：{sorted(members - agent_ids)}",
+                )
             declared_skills = set(declared.get("required_skills", []))
             self.assertTrue(
                 declared_skills <= skill_ids,
@@ -172,6 +186,16 @@ class FrameworkContractTests(unittest.TestCase):
                 "conductor", set(declared.get("required_agents", [])),
                 f"{path.name} required_agents 必须包含 conductor",
             )
+
+    def test_completion_contract_clears_active_state_after_distill(self):
+        conductor = (FRAMEWORK / "agents" / "conductor.md").read_text(encoding="utf-8")
+        adapter = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        for text in (conductor, adapter):
+            self.assertIn("Open Findings = 0", text)
+            self.assertIn("Distill", text)
+            self.assertIn("WORK.md", text)
+            self.assertIn("STATUS.md", text)
+            self.assertIn("no active work", text)
 
 
 if __name__ == "__main__":

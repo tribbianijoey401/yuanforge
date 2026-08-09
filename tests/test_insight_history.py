@@ -17,6 +17,7 @@ from yuan_insight.history import (  # noqa: E402
     get_work_summary,
     list_work_summaries,
     summarize_trace,
+    write_work_summary,
 )
 from yuan_insight.server import serve  # noqa: E402
 from yuan_insight.trace import (  # noqa: E402
@@ -82,6 +83,37 @@ class HistoryTests(unittest.TestCase):
             self.assertEqual(len(detail["trace"]), 1)
             self.assertIsNone(get_work_summary(insight_dir, "NOPE"))
 
+    def test_completion_transition_keeps_cleared_agent_and_skill(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            trace_path = Path(temporary) / "BUG-DONE.jsonl"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "id": "T-0001",
+                        "session_id": "OBS-1",
+                        "observed_at": "2026-08-09T00:00:00Z",
+                        "facts": [
+                            {
+                                "field": "status.agent.id",
+                                "from": "tester",
+                                "to": None,
+                            },
+                            {
+                                "field": "work.latest_result",
+                                "from": "skills_applied:\n- test-driven-development",
+                                "to": None,
+                            },
+                        ],
+                    },
+                    ensure_ascii=False,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            summary = summarize_trace(trace_path)
+            self.assertEqual(summary.agents, ["tester"])
+            self.assertEqual(summary.skills, ["test-driven-development"])
+
 
 class TraceArchiveTests(unittest.TestCase):
     def test_archive_and_prune(self):
@@ -95,6 +127,7 @@ class TraceArchiveTests(unittest.TestCase):
             self.assertIsNotNone(archived)
             self.assertTrue((insight_dir / "traces" / "BUG-300.jsonl").is_file())
             self.assertFalse(trace_path.exists())
+            self.assertTrue((insight_dir / "summaries" / "BUG-300.json").is_file())
             # prune 保留 keep 个
             for i in range(5):
                 (insight_dir / "traces" / f"W-{i}.jsonl").write_text('{"id":"T"}\n', encoding="utf-8")
@@ -102,6 +135,28 @@ class TraceArchiveTests(unittest.TestCase):
             remaining = list((insight_dir / "traces").glob("*.jsonl"))
             self.assertEqual(len(removed), 4)
             self.assertEqual(len(remaining), 2)
+            # Summary 是长期历史，不随 Trace retention 被删除。
+            self.assertTrue((insight_dir / "summaries" / "BUG-300.json").is_file())
+
+    def test_summary_remains_readable_after_trace_pruned(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            insight_dir = ensure_insight_dir(Path(temporary))
+            trace_path = insight_dir / "traces" / "BUG-KEEP.jsonl"
+            trace_path.parent.mkdir(parents=True)
+            trace_path.write_text(
+                json.dumps(
+                    make_transition("T-0001", "OBS-1", "BUG-KEEP", "review", "tester"),
+                    ensure_ascii=False,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            write_work_summary(insight_dir, "BUG-KEEP", trace_path)
+            trace_path.unlink()
+            summary = get_work_summary(insight_dir, "BUG-KEEP")
+            self.assertIsNotNone(summary)
+            self.assertFalse(summary["trace_available"])
+            self.assertEqual(summary["agents"], ["tester"])
 
     def test_archive_requires_work_id(self):
         with tempfile.TemporaryDirectory() as temporary:

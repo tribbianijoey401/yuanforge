@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -15,11 +16,14 @@ SYNC = ROOT / "scripts" / "sync_project.py"
 
 class InstallerTests(unittest.TestCase):
     def run_command(self, *args: str) -> subprocess.CompletedProcess[str]:
+        env = os.environ.copy()
+        env["PYTHONIOENCODING"] = "utf-8"
         return subprocess.run(
             [sys.executable, "-B", *args],
             cwd=ROOT,
             text=True,
             encoding="utf-8",
+            env=env,
             capture_output=True,
             check=False,
         )
@@ -31,6 +35,10 @@ class InstallerTests(unittest.TestCase):
             self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
             self.assertTrue((project / ".yuan" / "framework").is_dir())
+            self.assertTrue(
+                (project / ".yuan" / "insight" / "tool" / "yuan_insight" / "cli.py").is_file()
+            )
+            self.assertTrue((project / ".yuan" / "insight" / "yuan.py").is_file())
             self.assertTrue((project / ".yuan" / "overrides" / "README.md").is_file())
             for name in (
                 "PRODUCT.md",
@@ -46,6 +54,15 @@ class InstallerTests(unittest.TestCase):
             self.assertIn("直接向 Agent 描述你的 Goal、Bug 或修改需求", result.stdout)
             self.assertIn("不需要在描述中指定 Phase、Agent 或 Skill", result.stdout)
             self.assertNotIn("启动 12 人专家团", result.stdout)
+
+            observed = self.run_command(
+                str(project / ".yuan" / "insight" / "yuan.py"),
+                "observe",
+                str(project),
+                "--once",
+            )
+            self.assertEqual(0, observed.returncode, observed.stdout + observed.stderr)
+            self.assertIn('"status": "OBSERVED"', observed.stdout)
 
     def test_update_replaces_official_snapshot_and_preserves_project_content(self):
         with tempfile.TemporaryDirectory(prefix="yuan-vnext-update-") as parent:
@@ -70,6 +87,9 @@ class InstallerTests(unittest.TestCase):
             old_custom = project / ".yuan" / "skills" / "user-team" / "SKILL.md"
             old_custom.parent.mkdir(parents=True)
             old_custom.write_text("# User Skill\n", encoding="utf-8")
+            insight_history = project / ".yuan" / "insight" / "summaries" / "OLD.json"
+            insight_history.parent.mkdir(parents=True)
+            insight_history.write_text('{"work_id":"OLD"}\n', encoding="utf-8")
 
             result = self.run_command(str(SYNC), "update", str(project))
             self.assertEqual(0, result.returncode, result.stdout + result.stderr)
@@ -83,10 +103,17 @@ class InstallerTests(unittest.TestCase):
             self.assertFalse(stale.exists())
             self.assertFalse((project / ".yuan" / "runtime").exists())
             self.assertTrue((project / ".yuan" / "framework" / "VERSION").is_file())
+            self.assertEqual(
+                '{"work_id":"OLD"}\n', insight_history.read_text(encoding="utf-8")
+            )
+            self.assertTrue(
+                (project / ".yuan" / "insight" / "tool" / "yuan_insight" / "cli.py").is_file()
+            )
             record = json.loads(
                 (project / ".yuan" / "install.json").read_text(encoding="utf-8")
             )
             self.assertEqual(".yuan/framework", record["layout"])
+            self.assertEqual(".yuan/insight/tool", record["insight_tool"])
 
             checked = self.run_command(str(SYNC), "check", str(project))
             self.assertEqual(0, checked.returncode, checked.stdout + checked.stderr)

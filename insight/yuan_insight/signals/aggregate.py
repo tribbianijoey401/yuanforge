@@ -14,6 +14,7 @@ from .expected_observed import (
     compute_missing_skills,
     expected_from_workflow,
     observed_from_snapshot,
+    observed_from_trace,
 )
 from .memory_effectiveness import (
     compute_memory_effectiveness,
@@ -52,6 +53,7 @@ def compute_signals(
     snapshot: dict[str, Any],
     registry: Registry,
     coverage: str = "UNKNOWN",
+    transitions: list[dict[str, Any]] | None = None,
 ) -> SignalReport:
     """从单个 Snapshot 计算 Signals。
 
@@ -67,20 +69,44 @@ def compute_signals(
         return report
 
     expected = expected_from_workflow(snapshot_workflow, registry)
-    observed = observed_from_snapshot(snapshot)
-    report.signals.extend(
-        compute_missing_agents(expected, observed, coverage=coverage)
+    observed = observed_from_trace(transitions or []) if transitions else observed_from_snapshot(snapshot)
+    current_observed = observed_from_snapshot(snapshot)
+    for agent_id in current_observed.observed_ids:
+        if agent_id not in observed.observed_ids:
+            observed.observed_ids.append(agent_id)
+    # Manager Model 下，可观察的 Active Work/STATUS 由 Conductor 作为唯一 State
+    # Owner 维护；这是 Core Contract 的确定性推导，不是平台 Telemetry 猜测。
+    status = snapshot.get("status") or {}
+    work = snapshot.get("work") or {}
+    if (status.get("work") or work.get("has_active_work")) and "conductor" not in observed.observed_ids:
+        observed.observed_ids.insert(0, "conductor")
+    stages = snapshot_workflow.get("stages", [])
+    work_state = str(status.get("work_state") or "").lower()
+    evaluation_ready = work_state in {"completed", "complete", "done"} or bool(
+        stages and status.get("stage") == stages[-1]
     )
+    if evaluation_ready:
+        report.signals.extend(
+            compute_missing_agents(expected, observed, coverage=coverage)
+        )
 
     expected_skills = snapshot_workflow.get("required_skills", [])
     latest_result = (snapshot.get("work") or {}).get("latest_result") or ""
-    observed_skills = _extract_skills_applied(latest_result)
-    report.signals.extend(
-        compute_missing_skills(expected_skills, observed_skills, coverage=coverage)
+    observed_skills = sorted(
+        set(observed.reported_skills + _extract_skills_applied(latest_result))
     )
+    if evaluation_ready:
+        report.signals.extend(
+            compute_missing_skills(expected_skills, observed_skills, coverage=coverage)
+        )
 
     # Repeated Reviewer Finding（不依赖 coverage——Open Findings 是持久化事实）
-    findings = extract_findings(snapshot.get("work") or {})
+    if transitions:
+        from .repeated_review import extract_findings_from_transitions
+
+        findings = extract_findings_from_transitions(transitions)
+    else:
+        findings = extract_findings(snapshot.get("work") or {})
     report.signals.extend(compute_repeated_review(findings))
 
     # Known Bug Recurrence：v0 无可靠 Bug identity，显示 unavailable 不猜

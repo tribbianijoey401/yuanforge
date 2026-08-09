@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -13,6 +14,7 @@ sys.path.insert(0, str(ROOT / "insight"))
 
 from yuan_insight.diff import diff_snapshots, to_transition  # noqa: E402
 from yuan_insight.loader import Snapshot, build_snapshot  # noqa: E402
+from yuan_insight.observer import ObservationService  # noqa: E402
 from yuan_insight.parsers.status import parse_status  # noqa: E402
 from yuan_insight.parsers.work import parse_work  # noqa: E402
 from yuan_insight.trace import append_transition, ensure_insight_dir, start_session  # noqa: E402
@@ -46,6 +48,38 @@ quality:
 """,
         encoding="utf-8",
     )
+
+
+def write_idle_status(root: Path) -> None:
+    (root / "docs" / "STATUS.md").write_text(
+        """---
+work: null
+work_state: idle
+workflow: null
+stage: null
+agent:
+  id: null
+  state: null
+quality:
+  test: pending
+  review: pending
+---
+
+# Current Situation
+无 Active Work
+""",
+        encoding="utf-8",
+    )
+
+
+def wait_for_update(service: ObservationService, timeout: float = 2.0):
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        update = service.poll_once()
+        if update is not None:
+            return update
+        time.sleep(0.02)
+    return None
 
 
 class StatusParserTests(unittest.TestCase):
@@ -201,6 +235,72 @@ class TraceTests(unittest.TestCase):
             line = trace_path.read_text(encoding="utf-8").strip()
             record = json.loads(line)
             self.assertEqual(record["id"], "T-0001")
+
+
+class ObservationServiceTests(unittest.TestCase):
+    def test_work_completion_archives_trace_and_writes_summary(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = make_project(Path(temporary))
+            write_status(root, "BUG-9", "distill", "tester", "completed")
+            (root / "docs" / "WORK.md").write_text(
+                "# Active Work\n\n## Goal\n\n修复 BUG-9\n",
+                encoding="utf-8",
+            )
+            service = ObservationService(root, poll_interval=0.01, debounce_window=0.02)
+            service.start()
+            write_idle_status(root)
+            (root / "docs" / "WORK.md").write_text(
+                "# Active Work\n\nNo active work.\n",
+                encoding="utf-8",
+            )
+            update = wait_for_update(service)
+            service.stop()
+            self.assertIsNotNone(update)
+            self.assertTrue((root / ".yuan" / "insight" / "traces" / "BUG-9.jsonl").is_file())
+            self.assertTrue((root / ".yuan" / "insight" / "summaries" / "BUG-9.json").is_file())
+            self.assertFalse((root / ".yuan" / "insight" / "traces" / "current.jsonl").exists())
+
+    def test_restart_records_gap_and_active_work_is_partial(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = make_project(Path(temporary))
+            write_status(root, "BUG-10", "implement", "backend-dev", "active")
+            (root / "docs" / "WORK.md").write_text(
+                "# Active Work\n\n## Goal\n\n修复 BUG-10\n",
+                encoding="utf-8",
+            )
+            first = ObservationService(root, poll_interval=0.01, debounce_window=0.02)
+            first.start()
+            first.stop()
+            time.sleep(0.01)
+            second = ObservationService(root, poll_interval=0.01, debounce_window=0.02)
+            second.start()
+            evidence = second.evidence()
+            second.stop()
+            self.assertEqual(evidence.coverage, "PARTIAL")
+            self.assertEqual(len(evidence.gaps), 1)
+            self.assertLess(evidence.gaps[0]["gap_start"], evidence.gaps[0]["gap_end"])
+
+    def test_work_started_while_observing_has_full_coverage(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = make_project(Path(temporary))
+            write_idle_status(root)
+            (root / "docs" / "WORK.md").write_text(
+                "# Active Work\n\nNo active work.\n",
+                encoding="utf-8",
+            )
+            service = ObservationService(root, poll_interval=0.01, debounce_window=0.02)
+            service.start()
+            write_status(root, "BUG-11", "orient", "backend-dev", "active")
+            (root / "docs" / "WORK.md").write_text(
+                "# Active Work\n\n## Goal\n\n修复 BUG-11\n",
+                encoding="utf-8",
+            )
+            update = wait_for_update(service)
+            evidence = service.evidence()
+            service.stop()
+            self.assertIsNotNone(update)
+            self.assertEqual(evidence.coverage, "FULL")
+            self.assertTrue(evidence.transitions)
 
 
 if __name__ == "__main__":

@@ -33,6 +33,7 @@ class Signal:
 @dataclass
 class ExpectedAgents:
     required: list[str] = field(default_factory=list)
+    required_groups: list[list[str]] = field(default_factory=list)
     optional: list[str] = field(default_factory=list)
 
 
@@ -40,6 +41,7 @@ class ExpectedAgents:
 class ObservedAgents:
     observed_ids: list[str] = field(default_factory=list)
     completed_ids: list[str] = field(default_factory=list)
+    reported_skills: list[str] = field(default_factory=list)
     coverage: str = "UNKNOWN"  # FULL / PARTIAL / UNKNOWN
 
 
@@ -50,11 +52,14 @@ def expected_from_workflow(
     """从 Snapshot 的 workflow Expected + registry 提取 Expected Agents。"""
     required = list(snapshot_workflow.get("required_agents", []))
     optional = list(snapshot_workflow.get("optional_agents", []))
-    # writer 语义：frontend-dev/backend-dev 至少一个作为 Implementation Writer
-    writers = [agent for agent in required if agent in ("frontend-dev", "backend-dev")]
-    if len(writers) > 1:
-        required = [agent for agent in required if agent not in writers] + [writers[0]]
-    return ExpectedAgents(required=required, optional=optional)
+    raw_groups = snapshot_workflow.get("required_agent_groups", [])
+    groups: list[list[str]] = []
+    for group in raw_groups:
+        members = group if isinstance(group, list) else str(group).split("|")
+        normalized = [str(member) for member in members if str(member)]
+        if normalized:
+            groups.append(normalized)
+    return ExpectedAgents(required=required, required_groups=groups, optional=optional)
 
 
 def observed_from_snapshot(snapshot: dict[str, Any]) -> ObservedAgents:
@@ -64,7 +69,8 @@ def observed_from_snapshot(snapshot: dict[str, Any]) -> ObservedAgents:
     Agent（覆盖语义），Insight 无法从单一 Snapshot 看到全部历史 Agent；
     完整 Observed 集合需要 Trace。此处返回基于当前 Snapshot 的最小事实。
     """
-    agent = (snapshot.get("status") or {}).get("agent") or {}
+    status = snapshot.get("status") or snapshot
+    agent = status.get("agent") or {}
     agent_id = agent.get("id")
     agent_state = agent.get("state")
     observed: ObservedAgents = ObservedAgents()
@@ -79,22 +85,57 @@ def observed_from_snapshot(snapshot: dict[str, Any]) -> ObservedAgents:
 def observed_from_trace(trace_facts: list[dict[str, Any]]) -> ObservedAgents:
     """从 Trace Facts 聚合完整 Observed Agent 集合（跨 Transition）。"""
     observed: ObservedAgents = ObservedAgents()
-    for fact in trace_facts:
-        if fact.get("field") != "status.agent.id":
-            continue
-        to_value = fact.get("to")
-        if to_value:
-            if to_value not in observed.observed_ids:
-                observed.observed_ids.append(to_value)
-        if fact.get("field") == "status.agent.state" and fact.get("to") == "completed":
-            pass
-    # agent.state 变化单独聚合
-    for fact in trace_facts:
-        if fact.get("field") == "status.agent.state" and fact.get("to") == "completed":
-            # 找到同 Transition 的 agent id 变化
-            pass
+    for transition in trace_facts:
+        facts = transition.get("facts", []) if "facts" in transition else [transition]
+        if transition.get("work_id") or (transition.get("state") or {}).get("work"):
+            # Manager Model 下，存在受管 Work 即可确定 Conductor 参与了状态维护。
+            if "conductor" not in observed.observed_ids:
+                observed.observed_ids.append("conductor")
+        state_agent = (transition.get("state") or {}).get("agent") or {}
+        transition_agent: str | None = state_agent.get("id")
+        if transition_agent and transition_agent not in observed.observed_ids:
+            observed.observed_ids.append(transition_agent)
+        for fact in facts:
+            if fact.get("field") == "status.agent.id":
+                for value in (fact.get("from"), fact.get("to")):
+                    if value and str(value) not in observed.observed_ids:
+                        observed.observed_ids.append(str(value))
+                if fact.get("to"):
+                    transition_agent = str(fact["to"])
+            if fact.get("field") == "work.latest_result":
+                for value in (fact.get("from"), fact.get("to")):
+                    for skill in _skills_from_result(str(value or "")):
+                        if skill not in observed.reported_skills:
+                            observed.reported_skills.append(skill)
+        if transition_agent:
+            for fact in facts:
+                if fact.get("field") == "status.agent.state" and fact.get("to") == "completed":
+                    if transition_agent not in observed.completed_ids:
+                        observed.completed_ids.append(transition_agent)
     observed.coverage = "FULL" if observed.observed_ids else "UNKNOWN"
     return observed
+
+
+def _skills_from_result(text: str) -> list[str]:
+    skills: list[str] = []
+    capture = False
+    for line in text.splitlines():
+        stripped = line.strip()
+        if "skills_applied" in stripped:
+            capture = True
+            inline = stripped.split(":", 1)[1].strip() if ":" in stripped else ""
+            if inline:
+                skills.extend(
+                    item.strip().strip("'\"")
+                    for item in inline.strip("[]").split(",")
+                    if item.strip()
+                )
+            continue
+        if capture and stripped.startswith("-"):
+            skills.append(stripped.lstrip("- ").strip())
+        elif capture and stripped:
+            break
+    return sorted(set(skills))
 
 
 def compute_missing_agents(
@@ -129,6 +170,24 @@ def compute_missing_agents(
                     observed=f"Coverage={coverage}，已观察 Agents={sorted(observed_ids)}",
                     derived=f"{agent_id} 应在当前 Workflow 出现但未出现",
                     check="检查 Conductor Routing 与 Workflow 遵循情况",
+                ),
+            )
+        )
+    for group in expected.required_groups:
+        if observed_ids.intersection(group):
+            continue
+        group_id = "-or-".join(group)
+        signals.append(
+            Signal(
+                signal_id=f"MISSING-AGENT-GROUP-{group_id}",
+                level="MISSING",
+                entity="|".join(group),
+                summary=f"Expected Agent Group {' / '.join(group)} 未被观察到",
+                why=WhyProvenance(
+                    expected_rule=f"Workflow required_agent_groups 声明 {' | '.join(group)} 至少一个",
+                    observed=f"Coverage={coverage}，已观察 Agents={sorted(observed_ids)}",
+                    derived=f"{' / '.join(group)} 中应至少出现一个 Agent",
+                    check="检查 Conductor Writer Routing 与 Workflow 遵循情况",
                 ),
             )
         )

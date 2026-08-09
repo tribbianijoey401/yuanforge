@@ -14,19 +14,11 @@ import sys
 import time
 from pathlib import Path
 
-from .diff import diff_snapshots, to_transition
+from .diff import diff_snapshots
 from .loader import build_snapshot
+from .observer import ObservationService, load_observation_evidence
 from .registry import load_registry
 from .signals.aggregate import compute_signals
-from .trace import (
-    append_transition,
-    archive_trace,
-    ensure_insight_dir,
-    prune_traces,
-    record_gap,
-    start_session,
-)
-from .watcher import DebouncedWatcher
 
 
 def _utc_now() -> str:
@@ -54,7 +46,13 @@ def _run_signals(root: Path) -> int:
     if not framework_root.is_dir():
         framework_root = root / "framework"
     registry = load_registry(framework_root)
-    report = compute_signals(snapshot.to_dict(), registry)
+    evidence = load_observation_evidence(root)
+    report = compute_signals(
+        snapshot.to_dict(),
+        registry,
+        coverage=evidence.coverage,
+        transitions=evidence.transitions,
+    )
     _emit(report.to_dict())
     return 0
 
@@ -69,54 +67,44 @@ def _run_diff(root: Path) -> int:
 
 
 def _run_watch(root: Path, poll_interval: float, debounce: float) -> int:
-    insight_dir = ensure_insight_dir(root)
-    baseline = build_snapshot(root, _utc_now())
-    insight_dir, session_id = start_session(root, baseline)
-    _emit({"status": "OBSERVING", "session_id": session_id, "root": str(root.resolve())})
+    observer = ObservationService(
+        root,
+        poll_interval=poll_interval,
+        debounce_window=debounce,
+    )
+    baseline = observer.start()
+    _emit(
+        {
+            "status": "OBSERVING",
+            "session_id": observer.session_id,
+            "coverage": observer.coverage,
+            "root": str(root.resolve()),
+        }
+    )
     _emit({"status": "BASELINE", "fingerprint": baseline.fingerprint()})
-
-    watcher = DebouncedWatcher(root, poll_interval=poll_interval, debounce_window=debounce)
-    previous = baseline
-    transition_index = 0
-    previous_work_id: str | None = None
     try:
         while True:
-            event = watcher.tick()
-            if event is None:
+            update = observer.poll_once()
+            if update is None:
                 time.sleep(poll_interval)
                 continue
-            # Work 变化时归档当前 Trace（方案 §42/§43）
-            current_work_id = (event.snapshot.work or {}).get("has_active_work") and (event.snapshot.status or {}).get("work")
-            if current_work_id and current_work_id != previous_work_id:
-                archived = archive_trace(insight_dir, previous_work_id)
-                if archived:
-                    _emit({"status": "ARCHIVED", "work": previous_work_id, "path": str(archived)})
-                pruned = prune_traces(insight_dir, keep=50)
-                if pruned:
-                    _emit({"status": "PRUNED", "removed": pruned})
-                previous_work_id = current_work_id
-            transition_index += 1
-            facts = diff_snapshots(previous, event.snapshot)
-            transition = to_transition(
-                transition_id=f"T-{transition_index:04d}",
-                session_id=session_id,
-                observed_at=event.snapshot.observed_at,
-                before=previous,
-                after=event.snapshot,
-                facts=facts,
-            )
-            trace_path = append_transition(insight_dir, transition)
-            _emit({"status": "TRANSITION", "transition": transition})
-            _emit({"status": "TRACE", "path": str(trace_path)})
-            previous = event.snapshot
+            if update.transition:
+                _emit({"status": "TRANSITION", "transition": update.transition})
+            if update.trace_path:
+                _emit({"status": "TRACE", "path": str(update.trace_path)})
+            if update.archived_path:
+                _emit({"status": "ARCHIVED", "path": str(update.archived_path)})
+            if update.pruned:
+                _emit({"status": "PRUNED", "removed": update.pruned})
     except KeyboardInterrupt:
-        _emit({"status": "STOPPED", "session_id": session_id})
+        observer.stop()
+        _emit({"status": "STOPPED", "session_id": observer.session_id})
         return 0
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Yuan Insight — 只读旁路观察 Yuan 语义状态")
-    parser.add_argument("root", type=Path, help="Project 根目录")
+    parser.add_argument("root", nargs="?", type=Path, default=Path("."), help="Project 根目录")
     parser.add_argument("--once", action="store_true", help="生成 Baseline Snapshot 后退出")
     parser.add_argument("--diff", action="store_true", help="输出 Baseline 到当前状态的 Facts")
     parser.add_argument("--signals", action="store_true", help="计算并输出 Signals（Expected vs Observed）")
@@ -135,14 +123,31 @@ def main(argv: list[str] | None = None) -> int:
         if args.web:
             from .server import serve
 
-            server = serve(args.root, port=args.port)
+            server = serve(
+                args.root,
+                port=args.port,
+                poll_interval=args.poll,
+                debounce_window=args.debounce,
+            )
             try:
                 server.serve_forever()
             except KeyboardInterrupt:
                 return 0
+            finally:
+                server.server_close()
+            return 0
         return _run_watch(args.root, args.poll, args.debounce)
     except KeyboardInterrupt:
         return 0
+
+
+def yuan_main(argv: list[str] | None = None) -> int:
+    """`yuan observe` 兼容入口；不建立 Yuan Core Runtime。"""
+    values = list(sys.argv[1:] if argv is None else argv)
+    if not values or values[0] != "observe":
+        sys.stderr.write("usage: yuan observe [project-root] [--web|--once|--signals]\n")
+        return 2
+    return main(values[1:])
 
 
 if __name__ == "__main__":

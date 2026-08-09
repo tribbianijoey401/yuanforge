@@ -17,6 +17,7 @@ from yuan_insight.signals.expected_observed import (  # noqa: E402
     compute_missing_skills,
     expected_from_workflow,
     observed_from_snapshot,
+    observed_from_trace,
 )
 
 
@@ -41,17 +42,81 @@ class RegistryTests(unittest.TestCase):
 
 
 class ExpectedObservedTests(unittest.TestCase):
-    def test_expected_from_workflow_dedupes_writers(self):
+    def test_expected_from_workflow_preserves_writer_one_of_group(self):
         expected = expected_from_workflow(
             {
-                "required_agents": ["conductor", "frontend-dev", "backend-dev", "tester"],
+                "required_agents": ["conductor", "tester"],
+                "required_agent_groups": [["frontend-dev", "backend-dev"]],
                 "optional_agents": ["architect"],
             },
             Registry(),
         )
-        # frontend-dev/backend-dev 是 writer 二选一，只保留一个
-        writers = [agent for agent in expected.required if agent in ("frontend-dev", "backend-dev")]
-        self.assertEqual(len(writers), 1)
+        self.assertEqual(expected.required, ["conductor", "tester"])
+        self.assertEqual(expected.required_groups, [["frontend-dev", "backend-dev"]])
+
+    def test_backend_satisfies_writer_one_of_group(self):
+        expected = expected_from_workflow(
+            {
+                "required_agents": ["conductor"],
+                "required_agent_groups": [["frontend-dev", "backend-dev"]],
+                "optional_agents": [],
+            },
+            Registry(),
+        )
+        observed = observed_from_trace(
+            [
+                {
+                    "facts": [
+                        {"field": "status.agent.id", "to": "conductor"},
+                        {"field": "status.agent.id", "to": "backend-dev"},
+                    ]
+                }
+            ]
+        )
+        self.assertEqual(compute_missing_agents(expected, observed, coverage="FULL"), [])
+
+    def test_trace_aggregates_agents_and_skills(self):
+        observed = observed_from_trace(
+            [
+                {
+                    "facts": [
+                        {"field": "status.agent.id", "to": "backend-dev"},
+                        {
+                            "field": "work.latest_result",
+                            "to": "skills_applied:\n- systematic-debugging",
+                        },
+                    ]
+                },
+                {"facts": [{"field": "status.agent.id", "to": "tester"}]},
+            ]
+        )
+        self.assertEqual(observed.observed_ids, ["backend-dev", "tester"])
+        self.assertEqual(observed.reported_skills, ["systematic-debugging"])
+        self.assertEqual(observed.coverage, "FULL")
+
+    def test_completion_transition_preserves_cleared_evidence(self):
+        observed = observed_from_trace(
+            [
+                {
+                    "work_id": "BUG-1",
+                    "state": {"work": None, "agent": {"id": None, "state": None}},
+                    "facts": [
+                        {
+                            "field": "status.agent.id",
+                            "from": "tester",
+                            "to": None,
+                        },
+                        {
+                            "field": "work.latest_result",
+                            "from": "skills_applied:\n- systematic-debugging",
+                            "to": None,
+                        },
+                    ],
+                }
+            ]
+        )
+        self.assertEqual(observed.observed_ids, ["conductor", "tester"])
+        self.assertEqual(observed.reported_skills, ["systematic-debugging"])
 
     def test_observed_from_snapshot(self):
         observed = observed_from_snapshot(
@@ -97,7 +162,10 @@ class AggregateTests(unittest.TestCase):
     def test_aggregate_unknown_coverage_no_signals(self):
         snapshot = {
             "work": {"has_active_work": True, "latest_result": "outcome: completed"},
-            "status": {"agent": {"id": "backend-dev", "state": "active"}},
+            "status": {
+                "work_state": "completed",
+                "agent": {"id": "backend-dev", "state": "active"},
+            },
             "workflow": {
                 "workflow_id": "complex-bug",
                 "required_agents": ["tester"],
@@ -117,7 +185,10 @@ class AggregateTests(unittest.TestCase):
     def test_aggregate_full_coverage_missing_signal(self):
         snapshot = {
             "work": {"has_active_work": True, "latest_result": "outcome: completed"},
-            "status": {"agent": {"id": "backend-dev", "state": "active"}},
+            "status": {
+                "work_state": "completed",
+                "agent": {"id": "backend-dev", "state": "active"},
+            },
             "workflow": {
                 "workflow_id": "complex-bug",
                 "required_agents": ["tester"],

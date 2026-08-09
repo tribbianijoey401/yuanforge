@@ -124,5 +124,7 @@ context_refs:
 1. `docs/WORK.md` 的必要任务和 Acceptance 已逐项核对。
 2. 自动 Test 通过，或 Manual Verification 的步骤、结果与限制已记录。
 3. Risk 要求的独立 Review 已完成，Known Issue 未被隐藏。
-4. 用户收到可执行的验收步骤或足够清晰的完成摘要。
-5. `docs/STATUS.md` 已更新；稳定事实、Decision 或 Pitfall 已去重写入正确的长期 Project Document。
+4. `Open Findings = 0`；不影响当前 Acceptance 的改善项已进入 `BACKLOG.md` 或被明确丢弃。
+5. Completion 之前已执行 Distill：稳定事实、Decision、Pitfall 与 Future Work 已去重写入正确的长期 Project Document。
+6. Distill 完成后，`docs/WORK.md` 与 `docs/STATUS.md` 同时回到 no active work，不保留上一 Work 作为 Active State。
+7. 用户收到可执行的验收步骤或足够清晰的完成摘要。

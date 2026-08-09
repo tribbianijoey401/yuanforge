@@ -34,6 +34,7 @@ yuanforge/
 │   └── VERSION               唯一 Framework Version
 ├── bin/yuanforge-init        Init、Update 与 Check
 ├── scripts/sync_project.py   兼容的 Source 外部 Update 入口
+├── insight/                  可选、只读的 Insight Sidecar 源码与 Dashboard
 ├── tests/                    Contract 与 Installer Regression
 └── docs/                     Yuan Repository 自身的七类 Project Document
 ```
@@ -62,6 +63,14 @@ project/
 │   ├── VERSION
 │   ├── install.json
 │   ├── framework/            官方 Vendored Snapshot，Update 可整体替换
+│   ├── insight/
+│   │   ├── tool/             官方 Insight Tool，Update 只替换此子目录
+│   │   ├── yuan.py           Project-local `yuan observe` Launcher
+│   │   ├── sessions/         Observation Session
+│   │   ├── traces/           近期详细 Trace
+│   │   ├── summaries/        长期 Work Observation Summary
+│   │   ├── gaps/             Observation Gap
+│   │   └── cache/            当前 Observer Cache
 │   └── overrides/            Project Override，Update 永不覆盖
 └── docs/
     ├── PRODUCT.md

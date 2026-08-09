@@ -1,9 +1,10 @@
 ---
 workflow: small-change
+stages: [resume, scope, verify-plan, implement, verify, close]
 required_agents:
   - conductor
-  - frontend-dev
-  - backend-dev
+required_agent_groups:
+  - frontend-dev|backend-dev
 optional_agents:
   - tester
   - spec-reviewer

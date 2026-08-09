@@ -87,5 +87,12 @@ def to_transition(
         "sources_changed": changed,
         "before_hash": before.fingerprint(),
         "after_hash": after.fingerprint(),
+        "state": {
+            "work": after.status.get("work"),
+            "work_state": after.status.get("work_state"),
+            "workflow": after.status.get("workflow"),
+            "stage": after.status.get("stage"),
+            "agent": after.status.get("agent"),
+        },
         "facts": facts,
     }

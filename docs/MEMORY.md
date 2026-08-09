@@ -73,6 +73,12 @@ description: 可复用的 Verified Finding、Pitfall、Preference 和 Convention
 - **Symptom**：解析器只支持内联 `[a, b]`，遇到展开 `- item` 列表静默丢字段（如 workflow_id 恒为 unknown），校验形同虚设。
 - **Rule**：任何解析 Frontmatter 列表的代码必须同时支持内联与展开两种形式，并用"注入不存在的 id 应报错"的负向测试验证校验真实生效。
 
+### M-011：Observability 必须验证 Production Path，而非只验证函数
+
+- **Symptom**：Unit Test 全绿，但 CLI、Dashboard、Observer、Coverage、Trace、Summary 和 Retention 没有接成一条真实链路。
+- **Cause**：测试只覆盖局部计算，没有覆盖启动、状态变化、停止、恢复、完成归档和安装后执行。
+- **Rule**：Observability 变更必须至少验证一次生产入口的端到端生命周期；Completion Transition 的 `from` 与 `to` 都是证据，清空 Active State 不得丢失最后 Agent 或 `skills_applied`。
+
 ## Engineering Conventions
 
 - 任何新机制先回答是否直接改善非技术用户的软件交付质量，是否减少 Token、确认和维护成本。

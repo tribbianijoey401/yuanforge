@@ -11,7 +11,9 @@ from typing import Any
 @dataclass
 class WorkflowDefinition:
     workflow_id: str
+    stages: list[str] = field(default_factory=list)
     required_agents: list[str] = field(default_factory=list)
+    required_agent_groups: list[list[str]] = field(default_factory=list)
     optional_agents: list[str] = field(default_factory=list)
     required_skills: list[str] = field(default_factory=list)
     raw: dict[str, Any] = field(default_factory=dict)
@@ -50,7 +52,13 @@ def parse_workflow(text: str) -> WorkflowDefinition:
     workflow_id = workflow_match.group(1) if workflow_match else "unknown"
     return WorkflowDefinition(
         workflow_id=workflow_id,
+        stages=list(lists.get("stages", [])),
         required_agents=list(lists.get("required_agents", [])),
+        required_agent_groups=[
+            [member for member in group.split("|") if member]
+            for group in lists.get("required_agent_groups", [])
+            if "|" in group
+        ],
         optional_agents=list(lists.get("optional_agents", [])),
         required_skills=list(lists.get("required_skills", [])),
         raw=lists,

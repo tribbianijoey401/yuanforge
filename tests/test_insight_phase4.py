@@ -23,6 +23,7 @@ from yuan_insight.signals.memory_effectiveness import (  # noqa: E402
 from yuan_insight.signals.repeated_review import (  # noqa: E402
     compute_repeated_review,
     extract_findings,
+    extract_findings_from_transitions,
 )
 
 
@@ -41,7 +42,7 @@ class RepeatedReviewTests(unittest.TestCase):
         self.assertIn("test-gap", categories)
         self.assertIn("correctness", categories)
 
-    def test_repeated_finding_reports_fact_not_cause(self):
+    def test_same_round_findings_do_not_report_repeat(self):
         findings = extract_findings(
             {
                 "open_findings": [
@@ -51,6 +52,25 @@ class RepeatedReviewTests(unittest.TestCase):
                 ],
                 "latest_result": "",
             }
+        )
+        self.assertEqual(compute_repeated_review(findings), [])
+
+    def test_repeated_finding_across_transitions_reports_fact_not_cause(self):
+        findings = extract_findings_from_transitions(
+            [
+                {
+                    "id": "T-1",
+                    "facts": [
+                        {"field": "work.latest_result", "to": "finding: test-gap: 缺测试 A"}
+                    ],
+                },
+                {
+                    "id": "T-2",
+                    "facts": [
+                        {"field": "work.latest_result", "to": "finding: test-gap: 缺测试 B"}
+                    ],
+                },
+            ]
         )
         signals = compute_repeated_review(findings)
         self.assertEqual(len(signals), 1)
@@ -119,11 +139,61 @@ class FootprintTests(unittest.TestCase):
             self.assertGreater(footprint.characters, 0)
             self.assertGreater(footprint.sections, 0)
             self.assertIn("docs/ARCHITECTURE.md", footprint.per_document)
+            self.assertEqual(footprint.references, 2)
+            self.assertEqual(footprint.coverage, "PARTIAL")
+
+    def test_missing_or_escaping_ref_is_partial_and_not_duplicated(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            footprint = extract_context_refs(
+                {
+                    "current_task": (
+                        "context_refs:\n"
+                        "  - docs/DOES_NOT_EXIST.md\n"
+                        "  - ../../outside.md"
+                    ),
+                    "latest_result": "",
+                },
+                root,
+            )
+            self.assertEqual(footprint.references, 2)
+            self.assertEqual(footprint.documents, 2)
+            self.assertEqual(footprint.coverage, "PARTIAL")
+            self.assertEqual(footprint.per_document, {})
 
     def test_no_refs_is_unknown_coverage(self):
         footprint = extract_context_refs({"current_task": "", "latest_result": ""}, Path("/tmp"))
         self.assertEqual(footprint.coverage, "UNKNOWN")
         self.assertEqual(footprint.references, 0)
+
+    def test_logical_memory_id_is_not_counted_as_document(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            footprint = extract_context_refs(
+                {
+                    "current_task": "memory_refs: [MEM-001]",
+                    "latest_result": "",
+                },
+                Path(temporary),
+            )
+            self.assertEqual(footprint.references, 1)
+            self.assertEqual(footprint.memory_refs, 1)
+            self.assertEqual(footprint.documents, 0)
+            self.assertEqual(footprint.coverage, "PARTIAL")
+
+    def test_non_utf8_document_is_partial(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "docs").mkdir()
+            (root / "docs" / "BAD.md").write_bytes(b"\xff\xfe")
+            footprint = extract_context_refs(
+                {
+                    "current_task": "context_refs: [docs/BAD.md]",
+                    "latest_result": "",
+                },
+                root,
+            )
+            self.assertEqual(footprint.coverage, "PARTIAL")
+            self.assertEqual(footprint.per_document, {})
 
 
 class AggregatePhase4Tests(unittest.TestCase):
@@ -133,9 +203,12 @@ class AggregatePhase4Tests(unittest.TestCase):
                 "has_active_work": True,
                 "current_task": "context_refs: [docs/MEMORY.md]",
                 "latest_result": "outcome: partial",
-                "open_findings": ["test-gap: A", "test-gap: B"],
+                "open_findings": ["test-gap: A", "correctness: B"],
             },
-            "status": {"agent": {"id": "backend-dev", "state": "active"}},
+            "status": {
+                "work_state": "completed",
+                "agent": {"id": "backend-dev", "state": "active"},
+            },
             "workflow": {
                 "workflow_id": "complex-bug",
                 "required_agents": ["tester"],
@@ -145,7 +218,7 @@ class AggregatePhase4Tests(unittest.TestCase):
         }
         report = compute_signals(snapshot, object(), coverage="FULL")  # type: ignore[arg-type]
         signal_ids = {s.signal_id for s in report.signals}
-        self.assertIn("REPEATED-REVIEW-test-gap", signal_ids)
+        self.assertNotIn("REPEATED-REVIEW-test-gap", signal_ids)
         self.assertIn("BUG-RECURRENCE-UNAVAILABLE", signal_ids)
         self.assertIn("MEMORY-USAGE-UNAVAILABLE", signal_ids)
 

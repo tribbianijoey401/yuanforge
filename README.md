@@ -46,6 +46,25 @@ UI Designer 和 Reviewer 都按任务 Signal 与 Risk 加载，不固定启动�
 
 `TASK_BOARD` 只在复杂 Work 中按需嵌入 `WORK.md`；`SESSION` 默认取消；`PROGRESS` 合并到 `WORK.md` 与 `STATUS.md`。
 
+## Yuan Insight
+
+Yuan Insight 是 Yuan 官方的只读 Sidecar，通过 File Watch 观察 `WORK.md`、`STATUS.md` 与 Framework Definition，生成 Coverage、Trace、Work Summary、Expected vs Observed Signal 和 Dashboard。它不修改 Yuan Core State，失败时不影响 Agent Routing 与 Project Memory。
+
+Installer 将官方 Tool 安装到 `.yuan/insight/tool/`，同目录中的 `sessions/`、`traces/`、`summaries/`、`gaps/` 和 `cache/` 是 Project 的 Insight Observation Data。`update` 只替换 `tool/` 与 Launcher，不删除已有 Observation Data。
+
+安装后启动 Dashboard：
+
+```powershell
+python -B .yuan/insight/yuan.py observe . --web
+```
+
+从 Source Package 安装后也可使用：
+
+```powershell
+python -m pip install ./insight
+yuan observe . --web
+```
+
 ## 安装
 
 ```powershell
@@ -85,7 +104,7 @@ yuanforge/
 ├── AGENTS.md                 Agent Platform 入口
 ├── framework/
 │   ├── agents/               13 个成熟 Agent Contract
-│   ├── skills/               18 个工程 Skill
+│   ├── skills/               17 个工程 Skill
 │   ├── references/           32 个专业 Reference（原知识资产全部保留并补入迁移经验）
 │   ├── policies/             Core、Routing、Review 与可选纪律
 │   ├── workflows/            四种 Primary Workflow
@@ -93,6 +112,7 @@ yuanforge/
 │   └── templates/project/    七类 Project Document 模板
 ├── bin/yuanforge-init        Init / Update / Check 实现
 ├── scripts/sync_project.py   兼容更新入口
+├── insight/                  可选的 Yuan Insight Sidecar 与 Dashboard
 ├── tests/                    Contract 与 Installer Regression
 └── docs/                     Yuan 自身的 Project Memory
 ```

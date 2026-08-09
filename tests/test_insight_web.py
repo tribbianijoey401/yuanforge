@@ -6,7 +6,9 @@ import json
 import sys
 import tempfile
 import threading
+import time
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 from urllib.request import urlopen
 
@@ -14,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "insight"))
 
 from yuan_insight.server import serve  # noqa: E402
+from yuan_insight.cli import main as insight_main  # noqa: E402
 
 
 def make_project(tmp: Path) -> Path:
@@ -77,6 +80,34 @@ class ServerTests(unittest.TestCase):
         self.assertIn("registry", data)
         self.assertEqual(data["snapshot"]["status"]["work"], "BUG-010")
         self.assertIn("backend-dev", data["registry"]["agents"])
+        self.assertEqual(data["coverage"], "PARTIAL")
+
+    def test_dashboard_observer_records_transition(self):
+        (self.project / "docs" / "STATUS.md").write_text(
+            """---
+work: BUG-010
+work_state: active
+workflow: complex-bug
+stage: regression
+agent:
+  id: tester
+  state: active
+quality:
+  test: active
+  review: pending
+---
+
+# Current Situation
+回归中
+""",
+            encoding="utf-8",
+        )
+        deadline = time.time() + 3
+        trace = self.project / ".yuan" / "insight" / "traces" / "current.jsonl"
+        while time.time() < deadline and not trace.is_file():
+            time.sleep(0.05)
+        self.assertTrue(trace.is_file())
+        self.assertIn("status.agent.id", trace.read_text(encoding="utf-8"))
 
     def test_index_serves_dashboard(self):
         with urlopen(f"http://127.0.0.1:{self.port}/", timeout=5) as response:
@@ -94,6 +125,34 @@ class ServerTests(unittest.TestCase):
 
         with self.assertRaises(urllib.error.HTTPError):
             urlopen(f"http://127.0.0.1:{self.port}/nope", timeout=5)
+
+    def test_static_path_cannot_escape_web_root(self):
+        import urllib.error
+
+        with self.assertRaises(urllib.error.HTTPError) as raised:
+            urlopen(
+                f"http://127.0.0.1:{self.port}/static/../../README.md",
+                timeout=5,
+            )
+        self.assertEqual(raised.exception.code, 404)
+
+
+class WebCliTests(unittest.TestCase):
+    def test_web_command_always_closes_server(self):
+        class FakeServer:
+            closed = False
+
+            def serve_forever(self):
+                return None
+
+            def server_close(self):
+                self.closed = True
+
+        server = FakeServer()
+        with patch("yuan_insight.server.serve", return_value=server):
+            result = insight_main([".", "--web"])
+        self.assertEqual(result, 0)
+        self.assertTrue(server.closed)
 
 
 if __name__ == "__main__":

@@ -1,11 +1,12 @@
 ---
 workflow: new-feature
+stages: [discover, clarify, confirm, design, implement, verify, review, distill]
 required_agents:
   - conductor
   - product-analyst
-  - frontend-dev
-  - backend-dev
   - tester
+required_agent_groups:
+  - frontend-dev|backend-dev
 optional_agents:
   - architect
   - ui-designer

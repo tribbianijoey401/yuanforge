@@ -28,7 +28,10 @@ def ensure_insight_dir(root: Path) -> Path:
 def start_session(root: Path, baseline: Snapshot) -> tuple[Path, str]:
     """创建 Observation Session，写入 Baseline Snapshot。"""
     insight_dir = ensure_insight_dir(root)
-    session_id = f"OBS-{_utc_now()[:19].replace('-', '').replace(':', '')}"
+    session_id = (
+        f"OBS-{_utc_now()[:19].replace('-', '').replace(':', '')}-"
+        f"{uuid.uuid4().hex[:8]}"
+    )
     session_path = insight_dir / "sessions"
     session_path.mkdir(parents=True, exist_ok=True)
     record = {
@@ -41,6 +44,25 @@ def start_session(root: Path, baseline: Snapshot) -> tuple[Path, str]:
         json.dumps(record, ensure_ascii=False, indent=1), encoding="utf-8"
     )
     return insight_dir, session_id
+
+
+def update_session(
+    insight_dir: Path,
+    session_id: str,
+    **changes: object,
+) -> None:
+    """更新 Observation Session metadata，不触碰 Yuan Authority。"""
+    path = insight_dir / "sessions" / f"{session_id}.json"
+    try:
+        record = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        record = {"session_id": session_id}
+    record.update(changes)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(record, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
 
 
 def append_transition(
@@ -56,7 +78,12 @@ def append_transition(
     return trace_path
 
 
-def archive_trace(insight_dir: Path, work_id: str | None) -> Path | None:
+def archive_trace(
+    insight_dir: Path,
+    work_id: str | None,
+    coverage: str = "UNKNOWN",
+    gaps: list[dict] | None = None,
+) -> Path | None:
     """Work 变化时把 current.jsonl 归档到 traces/<work>.jsonl（方案 §43）。
 
     返回归档路径；无当前 Trace 或 work_id 为空时返回 None。
@@ -69,8 +96,20 @@ def archive_trace(insight_dir: Path, work_id: str | None) -> Path | None:
         return None
     archive_path = traces / f"{work_id}.jsonl"
     if archive_path.exists():
-        archive_path.unlink()  # 同一 Work 重新激活时覆盖旧 Trace
-    current.rename(archive_path)
+        with archive_path.open("ab") as destination, current.open("rb") as source:
+            destination.write(source.read())
+        current.unlink()
+    else:
+        current.rename(archive_path)
+    from .history import write_work_summary
+
+    write_work_summary(
+        insight_dir,
+        work_id,
+        archive_path,
+        coverage=coverage,
+        gaps=gaps,
+    )
     return archive_path
 
 

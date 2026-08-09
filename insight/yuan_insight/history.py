@@ -23,6 +23,8 @@ class WorkSummary:
     skills: list[str] = field(default_factory=list)
     files_changed: list[str] = field(default_factory=list)
     sessions: list[str] = field(default_factory=list)
+    coverage: str = "UNKNOWN"
+    gaps: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -35,6 +37,8 @@ class WorkSummary:
             "skills": self.skills,
             "files_changed": self.files_changed,
             "sessions": self.sessions,
+            "coverage": self.coverage,
+            "gaps": self.gaps,
         }
 
 
@@ -75,21 +79,25 @@ def summarize_trace(trace_path: Path) -> WorkSummary:
         session_id = transition.get("session_id")
         if session_id and session_id not in sessions:
             sessions.append(session_id)
+        state = transition.get("state") or {}
+        state_stage = state.get("stage")
+        if state_stage and state_stage not in stages:
+            stages.append(state_stage)
+        state_agent = (state.get("agent") or {}).get("id")
+        if state_agent and state_agent not in agents:
+            agents.append(state_agent)
         for fact in transition.get("facts", []):
             field = fact.get("field", "")
             if field == "status.stage" and fact.get("to"):
                 if fact["to"] not in stages:
                     stages.append(fact["to"])
-            elif field == "status.agent.id" and fact.get("to"):
-                if fact["to"] not in agents:
-                    agents.append(fact["to"])
+            elif field == "status.agent.id":
+                for value in (fact.get("from"), fact.get("to")):
+                    if value and value not in agents:
+                        agents.append(value)
             elif field == "work.latest_result":
-                # skills_applied 在 latest_result 文本里
-                text = str(fact.get("to") or "")
-                for line in text.splitlines():
-                    stripped = line.strip()
-                    if stripped.startswith("-"):
-                        skills.append(stripped.lstrip("- ").strip())
+                for value in (fact.get("from"), fact.get("to")):
+                    skills.extend(_extract_skills_applied(str(value or "")))
             elif fact.get("kind") == "files_changed":
                 files.extend(fact.get("sources_changed", []))
 
@@ -101,27 +109,97 @@ def summarize_trace(trace_path: Path) -> WorkSummary:
     return summary
 
 
+def _extract_skills_applied(text: str) -> list[str]:
+    skills: list[str] = []
+    capture = False
+    for line in text.splitlines():
+        stripped = line.strip()
+        if "skills_applied" in stripped:
+            capture = True
+            inline = stripped.split(":", 1)[1].strip() if ":" in stripped else ""
+            if inline:
+                skills.extend(
+                    item.strip().strip("'\"")
+                    for item in inline.strip("[]").split(",")
+                    if item.strip()
+                )
+            continue
+        if capture and stripped.startswith("-"):
+            skills.append(stripped.lstrip("- ").strip())
+        elif capture and stripped:
+            break
+    return skills
+
+
+def write_work_summary(
+    insight_dir: Path,
+    work_id: str,
+    trace_path: Path,
+    coverage: str = "UNKNOWN",
+    gaps: list[dict[str, Any]] | None = None,
+) -> Path:
+    """生成长期 Work Observation Summary。
+
+    Summary 与 Trace retention 解耦；删除旧 Trace 不会删除 Summary。
+    """
+    summary = summarize_trace(trace_path)
+    summary.work_id = work_id
+    summary.coverage = coverage
+    summary.gaps = list(gaps or [])
+    summaries = insight_dir / "summaries"
+    summaries.mkdir(parents=True, exist_ok=True)
+    destination = summaries / f"{work_id}.json"
+    destination.write_text(
+        json.dumps(summary.to_dict(), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return destination
+
+
+def _read_summary(path: Path) -> dict[str, Any] | None:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return None
+    return value if isinstance(value, dict) else None
+
+
 def list_work_summaries(insight_dir: Path, limit: int = 50) -> list[dict[str, Any]]:
     """列出全部归档 Work 的 Summary，按最后观察时间倒序。"""
+    values: dict[str, dict[str, Any]] = {}
+    summaries_dir = insight_dir / "summaries"
+    if summaries_dir.is_dir():
+        for path in summaries_dir.glob("*.json"):
+            value = _read_summary(path)
+            if value and value.get("work_id"):
+                values[str(value["work_id"])] = value
+
     traces = insight_dir / "traces"
-    if not traces.is_dir():
-        return []
-    archived = sorted(
-        (path for path in traces.glob("*.jsonl") if path.name != "current.jsonl"),
-        key=lambda path: path.stat().st_mtime,
+    if traces.is_dir():
+        for path in traces.glob("*.jsonl"):
+            if path.name == "current.jsonl" or path.stem in values:
+                continue
+            summary = summarize_trace(path).to_dict()
+            values[path.stem] = summary
+
+    ordered = sorted(
+        values.values(),
+        key=lambda value: str(value.get("last_observed_at") or ""),
         reverse=True,
     )
-    summaries = [summarize_trace(path) for path in archived[:limit]]
-    return [summary.to_dict() for summary in summaries]
+    return ordered[:limit]
 
 
 def get_work_summary(insight_dir: Path, work_id: str) -> dict[str, Any] | None:
     """获取单个 Work 的 Summary（含完整 Trace）。"""
     traces = insight_dir / "traces"
     trace_path = traces / f"{work_id}.jsonl"
-    if not trace_path.is_file():
+    summary_path = insight_dir / "summaries" / f"{work_id}.json"
+    result = _read_summary(summary_path) if summary_path.is_file() else None
+    if result is None and trace_path.is_file():
+        result = summarize_trace(trace_path).to_dict()
+    if result is None:
         return None
-    summary = summarize_trace(trace_path)
-    result = summary.to_dict()
-    result["trace"] = _iter_transitions(trace_path)
+    result["trace_available"] = trace_path.is_file()
+    result["trace"] = _iter_transitions(trace_path) if trace_path.is_file() else []
     return result

@@ -7,7 +7,6 @@
 from __future__ import annotations
 
 import re
-from collections import Counter
 from dataclasses import dataclass, field
 
 from .expected_observed import Signal, WhyProvenance
@@ -54,6 +53,46 @@ def extract_findings(work_snapshot: dict) -> list[ReviewFinding]:
     return findings
 
 
+def extract_findings_from_transitions(
+    transitions: list[dict],
+) -> list[ReviewFinding]:
+    """从 Trace Transition 提取 Review Round。
+
+    同一 Transition 代表同一次稳定语义更新，同类 Finding 在其中只计
+    一个 Round；只有出现在不同 Transition 才构成 Repeated Review。
+    """
+    findings: list[ReviewFinding] = []
+    for index, transition in enumerate(transitions, 1):
+        round_id = index
+        categories_seen: set[str] = set()
+        state = transition.get("state") or {}
+        agent_id = str((state.get("agent") or {}).get("id") or "")
+        stage = str(state.get("stage") or "")
+        role_is_review = agent_id == "tester" or agent_id.endswith("reviewer") or agent_id.endswith("auditor")
+        for fact in transition.get("facts", []):
+            if fact.get("field") not in ("work.latest_result", "work.open_findings"):
+                continue
+            value = fact.get("to")
+            lines = value if isinstance(value, list) else str(value or "").splitlines()
+            text = "\n".join(str(line) for line in lines)
+            if not role_is_review and stage not in {"review", "regression"}:
+                if "finding" not in text.lower() and "verdict" not in text.lower():
+                    continue
+            for line in lines:
+                category = _match_category(str(line))
+                if not category or category in categories_seen:
+                    continue
+                categories_seen.add(category)
+                findings.append(
+                    ReviewFinding(
+                        category=category,
+                        round_number=round_id,
+                        text=str(line),
+                    )
+                )
+    return findings
+
+
 def _match_category(text: str) -> str | None:
     for category in FINDING_CATEGORIES:
         if category in text:
@@ -63,13 +102,16 @@ def _match_category(text: str) -> str | None:
 
 def compute_repeated_review(findings: list[ReviewFinding]) -> list[Signal]:
     """统计跨 Round 的 Finding 分类重复。"""
-    counters: Counter[str] = Counter()
+    rounds_by_category: dict[str, set[int]] = {}
     for finding in findings:
         if finding.category:
-            counters[finding.category] += 1
+            rounds_by_category.setdefault(finding.category, set()).add(
+                finding.round_number
+            )
 
     signals: list[Signal] = []
-    for category, count in counters.items():
+    for category, rounds in rounds_by_category.items():
+        count = len(rounds)
         if count < REPEAT_THRESHOLD:
             continue
         signals.append(

@@ -1,10 +1,11 @@
 ---
 workflow: complex-bug
+stages: [orient, reproduce, diagnose, implement, regression, review, distill]
 required_agents:
   - conductor
-  - frontend-dev
-  - backend-dev
   - tester
+required_agent_groups:
+  - frontend-dev|backend-dev
 optional_agents:
   - architect
   - spec-reviewer

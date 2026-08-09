@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import sys
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -20,14 +21,21 @@ from pathlib import Path
 from .footprint import extract_context_refs
 from .history import get_work_summary, list_work_summaries
 from .loader import build_snapshot
+from .observer import ObservationService
 from .registry import load_registry
 from .signals.aggregate import compute_signals
+from .signals.expected_observed import observed_from_snapshot, observed_from_trace
 
 
 class InsightHandler(BaseHTTPRequestHandler):
     root: Path = Path(".")
     framework_root: Path = Path(".")
-    web_dir: Path = Path(__file__).parent.parent / "web"
+    source_web_dir = Path(__file__).parent.parent / "web"
+    web_dir: Path = (
+        source_web_dir
+        if source_web_dir.is_dir()
+        else Path(sys.prefix) / "yuan_insight_web"
+    )
 
     def _send_json(self, value: dict) -> None:
         payload = json.dumps(value, ensure_ascii=False).encode("utf-8")
@@ -53,13 +61,34 @@ class InsightHandler(BaseHTTPRequestHandler):
     def _current_state(self) -> dict:
         snapshot = build_snapshot(self.root, f"{time.time():.3f}")
         registry = load_registry(self.framework_root)
-        report = compute_signals(snapshot.to_dict(), registry)
+        observer = getattr(self.server, "observer", None)
+        evidence = observer.evidence() if observer else None
+        coverage = evidence.coverage if evidence else "UNKNOWN"
+        transitions = evidence.transitions if evidence else []
+        report = compute_signals(
+            snapshot.to_dict(),
+            registry,
+            coverage=coverage,
+            transitions=transitions,
+        )
+        observed = observed_from_trace(transitions)
+        current = observed_from_snapshot(snapshot.to_dict())
+        for agent_id in current.observed_ids:
+            if agent_id not in observed.observed_ids:
+                observed.observed_ids.append(agent_id)
         footprint = extract_context_refs(snapshot.to_dict().get("work", {}), self.root)
         return {
             "observed_at": snapshot.observed_at,
             "snapshot": snapshot.to_dict(),
             "coverage": report.coverage,
             "signals": report.to_dict()["signals"],
+            "observation": {
+                "session_id": evidence.session_id if evidence else None,
+                "current_work_id": evidence.current_work_id if evidence else None,
+                "agents": observed.observed_ids,
+                "skills": observed.reported_skills,
+                "gaps": evidence.gaps if evidence else [],
+            },
             "footprint": {
                 "references": footprint.references,
                 "documents": footprint.documents,
@@ -74,6 +103,14 @@ class InsightHandler(BaseHTTPRequestHandler):
                 "agents": sorted(registry.agents),
                 "skills": sorted(registry.skills),
                 "workflows": sorted(registry.workflows),
+                "agent_skills": {
+                    agent_id: {
+                        "required": contract.required_skills,
+                        "recommended": contract.recommended_skills,
+                        "conditional": contract.conditional_skills,
+                    }
+                    for agent_id, contract in sorted(registry.agents.items())
+                },
             },
         }
 
@@ -102,7 +139,14 @@ class InsightHandler(BaseHTTPRequestHandler):
             return
         if self.path.startswith("/static/"):
             relative = self.path.removeprefix("/static/")
-            self._send_file((self.web_dir / relative).resolve())
+            web_root = self.web_dir.resolve()
+            candidate = (web_root / relative).resolve()
+            try:
+                candidate.relative_to(web_root)
+            except ValueError:
+                self.send_error(404)
+                return
+            self._send_file(candidate)
             return
         self.send_error(404)
 
@@ -111,7 +155,23 @@ class InsightHandler(BaseHTTPRequestHandler):
         pass
 
 
-def serve(project_root: Path, port: int = 8765, host: str = "127.0.0.1") -> ThreadingHTTPServer:
+class InsightHTTPServer(ThreadingHTTPServer):
+    observer: ObservationService | None = None
+
+    def server_close(self) -> None:
+        if self.observer:
+            self.observer.stop()
+        super().server_close()
+
+
+def serve(
+    project_root: Path,
+    port: int = 8765,
+    host: str = "127.0.0.1",
+    poll_interval: float = 0.1,
+    debounce_window: float = 0.2,
+    observe: bool = True,
+) -> ThreadingHTTPServer:
     """启动 Dashboard Server（阻塞）。"""
     project_root = project_root.resolve()
     framework_root = project_root / ".yuan" / "framework"
@@ -120,8 +180,16 @@ def serve(project_root: Path, port: int = 8765, host: str = "127.0.0.1") -> Thre
 
     InsightHandler.root = project_root
     InsightHandler.framework_root = framework_root
-    server = ThreadingHTTPServer((host, port), InsightHandler)
-    print(f"Yuan Insight Dashboard: http://{host}:{port}")
+    server = InsightHTTPServer((host, port), InsightHandler)
+    if observe:
+        server.observer = ObservationService(
+            project_root,
+            poll_interval=poll_interval,
+            debounce_window=debounce_window,
+        )
+        server.observer.start_background()
+    actual_port = server.server_address[1]
+    print(f"Yuan Insight Dashboard: http://{host}:{actual_port}")
     print(f"Observing: {project_root}")
     print("Ctrl+C 停止；Dashboard 关闭不影响 Yuan。")
     return server
