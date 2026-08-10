@@ -15,6 +15,7 @@
 - Semantic Real-Time：只在语义状态变化时反映，不做 Heartbeat
 - Native First：Windows 使用 `ReadDirectoryChangesW`，Linux 使用 `inotify`；不支持或失效时显式降级为 `polling-fallback`，Coverage 为 Partial
 - State Ownership：Project State 只由 Conductor 写入；Insight 的 transition index 不反写 STATUS
+- Shared State Contract：复用 `framework://tools/state_guard.py` 的只读结果，不复制规范值、不自动修复
 - Missing-state honest：WORK/STATUS 缺失或不可读时显示 `STATE UNAVAILABLE` 与 `UNKNOWN` Coverage，不把空 Parser 结果当成 IDLE
 
 ## 用法
@@ -39,6 +40,7 @@ python -B .yuan/insight/yuan.py observe . --web
 
 - **Work / Execution Map**：Work 状态、Stage Timeline、当前 Agent
 - **Agent Matrix**：ACTIVE / COMPLETED / MISSING / NOT REQUIRED
+- **Invalid-state visibility**：非法 Stage 显示原始 `UNKNOWN STAGE`；未注册 Agent 显示 `UNREGISTERED ACTOR`；规范 Agent 与可选 Instance 同时展示
 - **Skill Matrix**：REPORTED / MISSING / AVAILABLE
 - **Signals**：Missing Agent/Skill、Repeated Review、Bug Recurrence、Memory；点击展开 Why（expected/observed/derived/check）
 - **Context Footprint**：References / Docs / Sections / Chars / Bytes / Memory
@@ -53,7 +55,7 @@ python -B .yuan/insight/yuan.py observe . --web
 | Repeated Review | Finding 分类跨轮重复 ≥2 | 只报事实不猜根因 |
 | Bug Recurrence | 需 Bug identity / Memory linkage | v0 无则 UNAVAILABLE |
 | Memory Effectiveness | selected + reported used | 无 usage 证据则 UNAVAILABLE |
-| State Divergence | WORK / STATUS / Workflow / Stage / Agent checkpoint 不一致 | 只读报告，交由 Conductor 修复 |
+| State Divergence | State Guard 报告 WORK / STATUS / Workflow / Stage / Agent checkpoint 不一致 | 保留原始值，只读报告，交由 Conductor 修复 |
 
 ## 存储
 
@@ -80,6 +82,7 @@ insight/
 │   ├── observer.py     # CLI/Web 共用的 Observation Service 与 Coverage/Gap 生命周期
 │   ├── loader.py       # collect → build_snapshot（含 Expected workflow）
 │   ├── registry.py     # Agent/Skill/Workflow 注册表（直读 Framework）
+│   ├── state_validation.py # 加载 vendored State Guard，不定义第二套契约
 │   ├── parsers/        # status/work/framework frontmatter 解析
 │   ├── diff.py         # snapshot diff → facts → Transition
 │   ├── footprint.py    # Declared Context Footprint

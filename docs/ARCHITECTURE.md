@@ -109,6 +109,8 @@ Override 优先级为 `Project Override > Vendored Official Asset > Yuan Default
 
 Conductor 是 `WORK.md` / `STATUS.md` 的唯一正式 State Writer。每个 Dispatch 前和 Specialist Focused Result 返回后都执行 State Commit；单 LLM Persona Switch 也必须回到 Conductor。Specialist 只返回 `work_updates` 提案。STATUS 不保存 visualization revision。
 
+`framework://policies/state-contract.md` 是状态词汇的唯一语义契约，`framework://tools/state_guard.py` 是只读执行门。Guard 从实际 Workflow frontmatter 和 Agent Contract 文件名动态取得 Canonical Stage / Agent ID，确认 Agent 已被当前 Workflow 声明，并验证 Work state、Agent state、Current Task 与 Pause Checkpoint 组合。Conductor 落盘后必须得到 `STATE_VALID` 才能继续 Dispatch。Installer Check 与 Insight 动态加载同一 Guard；前者输出问题、后者投影 Signal，二者都不写 Project State。具体动作由 WORK 的 Current Task 保存，Insight 从该事实派生展示；可选 `agent.instance` 只标记执行实例，不参与路由或 Stage 推进。
+
 ## Update Boundary
 
 `update` 不要求旧 Framework 自证，也不以 Version、Integrity 或旧 Runtime 健康状态阻止更新。它强制用最新官方快照替换 `.yuan/framework/` 与 Framework-owned `AGENTS.md`，同时保持以下 Project-owned 内容完整：
@@ -123,7 +125,7 @@ Update 不迁移或解释 Project-owned 内容。它只在任何写入前读取�
 
 ## Insight Degraded-State Rendering
 
-Insight 的事实源可以部分可用：例如 `WORK.md` 已有 Active Work，而 `STATUS.md` 尚未形成结构化 Checkpoint。Dashboard 必须展示已经观察到的 Work Goal、Scope、Current Task 与 Latest Result，并把缺失的 Workflow、Stage、Agent 明确标为 `UNKNOWN`；不得把 Unknown 渲染为“无工作”或“无需 Agent”。WORK/STATUS 文件本身缺失或不可读时，Snapshot source availability 产生 `STATE_FILES_MISSING`，Coverage 为 `UNKNOWN`，Dashboard 显示 `STATE UNAVAILABLE`。Framework 同时要求激活 Work 时在同一逻辑步骤维护 `WORK.md` 与结构化 `STATUS.md`，避免长期处于降级状态。
+Insight 的事实源可以部分可用：例如 `WORK.md` 已有 Active Work，而 `STATUS.md` 尚未形成结构化 Checkpoint。Dashboard 必须展示已经观察到的 Work Goal、Scope、Current Task 与 Latest Result，并把缺失的 Workflow、Stage、Agent 明确标为 `UNKNOWN`；不得把 Unknown 渲染为“无工作”或“无需 Agent”。非法但可读的值也必须原样可见：Stage 增加 `UNKNOWN STAGE` 节点，Agent Matrix 增加 `UNREGISTERED ACTOR` Tile。WORK/STATUS 文件本身缺失或不可读时，Snapshot source availability 产生 `STATE_FILES_MISSING`，Coverage 为 `UNKNOWN`，Dashboard 显示 `STATE UNAVAILABLE`。Framework 同时要求激活 Work 时在同一逻辑步骤维护 `WORK.md` 与结构化 `STATUS.md`，避免长期处于降级状态。
 
 ## Insight Observation Backend
 

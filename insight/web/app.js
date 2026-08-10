@@ -172,8 +172,8 @@ function renderWork(snapshot) {
     : checkpointMissing
       ? "STATUS checkpoint incomplete：已展示 WORK 中可确认的事实；Workflow、Stage、Agent 缺失项保持 UNKNOWN。"
       : "";
-  replaceChildren("work-details", [work.goal, work.current_task, work.latest_result, status.activity, work.scope],
-    [["Goal", work.goal], ["Current Task", work.current_task], ["Latest Result", work.latest_result], ["Activity", status.activity], ["Scope", work.scope]]
+  replaceChildren("work-details", [work.goal, work.current_task, work.latest_result, work.scope],
+    [["Goal", work.goal], ["Current Task", work.current_task], ["Latest Result", work.latest_result], ["Scope", work.scope]]
       .filter(([, value]) => value)
       .map(([label, value]) => detail(label, value))
       .concat(!work.goal && !work.current_task && !work.latest_result ? [empty("No observable Work details")] : []));
@@ -231,11 +231,20 @@ function renderExecutionRail(work, status, workflow) {
     (workflow.workflow_id || "Workflow UNKNOWN") + " · " + (currentStage || "Stage UNKNOWN");
 }
 
+function stateFallback(status) {
+  const stage = status.stage;
+  const agent = (status.agent || {}).id;
+  if (stage && agent) return "Stage " + stage + " · Agent " + agent;
+  if (stage) return "Stage " + stage;
+  if (agent) return "Agent " + agent;
+  return "UNKNOWN — no current task observed";
+}
+
 function renderNowNext(work, status) {
   const agent = status.agent || {};
   const agentLabel = agent.instance ? agent.id + " · " + agent.instance : agent.id;
   const rows = [
-    ["NOW", work.current_task || status.activity || "UNKNOWN — no current task observed"],
+    ["NOW", work.current_task || stateFallback(status)],
     ["NEXT", work.latest_result || "UNKNOWN — no next evidence observed"],
     ["OWNER", agent.id ? agentLabel + " (" + (agent.state || "UNKNOWN") + ")" : work.has_active_work ? "Current Agent: UNKNOWN" : "No active agent"],
   ];

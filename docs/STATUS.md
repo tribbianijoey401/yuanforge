@@ -1,30 +1,32 @@
 ---
-work: null
-work_state: idle
-workflow: null
-stage: null
+work: 2026-08-10_insight-workflow-full-entities
+work_state: active
+workflow: complex-bug
+stage: reproduce
 agent:
-  id: null
-  state: null
+  id: tester
+  state: active
 quality:
-  test: passed
+  test: pending
   review: not_required
 ---
 
 # Current Situation
 
-Yuan Insight Dashboard 前端轮询周期已调整为 0.5 秒。
+正在修正 Insight 首屏对 Workflow 涉及 Agent / Skill 的截断与混合汇总问题。
 
-## Last Completed
+## Current Task
 
-- 逻辑定位符、Mutation Gate 与 Conductor State Ownership 已统一。
-- Update/Check、86 项测试、btc-data 升级和实际 Dashboard 验证通过。
-- `POLL_MS = 500`，页面与 Insight README 已同步；Insight 前端回归通过。
+复现固定数量上限会隐藏必要 Agent / Skill，并确认 Optional 汇总计数边界。
+
+## Last Result
+
+用户确认所有 Workflow 涉及项必须完整展示，只有 Optional / Catalog 可以折叠。
 
 ## Next
 
-等待下一项工作。
+建立失败验收后交给 Frontend Dev 实现。
 
 ## Blocker
 
-无
+无。

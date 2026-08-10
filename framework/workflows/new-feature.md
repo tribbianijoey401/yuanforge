@@ -42,7 +42,7 @@ Mentor 式 Requirement Discovery
 
 ## State Commit
 
-每次角色 Dispatch 前和 Focused Result 返回后，必须先回到 Conductor 更新 `project://docs/WORK.md` / `project://docs/STATUS.md`；Stage 或 Agent 的变化只有在该 Commit 落盘后才成立。单 LLM Persona Switch 也不得跳过。
+每次角色 Dispatch 前和 Focused Result 返回后，必须先回到 Conductor 更新 `project://docs/WORK.md` / `project://docs/STATUS.md`；Stage 或 Agent 的变化只有在该 Commit 落盘并通过 `framework://tools/state_guard.py` 后才成立。单 LLM Persona Switch 也不得跳过。
 
 ## Pause / Resume
 

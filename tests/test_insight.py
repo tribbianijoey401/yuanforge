@@ -93,8 +93,10 @@ work: BUG-001
 work_state: active
 workflow: complex-bug
 stage: implement
+activity: specialist_execution
 agent:
   id: backend-dev
+  instance: frontend-fixer
   state: active
 quality:
   test: pending
@@ -108,10 +110,29 @@ quality:
         self.assertEqual(state.work, "BUG-001")
         self.assertEqual(state.workflow, "complex-bug")
         self.assertEqual(state.stage, "implement")
+        self.assertFalse(hasattr(state, "activity"))
         self.assertEqual(state.agent_id, "backend-dev")
+        self.assertEqual(state.agent_instance, "frontend-fixer")
         self.assertEqual(state.agent_state, "active")
         self.assertEqual(state.quality_test, "pending")
         self.assertIn("token race", state.situation or "")
+
+    def test_snapshot_does_not_project_legacy_activity(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = make_project(Path(temporary))
+            write_status(root, "BUG-activity", "implement", "backend-dev", "active")
+            status_path = root / "docs" / "STATUS.md"
+            status_path.write_text(
+                status_path.read_text(encoding="utf-8").replace(
+                    "stage: implement\n",
+                    "stage: implement\nactivity: legacy_execution_label\n",
+                ),
+                encoding="utf-8",
+            )
+
+            snapshot = build_snapshot(root, "1.0").to_dict()
+
+            self.assertNotIn("activity", snapshot["status"])
 
     def test_missing_frontmatter_is_unknown(self):
         state = parse_status("# Status\n\n无 frontmatter")
@@ -393,6 +414,44 @@ class ObservationServiceTests(unittest.TestCase):
 
 
 class StateConsistencySignalTests(unittest.TestCase):
+    def test_snapshot_and_signal_use_vendored_state_guard_codes(self):
+        import shutil
+
+        with tempfile.TemporaryDirectory(prefix="yuan-insight-state-contract-") as parent:
+            root = Path(parent) / "project"
+            (root / "docs").mkdir(parents=True)
+            shutil.copytree(ROOT / "framework", root / ".yuan" / "framework")
+            write_status(
+                root,
+                "BUG-contract",
+                "specialist_execution",
+                "frontend-fixer",
+                "running",
+            )
+            (root / "docs" / "WORK.md").write_text(
+                "# Active Work\n\n## Goal\n\n修复状态。\n\n"
+                "## Current Task\n\n执行实现。\n",
+                encoding="utf-8",
+            )
+
+            snapshot = build_snapshot(root, "1.0").to_dict()
+            codes = {issue["code"] for issue in snapshot["state_validation"]}
+            registry = Registry(
+                agents={"conductor": AgentContract("conductor")},
+                workflows=["complex-bug"],
+            )
+            report = compute_signals(snapshot, registry)
+            divergence = next(
+                signal for signal in report.signals
+                if signal.signal_id == "STATE_DIVERGENCE"
+            )
+
+            self.assertIn("STATE_STAGE_UNKNOWN", codes)
+            self.assertIn("STATE_AGENT_UNKNOWN", codes)
+            self.assertIn("STATE_AGENT_STATE_UNKNOWN", codes)
+            self.assertIn("STATE_STAGE_UNKNOWN", divergence.summary)
+            self.assertIn("STATE_AGENT_UNKNOWN", divergence.summary)
+
     def test_missing_work_and_status_are_not_reported_as_idle(self):
         registry = Registry(
             agents={"conductor": AgentContract("conductor")},

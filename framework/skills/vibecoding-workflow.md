@@ -16,6 +16,7 @@ version: 4.0.0
 - `project://docs/STATUS.md` 与当前 `project://docs/WORK.md`
 - 相关 Project Fact、Decision 与 Memory Section
 - `framework://policies/core.md`、`framework://policies/routing.md`、`framework://policies/review.md`
+- `framework://policies/state-contract.md` 与 `framework://tools/state_guard.py`
 - 当前 Platform Capability
 
 ## Procedure
@@ -34,7 +35,9 @@ version: 4.0.0
 
 ### 4. Activate and Commit
 
-第一次修改任何 Project Artifact 前，由 Conductor 在同一逻辑步骤写入 `project://docs/WORK.md` 和 `project://docs/STATUS.md`：至少包含 Work id、`work_state: active`、Workflow、Stage、当前 Agent、Current Task 与 Verification。Platform Task / Todo / Plan / Thread / Subagent 状态不能替代这两个文件。
+第一次修改任何 Project Artifact 前，由 Conductor 在同一逻辑步骤写入 `project://docs/WORK.md` 和 `project://docs/STATUS.md`：至少包含 Work id、`work_state: active`、Workflow、Stage、当前 Agent、Current Task 与 Verification。规范值只从 `framework://policies/state-contract.md` 声明的动态来源取得；自由 Activity 与 Agent Instance 不得占用 `stage` / `agent.id`。Platform Task / Todo / Plan / Thread / Subagent 状态不能替代这两个文件。
+
+落盘后运行 `python -B <resolved-state-guard-path> check <project-root>`（即 `state_guard.py check`）。只有输出 `STATE_VALID` 才表示校验通过并允许执行；失败时由 Conductor 修正同一次 Commit，校验通过前不得继续 Dispatch。该门同样适用于后续 Agent/Stage 转换、Focused Result、Pause、Resume 与 Distill。
 
 ### 5. Load Capability
 

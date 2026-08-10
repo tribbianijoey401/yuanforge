@@ -225,6 +225,8 @@ class ServerTests(unittest.TestCase):
         self.assertIn("UNKNOWN STAGE", app)
         self.assertIn("UNREGISTERED ACTOR", app)
         self.assertIn("agent.instance", app)
+        self.assertNotIn("status.activity", app)
+        self.assertIn("work.current_task || stateFallback(status)", app)
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -247,7 +249,7 @@ class ServerTests(unittest.TestCase):
         self.assertIn("footprint", data)
         self.assertIn("registry", data)
         self.assertEqual(data["snapshot"]["status"]["work"], "BUG-010")
-        self.assertEqual(data["snapshot"]["status"]["activity"], "specialist_execution")
+        self.assertNotIn("activity", data["snapshot"]["status"])
         self.assertEqual(
             data["snapshot"]["status"]["agent"]["instance"], "frontend-fixer"
         )

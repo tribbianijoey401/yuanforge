@@ -10,6 +10,7 @@ from typing import Any
 from .parsers.framework import load_workflow_by_id
 from .parsers.status import load_status
 from .parsers.work import load_work
+from .state_validation import validate_persisted_state
 
 
 @dataclass
@@ -19,6 +20,7 @@ class Snapshot:
     work: dict[str, Any] = field(default_factory=dict)
     status: dict[str, Any] = field(default_factory=dict)
     workflow: dict[str, Any] = field(default_factory=dict)
+    state_validation: list[dict[str, Any]] | None = None
 
     def source_status(self) -> dict[str, str]:
         """Expose availability without leaking content hashes to the UI."""
@@ -36,6 +38,7 @@ class Snapshot:
             "work": self.work,
             "status": self.status,
             "workflow": self.workflow,
+            "state_validation": self.state_validation,
             "sources": self.source_status(),
         }
 
@@ -79,7 +82,11 @@ def build_snapshot(root: Path, observed_at: str) -> Snapshot:
         "work_state": status.work_state,
         "workflow": status.workflow,
         "stage": status.stage,
-        "agent": {"id": status.agent_id, "state": status.agent_state},
+        "agent": {
+            "id": status.agent_id,
+            "instance": status.agent_instance,
+            "state": status.agent_state,
+        },
         "quality": {"test": status.quality_test, "review": status.quality_review},
         "situation": status.situation,
         "last_completed": status.last_completed,
@@ -112,4 +119,5 @@ def build_snapshot(root: Path, observed_at: str) -> Snapshot:
         "required_agent_groups": definition.required_agent_groups,
         "optional_agents": definition.optional_agents,
     }
+    snapshot.state_validation = validate_persisted_state(root, framework_root)
     return snapshot
