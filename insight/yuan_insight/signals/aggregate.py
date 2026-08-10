@@ -21,6 +21,7 @@ from .memory_effectiveness import (
     extract_memory_selection,
 )
 from .repeated_review import compute_repeated_review, extract_findings
+from .state_consistency import compute_state_consistency
 
 
 @dataclass
@@ -62,6 +63,7 @@ def compute_signals(
     Trace 就绪后传入 FULL coverage 才能触发 Missing。
     """
     report = SignalReport(coverage=coverage)
+    report.signals.extend(compute_state_consistency(snapshot, registry))
 
     snapshot_workflow = snapshot.get("workflow") or {}
     workflow_id = snapshot_workflow.get("workflow_id")

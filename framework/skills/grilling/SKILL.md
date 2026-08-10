@@ -8,9 +8,9 @@ trigger: Product Analyst 澄清需求（强制 5 维度）、Architect 确认设
 
 ## vNext Reference Routing
 
-- Product Contract 缺少可观察 Acceptance：读取 `references/01-standards/spec-as-contract.md` 的 Self-contained Spec 与 E2E Verification Section。
-- 出现无法立即决定的 Product Choice：读取 `references/01-standards/open-decisions-register.md` 的 Trigger 与 Resolve Section。
-- 已明确 Industry 且需要体验基线：只读取 `references/industries/{industry}.md` 的相关 Section。
+- Product Contract 缺少可观察 Acceptance：读取 `framework://references/01-standards/spec-as-contract.md` 的 Self-contained Spec 与 E2E Verification Section。
+- 出现无法立即决定的 Product Choice：读取 `framework://references/01-standards/open-decisions-register.md` 的 Trigger 与 Resolve Section。
+- 已明确 Industry 且需要体验基线：只读取 `framework://references/industries/{industry}.md` 的相关 Section。
 
 五维模型用于发现关键认知缺口，不要求把全部问题都问给用户。Repository 可验证的事实由 Agent 自行读取；用户不知道时给 Recommendation，用户不接受时识别 Concern 并换角度给 Alternative。
 

@@ -59,9 +59,11 @@ REQUIRED_AGENT_HEADINGS = (
     "Skill Assignment",
     "Reference Boundary",
     "Output",
+    "State Ownership",
 )
 
 UPDATE_SAFE_WORK_STATES = {"idle", "paused"}
+INSIGHT_MANAGED_ENTRIES = {"tool", "yuan.py"}
 
 
 def framework_version() -> str:
@@ -69,6 +71,15 @@ def framework_version() -> str:
     if not version_file.is_file():
         raise RuntimeError(f"Framework Version 缺失：{version_file}")
     return version_file.read_text(encoding="utf-8").strip()
+
+
+def installed_framework_version(root: Path) -> str:
+    """读取实际被检查的 Framework Version，不用 Source Version 冒充。"""
+    version_file = root / "VERSION"
+    try:
+        return version_file.read_text(encoding="utf-8").strip()
+    except (OSError, UnicodeError):
+        return "unknown"
 
 
 def read_update_work_state(target: Path) -> str | None:
@@ -94,21 +105,42 @@ def read_update_work_state(target: Path) -> str | None:
 
 
 def check_update_work_precondition(target: Path) -> tuple[bool, str | None]:
-    """Update 只在没有 Active Work，或 Work 已显式暂停时继续。"""
+    """Update 只阻止已明确标记为 active 的 Work；不解释旧 Project 内容。"""
     state = read_update_work_state(target)
-    if state is None or state in UPDATE_SAFE_WORK_STATES:
+    if state != "active":
         return True, state
-    if state == "unknown":
-        return False, (
-            "UPDATE_BLOCKED_UNKNOWN_WORK_STATE: 无法从 docs/STATUS.md 的 YAML "
-            "frontmatter 确认 Work 状态。请先让 Yuan 完成并 Distill 当前 Work，"
-            "或将其显式暂停为 work_state: paused。"
-        )
     return False, (
         f"UPDATE_BLOCKED_ACTIVE_WORK: 当前 work_state={state}。"
         "请先让 Yuan 完成并 Distill 当前 Work，或将其显式暂停为 "
         "work_state: paused。"
     )
+
+
+def collect_preserved_project_paths(target: Path) -> list[tuple[str, str]]:
+    """列出 Update 主动跳过的 Yuan-known Project-owned 路径。"""
+    preserved: list[tuple[str, str]] = []
+    for name in PROJECT_DOCUMENTS:
+        path = target / "docs" / name
+        if path.exists():
+            preserved.append((f"docs/{name}", "Project Document: project-owned state and memory"))
+
+    overrides = target / ".yuan" / "overrides"
+    if overrides.exists():
+        preserved.append((".yuan/overrides/", "Project Override: project-specific behavior"))
+
+    insight_root = target / ".yuan" / "insight"
+    if insight_root.is_dir():
+        for item in sorted(insight_root.iterdir(), key=lambda value: value.name):
+            if item.name in INSIGHT_MANAGED_ENTRIES or item.name.startswith(".tool-"):
+                continue
+            suffix = "/" if item.is_dir() else ""
+            preserved.append(
+                (
+                    f".yuan/insight/{item.name}{suffix}",
+                    "Insight Observation Data: project history",
+                )
+            )
+    return preserved
 
 
 def within(path: Path, parent: Path) -> bool:
@@ -350,6 +382,98 @@ def parse_frontmatter_lists(frontmatter: str) -> dict[str, list[str]]:
     return result
 
 
+def _frontmatter_scalar(frontmatter: str, field: str) -> str | None:
+    match = re.search(
+        rf"^[ \t]*{re.escape(field)}:\s*([^#\r\n]+)",
+        frontmatter,
+        re.MULTILINE,
+    )
+    if not match:
+        return None
+    value = match.group(1).strip().strip("'\"")
+    return None if value.lower() in {"", "null", "none", "~"} else value
+
+
+def _markdown_section(text: str, heading: str) -> str:
+    match = re.search(
+        rf"^##\s+{re.escape(heading)}\s*$\r?\n(.*?)(?=^##\s+|\Z)",
+        text,
+        re.MULTILINE | re.DOTALL,
+    )
+    return match.group(1).strip() if match else ""
+
+
+def validate_project_state(target: Path, framework_root: Path) -> list[str]:
+    """只读检查 Project State 一致性；不迁移、不修复，也不阻断 update。"""
+    status_path = target / "docs" / "STATUS.md"
+    work_path = target / "docs" / "WORK.md"
+    if not status_path.is_file() or not work_path.is_file():
+        return []
+    try:
+        status_text = status_path.read_text(encoding="utf-8")
+        work_text = work_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        return ["STATE_CHECK_UNAVAILABLE: 无法读取 docs/STATUS.md 或 docs/WORK.md"]
+
+    goal = _markdown_section(work_text, "Goal")
+    has_active_work = bool(goal) and "No active work." not in work_text
+    if not status_text.startswith("---") or len(status_text.split("---", 2)) < 3:
+        return (
+            ["STATE_DIVERGENCE: WORK 存在 Active Goal，但 STATUS 没有结构化 checkpoint"]
+            if has_active_work
+            else []
+        )
+
+    frontmatter = status_text.split("---", 2)[1]
+    work_id = _frontmatter_scalar(frontmatter, "work")
+    work_state = (_frontmatter_scalar(frontmatter, "work_state") or "unknown").lower()
+    workflow = _frontmatter_scalar(frontmatter, "workflow")
+    stage = _frontmatter_scalar(frontmatter, "stage")
+    agent_block = re.search(
+        r"^agent:\s*$\r?\n(?P<body>(?:^[ \t]+.*(?:\r?\n|$))*)",
+        frontmatter,
+        re.MULTILINE,
+    )
+    agent_body = agent_block.group("body") if agent_block else ""
+    agent_id = _frontmatter_scalar(agent_body, "id")
+    agent_state = (_frontmatter_scalar(agent_body, "state") or "unknown").lower()
+    warnings: list[str] = []
+
+    status_has_work = bool(work_id) or work_state in {"active", "paused"}
+    if has_active_work and not status_has_work:
+        warnings.append("STATE_DIVERGENCE: WORK 存在 Active Goal，但 STATUS 声明 idle/unknown")
+    if status_has_work and not has_active_work:
+        warnings.append("STATE_DIVERGENCE: STATUS 声明 Active/Paused Work，但 WORK 没有 Active Goal")
+    if not status_has_work:
+        return warnings
+
+    if work_state not in {"active", "paused"}:
+        warnings.append(f"STATE_CHECKPOINT_INCOMPLETE: work_state={work_state}")
+    for field, value in (("work", work_id), ("workflow", workflow), ("stage", stage), ("agent.id", agent_id)):
+        if not value:
+            warnings.append(f"STATE_CHECKPOINT_INCOMPLETE: 缺少 {field}")
+
+    if workflow:
+        workflow_path = framework_root / "workflows" / f"{workflow}.md"
+        if not workflow_path.is_file():
+            warnings.append(f"STATE_REFERENCE_UNKNOWN: workflow={workflow}")
+        elif stage:
+            workflow_text = workflow_path.read_text(encoding="utf-8")
+            parts = workflow_text.split("---", 2)
+            stages = parse_frontmatter_lists(parts[1]).get("stages", []) if len(parts) == 3 else []
+            if stage not in stages:
+                warnings.append(f"STATE_REFERENCE_UNKNOWN: stage={stage} 不属于 workflow={workflow}")
+    if agent_id and not (framework_root / "agents" / f"{agent_id}.md").is_file():
+        warnings.append(f"STATE_REFERENCE_UNKNOWN: agent.id={agent_id}")
+    if work_state == "paused" and agent_state != "paused":
+        warnings.append("STATE_DIVERGENCE: paused Work 的 agent.state 必须为 paused")
+    if work_state == "active" and not _markdown_section(work_text, "Current Task"):
+        warnings.append("STATE_CHECKPOINT_INCOMPLETE: Active Work 缺少 Current Task")
+    if work_state == "paused" and not _markdown_section(work_text, "Next Action"):
+        warnings.append("STATE_CHECKPOINT_INCOMPLETE: Paused Work 缺少 Next Action")
+    return sorted(set(warnings))
+
+
 def validate_framework(root: Path) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
@@ -361,6 +485,13 @@ def validate_framework(root: Path) -> tuple[list[str], list[str]]:
         "policies/routing.md",
         "policies/documents.md",
         "policies/review.md",
+        "agents/conductor.md",
+        "workflows/small-change.md",
+        "workflows/complex-bug.md",
+        "workflows/new-feature.md",
+        "workflows/large-project.md",
+        "templates/project/WORK.md",
+        "templates/project/STATUS.md",
     )
     for relative in required:
         if not (root / relative).is_file():
@@ -443,20 +574,30 @@ def validate_framework(root: Path) -> tuple[list[str], list[str]]:
                 f"{path.relative_to(root)} Workflow 不得越级声明 required_skills；Skill 由 Agent Contract 选择"
             )
 
-    path_pattern = re.compile(
-        r"`((?:agents|skills|references|policies|workflows|adapters)/[^`]+)`"
+    framework_locator_pattern = re.compile(
+        r"`framework://((?:agents|skills|references|policies|workflows|adapters|templates)/[^`]+)`"
     )
+    skill_locator_pattern = re.compile(r"`skill://([^`]+)`")
     for path in root.rglob("*.md"):
         text = path.read_text(encoding="utf-8")
-        for match in path_pattern.finditer(text):
+        for match in framework_locator_pattern.finditer(text):
             relative = match.group(1).split("#", 1)[0]
             if any(token in relative for token in ("*", "{", "}", "<", ">")):
                 continue
             candidate = root / relative
-            local_candidate = path.parent / relative
-            if not candidate.exists() and not local_candidate.exists():
+            if not candidate.exists():
                 errors.append(
-                    f"{path.relative_to(root)} -> Dangling Reference：{relative}"
+                    f"{path.relative_to(root)} -> Dangling Locator：framework://{relative}"
+                )
+        for match in skill_locator_pattern.finditer(text):
+            relative = match.group(1).split("#", 1)[0]
+            if any(token in relative for token in ("*", "{", "}", "<", ">")):
+                continue
+            skill_root = path.parent
+            candidate = skill_root / relative
+            if not candidate.exists():
+                errors.append(
+                    f"{path.relative_to(root)} -> Dangling Locator：skill://{relative}"
                 )
 
     return sorted(set(errors)), sorted(set(warnings))
@@ -484,10 +625,17 @@ def check_project(target: Path) -> int:
         errors.append("缺少 Yuan Insight Tool")
 
     for name in PROJECT_DOCUMENTS:
-        if not (target / "docs" / name).is_file():
-            warnings.append(f"缺少 Project Document：docs/{name}")
+        if (target / "docs" / name).is_file():
+            continue
+        message = f"缺少 Project Document：docs/{name}"
+        if name in {"WORK.md", "STATUS.md"}:
+            errors.append(message)
+        else:
+            warnings.append(message)
     if not (target / "AGENTS.md").is_file():
         errors.append("缺少 AGENTS.md")
+    if target.is_dir() and managed.is_dir():
+        warnings.extend(validate_project_state(target, managed))
 
     print("Yuan Check")
     for warning in warnings:
@@ -497,11 +645,16 @@ def check_project(target: Path) -> int:
     if errors:
         print(f"  FAIL  {len(errors)} error(s), {len(warnings)} warning(s)")
         return 1
-    print(f"  PASS  {framework_version()} ({len(warnings)} warning(s))")
+    print(f"  PASS  {installed_framework_version(managed)} ({len(warnings)} warning(s))")
     return 0
 
 
-def install_or_update(target: Path, mode: str, update: bool, dry_run: bool) -> int:
+def install_or_update(
+    target: Path,
+    mode: str,
+    update: bool,
+    dry_run: bool,
+) -> int:
     if not SOURCE_FRAMEWORK.is_dir():
         print(f"ERROR Source Framework 缺失：{SOURCE_FRAMEWORK}", file=sys.stderr)
         return 1
@@ -528,6 +681,9 @@ def install_or_update(target: Path, mode: str, update: bool, dry_run: bool) -> i
             print(f"ERROR {message}", file=sys.stderr)
             return 1
 
+    preserved_paths = collect_preserved_project_paths(target) if update else []
+    gitignore_existed = (target / ".gitignore").is_file()
+
     if not dry_run:
         target.mkdir(parents=True, exist_ok=True)
 
@@ -537,27 +693,44 @@ def install_or_update(target: Path, mode: str, update: bool, dry_run: bool) -> i
     write_insight_launcher(target, dry_run)
     write_project_adapter(target, dry_run)
     removed = cleanup_legacy_managed_layout(target, dry_run)
-    created_docs = [] if update else ensure_project_documents(target, dry_run)
+    # Project Document 已存在时逐字节保留；缺失时只补官方空模板。
+    # Update 不解释、不迁移现有内容，但必须修复不完整安装。
+    created_docs = ensure_project_documents(target, dry_run)
     override_created = ensure_override_readme(target, dry_run)
     write_install_record(target, dry_run)
     gitignore_added = merge_gitignore(target, dry_run)
 
     action = "Update" if update else "Install"
+    managed_action = "WOULD UPDATE" if dry_run else "UPDATED"
     print(f"Yuan {action} {framework_version()}")
     print(f"  Project：{target}")
-    print("  Official Snapshot：.yuan/framework/")
-    print("  Project Override：.yuan/overrides/")
-    print("  Insight Tool：.yuan/insight/tool/")
+    print(f"  {managed_action} AGENTS.md | Framework Adapter")
+    print(f"  {managed_action} .yuan/framework/ | Official Snapshot")
+    print(f"  {managed_action} .yuan/insight/tool/ | Official Insight Tool")
+    print(f"  {managed_action} .yuan/insight/yuan.py | Project-local Launcher")
+    print(f"  {managed_action} .yuan/install.json | Install Metadata")
+    print(f"  {managed_action} .yuan/VERSION | Framework Version")
+    for path, reason in preserved_paths:
+        print(f"  PRESERVED {path} | {reason}")
     if migrated:
-        print(f"  Migrated Override：{len(migrated)}")
+        label = "WOULD MIGRATE" if dry_run else "MIGRATED"
+        print(f"  {label} Override：{len(migrated)}")
     if removed:
-        print(f"  Removed Legacy Managed Directory：{len(removed)}")
+        label = "WOULD REMOVE" if dry_run else "REMOVED"
+        print(f"  {label} Legacy Managed Directory：{len(removed)}")
     if created_docs:
-        print(f"  Created Project Document：{len(created_docs)}")
+        label = "WOULD CREATE" if dry_run else "CREATED"
+        for path in created_docs:
+            print(f"  {label} {path} | Missing required Project Document")
     if override_created:
-        print("  Created Override Guide：1")
-    if gitignore_added:
-        print(f"  Updated .gitignore：{len(gitignore_added)} line(s)")
+        label = "WOULD CREATE" if dry_run else "CREATED"
+        print(f"  {label} Override Guide：1")
+    if gitignore_existed:
+        label = "WOULD MERGE" if dry_run else "MERGED"
+        print(f"  {label} .gitignore | 只补充 Yuan 必需规则；Project 规则原样保留")
+    elif gitignore_added:
+        label = "WOULD CREATE" if dry_run else "CREATED"
+        print(f"  {label} .gitignore | {len(gitignore_added)} 条 Yuan 必需规则")
     if dry_run:
         print("  DRY RUN：未修改文件")
         return 0

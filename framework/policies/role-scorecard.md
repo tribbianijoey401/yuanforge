@@ -2,7 +2,7 @@
 
 > **vNext Scope：** 仅在 Framework Maintainer 审计 Agent Contract，或 Material Review 明确要求 Role Conformance 时加载；普通 Project Work 不读取本文件。
 
-> 定位：审计 instrument，**不是规则制定处**。各 agent 的门禁/执行权限/对抗要求已在创建时（`agents/contract-template.md`）固化进合约；本卡只**核查创建是否做对**。
+> 定位：审计 instrument，**不是规则制定处**。各 agent 的门禁/执行权限/对抗要求已在创建时（`framework://agents/contract-template.md`）固化进合约；本卡只**核查创建是否做对**。
 > 用法：每 agent 在 7 原理（P-A~P-G）上 0–3 分。
 > **🔴 硬伤（死链/缺防御指令/缺对抗段/路由未单源）= 合入绝对门槛；均分 <2.5 为技术债触发器——进 WORK 跟踪，靠 Advisory 升级机制渐进施压，不阻断合入。**
 
@@ -34,7 +34,7 @@ Product Analyst(0.6) < Architect(0.7) < Frontend/Backend Dev(0.8)
 - P-A DRY：共享词汇/要求引用 contract-conventions.md，未把跨 agent 内容抄进本合约；路由条目对齐共享路由表。
 - P-B 基准：合约「工作依据」填了本 agent 具体的冻结基准文件。新增加载：seam-agreement.md 含 @ptg 注解（如有外部依赖字段）→ 缺则扣 0.3。
 - P-C 对抗：合约「对抗式审查」填了本 agent 具体对抗目标，且满足 ≥1 尝试要求。Tester 必须含 PTG+CAL+anti-patterns 验证。
-- P-D 门禁：合约「门禁定义」固化了本 agent 档位 + 是否可执行 + 可判定通过谓词（无主观自检）。新增加载：docs/ptg-critical.md 存在、CAL 脚本已生成可执行 → 缺则扣 0.3；Quality Auditor 含 Advisory 自动升级规则 → 缺则扣 0.2。
+- P-D 门禁：合约「门禁定义」固化了本 agent 档位 + 是否可执行 + 可判定通过谓词（无主观自检）。PTG-critical Scope 与 Verification Seam 必须来自 `project://docs/WORK.md`，Project-native contract test 必须可执行；缺失则扣 0.3。Quality Auditor 含 Advisory 自动升级规则；缺失则扣 0.2。
 - P-E 非职责：合约显式声明「执行权限 / 不负责」，边界划到层。
-- P-F 骨架：符合 `agents/contract-template.md` 节结构（含门禁定义段）。
+- P-F 骨架：符合 `framework://agents/contract-template.md` 节结构（含门禁定义段）。
 - P-G 闭环：产出命名消费者 + 反馈/蒸馏通道。

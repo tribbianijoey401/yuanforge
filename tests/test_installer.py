@@ -104,6 +104,25 @@ class InstallerTests(unittest.TestCase):
             self.assertFalse((project / ".yuan" / "runtime").exists())
             self.assertTrue((project / ".yuan" / "framework" / "VERSION").is_file())
             self.assertEqual(
+                (ROOT / "AGENTS.md").read_bytes(),
+                (project / "AGENTS.md").read_bytes(),
+            )
+            self.assertEqual(
+                (ROOT / "framework" / "policies" / "core.md").read_bytes(),
+                (project / ".yuan" / "framework" / "policies" / "core.md").read_bytes(),
+            )
+            self.assertEqual(
+                (ROOT / "insight" / "yuan_insight" / "cli.py").read_bytes(),
+                (
+                    project
+                    / ".yuan"
+                    / "insight"
+                    / "tool"
+                    / "yuan_insight"
+                    / "cli.py"
+                ).read_bytes(),
+            )
+            self.assertEqual(
                 '{"work_id":"OLD"}\n', insight_history.read_text(encoding="utf-8")
             )
             self.assertTrue(
@@ -184,25 +203,24 @@ Work 已暂停，等待下次 Session 恢复。
             self.assertEqual(work_payload, work.read_text(encoding="utf-8"))
             self.assertTrue((project / ".yuan" / "framework" / "VERSION").is_file())
 
-    def test_update_blocks_unstructured_existing_work_state(self):
+    def test_update_allows_unstructured_existing_work_state_without_rewriting_it(self):
         with tempfile.TemporaryDirectory(prefix="yuan-vnext-unknown-update-") as parent:
             project = Path(parent) / "project"
             docs = project / "docs"
             docs.mkdir(parents=True)
-            (docs / "STATUS.md").write_text(
-                "# Status\n\n- **State**: Completed\n",
-                encoding="utf-8",
-            )
-            (docs / "WORK.md").write_text(
-                "# Active Work\n\n## Goal\n\n遗留 Work。\n",
-                encoding="utf-8",
-            )
+            status = docs / "STATUS.md"
+            status_payload = "# Status\n\n- **State**: Completed\n"
+            status.write_text(status_payload, encoding="utf-8")
+            work = docs / "WORK.md"
+            work_payload = "# Active Work\n\n## Goal\n\n遗留 Work。\n"
+            work.write_text(work_payload, encoding="utf-8")
 
             result = self.run_command(str(SYNC), "update", str(project))
 
-            self.assertNotEqual(0, result.returncode)
-            self.assertIn("UPDATE_BLOCKED_UNKNOWN_WORK_STATE", result.stdout + result.stderr)
-            self.assertFalse((project / ".yuan" / "framework").exists())
+            self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+            self.assertEqual(status_payload, status.read_text(encoding="utf-8"))
+            self.assertEqual(work_payload, work.read_text(encoding="utf-8"))
+            self.assertTrue((project / ".yuan" / "framework" / "VERSION").is_file())
 
     def test_existing_install_does_not_interpret_project_documents(self):
         with tempfile.TemporaryDirectory(prefix="yuan-vnext-existing-install-") as parent:
@@ -224,6 +242,111 @@ Work 已暂停，等待下次 Session 恢复。
             self.assertEqual(status_payload, status.read_text(encoding="utf-8"))
             self.assertEqual(work_payload, work.read_text(encoding="utf-8"))
             self.assertTrue((project / ".yuan" / "framework" / "VERSION").is_file())
+
+    def test_update_reports_each_preserved_yuan_path_and_reason(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-preserved-report-") as parent:
+            project = Path(parent) / "project"
+            docs = project / "docs"
+            docs.mkdir(parents=True)
+            (docs / "STATUS.md").write_text(
+                """---
+work: null
+work_state: idle
+workflow: null
+stage: null
+---
+""",
+                encoding="utf-8",
+            )
+            (docs / "WORK.md").write_text(
+                "# Active Work\n\nNo active work.\n",
+                encoding="utf-8",
+            )
+            (docs / "MEMORY.md").write_text(
+                "# Persistent Memory\n\nProject-owned fact.\n",
+                encoding="utf-8",
+            )
+            override = project / ".yuan" / "overrides" / "policies" / "core.md"
+            override.parent.mkdir(parents=True)
+            override.write_text("# Override\n", encoding="utf-8")
+            trace = project / ".yuan" / "insight" / "traces" / "current.jsonl"
+            trace.parent.mkdir(parents=True)
+            trace.write_text("{}\n", encoding="utf-8")
+            gitignore = project / ".gitignore"
+            gitignore.write_text("# Project rules\nbuild/\n", encoding="utf-8")
+
+            result = self.run_command(str(SYNC), "update", str(project))
+
+            self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+            self.assertIn("PRESERVED docs/STATUS.md | Project Document", result.stdout)
+            self.assertIn("PRESERVED docs/WORK.md | Project Document", result.stdout)
+            self.assertIn("PRESERVED docs/MEMORY.md | Project Document", result.stdout)
+            self.assertIn("PRESERVED .yuan/overrides/ | Project Override", result.stdout)
+            self.assertIn(
+                "PRESERVED .yuan/insight/traces/ | Insight Observation Data",
+                result.stdout,
+            )
+            self.assertIn("MERGED .gitignore", result.stdout)
+            self.assertEqual("# Override\n", override.read_text(encoding="utf-8"))
+            self.assertEqual("{}\n", trace.read_text(encoding="utf-8"))
+            self.assertTrue(gitignore.read_text(encoding="utf-8").startswith("# Project rules\nbuild/\n"))
+
+    def test_check_warns_on_active_work_status_divergence_without_failing(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-state-check-") as parent:
+            project = Path(parent) / "project"
+            installed = self.run_command(str(INSTALLER), str(project), "--force")
+            self.assertEqual(0, installed.returncode, installed.stdout + installed.stderr)
+            (project / "docs" / "WORK.md").write_text(
+                "# Active Work\n\n## Goal\n\n修复状态漂移。\n",
+                encoding="utf-8",
+            )
+
+            checked = self.run_command(str(SYNC), "check", str(project))
+
+            self.assertEqual(0, checked.returncode, checked.stdout + checked.stderr)
+            self.assertIn("STATE_DIVERGENCE", checked.stdout)
+            self.assertIn("PASS", checked.stdout)
+
+    def test_update_repairs_only_missing_project_documents(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-repair-docs-") as parent:
+            project = Path(parent) / "project"
+            docs = project / "docs"
+            docs.mkdir(parents=True)
+            memory = docs / "MEMORY.md"
+            memory_payload = b"# Persistent Memory\n\nproject-owned bytes\n"
+            memory.write_bytes(memory_payload)
+
+            result = self.run_command(str(SYNC), "update", str(project))
+
+            self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+            self.assertEqual(memory_payload, memory.read_bytes())
+            for name in (
+                "PRODUCT.md",
+                "ARCHITECTURE.md",
+                "DECISIONS.md",
+                "BACKLOG.md",
+                "WORK.md",
+                "STATUS.md",
+            ):
+                self.assertTrue((docs / name).is_file(), name)
+                self.assertIn(f"CREATED docs/{name}", result.stdout)
+
+            checked = self.run_command(str(SYNC), "check", str(project))
+            self.assertEqual(0, checked.returncode, checked.stdout + checked.stderr)
+
+    def test_check_fails_when_required_work_state_files_are_missing(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-missing-state-") as parent:
+            project = Path(parent) / "project"
+            installed = self.run_command(str(INSTALLER), str(project), "--force")
+            self.assertEqual(0, installed.returncode, installed.stdout + installed.stderr)
+            (project / "docs" / "WORK.md").unlink()
+            (project / "docs" / "STATUS.md").unlink()
+
+            checked = self.run_command(str(SYNC), "check", str(project))
+
+            self.assertNotEqual(0, checked.returncode)
+            self.assertIn("缺少 Project Document：docs/WORK.md", checked.stdout)
+            self.assertIn("缺少 Project Document：docs/STATUS.md", checked.stdout)
 
 
 if __name__ == "__main__":

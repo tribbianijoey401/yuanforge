@@ -79,22 +79,42 @@ description: 可复用的 Verified Finding、Pitfall、Preference 和 Convention
 - **Cause**：测试只覆盖局部计算，没有覆盖启动、状态变化、停止、恢复、完成归档和安装后执行。
 - **Rule**：Observability 变更必须至少验证一次生产入口的端到端生命周期；Completion Transition 的 `from` 与 `to` 都是证据，清空 Active State 不得丢失最后 Agent 或 `skills_applied`。
 
-### M-013：Framework Update 前必须先稳定 Work Checkpoint
-
-- **Symptom**：Active Work 中途更新 Framework，下一 Session 无法判断旧 Work 做到哪里，或 Update 为了兼容而开始改写 Project Memory。
-- **Rule**：Update 不迁移 Project 内容，只在写入前检查 `STATUS.work_state`；仅 `idle` / `paused` 放行。Pause 保留 `WORK.md` 全文并写清唯一 Next Action，既不归档也不清空。
-
 ### M-012：Requirement Discovery 与 Spec Clarification 不得混为一个 Gate
 
 - **Symptom**：用户提出一个 Solution 后，Agent 立即追问字段、异常和实现细节，最终得到完整但解决错问题的 Spec；或两个 Agent 重复询问同一 Product 语义。
 - **Cause**：没有区分“是否在解决正确的问题”和“正确问题是否定义完整”。
 - **Rule**：同一 Product Analyst 在 Signal 命中时先完整执行 `deep-requirement-discovery`，再让 `grilling` 继承 Discovery Result 补齐 Spec；不得拆分前者规则、不得重复已有 Evidence。
 
+### M-013：Framework Update 前必须先稳定 Work Checkpoint
+
+- **Symptom**：Active Work 中途更新 Framework，下一 Session 无法判断旧 Work 做到哪里，或 Update 为了兼容而开始改写 Project Memory。
+- **Rule**：Update 不迁移 Project 内容，只在写入前阻止明确的 `STATUS.work_state: active`。Pause 保留 `WORK.md` 全文并写清唯一 Next Action，既不归档也不清空。旧格式或无法判定状态直接放行；Update 后补齐缺失的官方空文档，但逐字节保留已有文档。
+
 ### M-014：Routing 与 Workflow 不得越级选择 Skill
 
 - **Symptom**：Workflow Frontmatter 或 Routing Policy 声明 `required_skills`，造成 Conductor 绕过 Agent Contract 直接决定专业方法。
 - **Cause**：把 Workflow 编排与 Agent 内部能力选择混成同一层，破坏单向依赖并形成重复 Truth Source。
 - **Rule**：Routing 与 Workflow 只选择 Agent；Agent 根据自己的 Contract 和当前 Signal 选择 Skill；Skill 再选择 References。Insight 的 Expected Skill 也只能从已观察 Agent 的 Contract 推导。
+
+### M-015：文件观察必须区分原生事件与 Polling
+
+- **Symptom**：实现按固定间隔计算 hash，却对外称为 File Watch；快速持久化状态可能在两次采样之间被覆盖。
+- **Rule**：Windows 使用 `ReadDirectoryChangesW`，Linux 使用 `inotify`；事件只唤醒，hash 负责确认语义文件确实变化。原生源不可用时必须显式标为 `polling-fallback` 与 Partial coverage，不能伪装成完整观察。
+
+### M-016：正式 Work State 必须只有一个 Writer
+
+- **Symptom**：Specialist 各自维护 WORK/STATUS，或单 LLM 连续模拟多个角色后只写最终状态，导致恢复点与 Insight 都看不到真实 Workflow。
+- **Rule**：Conductor 是 WORK/STATUS 的唯一正式 State Writer。每次 Dispatch 前和 Focused Result 返回后提交状态；Specialist 只返回 `work_updates`。STATUS 不添加 visualization revision，观察序号由 Insight 自己维护。
+
+### M-017：路径根必须进入文本语法，不能依赖上下文猜测
+
+- **Symptom**：`docs/STATUS.md` 与 `policies/core.md` 看似同级，LLM 可能把 Framework Policy 错读成 Project `docs/policies/`，或把 Skill-local `references/` 与 Framework References 混淆。
+- **Rule**：运行时契约统一使用 `project://`、`framework://`、`skill://` 逻辑定位符；它们不是目录名或 URL，文件操作前必须按 Adapter 规则解析成真实路径。Installer 与 Contract Test 必须校验定位符指向存在的资产。
+
+### M-018：缺失状态源不能投影成 IDLE
+
+- **Symptom**：WORK/STATUS 缺失时，空 Parser 结果会让 Dashboard 显示 IDLE/FULL，掩盖 Framework 未实例化或状态丢失。
+- **Rule**：Snapshot 必须携带 source availability；WORK 或 STATUS 缺失/不可读时产生 `STATE_FILES_MISSING`、Coverage 为 `UNKNOWN`、UI 显示 `STATE UNAVAILABLE`。字段不完整但文件存在时，逐字段显示事实与 `UNKNOWN`。
 
 ## Engineering Conventions
 

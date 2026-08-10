@@ -4,10 +4,10 @@
 
 ## Start
 
-1. 把 Project Root `AGENTS.md` 作为主指令提供给 Agent。
-2. Agent 选择 `.yuan/framework/`；Yuan Source Repository 自身选择 `framework/`。
-3. 读取 `docs/STATUS.md` 与当前 `docs/WORK.md`，再按 Request 加载相关 Document Section。
-4. 读取 `policies/core.md`、`policies/routing.md` 和选中的 Primary Workflow。
+1. 把 `project://AGENTS.md` 作为主指令提供给 Agent。
+2. 解析 Framework Root：普通 Project 选择 `project://.yuan/framework/`；Yuan Source Repository 自身选择 `project://framework/`。
+3. 读取 `project://docs/STATUS.md` 与当前 `project://docs/WORK.md`，再按 Request 加载相关 Document Section。
+4. 读取 `framework://policies/core.md`、`framework://policies/routing.md` 和选中的 `framework://workflows/*` Primary Workflow。
 
 ## Role Execution
 
@@ -21,4 +21,4 @@
 
 ## Recovery
 
-Manual Mode 不依赖 Daemon、Lock、Ledger 或 Runtime Process。中断前更新 `docs/STATUS.md`，下次从 Status、Active Work 和相关 Memory Section 恢复。
+Manual Mode 不依赖 Daemon、Lock、Ledger 或 Runtime Process。中断前由 Conductor 更新 `project://docs/STATUS.md`，下次从 Status、Active Work 和相关 Memory Section 恢复。

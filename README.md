@@ -18,6 +18,8 @@ Yuan 的首要目标是提高 Vibe Coding 的代码质量，不是建设独立 R
 
 核心依赖关系只有一条：`Routing → Agent → Skill → References`。这保证了角色负责“谁来做”，Skill 负责“怎么做”，References 负责“需要哪些专业知识”，避免全部资产同时进入 Context。
 
+运行时路径不依赖当前目录猜测：`project://docs/STATUS.md` 指向 Project 文件，`framework://policies/core.md` 指向带 Override 优先级的 Framework 文件，`skill://references/...` 指向当前 Skill 自带资产。这些是逻辑定位符，不是真实目录名或 URL；Agent 在调用文件工具前解析它们。
+
 ## 四种 Primary Workflow
 
 | Workflow | 使用场景 | 默认最小角色集 |
@@ -45,11 +47,15 @@ UI Designer 和 Reviewer 都按任务 Signal 与 Risk 加载，不固定启动�
 
 `TASK_BOARD` 只在复杂 Work 中按需嵌入 `WORK.md`；`SESSION` 默认取消；`PROGRESS` 合并到 `WORK.md` 与 `STATUS.md`。
 
-Work 未完成但需要退出时，Yuan 会先把可恢复 Checkpoint 写回 `WORK.md`，再将 `STATUS.work_state` 设为 `paused`。Pause 不归档、不清空 Work；下次 Session 从 Next Action 恢复。
+用户说“我要先离开”“工作挂起吧”或“暂停”时，任何 Workflow 都会先把可恢复 Checkpoint 写回 `WORK.md`，保留当前 Workflow / Stage，再将 `STATUS.work_state` 设为 `paused` 并停止派发。Pause 不归档、不清空 Work；下次用户说继续时从 Next Action 恢复。
 
 ## Yuan Insight
 
-Yuan Insight 是 Yuan 官方的只读 Sidecar，通过 File Watch 观察 `WORK.md`、`STATUS.md` 与 Framework Definition，生成 Coverage、Trace、Work Summary、Expected vs Observed Signal 和 Dashboard。它不修改 Yuan Core State，失败时不影响 Agent Routing 与 Project Memory。
+Yuan Insight 是 Yuan 官方的只读 Sidecar，通过操作系统文件事件观察 `WORK.md`、`STATUS.md` 与 Framework Definition，生成 Coverage、Trace、Work Summary、Expected vs Observed Signal 和 Dashboard。Windows 使用 `ReadDirectoryChangesW`，Linux 使用 `inotify`；原生监听不可用时明确显示 `polling-fallback` 与 Partial coverage。它不修改 Yuan Core State，失败时不影响 Agent Routing 与 Project Memory。
+
+Yuan Core 不为 Dashboard 维护 revision：Conductor 是 `WORK.md` / `STATUS.md` 的唯一正式 State Writer；Insight 在自己的 Observation Data 中维护 transition index、gap 与 coverage。
+
+如果 `WORK.md` 或 `STATUS.md` 缺失/不可读，Dashboard 显示 `STATE UNAVAILABLE`、Coverage 为 `UNKNOWN`，并提示通过 update/bootstrap 只补缺失文档；不会把缺失状态误报为 IDLE。
 
 Installer 将官方 Tool 安装到 `.yuan/insight/tool/`，同目录中的 `sessions/`、`traces/`、`summaries/`、`gaps/` 和 `cache/` 是 Project 的 Insight Observation Data。`update` 只替换 `tool/` 与 Launcher，不删除已有 Observation Data。
 
@@ -92,7 +98,9 @@ python -B scripts/sync_project.py update C:\path\to\project
 - `.yuan/overrides/` Project Override
 - Project Source、Test、Config 与其他业务内容
 
-Update 不迁移或解释这些 Project-owned 文件，只读取 `STATUS.work_state` 做最小安全检查：`idle` 或 `paused` 才允许更新。其他状态必须先完成并 Distill，或显式 Pause；无法判定旧格式状态时会停止并给出处理提示。
+Update 不迁移或解释这些 Project-owned 文件，只读取 `STATUS.work_state` 做最小安全检查：已识别的 `active` Work 必须先完成并 Distill，或显式 Pause；旧格式、缺失或无法判定的状态直接更新，不需要迁移或额外参数。
+
+每次 Update 都逐项输出被替换的 Yuan-managed 路径；实际存在但未替换的 Project Document、Override 与 Insight Observation Data 会以 `PRESERVED <path> | <reason>` 输出。`.gitignore` 只合并 Yuan 必需规则，并明确标记为 `MERGED`。
 
 需要检查安装结果时运行：
 

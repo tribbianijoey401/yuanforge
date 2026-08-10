@@ -1,19 +1,19 @@
 # Extended Document Profile
 
-本 Policy 只在 `docs/WORK.md` 已无法清晰承载 Complex Work、且 Conductor 明确选择 Extended Profile 时启用。默认 Project Document 仍以 `policies/documents.md` 的七类文件为准。
+本 Policy 只在 `project://docs/WORK.md` 已无法清晰承载 Complex Work、且 Conductor 明确选择 Extended Profile 时启用。默认 Project Document 仍以 `framework://policies/documents.md` 的七类文件为准。
 
 ## Optional Task Board
 
-Complex Work 可以在 `WORK.md` 内增加 Task Board，字段最少包含：
+Complex Work 可以在 `project://docs/WORK.md` 内增加 Task Board，字段最少包含：
 
 | ID | Outcome | Owner Agent | Dependency | Status | Evidence | Next Action |
 |---|---|---|---|---|---|---|
 
-Task Board 不是第二个 Work Truth Source。Goal、Scope、Acceptance 与 Risk 仍由 `WORK.md` 的主段落定义；Task 完成必须引用 Evidence，不以角色口头状态替代。
+Task Board 不是第二个 Work Truth Source。Goal、Scope、Acceptance 与 Risk 仍由 `project://docs/WORK.md` 的主段落定义；Task 完成必须引用 Evidence，不以角色口头状态替代。
 
 ## Work Archive
 
-只有满足以下条件的完成摘要才写入 `docs/work/archive/`：
+只有满足以下条件的完成摘要才写入 `project://docs/work/archive/`：
 
 - 后续维护需要理解关键实现边界或 Migration；
 - 包含可复用的验证路径但不适合放入通用 Memory；

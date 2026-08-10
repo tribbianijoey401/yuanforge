@@ -28,6 +28,11 @@
   .stage.current { border-color: var(--blue); color: var(--blue); font-weight: 600; }
   .stage.done { border-color: var(--green); color: var(--green); }
   .agent-current { margin-top: 10px; font-size: 13px; }
+  .work-warning { display: none; margin: 10px 0; padding: 8px 10px; border: 1px solid var(--yellow); border-radius: 6px; color: var(--yellow); font-size: 12px; }
+  .work-details { display: grid; gap: 10px; margin-top: 12px; }
+  .work-detail { padding-top: 10px; border-top: 1px solid var(--border); }
+  .work-detail .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .4px; }
+  .work-detail .value { margin-top: 3px; white-space: pre-wrap; overflow-wrap: anywhere; }
   .matrix { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
   .tile { border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-size: 12px; }
   .tile .id { font-weight: 600; margin-bottom: 4px; }
@@ -67,8 +72,10 @@
     <div class="panel" id="work-panel">
       <h2>Work / Execution Map</h2>
       <div class="work" id="work-title">—</div>
+      <div class="work-warning" id="work-warning"></div>
       <div class="stage-row" id="stage-row"></div>
       <div class="agent-current" id="agent-current"></div>
+      <div class="work-details" id="work-details"></div>
     </div>
     <div class="panel" style="margin-top:16px">
       <h2>Agent Matrix</h2>

@@ -62,6 +62,7 @@ def read_transitions(path: Path) -> list[dict[str, Any]]:
 @dataclass
 class ObservationEvidence:
     coverage: str
+    mode: str
     transitions: list[dict[str, Any]]
     current_work_id: str | None
     session_id: str | None
@@ -87,6 +88,7 @@ def load_observation_evidence(root: Path) -> ObservationEvidence:
         gaps = read_transitions(insight_dir / "gaps" / f"{session_id}.jsonl")
     return ObservationEvidence(
         coverage=str(cache.get("coverage") or "UNKNOWN"),
+        mode=str(cache.get("observation_mode") or "unknown"),
         transitions=transitions,
         current_work_id=cache.get("current_work_id"),
         session_id=session_id,
@@ -95,13 +97,13 @@ def load_observation_evidence(root: Path) -> ObservationEvidence:
 
 
 class ObservationService:
-    """Polling + debounce + semantic diff + durable observation lifecycle。"""
+    """Native file events + debounce + semantic diff + durable lifecycle。"""
 
     def __init__(
         self,
         root: Path,
         poll_interval: float = 0.5,
-        debounce_window: float = 0.4,
+        debounce_window: float = 0.05,
     ) -> None:
         self.root = root.resolve()
         self.poll_interval = poll_interval
@@ -110,6 +112,7 @@ class ObservationService:
         self.cache_path = self.insight_dir / "cache" / "current.json"
         self.session_id: str | None = None
         self.coverage = "UNKNOWN"
+        self.observation_mode = "unknown"
         self.current_work_id: str | None = None
         self.previous: Snapshot | None = None
         self.latest_snapshot: Snapshot | None = None
@@ -123,11 +126,27 @@ class ObservationService:
         with self._lock:
             if self.previous is not None:
                 return self.previous
+            self.watcher = DebouncedWatcher(
+                self.root,
+                poll_interval=self.poll_interval,
+                debounce_window=self.debounce_window,
+            )
+            self.observation_mode = self.watcher.mode
             baseline = build_snapshot(self.root, _utc_now())
             previous_cache = _read_json(self.cache_path)
             self.insight_dir, self.session_id = start_session(self.root, baseline)
             self.current_work_id = baseline.status.get("work")
-            self.coverage = "PARTIAL" if self.current_work_id else "FULL"
+            required_sources_available = all(
+                baseline.files.get(path) not in {"MISSING", "UNREADABLE"}
+                for path in ("docs/WORK.md", "docs/STATUS.md")
+            )
+            self.coverage = (
+                "UNKNOWN"
+                if not required_sources_available
+                else "PARTIAL"
+                if self.current_work_id or not self.watcher.native
+                else "FULL"
+            )
 
             gap_start = previous_cache.get("last_observed_at")
             if gap_start and gap_start != baseline.observed_at:
@@ -154,12 +173,7 @@ class ObservationService:
             self.transition_index = len(
                 read_transitions(self.insight_dir / "traces" / "current.jsonl")
             )
-            self.watcher = DebouncedWatcher(
-                self.root,
-                poll_interval=self.poll_interval,
-                debounce_window=self.debounce_window,
-            )
-            self.watcher.tick()  # 建立 file hash baseline
+            self.watcher.prime(baseline.files)
             self._write_cache(baseline.observed_at, status="active")
             update_session(
                 self.insight_dir,
@@ -177,6 +191,9 @@ class ObservationService:
             assert self.previous is not None
             assert self.watcher is not None
             event = self.watcher.tick()
+            self.observation_mode = self.watcher.mode
+            if not self.watcher.native:
+                self.coverage = "PARTIAL"
             if event is None:
                 return None
 
@@ -212,11 +229,17 @@ class ObservationService:
                 )
                 pruned = prune_traces(self.insight_dir, keep=50)
 
-            if after_work and after_work != before_work:
-                # 在 Observer 活跃期间观察到新 Work 起点，其 Coverage 为 FULL。
-                self.coverage = "FULL"
+            required_sources_available = all(
+                after.files.get(path) not in {"MISSING", "UNREADABLE"}
+                for path in ("docs/WORK.md", "docs/STATUS.md")
+            )
+            if not required_sources_available:
+                self.coverage = "UNKNOWN"
+            elif after_work and after_work != before_work:
+                # 原生 Observer 活跃期间观察到新 Work 起点时 Coverage 才能为 FULL。
+                self.coverage = "FULL" if self.watcher.native else "PARTIAL"
             elif not after_work:
-                self.coverage = "FULL"
+                self.coverage = "FULL" if self.watcher.native else "PARTIAL"
 
             self.current_work_id = str(after_work) if after_work else None
             self.previous = after
@@ -246,6 +269,7 @@ class ObservationService:
             gaps = self._current_gaps()
             return ObservationEvidence(
                 coverage=self.coverage,
+                mode=self.observation_mode,
                 transitions=transitions,
                 current_work_id=self.current_work_id,
                 session_id=self.session_id,
@@ -275,8 +299,16 @@ class ObservationService:
         return baseline
 
     def _background_loop(self) -> None:
-        while not self._stop.wait(self.poll_interval):
+        while not self._stop.is_set():
+            assert self.watcher is not None
+            self.watcher.wait()
+            if self._stop.is_set():
+                break
             self.poll_once()
+
+    def wait_for_change(self) -> None:
+        if self.watcher is not None:
+            self.watcher.wait()
 
     def run_forever(
         self,
@@ -288,15 +320,20 @@ class ObservationService:
                 update = self.poll_once()
                 if update and on_update:
                     on_update(update)
-                time.sleep(self.poll_interval)
+                self.wait_for_change()
         finally:
             self.stop()
 
     def stop(self) -> None:
         self._stop.set()
+        # Close first so a native wait (or a large fallback interval) wakes
+        # immediately; then join the background loop with a fixed bound.
+        watcher = self.watcher
+        if watcher is not None:
+            watcher.close()
         thread = self._thread
         if thread and thread.is_alive() and thread is not threading.current_thread():
-            thread.join(timeout=max(2.0, self.poll_interval * 4))
+            thread.join(timeout=2.0)
         with self._lock:
             observed_at = _utc_now()
             self._write_cache(observed_at, status="stopped")
@@ -318,6 +355,7 @@ class ObservationService:
                 {
                     "session_id": self.session_id,
                     "coverage": self.coverage,
+                    "observation_mode": self.observation_mode,
                     "current_work_id": self.current_work_id,
                     "last_observed_at": observed_at,
                     "status": status,

@@ -23,7 +23,9 @@ async function poll() {
 
 function render(data) {
   document.getElementById("sub").textContent =
-    "Observed at " + data.observed_at + " · 每 3s 刷新 · 只读旁路，不影响 Yuan";
+    "Observed at " + data.observed_at + " · " +
+    (((data.observation || {}).mode) || "unknown") +
+    " · 每 3s 刷新 · 只读旁路，不影响 Yuan";
   renderWork(data.snapshot);
   renderAgents(data.snapshot, data.signals, data.registry, data.observation, data.coverage);
   renderSkills(data.snapshot, data.signals, data.registry, data.observation, data.coverage);
@@ -36,11 +38,38 @@ function renderWork(snapshot) {
   const work = snapshot.work || {};
   const status = snapshot.status || {};
   const workflow = snapshot.workflow || {};
+  const sources = snapshot.sources || {};
+  const unavailable = ["docs/WORK.md", "docs/STATUS.md"].filter(
+    (path) => ["MISSING", "UNREADABLE"].includes(sources[path])
+  );
   const title = document.getElementById("work-title");
+  if (unavailable.length) {
+    title.innerHTML =
+      'Project State<span class="state unknown">UNAVAILABLE</span>';
+    const warning = document.getElementById("work-warning");
+    warning.style.display = "block";
+    warning.textContent = "STATE UNAVAILABLE：" + unavailable.map(
+      (path) => path + "=" + sources[path]
+    ).join(" · ");
+    document.getElementById("stage-row").innerHTML =
+      '<div class="stage unknown">Stage UNKNOWN</div>';
+    document.getElementById("agent-current").textContent = "Current Agent: UNKNOWN";
+    document.getElementById("work-details").innerHTML =
+      '<div class="empty">Run Yuan update/bootstrap to create only the missing Project Documents.</div>';
+    return;
+  }
   const state = status.work_state || (work.has_active_work ? "active" : "idle");
   title.innerHTML =
-    esc(status.work || "—") +
+    esc(status.work || (work.has_active_work ? "Active Work" : "—")) +
     '<span class="state ' + esc(state) + '">' + esc(state.toUpperCase()) + "</span>";
+
+  const checkpointMissing = work.has_active_work &&
+    (!status.work || !status.work_state || !status.workflow || !status.stage);
+  const warning = document.getElementById("work-warning");
+  warning.style.display = checkpointMissing ? "block" : "none";
+  warning.textContent = checkpointMissing
+    ? "STATUS checkpoint incomplete：已展示 WORK 中可确认的事实；Workflow、Stage、Agent 缺失项保持 UNKNOWN。"
+    : "";
 
   // Stage Timeline：stage 之后 done，当前 current
   const currentStage = status.stage;
@@ -57,10 +86,31 @@ function renderWork(snapshot) {
     el.textContent = stage;
     row.appendChild(el);
   });
+  if (work.has_active_work && !stages.length) {
+    const unknown = document.createElement("div");
+    unknown.className = "stage unknown";
+    unknown.textContent = "Stage UNKNOWN";
+    row.appendChild(unknown);
+  }
 
   const agent = status.agent || {};
   document.getElementById("agent-current").textContent =
-    agent.id ? "Current Agent: " + agent.id + " (" + (agent.state || "?") + ")" : "No active agent";
+    agent.id
+      ? "Current Agent: " + agent.id + " (" + (agent.state || "UNKNOWN") + ")"
+      : work.has_active_work ? "Current Agent: UNKNOWN" : "No active agent";
+
+  const details = [
+    ["Goal", work.goal],
+    ["Current Task", work.current_task],
+    ["Latest Result", work.latest_result],
+    ["Scope", work.scope],
+  ].filter(([, value]) => value);
+  document.getElementById("work-details").innerHTML = details.length
+    ? details.map(([label, value]) =>
+        '<div class="work-detail"><div class="label">' + esc(label) +
+        '</div><div class="value">' + esc(value) + "</div></div>"
+      ).join("")
+    : '<div class="empty">No observable Work details</div>';
 }
 
 function agentStatus(agentId, snapshot, signals, observation, coverage) {
@@ -74,6 +124,9 @@ function agentStatus(agentId, snapshot, signals, observation, coverage) {
     (s) => s.level === "MISSING" && (s.entity === agentId || String(s.entity).split("|").includes(agentId))
   );
   if (miss) return { cls: "missing", tag: "MISSING" };
+  if ((snapshot.work || {}).has_active_work && workflow.workflow_id === "unknown") {
+    return { cls: "unknown", tag: "UNKNOWN" };
+  }
   const required = (workflow.required_agents || []).includes(agentId);
   const group = (workflow.required_agent_groups || []).find((members) => members.includes(agentId));
   if (required || group) {

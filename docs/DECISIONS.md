@@ -54,8 +54,14 @@
 ## D-009：Update 只检查 Work 状态，不迁移 Project 内容
 
 - **Status**：Confirmed
-- **Decision**：Update 继续只替换官方受管资产并原样保留 Project-owned 文件；写入前仅检查 `STATUS.work_state`，只允许 `idle` / `paused`。未完成 Work 可保存 Checkpoint 后标记为 `paused`，下次 Session 原地恢复。
+- **Decision**：Update 继续只替换全部官方受管资产并原样保留 Project-owned 文件；写入前只阻止明确的 `STATUS.work_state: active`。旧格式、缺失或无法判定的状态直接放行，不需要迁移 Document 或传递额外参数。未完成 Work 可保存 Checkpoint 后标记为 `paused`，下次 Session 原地恢复。每次 Update 必须逐项输出实际保留的 Yuan-known 路径及原因。
 - **Reason**：Update 不应猜测或重写项目事实，但也不能在 Active Work 尚未形成可恢复点时改变 Framework Contract。
+
+## D-010：Yuan 路径使用三种逻辑定位符
+
+- **Status**：Confirmed
+- **Decision**：运行时契约使用 `project://`、`framework://`、`skill://` 分别表示 Project Root、带 Override 优先级的 Framework Root、当前 Skill Root。定位符不是文件夹名、环境变量或 URL，必须在文件操作前解析；禁止使用 `PROJECT_ROOT/...` 这类容易被误认为真实目录的占位表达。
+- **Reason**：根信息必须存在于每个路径本身，单 LLM、多 Agent 与不同 Platform 才能在没有隐含当前目录假设时得到同一解析结果。
 
 ## Historical Decision
 

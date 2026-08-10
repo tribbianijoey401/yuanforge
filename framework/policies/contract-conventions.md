@@ -1,9 +1,16 @@
 # contract-conventions.md — 角色层共享规约（只放真正不变的部分）
 
-> **vNext Scope：** Agent Contract 必须包含 Activation、Skill Assignment、Reference Boundary 与 Focused Output。是否调用 Agent 由 `routing.md` 决定；Agent 不直接读取 Reference。下文旧 Gate / Defensive Injection 格式仅在 Routing 选择相关 Policy 时适用。
+> **vNext Scope：** Agent Contract 必须包含 Activation、Skill Assignment、Reference Boundary 与 Focused Output。是否调用 Agent 由 `framework://policies/routing.md` 决定；Agent 不直接读取 Reference。下文旧 Gate / Defensive Injection 格式仅在 Routing 选择相关 Policy 时适用。
 
-> 本文件只承载「跨 agent 不变」的词汇与要求。各 agent 的**具体规则**（执行权限、冻结基准、对抗目标、输出列、门禁阈值、路由条目）写在各自合约里，**创建时定下**（见 `agents/contract-template.md`）。
+> 本文件只承载「跨 agent 不变」的词汇与要求。各 agent 的**具体规则**（执行权限、冻结基准、对抗目标、输出列、门禁阈值、路由条目）写在各自合约里，**创建时定下**（见 `framework://agents/contract-template.md`）。
 > 各 agent 合约**引用**本文件，不重抄正文。修改须走原子提交。
+
+## State Ownership
+
+- `conductor` 是 `project://docs/WORK.md` 与 `project://docs/STATUS.md` 的唯一正式 State Writer。
+- Specialist Agent 只返回 Focused Result 和可选 `work_updates`；它可以修改职责内 Artifact，但不得直接提交 Active Work 的 Workflow、Stage、Agent、Current Task、Latest Result 或 Open Findings。
+- Conductor 在 Dispatch 前和 Focused Result 返回后各执行一次 State Commit。单 LLM Persona Switch 也必须回到 Conductor commit，不能把“同一进程”当作跳过状态维护的理由。
+- Insight 只读观察 Project State；Insight transition index 不写回 `project://docs/STATUS.md`。
 
 ## Skill Assignment 三档语义（统一标注）
 
@@ -16,7 +23,7 @@
 标注格式示例：
 
 ```text
-Skill Assignment：Required `skills/<skill-a>.md`；Recommended `skills/<skill-b>.md`；Conditional `skills/<skill-c>.md`（仅 Bug 时）。
+Skill Assignment：Required `framework://skills/<skill-a>.md`；Recommended `framework://skills/<skill-b>.md`；Conditional `framework://skills/<skill-c>.md`（仅 Bug 时）。
 ```
 
 （`<...>` 是占位符，不是真实路径；实际合约必须引用存在的 Skill 文件。）
@@ -44,9 +51,9 @@ Insight 与 Reviewer 按此语义解释 Expected Skill；未标注的 Skill 视�
 
 ## 路由表 schema（列定义）+ 引用
 列：触发源 | 失败/打回类型 | 路由目标 | 触发条件。
-> 具体路由表**不在此处**——它随 Agent 增减 / 职责微调频繁变动，属「协调规则」而非「不变词汇」，故独立为 `dispatch-routing.md`（与 `iron-rules.md` 平级），单源、独立演进、改动不震荡内核。
-> 本文件只定义列 schema；各 agent 合约在「路由条目」段声明自己提出的类型与去向，须与 `dispatch-routing.md` 一致。
+> 具体路由表**不在此处**——它随 Agent 增减 / 职责微调频繁变动，属「协调规则」而非「不变词汇」，故独立为 `framework://policies/dispatch-routing.md`，单源、独立演进、改动不震荡内核。
+> 本文件只定义列 schema；各 agent 合约在「路由条目」段声明自己提出的类型与去向，须与 `framework://policies/dispatch-routing.md` 一致。
 
 ## 升级 / 阻塞 / Human Gate 的最终裁决（与 Runtime 协议衔接）
-- 各 agent 合约中关于「何时升级 / 何时阻塞 / 何时需 Human 确认」的描述，**只是报告口径**；最终由 Conductor 依据 `policies/core.md`（连续返工升级闸门）与 `policies/routing.md` §十.2（四级 Human Gate：HG1–HG4）统一执行。
+- 各 agent 合约中关于「何时升级 / 何时阻塞 / 何时需 Human 确认」的描述，**只是报告口径**；最终由 Conductor 依据 `framework://policies/core.md` 与 `framework://policies/routing.md` 统一执行。
 - Agent 只负责**报告异常**（附依据 + 复现），**不自行触发 Loop 控制或 Human Gate**。

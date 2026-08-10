@@ -16,6 +16,11 @@ verification:
 risks:
   - <open risk>
 next: <recommended next action>
+work_updates:
+  current_task: <optional proposed text>
+  latest_result: <optional proposed text>
+  open_findings:
+    - <optional unresolved obligation>
 ```
 
 语义约束：
@@ -23,6 +28,7 @@ next: <recommended next action>
 - `outcome` 是 Agent 对自身工作的报告，**不等于 Task Done**。Conductor 根据 Done Conditions 判断任务是否真正满足完成标准。
 - `skills_applied` 语义是 "Agent **reported applied** this Skill"，不是 "verified executed"。它用于：Conductor 知道采用的方法、Reviewer 基于上游方法审查、Correction Routing 避免机械重复、失败 Workflow 知道已尝试过什么。
 - `skills_applied` 只在当前 Work 有意义（暂存于 WORK Latest Result），不进入长期 Memory。
+- `work_updates` 是给 Conductor 的提案，不是 Specialist 直接修改 `project://docs/WORK.md` / `project://docs/STATUS.md` 的授权。Conductor 判断 Done Conditions、去重并提交正式状态。
 
 ## Handoff Dispatch Contract
 

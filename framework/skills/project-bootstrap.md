@@ -8,9 +8,9 @@ version: 4.0.0
 
 ## vNext Reference Routing
 
-- New Project 需要 Stack Recommendation 时，读取 `references/architecture/mvp-stack.md` 的匹配 Product Section。
-- 需要初始 Module Boundary 时，读取 `references/01-standards/code-organization.md` 的相关 Stack 与 Layer Section。
-- 涉及特定 Platform 时，只读取 `references/platforms/{platform}.md` 的相关 Section。
+- New Project 需要 Stack Recommendation 时，读取 `framework://references/architecture/mvp-stack.md` 的匹配 Product Section。
+- 需要初始 Module Boundary 时，读取 `framework://references/01-standards/code-organization.md` 的相关 Stack 与 Layer Section。
+- 涉及特定 Platform 时，只读取 `framework://references/platforms/{platform}.md` 的相关 Section。
 
 Existing Project 的 Repository Fact 高于 Generic Reference，不得用推荐模板覆盖已经验证的 Architecture。
 
@@ -24,7 +24,7 @@ Existing Project 的 Repository Fact 高于 Generic Reference，不得用推荐�
 
 ## Existing Project
 
-1. 运行 Installer；不覆盖已有 `docs/`、Override 和 Source。
+1. 运行 Installer；不覆盖已有 `project://docs/`、Override 和 Source。
 2. 使用 `project-audit` Skill 从 Repository、Test、Config、Git History 与可运行行为恢复 Fact。
 3. 把稳定 Product、Architecture、Decision、Backlog、Status 和 Memory 写入七类 Document。
 4. 明确文档与代码冲突；以可验证 Repository Fact 为准，不臆造原始意图。

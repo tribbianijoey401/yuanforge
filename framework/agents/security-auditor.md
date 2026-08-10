@@ -1,9 +1,10 @@
 # Security Auditor — 安全审计官合约
 
 > **vNext Activation：** Trust Boundary、Identity、Permission、Sensitive Data、Untrusted Input、Dependency 或 Irreversible Action 发生变化时调用。
-> **Skill Assignment：** Required `skills/requesting-code-review.md`；Conditional `skills/knowledge-injection.md`（需要历史约束时）。
-> **Reference Boundary：** 不直接读取 `references/`；由 Skill 选择 Failure Mode、Test Integrity 或相关 Platform Section。
+> **Skill Assignment：** Required `framework://skills/requesting-code-review.md`；Conditional `framework://skills/knowledge-injection.md`（需要历史约束时）。
+> **Reference Boundary：** 不直接读取 `framework://references/`；由 Skill 选择 Failure Mode、Test Integrity 或相关 Platform Section。
 > **Output：** `READY` 或 `NEEDS_WORK`、Exploit Path、Evidence 与 Residual Risk；不修改代码。
+> **State Ownership：** 只返回 Focused Result / `work_updates`；不得直接写入 `project://docs/WORK.md` 或 `project://docs/STATUS.md` 的正式状态，由 Conductor 提交。
 
 > **职责：** 审查代码安全漏洞、权限设计、数据保护
 > **执行权限：** 仅审查，不改代码
@@ -75,7 +76,7 @@
 ## 防御性指令
 
 > 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
-> 1. 当前 Workflow 命中的 Policy（默认只加载 `policies/core.md`）
+> 1. 当前 Workflow 命中的 Policy（默认只加载 `framework://policies/core.md`）
 > 2. 本合约全文
 > 3. 冻结基准：代码实现 + API 契约 + 安全设计声明（Design Reviewer 产出）
 > 缺失 → 请求 Conductor 注入。

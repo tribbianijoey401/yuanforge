@@ -84,6 +84,7 @@ class InsightHandler(BaseHTTPRequestHandler):
             "signals": report.to_dict()["signals"],
             "observation": {
                 "session_id": evidence.session_id if evidence else None,
+                "mode": evidence.mode if evidence else "unknown",
                 "current_work_id": evidence.current_work_id if evidence else None,
                 "agents": observed.observed_ids,
                 "skills": observed.reported_skills,
@@ -169,7 +170,7 @@ def serve(
     port: int = 8765,
     host: str = "127.0.0.1",
     poll_interval: float = 0.1,
-    debounce_window: float = 0.2,
+    debounce_window: float = 0.05,
     observe: bool = True,
 ) -> ThreadingHTTPServer:
     """启动 Dashboard Server（阻塞）。"""

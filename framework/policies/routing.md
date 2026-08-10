@@ -6,14 +6,18 @@ Routing 只决定“当前需要谁”。专业方法由 Agent 选择的 Skill �
 
 | Request Signal | Workflow |
 |---|---|
-| 文案、格式、注释、局部机械修改，Scope 清楚且 Risk 很低 | `workflows/small-change.md` |
-| Bug、异常、Regression、间歇失败，或已有修复未解决 | `workflows/complex-bug.md` |
-| 新增或改变用户可观察 Behavior，可在一个 Work 内确认 | `workflows/new-feature.md` |
-| 目标模糊、跨多个 Feature、需要分阶段交付或 Architecture 影响广泛 | `workflows/large-project.md` |
+| 文案、格式、注释、局部机械修改，Scope 清楚、Risk 很低，且不修复错误行为 | `framework://workflows/small-change.md` |
+| Bug、异常、Regression、间歇失败、已有修复未解决或上次只完成一部分 | `framework://workflows/complex-bug.md` |
+| 新增或改变用户可观察 Behavior，可在一个 Work 内确认 | `framework://workflows/new-feature.md` |
+| 目标模糊、跨多个 Feature、需要分阶段交付或 Architecture 影响广泛 | `framework://workflows/large-project.md` |
 
 ## Agent Assignment
 
-> 权威源：每个 Primary Workflow 文件（`workflows/*.md`）的 frontmatter 只声明 `required_agents / required_agent_groups / optional_agents`。下表是快速参考，供 Conductor 开场恢复与人工浏览；发生冲突时以 Workflow 文件为准。Workflow 和 Routing 不选择 Skill。
+> 权威源：每个 Primary Workflow 文件（`framework://workflows/*.md`）的 frontmatter 只声明 `required_agents / required_agent_groups / optional_agents`。下表是快速参考，供 Conductor 开场恢复与人工浏览；发生冲突时以 Workflow 文件为准。Workflow 和 Routing 不选择 Skill。
+
+### Signal Precedence
+
+Bug、Regression、Failed Attempt、Partial Previous Fix 信号高于“文件少、改动小、先简单处理”等 Scope 信号；命中任一前者时不得选择 Small Change。Small Change 只适用于不改变用户可观察 Behavior、不修复错误行为、没有遗留半成品且可以局部机械验证的修改。
 
 | Workflow | Required Agent | Conditional Agent |
 |---|---|---|
@@ -37,6 +41,7 @@ Frontend 与 Backend 同时涉及代码时仍保持一个 Writer，按可验证 
 - 属于当前 Acceptance Criteria 的必要补充：纳入 Active Work；
 - 与当前 Work 无关：进入 Backlog；
 - 紧急 Bug：先保存 Work Checkpoint，再暂停、修复、验证并恢复；
+- 用户主动 Pause：不重新 Routing，不新增 Workflow Stage；保存 Checkpoint 后停止派发，Resume 时回到原 Workflow 与 Stage；
 - Scope 或 Risk 明显增长：升级 Workflow，并在 Work 中记录原因。
 
 ## Dependency Enforcement

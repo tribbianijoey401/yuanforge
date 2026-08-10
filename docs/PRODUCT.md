@@ -26,10 +26,13 @@ Yuan 不替代 Agent Platform。LLM 负责推理，Platform 负责文件、命�
 
 1. 一个 Project 默认只有一个 Active Work；无关新需求进入 `BACKLOG.md`。
 2. 紧急 Bug 可以中断，但必须先保存原 Work Checkpoint，修复后再恢复，禁止双写并发。
-3. 默认只有一个 Implementation Writer；其他 Agent 负责澄清、设计、验证或独立 Review。
-4. 用户主要确认 Scope、Acceptance、Business Rule、关键 Experience 和不可逆 Decision。
-5. Yuan 应给出明确推荐及主要 Trade-off，不能把所有技术选择抛给非技术用户。
-6. 对外只展示 Focused Summary；内部角色全文不默认暴露，也不默认进入长期 Memory。
+3. 用户明确说先离开、挂起或暂停时，任何 Workflow 都必须保存可恢复 Checkpoint、停止派发，并在用户继续时从原 Stage 的 Next Action 恢复。
+4. 默认只有一个 Implementation Writer；其他 Agent 负责澄清、设计、验证或独立 Review。
+5. 用户主要确认 Scope、Acceptance、Business Rule、关键 Experience 和不可逆 Decision。
+6. Yuan 应给出明确推荐及主要 Trade-off，不能把所有技术选择抛给非技术用户。
+7. 对外只展示 Focused Summary；内部角色全文不默认暴露，也不默认进入长期 Memory。
+8. Project、Framework 与 Skill-local 文件必须通过无歧义逻辑定位符引用；用户和 Agent 不需要猜测当前目录或同名文件属于哪一层。
+9. Project State 文件缺失是安装/状态不可用，不是 Idle；Update 只补缺失模板并保留全部已有 Project 内容。
 
 ## Non-goals
 

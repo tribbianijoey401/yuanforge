@@ -8,26 +8,26 @@ trigger: UI Designer 或 UX Reviewer 遇到特定行业/产品类型的 UX 惯�
 
 ## vNext Reference Routing
 
-- 首先根据 Industry / Product Signal 查询本 Skill 的 `references/*.csv`，只读取匹配行。
-- 需要 Design Token：读取 Framework Root 下 `references/design-systems/token-standard.md` 的相关 Section。
-- 需要 Color / Typography / Landing Pattern：分别读取 `references/design-systems/color-palettes.md`、`typography-pairings.md`、`landing-patterns.md` 的匹配 Section。
-- 已知 Industry：只读取 `references/industries/{industry}.md` 的相关体验原则，不读取全部 Industry Reference。
+- 首先根据 Industry / Product Signal 查询本 Skill 的 `skill://references/*.csv`，只读取匹配行。
+- 需要 Design Token：读取 `framework://references/design-systems/token-standard.md` 的相关 Section。
+- 需要 Color / Typography / Landing Pattern：分别读取 `framework://references/design-systems/color-palettes.md`、`framework://references/design-systems/typography-pairings.md`、`framework://references/design-systems/landing-patterns.md` 的匹配 Section。
+- 已知 Industry：只读取 `framework://references/industries/{industry}.md` 的相关体验原则，不读取全部 Industry Reference。
 
-> 数据内嵌于 `references/` 目录。来源：[UI-UX-Pro-Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
+> 数据内嵌于 `skill://references/`。这里的 Skill Root 是当前 `SKILL.md` 所在目录。来源：[UI-UX-Pro-Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
 
 ## 可用数据集
 
 | 文件 | 行数 | 内容 |
 |------|------|------|
-| `references/ui-reasoning.csv` | 161 | 行业 → 推荐模式 + 风格优先级 + 色彩情绪 + 字体个性 + 反模式（**核心文件**） |
-| `references/styles.csv` | 67 | UI 风格详情（关键词、适用场景、禁用场景、色彩、动效、实现清单） |
-| `references/ux-guidelines.csv` | 99 | UX 最佳实践 + 反模式（导航、表单、无障碍、性能、动效、触摸……） |
-| `references/landing.csv` | 24 | Landing Page 布局模式（Hero-Centric / Conversion / Feature-Rich……） |
-| `references/products.csv` | 161 | 产品/行业分类索引 |
+| `skill://references/ui-reasoning.csv` | 161 | 行业 → 推荐模式 + 风格优先级 + 色彩情绪 + 字体个性 + 反模式（**核心文件**） |
+| `skill://references/styles.csv` | 67 | UI 风格详情（关键词、适用场景、禁用场景、色彩、动效、实现清单） |
+| `skill://references/ux-guidelines.csv` | 99 | UX 最佳实践 + 反模式（导航、表单、无障碍、性能、动效、触摸……） |
+| `skill://references/landing.csv` | 24 | Landing Page 布局模式（Hero-Centric / Conversion / Feature-Rich……） |
+| `skill://references/products.csv` | 161 | 产品/行业分类索引 |
 
 ## 查询方法
 
-> 数据文件位于本 Skill 的 `references/` 目录。用 `grep` 本地查询，零网络依赖。
+> 数据文件位于 `skill://references/`。执行命令前先把逻辑定位符解析成当前 Skill 的真实目录；用本地文本搜索，零网络依赖。
 
 ### 1. 按行业查设计建议（最常用）
 
@@ -43,7 +43,7 @@ grep -i "<行业关键词>" <skill_dir>/references/ui-reasoning.csv
 
 示例：
 ```bash
-grep -i "beauty\|spa\|wellness" references/ui-reasoning.csv
+grep -i "beauty\|spa\|wellness" <skill_dir>/references/ui-reasoning.csv
 # → Beauty/Spa → Soft UI Evolution + Organic Biophilic
 # → 色彩: soft pink + sage green + gold
 # → 反模式: bright neon colors + harsh animations + dark mode + AI purple/pink gradients
@@ -62,7 +62,7 @@ grep -i "<风格名>" <skill_dir>/references/styles.csv
 
 示例：
 ```bash
-grep -i "glassmorphism" references/styles.csv
+grep -i "glassmorphism" <skill_dir>/references/styles.csv
 # → 关键词: frosted glass, blur, transparency, layered
 # → 最适合: modern SaaS, financial dashboards
 # → 不适合: critical accessibility, low-contrast environments
@@ -81,7 +81,7 @@ grep -i "<类别>" <skill_dir>/references/ux-guidelines.csv
 
 示例：
 ```bash
-grep -i "form\|accessibility\|animation" references/ux-guidelines.csv
+grep -i "form\|accessibility\|animation" <skill_dir>/references/ux-guidelines.csv
 ```
 
 ### 4. 查 Landing Page 模式

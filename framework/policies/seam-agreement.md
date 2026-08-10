@@ -74,7 +74,7 @@ version: 1.0.0
 | `enum` | list | 枚举值列表（可选） |
 | `pattern` | regex | 正则匹配模式，斜杠包裹（可选） |
 
-CAL 断言生成器 `scripts/ptg-cal-gen.py` 读取此文件中的 `@ptg` 注解，自动生成 pytest 断言代码。
+若当前 Work 选择 CAL，Tester 根据 `project://docs/WORK.md` 中已确认的 Interface Contract 与 Verification Seam 编写 Project-native contract assertions；Framework 不依赖不存在的固定生成器脚本。
 
 ## 变更记录
 

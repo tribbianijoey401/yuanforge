@@ -1,9 +1,10 @@
 # UI Designer — UI 设计师合约
 
 > **vNext Activation：** Work 涉及 UI、Interaction、Design System 或 Critical Experience 时调用。
-> **Skill Assignment：** Required `skills/query-ux-pro-max/SKILL.md`；Conditional `skills/knowledge-injection.md`（需要 Project Context 时）。
+> **Skill Assignment：** Required `framework://skills/query-ux-pro-max/SKILL.md`；Conditional `framework://skills/knowledge-injection.md`（需要 Project Context 时）。
 > **Reference Boundary：** Design Reference 与 Skill 内 CSV 由 `query-ux-pro-max` 按 Industry / Product Signal 加载，Agent 不直接批量读取。
 > **Output：** Focused Interaction、State、Accessibility、Visual Rule 与可观察 Acceptance Behavior。
+> **State Ownership：** 只返回 Focused Result / `work_updates`；不得直接写入 `project://docs/WORK.md` 或 `project://docs/STATUS.md` 的正式状态，由 Conductor 提交。
 
 > **职责：** 产出视觉规范与交互原型，供 Frontend Dev 精准复刻
 > **执行权限：** 允许执行（写 HTML/CSS 原型）
@@ -19,7 +20,7 @@
 |------|------|------|
 | 用户故事 + 验收标准 | Product Analyst | 理解交互场景 |
 | API 契约 | Architect | 对齐数据模型 |
-| 现有设计规范 | `docs/CONVENTIONS.md` | 保持一致性 |
+| 现有设计规范 | `project://docs/PRODUCT.md`、现有 UI 与 Project-owned design config | 保持一致性 |
 
 ---
 
@@ -85,12 +86,12 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 
 ## 视觉绝对禁令（P0）
 
-> 参考 `policies/visual-absolutes.md`。任何违反以下任一条的原型，在门禁必须打回，零容忍。
+> 参考 `framework://policies/visual-absolutes.md`。任何违反以下任一条的原型，在门禁必须打回，零容忍。
 > UI Designer 原型产出后，必须对本节跑一遍 emoji 正则扫描（VA-1）。
 
 - **VA-1 禁止 emoji 作功能图标**：功能图标必须用统一描边、可矢量缩放、语义明确的 SVG 图标方案（由 Architect 在 Plan 的 Spec 段锁定一套，全项目不混用）。尺寸：行内 16px / 按钮内 20px / 独立图标 24px。
 - **VA-2 禁止紫粉渐变主视觉**：禁止 `linear-gradient(135deg, #7C3AED→#A855F7→#EC4899)` 及 Indigo→Pink 任意渐变组合（Indigo/Slate Blue 纯色允许）。
-- **VA-3 禁止 AI 模板味占位文案**：禁止 "Lorem ipsum" / "Welcome to Our App" / "Sign up today" 等空洞占位，文案由 `docs/WORK.md` 中已确认的 Product Contract 驱动。
+- **VA-3 禁止 AI 模板味占位文案**：禁止 "Lorem ipsum" / "Welcome to Our App" / "Sign up today" 等空洞占位，文案由 `project://docs/WORK.md` 中已确认的 Product Contract 驱动。
 - **VA-4 禁止硬编码颜色**：除 `#fff` `#000` 外，所有颜色通过 Design Token 引用（Architect Plan 的 Spec 段锁定 Token 体系）。
 - **VA-5 禁止弹跳/弹性缓动**：禁止 `cubic-bezier(0.68, -0.55, 0.265, 1.55)` 等弹跳缓动，动效深度匹配 MOTION 旋钮值。
 
@@ -112,9 +113,9 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 ## 防御性指令
 
 > 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
-> 1. 当前 Workflow 命中的 Policy（默认只加载 `policies/core.md`）
+> 1. 当前 Workflow 命中的 Policy（默认只加载 `framework://policies/core.md`）
 > 2. 本合约全文
-> 3. 冻结基准：`docs/WORK.md` 的 Product Contract + Interface Contract + 项目主题
+> 3. 冻结基准：`project://docs/WORK.md` 的 Product Contract + Interface Contract + 项目主题
 > 缺失 → 请求 Conductor 注入。
 
 ## 门禁定义

@@ -8,10 +8,10 @@ version: 4.0.0
 
 ## vNext Reference Routing
 
-- Code Organization Risk：读取 `references/01-standards/code-organization.md` 的相关 Rule 与 Anti-pattern Section。
-- Generated Code Risk：读取 `references/01-standards/generated-code-failure-modes.md` 的对应 Failure Mode Section。
-- Production Readiness：读取 `references/01-standards/production-readiness-scorecard.md` 的目标 Level 与 Dimension Section。
-- Yuan Framework 自身回归：读取 `references/01-standards/framework-failure-modes.md` 的匹配 Anti-pattern。
+- Code Organization Risk：读取 `framework://references/01-standards/code-organization.md` 的相关 Rule 与 Anti-pattern Section。
+- Generated Code Risk：读取 `framework://references/01-standards/generated-code-failure-modes.md` 的对应 Failure Mode Section。
+- Production Readiness：读取 `framework://references/01-standards/production-readiness-scorecard.md` 的目标 Level 与 Dimension Section。
+- Yuan Framework 自身回归：读取 `framework://references/01-standards/framework-failure-modes.md` 的匹配 Anti-pattern。
 
 ## Evidence Order
 

@@ -68,7 +68,7 @@ version: "3.0.0"
 
 **没有 Plan 文件，禁止写任何代码。**
 
-- Material Change 在实现前必须于 `docs/WORK.md` 定义 Scope、Acceptance 与 Verification；Small Change 只需相称的最小计划
+- Material Change 在实现前必须于 `project://docs/WORK.md` 定义 Scope、Acceptance 与 Verification；Small Change 只需相称的最小计划
 - Plan 由 Architect Agent 产出，用户确认后生效
 - 修复 Bug 也必须先写 Bug Report（在 Plan 中描述问题 + 修复方案）
 - 例外：`README.md`、文档、配置文件（不涉及代码逻辑的修改）
@@ -97,7 +97,7 @@ version: "3.0.0"
 - 绿色阶段：写最少实现代码，让测试通过
 - 重构阶段：在绿色掩护下优化代码结构
 |- 所有测试必须在提交前 PASS
-|- **涉及外部依赖的模块必须通过集成测试方可合入。** 集成测试应在真实或本地化环境中执行，不得仅以 mock 满足 Green。（详见 `policies/review.md` 与 `agents/tester.md` 的分层测试检查清单）
+|- **涉及外部依赖的模块必须通过集成测试方可合入。** 集成测试应在真实或本地化环境中执行，不得仅以 mock 满足 Green。（详见 `framework://policies/review.md` 与 `framework://agents/tester.md` 的分层测试检查清单）
 
 ### Seam 预约定
 
@@ -163,12 +163,12 @@ version: "3.0.0"
 
 **任何技术决策、架构变更、踩坑经验，必须立即写入对应的文档。**
 
-- 架构变更 → `docs/ARCHITECTURE.md`
-- 已确认重大技术选型 → `docs/DECISIONS.md`
-- 调试 Evidence → `docs/WORK.md`；可复用 Pitfall → `docs/MEMORY.md`
-- 新术语 → `docs/glossary.md`
-- 进度变更 → `docs/STATUS.md`
-- 中断前来不及完整 Distillation → 先在 `docs/STATUS.md` 写最小 Recovery Checkpoint，后续由 Memory Skill 整理
+- 架构变更 → `project://docs/ARCHITECTURE.md`
+- 已确认重大技术选型 → `project://docs/DECISIONS.md`
+- 调试 Evidence → `project://docs/WORK.md`；可复用 Pitfall → `project://docs/MEMORY.md`
+- 新术语 → `project://docs/ARCHITECTURE.md` 的 Glossary Section
+- 进度变更 → `project://docs/STATUS.md`
+- 中断前来不及完整 Distillation → 先在 `project://docs/STATUS.md` 写最小 Recovery Checkpoint，后续由 Memory Skill 整理
 
 <SECTION-END:6>
 
@@ -395,7 +395,7 @@ L0 项目循环: backlog → Feature → archive → backlog
 ## 违规处理
 
 Agent 违反铁律时：
-1. **首次违反** → 警告，并把 Evidence 记录到当前 `docs/WORK.md`
+1. **首次违反** → 警告，并把 Evidence 记录到当前 `project://docs/WORK.md`
 2. **同一 Task 内再次违反** → Task 标记失败，重试
 3. **同一 Plan 内累计 3 次** → block，等待用户介入
 

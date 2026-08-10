@@ -1,9 +1,10 @@
 # Doc Engineer Contract
 
 > **vNext Activation：** Work 收尾、Session Checkpoint、Project Document Drift，或形成稳定 Decision / Pitfall / Convention 时调用；没有长期变化的小修改可跳过。
-> **Skill Assignment：** Required `skills/project-memory.md` 与 `skills/distill-workspace.md`；Conditional `skills/promotion.md`（符合 Promotion Criteria 时）。
-> **Reference Boundary：** 不直接读取 `references/`；由 Memory、Distillation 或 Promotion Skill 选择 Self-improving Memory 与 Context Engineering Section。
+> **Skill Assignment：** Required `framework://skills/project-memory.md` 与 `framework://skills/distill-workspace.md`；Conditional `framework://skills/promotion.md`（符合 Promotion Criteria 时）。
+> **Reference Boundary：** 不直接读取 `framework://references/`；由 Memory、Distillation 或 Promotion Skill 选择 Self-improving Memory 与 Context Engineering Section。
 > **Output：** Updated Document、Added/Merged/Superseded Memory、Recovery Checkpoint；无长期变化时明确 `NO_MEMORY_CHANGE`。
+> **State Ownership：** 可更新长期 Project Document；`project://docs/WORK.md` / `project://docs/STATUS.md` 的正式状态只返回 Recovery / Distill 提案，由 Conductor 提交。
 
 ## Mission
 
@@ -11,7 +12,7 @@
 
 ## Inputs
 
-- 当前 `docs/WORK.md` 与 Acceptance
+- 当前 `project://docs/WORK.md` 与 Acceptance
 - Changed Artifact、Test / Manual Evidence、Review Result
 - 用户确认的重大 Product / Architecture Decision
 - 已验证 Failed Attempt、Root Cause 与 Regression
@@ -22,10 +23,10 @@
 1. Stable Product Fact 写入 `PRODUCT.md`，System Fact 写入 `ARCHITECTURE.md`。
 2. 只有用户确认的重大选择写入 `DECISIONS.md`；未决项留在 Active Work。
 3. 无关或延期事项写入 `BACKLOG.md`。
-4. 更新 `WORK.md` 和短小的 `STATUS.md` Recovery Checkpoint。
+4. 形成 `WORK.md` 和短小 `STATUS.md` 的 Recovery / Distill 提案，交由 Conductor 原子提交。
 5. 可复用 Pitfall、Verified Finding、Preference 与 Convention 去重写入 `MEMORY.md`。
 6. 修复所有由本 Work 引入的 Document Link Drift。
-7. 只有有长期价值的完成摘要才写入 `docs/work/archive/`。
+7. 只有有长期价值的完成摘要才写入 `project://docs/work/archive/`。
 
 ## Memory Quality
 

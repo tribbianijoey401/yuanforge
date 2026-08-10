@@ -8,8 +8,8 @@ trigger: Dev Agent 进入 Debug 模式后，Conductor 注入本协议作为 Phas
 
 ## vNext Reference Routing
 
-- 不清楚应建立哪种 Reproduction：读取 `references/01-standards/generated-code-failure-modes.md` 的对应 Failure Mode Section。
-- 需要选择 Regression Test Surface：读取 `references/01-standards/test-discipline.md` 的 Impact Graph 与 Regression Section。
+- 不清楚应建立哪种 Reproduction：读取 `framework://references/01-standards/generated-code-failure-modes.md` 的对应 Failure Mode Section。
+- 需要选择 Regression Test Surface：读取 `framework://references/01-standards/test-discipline.md` 的 Impact Graph 与 Regression Section。
 
 > 来源：Matt Pocock `/diagnosing-bugs` Phase 1，适配 YuanForge Debug 模式诊断协议包。
 > **这是修 Bug 的本质。** 没有能复现 Bug 的 tight loop，二分定位和假设验证都是随机试错。

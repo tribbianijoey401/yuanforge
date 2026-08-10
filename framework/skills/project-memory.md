@@ -8,25 +8,25 @@ version: 4.0.0
 
 ## vNext Reference Routing
 
-- 设计 Memory 生命周期、去重和 Regression 时，读取 `references/01-standards/self-improving-memory.md` 的相关 Section。
-- 设计有限 Context Recovery 或处理 Context Loss 时，读取 `references/01-standards/context-engineering.md` 的 JIT、Compaction 和 Scratchpad Section。
+- 设计 Memory 生命周期、去重和 Regression 时，读取 `framework://references/01-standards/self-improving-memory.md` 的相关 Section。
+- 设计有限 Context Recovery 或处理 Context Loss 时，读取 `framework://references/01-standards/context-engineering.md` 的 JIT、Compaction 和 Scratchpad Section。
 
 ## Truth Model
 
 | Document | Memory Type | Update Moment |
 |---|---|---|
-| `docs/PRODUCT.md` | Stable Product Fact / Rule / Boundary | 事实确认后 |
-| `docs/ARCHITECTURE.md` | Current Structure / Interface / Constraint | 实现验证后 |
-| `docs/DECISIONS.md` | Confirmed Major Decision | 用户确认后 |
-| `docs/BACKLOG.md` | Inactive Request / Deferred Item | 与 Active Work 无关时 |
-| `docs/WORK.md` | Single Active Work | Goal、Scope、Plan、Progress 变化时 |
-| `docs/STATUS.md` | Short Recovery Checkpoint | 里程碑、中断、阻塞、Session 结束时 |
-| `docs/MEMORY.md` | Reusable Finding / Pitfall / Preference / Convention | 有稳定证据时 |
+| `project://docs/PRODUCT.md` | Stable Product Fact / Rule / Boundary | 事实确认后 |
+| `project://docs/ARCHITECTURE.md` | Current Structure / Interface / Constraint | 实现验证后 |
+| `project://docs/DECISIONS.md` | Confirmed Major Decision | 用户确认后 |
+| `project://docs/BACKLOG.md` | Inactive Request / Deferred Item | 与 Active Work 无关时 |
+| `project://docs/WORK.md` | Single Active Work | Goal、Scope、Plan、Progress 变化时 |
+| `project://docs/STATUS.md` | Short Recovery Checkpoint | 里程碑、中断、阻塞、Session 结束时 |
+| `project://docs/MEMORY.md` | Reusable Finding / Pitfall / Preference / Convention | 有稳定证据时 |
 
 ## Resume
 
-1. 先读 `STATUS.md`。
-2. 有 Active Work 时读 `WORK.md` 的 Goal、Acceptance、Progress、Verification 和 Next Action。
+1. 先读 `project://docs/STATUS.md`。
+2. 有 Active Work 时读 `project://docs/WORK.md` 的 Goal、Acceptance、Progress、Verification 和 Next Action。
 3. 根据当前 Request 只检索相关 Product、Architecture、Decision 与 Memory Section。
 4. 区分 `Verified Fact`、`User-confirmed Decision`、`Hypothesis` 和 `Historical Note`；Hypothesis 不得伪装成长期事实。
 
@@ -40,10 +40,14 @@ Work 收尾且尚未报告完成时：
 
 1. 更新真实 Project Fact，而不是保留过时描述。
 2. 合并重复 Memory；保留最小 Reproduction、Verified Cause 和 Prevention Rule。
-3. 重大 Decision 写入 `DECISIONS.md`，并标记被 Supersede 的旧 Decision。
-4. 未完成且不属于 Active Work 的 Item 写入 `BACKLOG.md`。
-5. 只有有长期价值的完成摘要才进入 `docs/work/archive/`。
-6. 在 `Open Findings = 0` 且上述信息已归位后，将 `WORK.md` 和 `STATUS.md` 同时清为 no active work。
+3. 重大 Decision 写入 `project://docs/DECISIONS.md`，并标记被 Supersede 的旧 Decision。
+4. 未完成且不属于 Active Work 的 Item 写入 `project://docs/BACKLOG.md`。
+5. 只有有长期价值的完成摘要才进入 `project://docs/work/archive/`。
+6. 在 `Open Findings = 0` 且上述信息已归位后，向 Conductor 返回同时清理 `project://docs/WORK.md` 和 `project://docs/STATUS.md` 的 Distill 提案；只有 Conductor 正式提交 no active work。
+
+## State Ownership
+
+本 Skill 可以维护长期 Project Document，但 WORK / STATUS 的 Activation、Checkpoint、Pause、Resume 与 Completion 只产生 `work_updates`，不得由 Specialist 直接提交。
 
 ## Exclusions
 

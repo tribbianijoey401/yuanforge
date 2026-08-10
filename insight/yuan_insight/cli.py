@@ -86,7 +86,7 @@ def _run_watch(root: Path, poll_interval: float, debounce: float) -> int:
         while True:
             update = observer.poll_once()
             if update is None:
-                time.sleep(poll_interval)
+                observer.wait_for_change()
                 continue
             if update.transition:
                 _emit({"status": "TRANSITION", "transition": update.transition})
@@ -110,8 +110,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--signals", action="store_true", help="计算并输出 Signals（Expected vs Observed）")
     parser.add_argument("--web", action="store_true", help="启动 Dashboard Server（/api/state + 静态 UI）")
     parser.add_argument("--port", type=int, default=8765, help="Dashboard 端口（默认 8765）")
-    parser.add_argument("--poll", type=float, default=0.5, help="轮询间隔秒数（默认 0.5）")
-    parser.add_argument("--debounce", type=float, default=0.4, help="debounce 窗口秒数（默认 0.4）")
+    parser.add_argument("--poll", type=float, default=0.5, help="原生监听不可用时的轮询间隔（默认 0.5）")
+    parser.add_argument("--debounce", type=float, default=0.05, help="文件写入稳定窗口秒数（默认 0.05）")
     args = parser.parse_args(argv)
     try:
         if args.once:

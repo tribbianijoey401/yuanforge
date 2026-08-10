@@ -58,6 +58,11 @@ quality:
 
 
 class ServerTests(unittest.TestCase):
+    def test_missing_state_is_rendered_as_unavailable_not_idle(self):
+        app = (ROOT / "insight" / "web" / "app.js").read_text(encoding="utf-8")
+        self.assertIn("STATE UNAVAILABLE", app)
+        self.assertIn('class="state unknown">UNAVAILABLE', app)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.project = make_project(Path(self.temp.name))
@@ -81,6 +86,7 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(data["snapshot"]["status"]["work"], "BUG-010")
         self.assertIn("backend-dev", data["registry"]["agents"])
         self.assertEqual(data["coverage"], "PARTIAL")
+        self.assertTrue(data["observation"]["mode"].startswith("native-") or data["observation"]["mode"] == "polling-fallback")
 
     def test_dashboard_observer_records_transition(self):
         (self.project / "docs" / "STATUS.md").write_text(
@@ -119,6 +125,18 @@ quality:
         with urlopen(f"http://127.0.0.1:{self.port}/static/app.js", timeout=5) as response:
             js = response.read().decode("utf-8")
         self.assertIn("api/state", js)
+
+    def test_dashboard_exposes_work_fallback_for_incomplete_status(self):
+        with urlopen(f"http://127.0.0.1:{self.port}/", timeout=5) as response:
+            html = response.read().decode("utf-8")
+        with urlopen(f"http://127.0.0.1:{self.port}/static/app.js", timeout=5) as response:
+            js = response.read().decode("utf-8")
+
+        self.assertIn('id="work-warning"', html)
+        self.assertIn('id="work-details"', html)
+        self.assertIn("work.goal", js)
+        self.assertIn("STATUS checkpoint incomplete", js)
+        self.assertIn("Current Agent: UNKNOWN", js)
 
     def test_unknown_path_404(self):
         import urllib.error

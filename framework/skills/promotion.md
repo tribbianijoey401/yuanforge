@@ -8,7 +8,7 @@ version: 4.0.0
 
 ## vNext Reference Routing
 
-Candidate Knowledge 需要形成长期 Memory 或 Regression 时，读取 `references/01-standards/self-improving-memory.md` 的 Delta Evolution 与 Local Regression Section。
+Candidate Knowledge 需要形成长期 Memory 或 Regression 时，读取 `framework://references/01-standards/self-improving-memory.md` 的 Delta Evolution 与 Local Regression Section。
 
 ## Promotion Criteria
 
@@ -22,11 +22,11 @@ Candidate Knowledge 需要形成长期 Memory 或 Regression 时，读取 `refer
 
 ## Destination
 
-- Product Fact → `docs/PRODUCT.md`
-- System Fact → `docs/ARCHITECTURE.md`
-- Confirmed Decision → `docs/DECISIONS.md`
-- Reusable Finding / Pitfall / Preference / Convention → `docs/MEMORY.md`
-- Deferred Item → `docs/BACKLOG.md`
+- Product Fact → `project://docs/PRODUCT.md`
+- System Fact → `project://docs/ARCHITECTURE.md`
+- Confirmed Decision → `project://docs/DECISIONS.md`
+- Reusable Finding / Pitfall / Preference / Convention → `project://docs/MEMORY.md`
+- Deferred Item → `project://docs/BACKLOG.md`
 
 ## Rejection
 

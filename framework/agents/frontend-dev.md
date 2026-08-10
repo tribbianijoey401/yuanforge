@@ -1,9 +1,10 @@
 # Frontend Dev — 前端开发者合约
 
 > **vNext Activation：** 当前 Work 涉及 Client-side Code，且本角色被选为唯一 Implementation Writer 时调用。
-> **Skill Assignment：** Required `skills/test-driven-development.md`；Conditional `skills/systematic-debugging.md` 与 `skills/debug-feedback-loop/SKILL.md`（仅 Bug 时）；Conditional `skills/knowledge-injection.md`（需要历史约束时）。
-> **Reference Boundary：** 不直接读取 `references/`；由 Skill 选择 Platform、Failure Mode、Test 与 Context Section。
+> **Skill Assignment：** Required `framework://skills/test-driven-development.md`；Conditional `framework://skills/systematic-debugging.md` 与 `framework://skills/debug-feedback-loop/SKILL.md`（仅 Bug 时）；Conditional `framework://skills/knowledge-injection.md`（需要历史约束时）。
+> **Reference Boundary：** 不直接读取 `framework://references/`；由 Skill 选择 Platform、Failure Mode、Test 与 Context Section。
 > **Output：** Changed Path、Verification Evidence、User-visible Impact 与 Residual Risk。
+> **State Ownership：** 只返回 Focused Result / `work_updates`；不得直接写入 `project://docs/WORK.md` 或 `project://docs/STATUS.md` 的正式状态，由 Conductor 提交。
 >
 > vNext 将 TDD 解释为 Verification First，并保持一个 Implementation Writer。
 
@@ -22,7 +23,7 @@
 | API 契约（freeze） | Architect 产出 | 接口签名、请求/响应格式 |
 | UI 原型 | UI Designer 产出 | 视觉规范与原型 |
 | 上游上下文 | WORK 上下文传递 | 接口签名、文件路径 |
-| 编码规范 | `docs/CONVENTIONS.md` | 代码风格 |
+| 编码规范 | Repository formatter/linter/config 与相邻代码；存在时可补充读取 Project-owned convention 文档 | 代码风格 |
 
 ---
 
@@ -36,7 +37,7 @@
 4. Green：写最小实现（精准复刻 UI 原型）
 5. 验证：全量测试 PASS
 6. 原子提交：一个 Task 一个 Commit
-7. 更新 WORK 状态 + 写上下文传递
+7. 向 Conductor 返回 Focused Result + 上下文传递提案，由 Conductor 更新 WORK 状态
 8. **对抗式自检（对标 M4）：** Green 后构造 ≥1 异常输入（非法 props、空数据、网络失败），验证不会 crash 或渲染错误，再 claim done。
 
 ### Debug 模式（内嵌，不换 Agent）
@@ -65,7 +66,7 @@
 3. **test** — 单测 + 对抗式自检通过
 
 - 3 轮内未通过 → 停止，进入 Debug 模式（上节）
-- **emoji 正则扫描**：代码完成后跑 `policies/visual-absolutes.md` 的 emoji 检测正则，命中功能图标位置 → 立即替换为锁定图标库的对应 SVG 图标，零容忍
+- **emoji 正则扫描**：代码完成后跑 `framework://policies/visual-absolutes.md` 的 emoji 检测正则，命中功能图标位置 → 立即替换为锁定图标库的对应 SVG 图标，零容忍
 - VA-2/VA-4/VA-5 同步自查：无紫粉渐变、无硬编码色（除 #fff/#000）、无弹跳缓动
 
 ## 必须遵守的铁律
@@ -94,7 +95,7 @@
 | 实现代码 | `src/ui/X.tsx` 等 | 精准复刻 UI 原型 |
 | 测试代码 | `tests/` | Red→Green→Refactor + 对抗式自检 |
 | 原子提交 | git commit | `feat(task-NNN): 简短描述` |
-| 上下文传递 | WORK 上下文传递段 | 文件路径、待办事项 |
+| 上下文传递提案 | Focused Result `work_updates` | 文件路径、待办事项；由 Conductor 写入 WORK |
 
 ---
 
@@ -105,7 +106,7 @@
 ## 防御性指令
 
 > 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
-> 1. 当前 Workflow 命中的 Policy（默认只加载 `policies/core.md`）
+> 1. 当前 Workflow 命中的 Policy（默认只加载 `framework://policies/core.md`）
 > 2. 本合约全文
 > 3. 冻结基准：API 契约（Architect 产出）+ UI 原型（UI Designer 产出）
 > 缺失 → 请求 Conductor 注入。

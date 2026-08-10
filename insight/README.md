@@ -13,6 +13,9 @@
 - 不做 Event Ledger、不依赖平台 telemetry、不做 exact token、不常驻 LLM
 - Trace 与 Signal 分离：Trace 只保存 What Changed，Signal 动态计算 What It Means
 - Semantic Real-Time：只在语义状态变化时反映，不做 Heartbeat
+- Native First：Windows 使用 `ReadDirectoryChangesW`，Linux 使用 `inotify`；不支持或失效时显式降级为 `polling-fallback`，Coverage 为 Partial
+- State Ownership：Project State 只由 Conductor 写入；Insight 的 transition index 不反写 STATUS
+- Missing-state honest：WORK/STATUS 缺失或不可读时显示 `STATE UNAVAILABLE` 与 `UNKNOWN` Coverage，不把空 Parser 结果当成 IDLE
 
 ## 用法
 
@@ -32,7 +35,7 @@ python -B .yuan/insight/yuan.py observe . --web
 
 ## Dashboard
 
-打开 `http://127.0.0.1:8765/`。`--web` 在同一进程启动 Observation Service，后台完成 File Watch / Debounce / Trace / Gap / Summary，UI 每 3s 轮询 `/api/state`：
+打开 `http://127.0.0.1:8765/`。`--web` 在同一进程启动 Observation Service，后台由原生文件事件唤醒并完成 Debounce / Trace / Gap / Summary；UI 每 3s 读取 `/api/state`。`--poll` 只控制 fallback polling / watcher health check 间隔，不是原生模式的采样周期：
 
 - **Work / Execution Map**：Work 状态、Stage Timeline、当前 Agent
 - **Agent Matrix**：ACTIVE / COMPLETED / MISSING / NOT REQUIRED
@@ -50,6 +53,7 @@ python -B .yuan/insight/yuan.py observe . --web
 | Repeated Review | Finding 分类跨轮重复 ≥2 | 只报事实不猜根因 |
 | Bug Recurrence | 需 Bug identity / Memory linkage | v0 无则 UNAVAILABLE |
 | Memory Effectiveness | selected + reported used | 无 usage 证据则 UNAVAILABLE |
+| State Divergence | WORK / STATUS / Workflow / Stage / Agent checkpoint 不一致 | 只读报告，交由 Conductor 修复 |
 
 ## 存储
 
@@ -71,7 +75,8 @@ insight/
 ├── pyproject.toml
 ├── yuan_insight/
 │   ├── cli.py          # 入口：--once / --signals / watch / --web
-│   ├── watcher.py      # DebouncedWatcher（hash 检测 + debounce）
+│   ├── fswatch.py      # ReadDirectoryChangesW / inotify 原生事件源
+│   ├── watcher.py      # Native wakeup + hash confirmation + debounce；polling fallback
 │   ├── observer.py     # CLI/Web 共用的 Observation Service 与 Coverage/Gap 生命周期
 │   ├── loader.py       # collect → build_snapshot（含 Expected workflow）
 │   ├── registry.py     # Agent/Skill/Workflow 注册表（直读 Framework）
@@ -81,7 +86,7 @@ insight/
 │   ├── history.py      # Work Summary 聚合 + 归档
 │   ├── trace.py        # JSONL Trace / archive / prune / gap
 │   ├── server.py       # Dashboard HTTP Server（标准库）
-│   └── signals/        # expected_observed / repeated_review / bug_recurrence / memory_effectiveness
+│   └── signals/        # expected_observed / state_consistency / review / bug / memory
 └── web/                # 静态 Dashboard（index.html + app.js）
 ```
 
@@ -92,3 +97,5 @@ python3 -B -m unittest tests.test_insight tests.test_insight_signals tests.test_
 ```
 
 设计依据：`yuan-insight.plan`（Phase 2-6 已实施，Phase 7 Compare Works / richer trends 为非 MVP Later 项）。
+
+`FULL` 表示 Observer 从当前 Work 起点持续运行且原生监听健康，不表示可以重建从未落盘的 Persona。一次 Conductor Commit 对 WORK/STATUS 的连续写入会在 debounce 窗口中合并为一个语义 Transition；彼此独立、稳定落盘的角色状态会分别记录。

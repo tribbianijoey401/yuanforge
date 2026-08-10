@@ -7,6 +7,7 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,6 +16,8 @@ sys.path.insert(0, str(ROOT / "insight"))
 from yuan_insight.diff import diff_snapshots, to_transition  # noqa: E402
 from yuan_insight.loader import Snapshot, build_snapshot  # noqa: E402
 from yuan_insight.observer import ObservationService  # noqa: E402
+from yuan_insight.registry import AgentContract, Registry  # noqa: E402
+from yuan_insight.signals.aggregate import compute_signals  # noqa: E402
 from yuan_insight.parsers.status import parse_status  # noqa: E402
 from yuan_insight.parsers.work import parse_work  # noqa: E402
 from yuan_insight.trace import append_transition, ensure_insight_dir, start_session  # noqa: E402
@@ -117,6 +120,18 @@ quality:
 
 
 class WorkParserTests(unittest.TestCase):
+    def test_empty_work_template_does_not_expose_html_guidance_as_state(self):
+        template = (
+            ROOT / "framework" / "templates" / "project" / "WORK.md"
+        ).read_text(encoding="utf-8")
+
+        state = parse_work(template)
+
+        self.assertFalse(state.has_active_work)
+        self.assertIsNone(state.current_task)
+        self.assertIsNone(state.latest_result)
+        self.assertEqual([], state.open_findings)
+
     def test_parses_contract_and_workspace(self):
         state = parse_work(
             """# Active Work
@@ -199,7 +214,12 @@ class WatcherTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = make_project(Path(temporary))
             write_status(root, "BUG-1", "implement", "backend-dev", "active")
-            watcher = DebouncedWatcher(root, poll_interval=0.01, debounce_window=0.05)
+            watcher = DebouncedWatcher(
+                root,
+                poll_interval=0.01,
+                debounce_window=0.05,
+                prefer_native=False,
+            )
             # 第一次 tick 建立 baseline，不产出事件
             self.assertIsNone(watcher.tick())
             # 快速连续修改 STATUS 两次（模拟 Conductor 一次语义更新写多个文件）
@@ -208,8 +228,6 @@ class WatcherTests(unittest.TestCase):
             write_status(root, "BUG-1", "review", "spec-reviewer", "active")
             self.assertIsNone(watcher.tick())
             # debounce 窗口内继续安静，产出合并后的一个事件
-            import time
-
             time.sleep(0.15)
             event = watcher.tick()
             self.assertIsNotNone(event)
@@ -217,6 +235,43 @@ class WatcherTests(unittest.TestCase):
             self.assertEqual(event.snapshot.status["stage"], "review")  # type: ignore[union-attr]
             # 第二次稳定后不应再产出（pending 已清空）
             self.assertIsNone(watcher.tick())
+
+    def test_native_source_observes_separate_persisted_transitions(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = make_project(Path(temporary))
+            write_status(root, "BUG-NATIVE", "implement", "backend-dev", "active")
+            watcher = DebouncedWatcher(root, poll_interval=0.02, debounce_window=0.02)
+            self.addCleanup(watcher.close)
+            if not watcher.native:
+                self.skipTest("Native file events are unavailable on this platform")
+            self.assertTrue(watcher.mode.startswith("native-"))
+            baseline = build_snapshot(root, "baseline")
+            # Simulate a write racing with ObservationService baseline setup.
+            write_status(root, "BUG-NATIVE", "regression", "tester", "active")
+            watcher.wait()
+            watcher.prime(baseline.files)
+            first = self._wait_for_event(watcher)
+            second = self._write_and_wait(
+                watcher,
+                lambda: write_status(root, "BUG-NATIVE", "review", "spec-reviewer", "active"),
+            )
+            self.assertEqual(first.snapshot.status["stage"], "regression")
+            self.assertEqual(second.snapshot.status["stage"], "review")
+
+    @staticmethod
+    def _write_and_wait(watcher: DebouncedWatcher, write) -> object:
+        write()
+        return WatcherTests._wait_for_event(watcher)
+
+    @staticmethod
+    def _wait_for_event(watcher: DebouncedWatcher) -> object:
+        deadline = time.time() + 2
+        while time.time() < deadline:
+            watcher.wait()
+            event = watcher.tick()
+            if event is not None:
+                return event
+        raise AssertionError("Native watcher did not emit a persisted transition")
 
 
 class TraceTests(unittest.TestCase):
@@ -238,6 +293,40 @@ class TraceTests(unittest.TestCase):
 
 
 class ObservationServiceTests(unittest.TestCase):
+    def test_missing_required_state_files_make_coverage_unknown(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = make_project(Path(temporary))
+            (root / "docs" / "WORK.md").unlink(missing_ok=True)
+            (root / "docs" / "STATUS.md").unlink(missing_ok=True)
+            service = ObservationService(root, poll_interval=0.01, debounce_window=0.01)
+            service.start()
+            try:
+                self.assertEqual("UNKNOWN", service.evidence().coverage)
+                self.assertIsNotNone(service.latest_snapshot)
+                snapshot = service.latest_snapshot.to_dict()
+                self.assertEqual("MISSING", snapshot["sources"]["docs/WORK.md"])
+                self.assertEqual("MISSING", snapshot["sources"]["docs/STATUS.md"])
+            finally:
+                service.stop()
+
+    def test_polling_fallback_is_explicit_and_partial(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = make_project(Path(temporary))
+            write_idle_status(root)
+            (root / "docs" / "WORK.md").write_text(
+                "# Active Work\n\nNo active work.\n",
+                encoding="utf-8",
+            )
+            with patch("yuan_insight.watcher.create_event_source", return_value=None):
+                service = ObservationService(root, poll_interval=0.01, debounce_window=0.01)
+                service.start()
+                self.assertEqual(service.evidence().mode, "polling-fallback")
+                self.assertEqual(service.evidence().coverage, "PARTIAL")
+                write_status(root, "BUG-FALLBACK", "orient", "backend-dev", "active")
+                update = wait_for_update(service)
+                service.stop()
+            self.assertIsNotNone(update)
+
     def test_work_completion_archives_trace_and_writes_summary(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = make_project(Path(temporary))
@@ -301,6 +390,51 @@ class ObservationServiceTests(unittest.TestCase):
             self.assertIsNotNone(update)
             self.assertEqual(evidence.coverage, "FULL")
             self.assertTrue(evidence.transitions)
+
+
+class StateConsistencySignalTests(unittest.TestCase):
+    def test_missing_work_and_status_are_not_reported_as_idle(self):
+        registry = Registry(
+            agents={"conductor": AgentContract("conductor")},
+            workflows=["complex-bug"],
+        )
+        snapshot = {
+            "sources": {
+                "docs/WORK.md": "MISSING",
+                "docs/STATUS.md": "MISSING",
+            },
+            "status": {"work_state": None},
+            "work": {"has_active_work": False},
+            "workflow": {"workflow_id": "unknown", "stages": []},
+        }
+
+        signals = compute_signals(snapshot, registry).signals
+
+        self.assertEqual("STATE_FILES_MISSING", signals[0].signal_id)
+        self.assertEqual("MISSING", signals[0].level)
+
+    def test_active_work_with_idle_status_reports_state_divergence(self):
+        registry = Registry(
+            agents={"conductor": AgentContract("conductor")},
+            workflows=["complex-bug"],
+        )
+        report = compute_signals(
+            {
+                "status": {
+                    "work": None,
+                    "work_state": "idle",
+                    "workflow": None,
+                    "stage": None,
+                    "agent": {"id": None, "state": None},
+                },
+                "work": {"has_active_work": True, "goal": "fix it"},
+                "workflow": {"workflow_id": "unknown", "stages": []},
+            },
+            registry,
+        )
+        signals = {signal.signal_id: signal for signal in report.signals}
+        self.assertIn("STATE_DIVERGENCE", signals)
+        self.assertEqual(signals["STATE_DIVERGENCE"].level, "INCONSISTENT")
 
 
 if __name__ == "__main__":

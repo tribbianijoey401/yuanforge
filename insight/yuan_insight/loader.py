@@ -20,6 +20,13 @@ class Snapshot:
     status: dict[str, Any] = field(default_factory=dict)
     workflow: dict[str, Any] = field(default_factory=dict)
 
+    def source_status(self) -> dict[str, str]:
+        """Expose availability without leaking content hashes to the UI."""
+        return {
+            path: digest if digest in {"MISSING", "UNREADABLE"} else "AVAILABLE"
+            for path, digest in self.files.items()
+        }
+
     def fingerprint(self) -> str:
         payload = "|".join(f"{path}:{digest}" for path, digest in sorted(self.files.items()))
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()
@@ -29,6 +36,7 @@ class Snapshot:
             "work": self.work,
             "status": self.status,
             "workflow": self.workflow,
+            "sources": self.source_status(),
         }
 
 
@@ -86,6 +94,7 @@ def build_snapshot(root: Path, observed_at: str) -> Snapshot:
         "scope": work.scope,
         "current_task": work.current_task,
         "latest_result": work.latest_result,
+        "next_action": work.next_action,
         "open_findings": work.open_findings,
         "work_learnings": work.work_learnings,
     }

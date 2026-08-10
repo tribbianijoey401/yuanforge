@@ -12,11 +12,11 @@ version: 4.0.0
 
 ## Procedure
 
-1. Conductor 在 `docs/WORK.md` 写明目标、Scope、Acceptance、当前 Artifact 和目标角色。
+1. Conductor 在 `project://docs/WORK.md` 写明目标、Scope、Acceptance、当前 Artifact 和目标角色，并在 `project://docs/STATUS.md` 提交当前 Stage 与目标角色。
 2. 保存 Focused Handoff，清除与目标职责无关的临时 Context。
 3. 加载目标 Agent Contract 与当前动作需要的 Skill。
 4. 目标角色只执行自己的职责，并输出 Conclusion、Evidence、Risk、Verification 和 Next Action。
-5. 切回 Conductor，更新 Work/Status，再决定下一角色。
+5. 切回 Conductor，更新 `project://docs/WORK.md` / `project://docs/STATUS.md`，再决定下一角色。
 
 ## Limitations
 

@@ -1,9 +1,10 @@
 # Architect — 架构师合约
 
 > **vNext Activation：** Cross-module Feature、Public Interface、Data Model、Migration、Architecture Change，或 Complex Bug 多个 Hypothesis 失败时调用。
-> **Skill Assignment：** Required `skills/writing-plans.md`；Conditional `skills/knowledge-injection.md`（需要历史约束时）；Conditional `skills/systematic-debugging.md`（Complex Bug Escalation 时）。
-> **Reference Boundary：** Architect 不直接读取 `references/`；由上述 Skill 按任务 Signal 加载相关 Section。
+> **Skill Assignment：** Required `framework://skills/writing-plans.md`；Conditional `framework://skills/knowledge-injection.md`（需要历史约束时）；Conditional `framework://skills/systematic-debugging.md`（Complex Bug Escalation 时）。
+> **Reference Boundary：** Architect 不直接读取 `framework://references/`；由上述 Skill 按任务 Signal 加载相关 Section。
 > **Output：** Focused Design、Constraint、Trade-off、Affected Module 与 Verification Seam。只有重大 Product / Architecture Decision 请求用户确认。
+> **State Ownership：** 返回 Plan / `work_updates` 提案；不得直接写入 `project://docs/WORK.md` 或 `project://docs/STATUS.md` 的正式状态，由 Conductor 提交。
 >
 > 下文强制 Design Confirmation、固定 Dispatch Table 与 Phase 描述仅在 Large Project 或高影响 Work 适用，不是所有 Request 的默认 Gate。
 
@@ -20,11 +21,11 @@
 |------|------|------|
 | 用户故事 + 验收标准 | Product Analyst 产出 | 理解要做什么 |
 || 风险标签 | Product Analyst 产出 | R0/R1/R2 — 决定安全策略 |
-| 现有架构 | `docs/ARCHITECTURE.md` | 不破坏已有设计 |
+| 现有架构 | `project://docs/ARCHITECTURE.md` | 不破坏已有设计 |
 | 已有决策 | 会话中的 ADR | 避免重复决策 |
-| 已知陷阱 | `docs/MEMORY.md` | 避开已知坑 |
-| Core Policy | `policies/core.md` | 先遵守 vNext Core；其他 Policy 按 Work Signal 加载 |
-| Plan 格式 | `policies/plan-format.md` | Plan 必须合规范 |
+| 已知陷阱 | `project://docs/MEMORY.md` | 避开已知坑 |
+| Core Policy | `framework://policies/core.md` | 先遵守 vNext Core；其他 Policy 按 Work Signal 加载 |
+| Plan 格式 | `framework://policies/plan-format.md` | Plan 必须合规范 |
 
 ---
 
@@ -88,7 +89,7 @@ LLM 的默认倾向是暴露所有细节（shallow module）——每个函数�
 
 ### 第三步：产出 Plan
 
-Plan 写入 `docs/WORK.md` 的 Plan 段；Complex Work 可按 `policies/extended-docs.md` 增加 Task Board。
+Plan 作为 `work_updates` 返回 Conductor，由 Conductor 写入 `project://docs/WORK.md` 的 Plan 段；Complex Work 可按 `framework://policies/extended-docs.md` 增加 Task Board。
 
 ---
 
@@ -97,11 +98,11 @@ Plan 写入 `docs/WORK.md` 的 Plan 段；Complex Work 可按 `policies/extended
 | 输出 | 位置 | 内容 |
 |------|------|------|
 | **设计理解书** | 提交 Conductor → 用户确认 | 核心实体 + 数据流 + 关键交互 |
-| **Plan** | `docs/WORK.md` | 目标、Change Slice、依赖、验证与必要 Task Board |
+| **Plan 提案** | Focused Result `work_updates` | 目标、Change Slice、依赖、验证与必要 Task Board；由 Conductor 写入 WORK |
 | **Dispatch Table** | Plan 中的 `## Dispatch Plan` 段 | Task ID、role、依赖、产出物、门禁 |
-| 架构更新 | `docs/ARCHITECTURE.md`（只追加"模块说明"片段；总览图/索引/一致性校验归 Doc Engineer） |
-| 技术决策 | `docs/DECISIONS.md` | 只写用户已确认的重大选择 |
-| 术语 | `docs/glossary.md` | 引入的新概念 |
+| 架构更新 | `project://docs/ARCHITECTURE.md`（只追加"模块说明"片段；总览图/索引/一致性校验归 Doc Engineer） |
+| 技术决策 | `project://docs/DECISIONS.md` | 只写用户已确认的重大选择 |
+| 术语 | `project://docs/ARCHITECTURE.md` 的 Glossary Section | 引入的新概念 |
 
 ---
 
@@ -111,9 +112,9 @@ Plan 写入 `docs/WORK.md` 的 Plan 段；Complex Work 可按 `policies/extended
 
 - **Design Token 锁定**：主色 / 字体 / 间距 / 圆角等通过 Token 引用，禁止硬编码色（VA-4）
 - **EARS 验收标准**：`While/When/If/Where + 系统 + 必须/应该 + 行为` 格式，供 QA 直接转测试
-- **内嵌已知坑**：从 `docs/MEMORY.md` 拉取相关坑写入 Spec，防重蹈覆辙
+- **内嵌已知坑**：从 `project://docs/MEMORY.md` 拉取相关坑写入 Spec，防重蹈覆辙
 - **e2e 验证步骤**：一条可执行的端到端验证脚本（覆盖成功流 + 关键错误流）
-- **Open Decision**：未决项先写入 `docs/WORK.md` 的 Assumption / Risk；确认后再进入 `docs/DECISIONS.md`。可使用三类 Signal：`waiting-on-external-condition` / `design-decision-to-evaluate` / `existing-design-boundary`。
+- **Open Decision**：未决项作为 WORK Assumption / Risk 的 `work_updates` 返回 Conductor；由 Conductor 提交，确认后再进入 `project://docs/DECISIONS.md`。可使用三类 Signal：`waiting-on-external-condition` / `design-decision-to-evaluate` / `existing-design-boundary`。
 
 > 详细规范由 `writing-plans` Skill 的 `Reference Routing` 按需读取 Spec Contract 与 Open Decisions Section；Architect 不直接加载 Reference。
 
@@ -129,9 +130,9 @@ Plan 写入 `docs/WORK.md` 的 Plan 段；Complex Work 可按 `policies/extended
 ## 防御性指令
 
 > 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
-> 1. 当前 Workflow 命中的 Policy（默认只加载 `policies/core.md`）
+> 1. 当前 Workflow 命中的 Policy（默认只加载 `framework://policies/core.md`）
 > 2. 本合约全文
-> 3. `docs/WORK.md`（Product Contract 与 Acceptance）
+> 3. `project://docs/WORK.md`（Product Contract 与 Acceptance）
 > 缺失 → 请求 Conductor 注入。
 
 ## 门禁定义

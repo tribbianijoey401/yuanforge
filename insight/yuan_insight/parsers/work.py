@@ -15,6 +15,7 @@ class WorkState:
     scope: str | None = None
     current_task: str | None = None
     latest_result: str | None = None
+    next_action: str | None = None
     open_findings: list[str] = field(default_factory=list)
     work_learnings: list[str] = field(default_factory=list)
     raw: dict[str, Any] = field(default_factory=dict)
@@ -45,6 +46,8 @@ def _is_empty(text: str) -> bool:
 
 
 def parse_work(text: str) -> WorkState:
+    # Template guidance is metadata for humans/LLMs, not persisted Work fact.
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
     sections = _heading_sections(text)
     state = WorkState()
 
@@ -54,6 +57,7 @@ def parse_work(text: str) -> WorkState:
     state.scope = sections.get("scope", "").strip() or None
     state.current_task = sections.get("current task", "").strip() or None
     state.latest_result = sections.get("latest result", "").strip() or None
+    state.next_action = sections.get("next action", "").strip() or None
 
     findings = sections.get("open findings", "")
     if findings and not _is_empty(findings):

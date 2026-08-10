@@ -22,6 +22,45 @@ def load_installer():
 
 
 class FrameworkContractTests(unittest.TestCase):
+    def test_logical_locators_are_unambiguous_in_runtime_contracts(self):
+        adapter = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        for locator in ("project://", "framework://", "skill://"):
+            self.assertIn(locator, adapter)
+        self.assertIn("不是目录名、环境变量或可直接传给 Tool 的 URL", adapter)
+        self.assertIn("每次文件操作前", adapter)
+
+        active_paths = []
+        for directory in ("agents", "skills", "workflows", "adapters"):
+            active_paths.extend((FRAMEWORK / directory).rglob("*.md"))
+        active_paths.extend((FRAMEWORK / "policies").rglob("*.md"))
+
+        ambiguous = re.compile(
+            r"`((?:docs|policies|agents|skills|workflows|adapters|templates|references)/[^`]+)`"
+        )
+        failures = []
+        for path in active_paths:
+            for line_number, line in enumerate(
+                path.read_text(encoding="utf-8").splitlines(), 1
+            ):
+                match = ambiguous.search(line)
+                if match:
+                    failures.append(
+                        f"{path.relative_to(FRAMEWORK)}:{line_number}: {match.group(1)}"
+                    )
+        self.assertEqual([], failures)
+
+    def test_specialist_skills_return_state_updates_to_conductor(self):
+        for relative in (
+            "systematic-debugging.md",
+            "test-driven-development.md",
+            "writing-plans.md",
+            "project-memory.md",
+            "distill-workspace.md",
+        ):
+            text = (FRAMEWORK / "skills" / relative).read_text(encoding="utf-8")
+            self.assertIn("Conductor", text, relative)
+            self.assertIn("work_updates", text, relative)
+
     def test_framework_contract_and_dangling_references(self):
         installer = load_installer()
         errors, warnings = installer.validate_framework(FRAMEWORK)
@@ -93,8 +132,8 @@ class FrameworkContractTests(unittest.TestCase):
         )
         self.assertRegex(
             assignment,
-            r"Conditional `skills/deep-requirement-discovery/SKILL\.md`.*"
-            r"Required `skills/grilling/SKILL\.md`",
+            r"Conditional `framework://skills/deep-requirement-discovery/SKILL\.md`.*"
+            r"Required `framework://skills/grilling/SKILL\.md`",
         )
         self.assertIn("deep-requirement-discovery → grilling", analyst)
         self.assertIn("不得从零重新访谈", analyst)
@@ -116,7 +155,7 @@ class FrameworkContractTests(unittest.TestCase):
             assignment = next(
                 line for line in text.splitlines() if "Skill Assignment" in line
             )
-            paths = re.findall(r"`(skills/[^`]+)`", assignment)
+            paths = re.findall(r"`framework://(skills/[^`]+)`", assignment)
             self.assertTrue(paths, f"{agent.name} 没有可解析的 Skill Assignment")
             for relative in paths:
                 self.assertTrue(
@@ -132,12 +171,12 @@ class FrameworkContractTests(unittest.TestCase):
             assignment = next(
                 line for line in text.splitlines() if "Skill Assignment" in line
             )
-            paths = re.findall(r"`(skills/[^`]+)`", assignment)
+            paths = re.findall(r"`framework://(skills/[^`]+)`", assignment)
             self.assertTrue(paths, f"{agent.name} 没有可解析的 Skill Assignment")
             for relative in paths:
                 segments = re.split(r"[；;]", assignment)
                 owner = next(
-                    seg for seg in segments if f"`{relative}`" in seg
+                    seg for seg in segments if f"`framework://{relative}`" in seg
                 )
                 self.assertTrue(
                     re.search(r"(Required|Recommended|Conditional)", owner),
@@ -250,6 +289,52 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("不得归档", documents)
         self.assertIn("不得归档或清空", adapter)
         self.assertIn("Next Action", documents)
+
+    def test_work_activation_writes_structured_status_checkpoint(self):
+        conductor = (FRAMEWORK / "agents" / "conductor.md").read_text(encoding="utf-8")
+        documents = (FRAMEWORK / "policies" / "documents.md").read_text(encoding="utf-8")
+        adapter = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+
+        for text in (conductor, documents, adapter):
+            self.assertIn("同一逻辑步骤", text)
+            self.assertIn("work_state: active", text)
+            self.assertIn("Workflow", text)
+            self.assertIn("Stage", text)
+            self.assertIn("当前 Agent", text)
+
+    def test_every_workflow_supports_user_requested_pause_and_resume(self):
+        for workflow in sorted((FRAMEWORK / "workflows").glob("*.md")):
+            text = workflow.read_text(encoding="utf-8")
+            self.assertIn("## Pause / Resume", text, workflow.name)
+            self.assertIn("work_state: paused", text, workflow.name)
+            self.assertIn("Next Action", text, workflow.name)
+            self.assertIn("当前 Stage", text, workflow.name)
+
+        conductor = (FRAMEWORK / "agents" / "conductor.md").read_text(encoding="utf-8")
+        for phrase in ("先离开", "挂起", "暂停"):
+            self.assertIn(phrase, conductor)
+        self.assertIn("停止继续派发", conductor)
+
+    def test_conductor_is_the_only_formal_work_state_writer(self):
+        conductor = (FRAMEWORK / "agents" / "conductor.md").read_text(encoding="utf-8")
+        documents = (FRAMEWORK / "policies" / "documents.md").read_text(encoding="utf-8")
+        core = (FRAMEWORK / "policies" / "core.md").read_text(encoding="utf-8")
+        for text in (conductor, documents, core):
+            self.assertIn("唯一正式 State Writer", text)
+            self.assertIn("Conductor commit", text)
+
+        for agent in (FRAMEWORK / "agents").glob("*.md"):
+            if agent.name in {"conductor.md", "contract-template.md"}:
+                continue
+            text = agent.read_text(encoding="utf-8")
+            self.assertIn("State Ownership", text, agent.name)
+            self.assertIn("Conductor", text, agent.name)
+
+        status_template = (FRAMEWORK / "templates" / "project" / "STATUS.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotRegex(status_template, r"(?im)^revision:")
+        self.assertIn("不保存 visualization revision", documents)
 
 
 if __name__ == "__main__":

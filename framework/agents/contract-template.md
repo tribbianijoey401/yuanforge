@@ -1,5 +1,11 @@
 # [Role] — [中文名]合约
 
+> **vNext Activation：** [何时由 Routing 选择此 Agent]
+> **Skill Assignment：** Required / Recommended / Conditional `framework://skills/...`
+> **Reference Boundary：** 不直接读取 `framework://references/`；由 Skill 按 Signal 选择。
+> **Output：** [Focused Result]
+> **State Ownership：** Specialist 只返回 Focused Result / `work_updates`；Conductor 是 `project://docs/WORK.md` / `project://docs/STATUS.md` 的唯一正式 State Writer。
+
 > 职责 / 档位 / 执行权限 / 不负责        # M1 头三元组（执行权限在此定下）
 
 ## 门禁定义（创建时定下；稳定型固化 / 演进型可迭代修改）    # 质量门禁在创建时定下，但非永久冻结
@@ -46,4 +52,4 @@
 
 ## 消费者与反馈（产出交给谁、反馈通道）                     # P-G
 - 产出 → …
-- 经验回流 → `docs/MEMORY.md` / `docs/DECISIONS.md`（闭环蒸馏）
+- 经验回流 → `project://docs/MEMORY.md` / `project://docs/DECISIONS.md`（闭环蒸馏）

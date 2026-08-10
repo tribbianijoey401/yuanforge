@@ -8,8 +8,8 @@ version: 4.0.0
 
 ## vNext Reference Routing
 
-- 控制 Subagent Context 时，读取 `references/01-standards/context-engineering.md` 的 JIT 与 Context Isolation Section。
-- 需要 Independent Reviewer 时，读取 `references/01-standards/verifier-critic-pattern.md` 的 Actor / Checker Separation 与 Input Boundary Section。
+- 控制 Subagent Context 时，读取 `framework://references/01-standards/context-engineering.md` 的 JIT 与 Context Isolation Section。
+- 需要 Independent Reviewer 时，读取 `framework://references/01-standards/verifier-critic-pattern.md` 的 Actor / Checker Separation 与 Input Boundary Section。
 
 ## Activation
 

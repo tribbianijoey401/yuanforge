@@ -45,7 +45,7 @@ def _parse_skill_assignment(assignment: str) -> tuple[list[str], list[str], list
     conditional: list[str] = []
     segments = re.split(r"[；;]", assignment)
     for segment in segments:
-        paths = re.findall(r"`(skills/[^`]+)`", segment)
+        paths = re.findall(r"`(?:framework://)?(skills/[^`]+)`", segment)
         if not paths:
             continue
         ids = [_skill_id_from_path(Path(path)) for path in paths]

@@ -1,9 +1,10 @@
 # Spec Reviewer — 规范审计官合约
 
 > **vNext Activation：** Implementation 可能偏离 Scope、Business Rule 或 Acceptance Criteria 时调用。
-> **Skill Assignment：** Required `skills/requesting-code-review.md`；Conditional `skills/knowledge-injection.md`（需要历史约束时）。
-> **Reference Boundary：** 不直接读取 `references/`；由 Review Skill 读取 Spec-as-contract 与 Verifier Section。
+> **Skill Assignment：** Required `framework://skills/requesting-code-review.md`；Conditional `framework://skills/knowledge-injection.md`（需要历史约束时）。
+> **Reference Boundary：** 不直接读取 `framework://references/`；由 Review Skill 读取 Spec-as-contract 与 Verifier Section。
 > **Output：** `READY` 或 `NEEDS_WORK`、Mismatch、Evidence 与未验证 Acceptance；不修改代码。
+> **State Ownership：** 只返回 Focused Result / `work_updates`；不得直接写入 `project://docs/WORK.md` 或 `project://docs/STATUS.md` 的正式状态，由 Conductor 提交。
 
 > **职责：** 审查实现是否符合 Plan 规格与验收标准
 > **执行权限：** 仅审查，不改代码
@@ -31,7 +32,7 @@
 |------|------|------|
 | 验收标准 | Product Analyst 产出 | "用户登录成功后应跳转到首页" |
 | API 契约 + 数据模型 | Architect 产出（已 freeze） | "POST /login 返回 {token, user}" |
-| 编码规范 | `docs/CONVENTIONS.md` / `.eslintrc` 等 | 命名约定、目录结构 |
+| 编码规范 | Repository formatter/linter/config 与相邻代码 | 命名约定、目录结构 |
 
 ---
 
@@ -88,9 +89,9 @@
 ## 防御性指令
 
 > 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
-> 1. 当前 Workflow 命中的 Policy（默认只加载 `policies/core.md`）
+> 1. 当前 Workflow 命中的 Policy（默认只加载 `framework://policies/core.md`）
 > 2. 本合约全文
-> 3. 冻结基准：`docs/WORK.md` 的 Acceptance、Interface Contract 与 Plan
+> 3. 冻结基准：`project://docs/WORK.md` 的 Acceptance、Interface Contract 与 Plan
 > 缺失 → 请求 Conductor 注入。
 
 ## 门禁定义

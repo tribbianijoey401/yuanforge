@@ -21,12 +21,14 @@ Conductor 读取 Policy 与 Workflow
 
 ## 加载顺序
 
-1. `policies/core.md`；
-2. `policies/routing.md`；
-3. 当前 Primary Workflow；
-4. Routing 选中的 Agent Contract；
-5. Agent Contract 声明的 Skill；
-6. Skill 中 `Reference Routing` 命中的 Reference Section；
-7. 相同相对路径的 Project Override。
+1. `framework://policies/core.md`；
+2. `framework://policies/routing.md`；
+3. 当前 `framework://workflows/*` Primary Workflow；
+4. Routing 选中的 `framework://agents/*` Agent Contract；
+5. Agent Contract 声明的 `framework://skills/*` Skill；
+6. Skill 中 `Reference Routing` 命中的 `framework://references/*` 或 `skill://references/*` Section；
+7. `framework://` 解析时自动优先采用相同相对路径的 Project Override。
+
+`project://`、`framework://`、`skill://` 是逻辑定位符，不是目录名、环境变量或 URL。调用文件 Tool 前必须先解析为真实路径。
 
 旧 Contract 中的固定 Phase、Gate、`WORK`、`STATUS` 等内容仅作为历史能力说明；与 vNext Header、Core Policy 或 Routing 冲突时，以 vNext 规则为准。

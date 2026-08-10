@@ -8,10 +8,10 @@ version: 4.0.0
 
 ## vNext Reference Routing
 
-- Bug / Behavior Change：读取 `references/01-standards/test-discipline.md` 的 Impact Graph、Regression 与 Independent Test Section。
-- Test 本身被修改或存在 Gaming Risk：读取 `references/01-standards/test-integrity-anti-gaming.md` 的作弊目录与验证手段 Section。
-- Generated Code 可能产生 Silent Failure：读取 `references/01-standards/generated-code-failure-modes.md` 的对应 Failure Mode Section。
-- 需要 Independent Verification：读取 `references/01-standards/verifier-critic-pattern.md` 的 Input Boundary 与 Verdict Section。
+- Bug / Behavior Change：读取 `framework://references/01-standards/test-discipline.md` 的 Impact Graph、Regression 与 Independent Test Section。
+- Test 本身被修改或存在 Gaming Risk：读取 `framework://references/01-standards/test-integrity-anti-gaming.md` 的作弊目录与验证手段 Section。
+- Generated Code 可能产生 Silent Failure：读取 `framework://references/01-standards/generated-code-failure-modes.md` 的对应 Failure Mode Section。
+- 需要 Independent Verification：读取 `framework://references/01-standards/verifier-critic-pattern.md` 的 Input Boundary 与 Verdict Section。
 
 ## Choose Verification Mode
 
@@ -42,4 +42,4 @@ version: 4.0.0
 
 ## Record
 
-Verification Plan、Command、Result 和 Residual Risk 写入 `docs/WORK.md`。可复用 Regression 或 Pitfall 在验证 Root Cause 后写入 `docs/MEMORY.md`。
+Verification Plan、Command、Result 和 Residual Risk 作为 `work_updates` 返回 Conductor，由 Conductor 提交到 `project://docs/WORK.md`。可复用 Regression 或 Pitfall 在验证 Root Cause 后建议进入 `project://docs/MEMORY.md`。

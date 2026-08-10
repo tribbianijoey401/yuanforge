@@ -37,7 +37,7 @@ version: "1.0.0"
 ## VA-3 禁止 AI 模板味占位 / 文案
 
 - 禁止 "Lorem ipsum" / "Welcome to Our App" / "Sign up today" 等空洞占位。
-- 文案由 `docs/WORK.md` 中已确认的 Product Contract 驱动，体现真实业务语义。
+- 文案由 `project://docs/WORK.md` 中已确认的 Product Contract 驱动，体现真实业务语义。
 
 ## VA-4 禁止硬编码颜色
 

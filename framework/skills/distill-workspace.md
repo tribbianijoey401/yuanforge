@@ -8,8 +8,8 @@ version: 4.0.0
 
 ## vNext Reference Routing
 
-- 判断经验是否进入长期 Memory：读取 `references/01-standards/self-improving-memory.md` 的 Delta 与 Persistent Regression Section。
-- Distillation 可能造成 Context Loss：读取 `references/01-standards/context-engineering.md` 的 Compaction Fidelity Section。
+- 判断经验是否进入长期 Memory：读取 `framework://references/01-standards/self-improving-memory.md` 的 Delta 与 Persistent Regression Section。
+- Distillation 可能造成 Context Loss：读取 `framework://references/01-standards/context-engineering.md` 的 Compaction Fidelity Section。
 
 ## Procedure
 
@@ -18,9 +18,9 @@ version: 4.0.0
 3. 把每条信息写入唯一对应 Document，不跨文件复制。
 4. 对 Memory 去重：相同 Cause 更新现有条目；不同 Cause 才新增条目。
 5. 为 Bug 只保留 Signal、Minimal Reproduction、Verified Cause、Fix Rule 和 Regression Evidence。
-6. Work 未完成时，更新 `STATUS.md` 的 Current State 与 Next Action。
-7. Work 完成且摘要有长期价值时写入 `docs/work/archive/`；否则无需创建 Archive。
-8. 确认 Acceptance、Verification、Review 和 `Open Findings = 0` 后，清空 `WORK.md` Active Workspace，并将 `WORK.md` / `STATUS.md` 同时设为 no active work。Distill 是 Completion 的一部分，不在报告完成后延迟执行。
+6. Work 未完成时，向 Conductor 返回 `project://docs/STATUS.md` Current State 与 Next Action 的 `work_updates`。
+7. Work 完成且摘要有长期价值时写入 `project://docs/work/archive/`；否则无需创建 Archive。
+8. 确认 Acceptance、Verification、Review 和 `Open Findings = 0` 后，向 Conductor 返回同时清理 `project://docs/WORK.md` / `project://docs/STATUS.md` 的 Distill 提案。只有 Conductor 正式提交 no active work；Distill 是 Completion 的一部分，不在报告完成后延迟执行。
 
 ## Exclusions
 

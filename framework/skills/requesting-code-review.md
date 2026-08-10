@@ -12,9 +12,9 @@ version: 2.0.0
 
 ## vNext Reference Routing
 
-- 所有 Material Review：读取 `references/01-standards/verifier-critic-pattern.md` 的 Actor / Checker、Input Boundary 与 Verdict Section。
-- Test 或 Assertion 被修改：读取 `references/01-standards/test-integrity-anti-gaming.md` 的 Integrity Difference 与 Reviewer Section。
-- Production Readiness 是 Acceptance 一部分：读取 `references/01-standards/production-readiness-scorecard.md` 的相关 Level 与 Dimension Section。
+- 所有 Material Review：读取 `framework://references/01-standards/verifier-critic-pattern.md` 的 Actor / Checker、Input Boundary 与 Verdict Section。
+- Test 或 Assertion 被修改：读取 `framework://references/01-standards/test-integrity-anti-gaming.md` 的 Integrity Difference 与 Reviewer Section。
+- Production Readiness 是 Acceptance 一部分：读取 `framework://references/01-standards/production-readiness-scorecard.md` 的相关 Level 与 Dimension Section。
 
 > **YuanForge 的四审查官并行审查执行器。**
 > 所有审查官同时启动、双轨运行、各自独立报告。

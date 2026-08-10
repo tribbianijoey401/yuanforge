@@ -8,17 +8,17 @@ version: 4.0.0
 
 ## vNext Reference Routing
 
-- 怀疑 Generated Code Silent Failure、Hallucinated API 或 Context Loss：读取 `references/01-standards/generated-code-failure-modes.md` 的对应 Section。
-- 需要设计 Regression Surface：读取 `references/01-standards/test-discipline.md` 的 Impact Graph 与 Regression Section。
-- 修复经验应转为长期 Regression：读取 `references/01-standards/self-improving-memory.md` 的 Persistent Regression Section。
-- Context 过大导致定位困难：读取 `references/01-standards/context-engineering.md` 的 JIT、Compaction 与 Scratchpad Section。
+- 怀疑 Generated Code Silent Failure、Hallucinated API 或 Context Loss：读取 `framework://references/01-standards/generated-code-failure-modes.md` 的对应 Section。
+- 需要设计 Regression Surface：读取 `framework://references/01-standards/test-discipline.md` 的 Impact Graph 与 Regression Section。
+- 修复经验应转为长期 Regression：读取 `framework://references/01-standards/self-improving-memory.md` 的 Persistent Regression Section。
+- Context 过大导致定位困难：读取 `framework://references/01-standards/context-engineering.md` 的 JIT、Compaction 与 Scratchpad Section。
 
 ## Phase 1：Reproduce
 
 1. 分开记录 Observed Behavior、Expected Behavior、Environment 和 Frequency。
 2. 收集错误、Log 和最近 Change，建立最小可重复步骤。
 3. 优先建立 Failing Test；无法自动化时写明可重复 Manual Reproduction。
-4. 将 Reproduction 与当前 Evidence 写入 `docs/WORK.md`，不要先 Patch。
+4. 将 Reproduction 与当前 Evidence 作为 `work_updates` 返回 Conductor，由 Conductor 提交到 `project://docs/WORK.md`；不要先 Patch。
 
 ## Phase 2：Locate
 
@@ -39,7 +39,7 @@ version: 4.0.0
 1. 选择直接消除 Root Cause 的最小修改，不用掩盖 Symptom 的 Retry、Recover 或 Rebuild 代替修复。
 2. 保持失败 Test，完成一个 Writer 的 Fix。
 3. 运行 Focused Test、受影响 Regression 和必要的真实环境验证。
-4. 更新 `docs/WORK.md` 的 Verification；可复用的 Signal、Cause、Rule 和 Regression Evidence 去重写入 `docs/MEMORY.md`。
+4. 将 Verification 作为 `work_updates` 返回 Conductor；可复用的 Signal、Cause、Rule 和 Regression Evidence 可建议写入 `project://docs/MEMORY.md`，由有权限的角色处理。
 
 ## Output
 

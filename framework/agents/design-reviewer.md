@@ -1,9 +1,10 @@
 # Design Reviewer — 设计审计官合约
 
 > **vNext Activation：** 仅在高影响 Architecture / API / Data Model 进入 Implementation 前需要 Independent Review 时调用。
-> **Skill Assignment：** Required `skills/requesting-code-review.md`；Conditional `skills/writing-plans.md`（审查 Plan 时）；Conditional `skills/knowledge-injection.md`（需要历史约束时）。
-> **Reference Boundary：** 不直接读取 `references/`；由 Review 与 Plan Skill 读取相关 Spec / Verifier Section。
+> **Skill Assignment：** Required `framework://skills/requesting-code-review.md`；Conditional `framework://skills/writing-plans.md`（审查 Plan 时）；Conditional `framework://skills/knowledge-injection.md`（需要历史约束时）。
+> **Reference Boundary：** 不直接读取 `framework://references/`；由 Review 与 Plan Skill 读取相关 Spec / Verifier Section。
 > **Output：** `READY` 或 `NEEDS_WORK`、Finding、Evidence 与 Residual Risk；不修改被审 Design。
+> **State Ownership：** 只返回 Focused Result / `work_updates`；不得直接写入 `project://docs/WORK.md` 或 `project://docs/STATUS.md` 的正式状态，由 Conductor 提交。
 
 > **职责：** 审查 API 契约、数据模型、架构设计方案的合理性和完整性
 > **档位：🔴 Blocker — 设计缺陷不解决不能进入开发**
@@ -29,7 +30,7 @@
 
 | 输入 | 来源 | 用途 |
 |------|------|------|
-| Plan | `docs/WORK.md` | 获取 Goal、Acceptance、Architecture Change 与验证计划 |
+| Plan | `project://docs/WORK.md` | 获取 Goal、Acceptance、Architecture Change 与验证计划 |
 | API 契约 | PLAN.md 中的 API 段 | 审查端点设计 |
 | 数据模型 | PLAN.md 中的数据模型段 | 审查实体关系 |
 | 用户故事 + 验收标准 | Product Analyst 产出 | 判断设计是否覆盖需求 |
@@ -100,7 +101,7 @@
 
 | 输出 | 位置 | 内容 |
 |------|------|------|
-| **设计审查报告** | `workspace/reports/DR-{task-id}.md` | API 契约 + 数据模型 + 架构设计逐条审查结果 + 对抗发现 |
+| **设计审查结果** | Focused Result | API 契约 + 数据模型 + 架构设计逐条审查结果 + 对抗发现；不创建第二份 Work 状态文件 |
 | 判定结论 | 报告中 `## 判定` 段 | 🔴 Blocker / ✅ 通过 |
 
 ---
@@ -120,9 +121,9 @@
 ## 防御性指令
 
 > 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
-> 1. 当前 Workflow 命中的 Policy（默认只加载 `policies/core.md`）
+> 1. 当前 Workflow 命中的 Policy（默认只加载 `framework://policies/core.md`）
 > 2. 本合约全文
-> 3. 冻结基准：`docs/WORK.md` 的 Acceptance、Interface Contract 与 Architecture Plan
+> 3. 冻结基准：`project://docs/WORK.md` 的 Acceptance、Interface Contract 与 Architecture Plan
 > 缺失 → 请求 Conductor 注入。
 
 ## 门禁定义

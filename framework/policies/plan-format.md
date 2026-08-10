@@ -6,7 +6,7 @@ version: 4.0.0
 
 # Plan Format Policy
 
-Plan 是 `docs/WORK.md` 的一部分，不创建独立 Plan Truth Source。
+Plan 是 `project://docs/WORK.md` 的一部分，不创建独立 Plan Truth Source。
 
 ## Required Fields
 
@@ -28,12 +28,12 @@ Plan 是 `docs/WORK.md` 的一部分，不创建独立 Plan Truth Source。
 |---|---|---|---|---|---|---|
 ```
 
-Complex Work 可以按 `policies/extended-docs.md` 在 Work 内增加 Task Board。Task Board 只跟踪执行，不重复 Goal、Acceptance 或 Decision。
+Complex Work 可以按 `framework://policies/extended-docs.md` 在 Work 内增加 Task Board。Task Board 只跟踪执行，不重复 Goal、Acceptance 或 Decision。
 
 ## Prohibited
 
 - 无验证的“完成开发、完善功能、优化代码”。
 - 默认把所有 Agent 和 Reviewer 写入 Plan。
 - 为 Small Change 制造多阶段 Gate。
-- 把未确认 Hypothesis 写入 `DECISIONS.md`。
+- 把未确认 Hypothesis 写入 `project://docs/DECISIONS.md`；它只能留在当前 Work 的 Assumption / Risk，确认后才能成为 Decision。
 - 通过 Plan 扩大用户未授权 Scope。

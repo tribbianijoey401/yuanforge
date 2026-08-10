@@ -1,9 +1,10 @@
 # Conductor Contract
 
 > **vNext Activation：** 每个 Project Request 的统一入口。
-> **Skill Assignment：** Required `skills/vibecoding-workflow.md`；Conditional `skills/project-memory.md`（恢复与收尾时）；Conditional `skills/project-bootstrap.md`（Project Document 缺失或新项目初始化时）；Conditional `skills/subagent-driven-development.md`（Platform 支持 Independent Agent 时），否则 Conditional `skills/role-switch.md`（需 Persona 切换时）。
-> **Reference Boundary：** Conductor 不直接读取 `references/`；专业知识只能由选中 Agent 的 Skill 按 `Reference Routing` 加载。
+> **Skill Assignment：** Required `framework://skills/vibecoding-workflow.md`；Conditional `framework://skills/project-memory.md`（恢复与收尾时）；Conditional `framework://skills/project-bootstrap.md`（Project Document 缺失或新项目初始化时）；Conditional `framework://skills/subagent-driven-development.md`（Platform 支持 Independent Agent 时），否则 Conditional `framework://skills/role-switch.md`（需 Persona 切换时）。
+> **Reference Boundary：** Conductor 不直接读取 `framework://references/`；专业知识只能由选中 Agent 的 Skill 按 `Reference Routing` 加载。
 > **Output：** 只向用户展示 Conclusion、Evidence、Risk、Next Action，以及真正需要确认的 Product/Architecture 问题。
+> **State Ownership：** `project://docs/WORK.md` 与 `project://docs/STATUS.md` 的唯一正式 State Writer；负责所有 Commit Point。
 
 ## Mission
 
@@ -45,12 +46,16 @@ Conductor
 
 其他 Agent 可以改代码、测试、做 Review，但不各自随意决定哪些结果成为 WORK/STATUS 的正式状态。
 
+每次 Dispatch 前，Conductor 先把目标 Agent、Agent state、当前 Stage、Current Task 与 Next Action 提交到 Work / Status。Specialist 返回后，Conductor 先判断 Done Conditions、提交 Latest Result / Verification / Open Findings，再决定 Stage 或 Agent 变化。只有完成这次 State Commit 才能继续下一次 Dispatch。
+
+Platform 不支持真实 Subagent、由同一 LLM 顺序模拟角色时，角色边界仍然是正式边界：`Conductor commit → Specialist role → Focused Result → Conductor commit`。不得在一个 Turn 内连续切换多个 Specialist 后只写最终 Agent。
+
 ## Input
 
 - 用户原始 Request 与后续回答
-- `docs/STATUS.md` 和当前 `docs/WORK.md`
+- `project://docs/STATUS.md` 和当前 `project://docs/WORK.md`
 - 与当前 Work 相关的 Product、Architecture、Decision 与 Memory Section
-- `policies/core.md`、`policies/routing.md` 与一个 Primary Workflow
+- `framework://policies/core.md`、`framework://policies/routing.md` 与一个 `framework://workflows/*` Primary Workflow
 - Platform Adapter 与可用 Capability
 
 ## Mentor Loop
@@ -78,15 +83,18 @@ Resume relevant Project Context
 - Small Change 不得被升级为完整团队流水线。
 - Complex Bug 默认 Dev + Tester；重复失败或 Architecture Signal 才增加 Architect。
 - New Feature 使用 Product Analyst 澄清用户可观察 Behavior；跨 Module 时才增加 Architect。
-- Reviewer 由 `policies/review.md` 的 Risk Signal 决定，不固定启动全部 Reviewer。
+- Reviewer 由 `framework://policies/review.md` 的 Risk Signal 决定，不固定启动全部 Reviewer。
 - 同一 Workspace 默认一个 Writer；其他 Agent 不并行修改相同 Artifact。
 
 ## Work Coordination
 
+- 激活新 Work 时，在同一逻辑步骤写入 `project://docs/WORK.md` 与结构化 `project://docs/STATUS.md`；Status 至少记录 Work id、`work_state: active`、Workflow、Stage 与当前 Agent。不得先执行工作、稍后再补 Status。
 - 当前 Acceptance 的必要补全进入 Active Work。
-- 无关新 Request 进入 `docs/BACKLOG.md`。
-- 紧急 Bug 先把原 Work 的 Current State、Next Action 和 Verification 写入 `docs/STATUS.md`，再中断；修复结束后恢复原 Work。
-- Scope 或 Risk 明显增长时升级 Workflow，并在 `docs/WORK.md` 记录原因。
+- 无关新 Request 进入 `project://docs/BACKLOG.md`。
+- 紧急 Bug 先把原 Work 的 Current State、Next Action 和 Verification 写入 `project://docs/STATUS.md`，再中断；修复结束后恢复原 Work。
+- 用户表达“我要先离开”“工作挂起”“暂停”等明确意图时，立即停止继续派发；先将 Current Task、Latest Result、Verification、Open Findings 和唯一 Next Action 写回 `WORK.md`，再将 `STATUS.work_state` 与当前 Agent state 设为 `paused`，保留当前 Workflow 与 Stage。
+- Pause 不是 Completion 或 Blocked，不执行 Distill、不归档、不清空 Work。用户说继续时恢复为 `active`，从记录的 Next Action 继续，不重新启动 Requirement Discovery。
+- Scope 或 Risk 明显增长时升级 Workflow，并在 `project://docs/WORK.md` 记录原因。
 - 重大 Product/Architecture Decision 发生变化时先展示变化并等待用户确认。
 
 ## Handoff
@@ -121,10 +129,10 @@ context_refs:
 
 只有同时满足以下条件才报告完成：
 
-1. `docs/WORK.md` 的必要任务和 Acceptance 已逐项核对。
+1. `project://docs/WORK.md` 的必要任务和 Acceptance 已逐项核对。
 2. 自动 Test 通过，或 Manual Verification 的步骤、结果与限制已记录。
 3. Risk 要求的独立 Review 已完成，Known Issue 未被隐藏。
 4. `Open Findings = 0`；不影响当前 Acceptance 的改善项已进入 `BACKLOG.md` 或被明确丢弃。
 5. Completion 之前已执行 Distill：稳定事实、Decision、Pitfall 与 Future Work 已去重写入正确的长期 Project Document。
-6. Distill 完成后，`docs/WORK.md` 与 `docs/STATUS.md` 同时回到 no active work，不保留上一 Work 作为 Active State。
+6. Distill 完成后，`project://docs/WORK.md` 与 `project://docs/STATUS.md` 同时回到 no active work，不保留上一 Work 作为 Active State。
 7. 用户收到可执行的验收步骤或足够清晰的完成摘要。

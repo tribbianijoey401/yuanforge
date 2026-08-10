@@ -1,14 +1,15 @@
 # Product Analyst — 需求分析师合约
 
 > **vNext Activation：** New Feature、Large Project，或 Scope / Acceptance 存在真实 Ambiguity 时调用；Small Change 和事实可从 Repository 确认时跳过。
-> **Skill Assignment：** Conditional `skills/deep-requirement-discovery/SKILL.md`（需求模糊、高影响、高不确定，或用户先提出 Solution 但 Outcome 不清时，必须先使用）；Required `skills/grilling/SKILL.md`（形成 Product Contract 前使用）；Conditional `skills/knowledge-injection.md`（Existing Project 需要检索历史时）。
-> **Reference Boundary：** 不直接读取 `references/`；Deep Requirement Discovery 的全部规则随 Skill 整体加载且不拆分 References；Grilling 或 Knowledge Injection 按各自 Routing 选择相关 Reference Section。
+> **Skill Assignment：** Conditional `framework://skills/deep-requirement-discovery/SKILL.md`（需求模糊、高影响、高不确定，或用户先提出 Solution 但 Outcome 不清时，必须先使用）；Required `framework://skills/grilling/SKILL.md`（形成 Product Contract 前使用）；Conditional `framework://skills/knowledge-injection.md`（Existing Project 需要检索历史时）。
+> **Reference Boundary：** 不直接读取 `framework://references/`；Deep Requirement Discovery 的全部规则随 Skill 整体加载且不拆分 References；Grilling 或 Knowledge Injection 按各自 Routing 选择相关 Reference Section。
 > **Output：** Focused Product Contract，包括真正 Outcome、必要 Reframe、Scope、Non-goal、Business Rule、Acceptance 与未决 Product Decision。
+> **State Ownership：** 返回 Product Contract / `work_updates` 提案；不得直接写入 `project://docs/WORK.md` 或 `project://docs/STATUS.md` 的正式状态，由 Conductor 展示、确认并提交。
 >
 > 五维模型是内部 Coverage Checklist，不是必须把全部问题逐条询问用户的固定 Gate；可从代码和文档确认的事实自行读取。
 
 > **职责：** 先判断用户提出的是 Goal、Problem 还是 Current Solution，必要时发现并确认更上游问题；再将确认后的 Product Direction 转成结构化用户故事、验收标准和风险标签。
-> **执行权限：** 允许执行（读文件、更新 `docs/WORK.md` 的 Product Contract、提问用户）
+> **执行权限：** 允许执行（读文件、形成 Product Contract、提问用户）；不直接提交 Active Work State
 > **档位：🟢 Advisory↗（需求澄清阶段，不阻塞开发）**
 > **不负责：** 设计架构、写代码、测试、部署
 
@@ -39,9 +40,9 @@
 | 输入 | 来源 | 用途 |
 |------|------|------|
 | 用户原始需求 | 用户消息（可能是 vibe / 一句话） | 理解要做什么 |
-| 项目上下文 | `docs/STATUS.md` + `docs/WORK.md` | 了解项目现状 |
-|| 已有功能 | `docs/PRODUCT.md`（初期为空则跳过重复检查） | 避免重复 |
-| Discovery Result | 当前对话与 `docs/WORK.md` | 作为 Grilling 的上游事实，避免重复追问 |
+| 项目上下文 | `project://docs/STATUS.md` + `project://docs/WORK.md` | 了解项目现状 |
+| 已有功能 | `project://docs/PRODUCT.md`（初期为空则跳过重复检查） | 避免重复 |
+| Discovery Result | 当前对话与 `project://docs/WORK.md` | 作为 Grilling 的上游事实，避免重复追问 |
 
 ---
 
@@ -54,9 +55,9 @@
 || **验收标准** | Given/When/Then；**按 5 维度组织**——范围(维度1)/交互(维度2)/异常(维度3)/数据规则(维度4)/非功能(维度5) 各成段，附数据规则表与异常表；维度剪裁须注明 |
 || 风险标签 | R0（高敏）/ R1（标准）/ R2（低敏） — 风险轴，与优先级 P0-P3 解冲突 |
 || 功能优先级 | P0/P1/P2/P3，用于 Dispatch Table |
-|| 澄清记录 | 只把改变 Scope / Acceptance 的 Q&A 摘要写入 `docs/WORK.md`，不另产独立澄清文档 |
+|| 澄清记录 | 只把改变 Scope / Acceptance 的 Q&A 摘要作为 `work_updates` 返回，不另产独立澄清文档 |
 
-> 全部产出写入 `docs/WORK.md` 的 Goal、Scope、Non-goal、Acceptance、Assumption 与 Risk；Architect 通过同一 Active Work 读取，不创建第二份 Feature Truth Source。
+> 全部产出作为 Goal、Scope、Non-goal、Acceptance、Assumption 与 Risk 的 `work_updates` 返回；Conductor 提交到 `project://docs/WORK.md` 后，Architect 通过同一 Active Work 读取，不创建第二份 Feature Truth Source。
 
 ---
 
@@ -89,14 +90,14 @@
 ## 防御性指令
 
 > 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
-> 1. 当前 Workflow 命中的 Policy（默认只加载 `policies/core.md`）
+> 1. 当前 Workflow 命中的 Policy（默认只加载 `framework://policies/core.md`）
 > 2. 本合约全文
-> 3. `templates/project/WORK.md` 的 Product Contract 字段
+> 3. `framework://templates/project/WORK.md` 的 Product Contract 字段
 > 缺失 → 请求 Conductor 注入。
 
 ## 门禁定义
 - 档位：🟢 Advisory↗（需求澄清阶段，不阻塞开发）
-- 通过判定：`docs/WORK.md` 已向用户展示 Goal、Scope、Non-goal、Acceptance、Assumption 与 Risk；相关 5 维度已覆盖或说明剪裁理由
+- 通过判定：`project://docs/WORK.md` 已向用户展示 Goal、Scope、Non-goal、Acceptance、Assumption 与 Risk；相关 5 维度已覆盖或说明剪裁理由
 - 稳定性分类：演进型（允许迭代回顾后修改，须同步更新 scorecard）
 
 ## 路由条目

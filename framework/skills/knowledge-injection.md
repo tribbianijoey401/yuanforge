@@ -8,9 +8,9 @@ version: 4.0.0
 
 ## vNext Reference Routing
 
-本 Skill 是通用 Reference Router。先根据 Work、Agent Assignment、Code Path 和 Risk 形成 Retrieval Signal，再读取 `references/README.md` 的 Skill Mapping，最后只加载命中的 Reference Section。
+本 Skill 是通用 Reference Router。先根据 Work、Agent Assignment、Code Path 和 Risk 形成 Retrieval Signal，再读取 `framework://references/README.md` 的 Skill Mapping，最后只加载命中的 Reference Section。
 
-Context 设计必须遵守 `references/01-standards/context-engineering.md` 的 JIT 原则；禁止把全部 Project Memory、全部 Reference 或全文 Index 注入当前 Context。
+Context 设计必须遵守 `framework://references/01-standards/context-engineering.md` 的 JIT 原则；禁止把全部 Project Memory、全部 Reference 或全文 Index 注入当前 Context。
 
 ## Retrieval Procedure
 
@@ -25,9 +25,9 @@ Context 设计必须遵守 `references/01-standards/context-engineering.md` 的 
 
 Project Memory 不是 Framework References。检索顺序为：
 
-1. `docs/STATUS.md` 与当前 `docs/WORK.md`
+1. `project://docs/STATUS.md` 与当前 `project://docs/WORK.md`
 2. 相关 Product / Architecture / Decision Section
-3. `docs/MEMORY.md` 中命中 Module、Signal 或 Failure Mode 的条目
+3. `project://docs/MEMORY.md` 中命中 Module、Signal 或 Failure Mode 的条目
 
 不要扫描全部历史 Work，也不要把未验证 Hypothesis 当作 Pitfall 注入。
 
