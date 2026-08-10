@@ -1,7 +1,5 @@
 // Yuan Insight Dashboard: read-only evidence rendering for /api/state.
 const POLL_MS = 500;
-const MAX_VISIBLE_AGENTS = 4;
-const MAX_VISIBLE_SKILLS = 3;
 const moduleSignatures = new Map();
 const renderSignatures = new Map();
 const entitySignatures = new Map();
@@ -329,11 +327,10 @@ function renderAgents(snapshot, signals, registry, observation, coverageValue) {
     entries.push({ id: agent.id, state: { cls: "missing", tag: "UNREGISTERED ACTOR", group: "UNRESOLVED" } });
   }
   const sorted = sortAgentEntries(entries);
-  const keyEntries = sorted.filter((entry) => entry.state.cls !== "optional");
-  const visible = keyEntries.slice(0, MAX_VISIBLE_AGENTS);
-  const hiddenCount = sorted.length - visible.length;
-  const tiles = visible.map((entry) => tile(entry.id, entry.state, "agent"));
-  if (hiddenCount > 0) tiles.push(summaryTile(hiddenCount, "available / observed below"));
+  const operational = sorted.filter((entry) => entry.state.cls !== "optional");
+  const optionalCount = sorted.filter((entry) => entry.state.cls === "optional").length;
+  const tiles = operational.map((entry) => tile(entry.id, entry.state, "agent"));
+  if (optionalCount > 0) tiles.push(summaryTile(optionalCount, "optional / not required"));
   document.getElementById("agent-count").textContent =
     String((observation.agents || []).length) + " observed";
   replaceChildren("agent-matrix", [sorted, observation, coverageValue], tiles.length ? tiles : [empty("No registered Agents observed")]);
@@ -379,11 +376,10 @@ function renderSkills(snapshot, signals, registry, observation, coverageValue) {
     return { id, state };
   });
   const sorted = sortSkillEntries(entries);
-  const keyEntries = sorted.filter((entry) => entry.state.cls !== "optional");
-  const visible = keyEntries.slice(0, MAX_VISIBLE_SKILLS);
-  const hiddenCount = sorted.length - visible.length;
-  const tiles = visible.map((entry) => tile(entry.id, entry.state, "skill"));
-  if (hiddenCount > 0) tiles.push(summaryTile(hiddenCount, "available / expected below"));
+  const relevant = sorted.filter((entry) => entry.state.cls !== "optional");
+  const catalogCount = sorted.filter((entry) => entry.state.cls === "optional").length;
+  const tiles = relevant.map((entry) => tile(entry.id, entry.state, "skill"));
+  if (catalogCount > 0) tiles.push(summaryTile(catalogCount, "catalog available"));
   document.getElementById("skill-count").textContent = String(observed.length) + " loaded";
   replaceChildren("skill-matrix", [sorted, required, observed, signals, coverageValue], tiles.length ? tiles : [empty("No registered Skills observed")]);
   highlightChanged("skill-matrix-panel", [registry.skills, required, observed, signals, coverageValue]);

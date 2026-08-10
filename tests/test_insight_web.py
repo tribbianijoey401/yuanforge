@@ -113,8 +113,32 @@ class ServerTests(unittest.TestCase):
         self.assertIn("sortSkillEntries", app)
         self.assertIn("summary-tile", app)
         self.assertIn("critical-signals", app)
-        self.assertIn("MAX_VISIBLE_AGENTS", app)
-        self.assertIn("MAX_VISIBLE_SKILLS", app)
+
+    def test_required_agent_and_skill_nodes_are_never_truncated(self):
+        app = (ROOT / "insight" / "web" / "app.js").read_text(encoding="utf-8")
+        styles = (ROOT / "insight" / "web" / "styles.css").read_text(encoding="utf-8")
+        self.assertNotIn("MAX_VISIBLE_AGENTS", app)
+        self.assertNotIn("MAX_VISIBLE_SKILLS", app)
+        self.assertNotRegex(app, r"keyEntries\.slice\(")
+        self.assertIn(
+            'const operational = sorted.filter((entry) => entry.state.cls !== "optional");',
+            app,
+        )
+        self.assertIn(
+            'const optionalCount = sorted.filter((entry) => entry.state.cls === "optional").length;',
+            app,
+        )
+        self.assertIn("if (optionalCount > 0)", app)
+        self.assertIn(
+            'const relevant = sorted.filter((entry) => entry.state.cls !== "optional");',
+            app,
+        )
+        self.assertIn(
+            'const catalogCount = sorted.filter((entry) => entry.state.cls === "optional").length;',
+            app,
+        )
+        self.assertIn("if (catalogCount > 0)", app)
+        self.assertIn("minmax(12rem, auto)", styles)
 
     def test_dashboard_motion_is_change_driven_and_reduced_motion_safe(self):
         app = (ROOT / "insight" / "web" / "app.js").read_text(encoding="utf-8")
