@@ -1,110 +1,154 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Yuan Insight</title>
-<style>
-  :root {
-    --bg: #0d1117; --panel: #161b22; --border: #30363d;
-    --text: #c9d1d9; --muted: #8b949e;
-    --green: #3fb950; --red: #f85149; --yellow: #d29922;
-    --blue: #58a6ff; --gray: #6e7681;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font: 14px/1.5 -apple-system, "Segoe UI", "PingFang SC", sans-serif; padding: 20px; }
-  h1 { font-size: 20px; margin-bottom: 4px; }
-  .sub { color: var(--muted); font-size: 12px; margin-bottom: 20px; }
-  .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
-  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
-  .panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 12px; }
-  .work { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-  .work .state { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 8px; vertical-align: 2px; }
-  .state.active { background: rgba(63,185,80,.15); color: var(--green); }
-  .state.idle { background: rgba(110,118,129,.2); color: var(--muted); }
-  .state.blocked { background: rgba(248,81,73,.15); color: var(--red); }
-  .stage-row { display: flex; gap: 8px; margin: 14px 0; flex-wrap: wrap; }
-  .stage { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border); font-size: 12px; color: var(--muted); }
-  .stage.current { border-color: var(--blue); color: var(--blue); font-weight: 600; }
-  .stage.done { border-color: var(--green); color: var(--green); }
-  .agent-current { margin-top: 10px; font-size: 13px; }
-  .work-warning { display: none; margin: 10px 0; padding: 8px 10px; border: 1px solid var(--yellow); border-radius: 6px; color: var(--yellow); font-size: 12px; }
-  .work-details { display: grid; gap: 10px; margin-top: 12px; }
-  .work-detail { padding-top: 10px; border-top: 1px solid var(--border); }
-  .work-detail .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .4px; }
-  .work-detail .value { margin-top: 3px; white-space: pre-wrap; overflow-wrap: anywhere; }
-  .matrix { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
-  .tile { border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-size: 12px; }
-  .tile .id { font-weight: 600; margin-bottom: 4px; }
-  .tile .tag { font-size: 10px; color: var(--muted); }
-  .tile.active { border-color: var(--blue); }
-  .tile.completed { border-color: var(--green); }
-  .tile.missing { border-color: var(--red); background: rgba(248,81,73,.06); }
-  .tile.optional { border-color: var(--gray); opacity: .55; }
-  .tile.unknown { border-style: dashed; }
-  .signals { display: flex; flex-direction: column; gap: 8px; }
-  .signal { border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; font-size: 12px; cursor: pointer; }
-  .signal .lvl { display: inline-block; padding: 1px 6px; border-radius: 8px; font-size: 10px; margin-right: 6px; }
-  .lvl.MISSING { background: rgba(248,81,73,.15); color: var(--red); }
-  .lvl.REPEATED { background: rgba(210,153,34,.15); color: var(--yellow); }
-  .lvl.INFO { background: rgba(88,166,255,.15); color: var(--blue); }
-  .signal .summary { margin-top: 4px; }
-  .why { display: none; margin-top: 8px; padding: 10px; background: #0d1117; border-radius: 6px; font-size: 11px; }
-  .why.open { display: block; }
-  .why .row { margin: 4px 0; }
-  .why .label { color: var(--muted); display: inline-block; width: 70px; }
-  .footprint { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
-  .fitem { text-align: center; }
-  .fitem .num { font-size: 20px; font-weight: 600; color: var(--blue); }
-  .fitem .lbl { font-size: 10px; color: var(--muted); }
-  .empty { color: var(--muted); font-size: 12px; padding: 20px; text-align: center; }
-  .coverage { display: inline-block; padding: 1px 8px; border-radius: 8px; font-size: 10px; margin-left: 8px; }
-  .coverage.FULL { background: rgba(63,185,80,.15); color: var(--green); }
-  .coverage.UNKNOWN { background: rgba(110,118,129,.2); color: var(--muted); }
-  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Yuan Insight · Living Workflow Canvas</title>
+  <link rel="stylesheet" href="/static/tokens.css">
+  <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-<h1>Yuan Insight</h1>
-<div class="sub" id="sub">观察中…</div>
-<div class="grid">
-  <div>
-    <div class="panel" id="work-panel">
-      <h2>Work / Execution Map</h2>
-      <div class="work" id="work-title">—</div>
-      <div class="work-warning" id="work-warning"></div>
-      <div class="stage-row" id="stage-row"></div>
-      <div class="agent-current" id="agent-current"></div>
-      <div class="work-details" id="work-details"></div>
+  <a class="skip-link" href="#main-content">跳至主要内容</a>
+
+  <header class="topbar">
+    <a class="brand-lockup" href="#main-content" aria-label="Yuan Insight 首页">
+      <span class="brand-mark" aria-hidden="true">Y</span>
+      <span>
+        <strong>Yuan Insight</strong>
+        <small>Living Workflow Canvas</small>
+      </span>
+    </a>
+    <p class="observation-meta" id="sub" aria-live="polite">正在建立只读观察</p>
+  </header>
+
+  <section class="status-ribbon" aria-label="Overall Status">
+    <div class="ribbon-item">
+      <span class="ribbon-label">Work State</span>
+      <span class="ribbon-value" id="ribbon-work-state">UNKNOWN</span>
     </div>
-    <div class="panel" style="margin-top:16px">
-      <h2>Agent Matrix</h2>
-      <div class="matrix" id="agent-matrix"></div>
+    <div class="ribbon-item">
+      <span class="ribbon-label">Current Agent</span>
+      <span class="ribbon-value" id="ribbon-agent">UNKNOWN</span>
     </div>
-    <div class="panel" style="margin-top:16px">
-      <h2>Context Footprint <span class="coverage" id="fp-coverage">UNKNOWN</span></h2>
-      <div class="footprint" id="footprint"></div>
+    <div class="ribbon-item">
+      <span class="ribbon-label">Coverage</span>
+      <span class="ribbon-value" id="ribbon-coverage">UNKNOWN</span>
     </div>
-    <div class="panel" style="margin-top:16px">
-      <h2>Memory / Failure View</h2>
-      <div id="memory"><div class="empty">Usage evidence unavailable</div></div>
+    <div class="ribbon-item">
+      <span class="ribbon-label">Source Health</span>
+      <span class="ribbon-value" id="ribbon-source-health">UNKNOWN</span>
     </div>
-  </div>
-  <div>
-    <div class="panel">
-      <h2>Signals <span class="coverage" id="sig-coverage">UNKNOWN</span></h2>
-      <div class="signals" id="signals"><div class="empty">无信号</div></div>
+    <div class="connection-error" id="connection-error" role="alert" aria-live="assertive" hidden>
+      <span id="connection-error-message">刷新暂时不可用；保留最后一次成功快照。</span>
+      <button class="button" id="retry-button" type="button">重试</button>
     </div>
-    <div class="panel" style="margin-top:16px">
-      <h2>Skill Matrix</h2>
-      <div class="matrix" id="skill-matrix"></div>
-    </div>
-    <div class="panel" style="margin-top:16px">
-      <h2>Work History</h2>
-      <div id="history"><div class="empty">无历史</div></div>
-    </div>
-  </div>
-</div>
-<script src="/static/app.js"></script>
+  </section>
+
+  <main id="main-content" tabindex="-1">
+    <section class="above-fold" aria-label="当前工作概览">
+      <div class="primary-grid">
+        <article class="panel execution-rail" id="execution-rail" aria-labelledby="execution-rail-title">
+          <div class="panel-heading compact">
+            <div>
+              <p class="eyebrow">LIVE WORKFLOW</p>
+              <h1 id="execution-rail-title">Execution flow</h1>
+            </div>
+            <span class="workflow-caption" id="workflow-caption">正在读取阶段</span>
+          </div>
+          <ol class="stage-row" id="stage-row"></ol>
+        </article>
+
+      </div>
+
+      <div class="operational-grid">
+        <article class="panel matrix-panel agent-matrix-panel" id="agent-matrix-panel" aria-labelledby="agent-matrix-title">
+          <div class="panel-heading compact">
+            <div>
+              <p class="eyebrow">AGENT ORCHESTRATION</p>
+              <h2 id="agent-matrix-title">关键 Agent</h2>
+            </div>
+            <span class="panel-count" id="agent-count">0 observed</span>
+          </div>
+          <div class="matrix agent-matrix" id="agent-matrix"></div>
+        </article>
+
+        <article class="panel matrix-panel skill-matrix-panel" id="skill-matrix-panel" aria-labelledby="skill-matrix-title">
+          <div class="panel-heading compact">
+            <div>
+              <p class="eyebrow">SKILL LOADOUT</p>
+              <h2 id="skill-matrix-title">关键 Skill</h2>
+            </div>
+            <span class="panel-count" id="skill-count">0 loaded</span>
+          </div>
+          <div class="matrix skill-matrix" id="skill-matrix"></div>
+        </article>
+      </div>
+
+      <article class="panel critical-panel" id="critical-signal-panel" aria-labelledby="critical-signals-title">
+        <div class="panel-heading compact">
+          <div>
+            <p class="eyebrow">CRITICAL SIGNALS</p>
+            <h2 id="critical-signals-title">需要关注</h2>
+          </div>
+          <span class="coverage" id="sig-coverage">UNKNOWN</span>
+        </div>
+        <div class="critical-signals" id="critical-signals"></div>
+      </article>
+    </section>
+
+    <section class="details-zone" aria-label="工作内容与完整证据">
+      <article class="panel work-focus" id="work-focus" aria-labelledby="work-focus-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">WORK DETAILS</p>
+            <h2 id="work-focus-title">正在读取工作状态</h2>
+          </div>
+          <div id="work-state-badge"></div>
+        </div>
+        <div class="fact-strip" id="work-facts"></div>
+        <div class="work-warning" id="work-warning"></div>
+        <div class="work-details" id="work-details"></div>
+      </article>
+
+      <article class="panel now-next" id="now-next" aria-labelledby="now-next-title">
+        <div class="panel-heading compact">
+          <div><p class="eyebrow">NOW / NEXT</p><h2 id="now-next-title">工作叙事</h2></div>
+        </div>
+        <div class="narrative-grid" id="now-next-content"></div>
+      </article>
+
+      <article class="panel signal-inbox" id="signal-inbox" aria-labelledby="signal-inbox-title">
+        <div class="panel-heading compact">
+          <div><p class="eyebrow">ALL SIGNALS</p><h2 id="signal-inbox-title">完整证据</h2></div>
+        </div>
+        <div class="signals" id="signals"></div>
+      </article>
+
+      <article class="panel source-health" id="source-health" aria-labelledby="source-health-title">
+        <div class="panel-heading compact">
+          <div><p class="eyebrow">SOURCE HEALTH</p><h2 id="source-health-title">状态来源</h2></div>
+        </div>
+        <ul class="source-list" id="source-list"></ul>
+      </article>
+
+      <article class="panel context-load" id="context-load" aria-labelledby="context-load-title">
+        <div class="panel-heading compact">
+          <div><p class="eyebrow">CONTEXT LOAD</p><h2 id="context-load-title">已观测上下文</h2></div>
+          <span class="coverage" id="fp-coverage">UNKNOWN</span>
+        </div>
+        <div class="footprint" id="footprint"></div>
+        <div class="memory-evidence" id="memory"></div>
+      </article>
+
+      <article class="panel trace-archive" id="trace-archive" aria-labelledby="trace-archive-title">
+        <div class="panel-heading compact">
+          <div><p class="eyebrow">TRACE ARCHIVE</p><h2 id="trace-archive-title">工作轨迹</h2></div>
+        </div>
+        <div id="history"></div>
+      </article>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
 </body>
 </html>
