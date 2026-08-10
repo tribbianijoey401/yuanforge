@@ -58,6 +58,11 @@ quality:
 
 
 class ServerTests(unittest.TestCase):
+    def test_dashboard_polls_every_half_second(self):
+        app = (ROOT / "insight" / "web" / "app.js").read_text(encoding="utf-8")
+        self.assertIn("const POLL_MS = 500", app)
+        self.assertIn("每 0.5s 刷新", app)
+
     def test_missing_state_is_rendered_as_unavailable_not_idle(self):
         app = (ROOT / "insight" / "web" / "app.js").read_text(encoding="utf-8")
         self.assertIn("STATE UNAVAILABLE", app)

@@ -35,7 +35,7 @@ python -B .yuan/insight/yuan.py observe . --web
 
 ## Dashboard
 
-打开 `http://127.0.0.1:8765/`。`--web` 在同一进程启动 Observation Service，后台由原生文件事件唤醒并完成 Debounce / Trace / Gap / Summary；UI 每 3s 读取 `/api/state`。`--poll` 只控制 fallback polling / watcher health check 间隔，不是原生模式的采样周期：
+打开 `http://127.0.0.1:8765/`。`--web` 在同一进程启动 Observation Service，后台由原生文件事件唤醒并完成 Debounce / Trace / Gap / Summary；UI 每 0.5s 读取 `/api/state`。`--poll` 只控制 fallback polling / watcher health check 间隔，不是原生模式的采样周期：
 
 - **Work / Execution Map**：Work 状态、Stage Timeline、当前 Agent
 - **Agent Matrix**：ACTIVE / COMPLETED / MISSING / NOT REQUIRED

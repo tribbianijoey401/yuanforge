@@ -1,5 +1,5 @@
 // Yuan Insight Dashboard — 轮询 /api/state，Fact First 渲染
-const POLL_MS = 3000;
+const POLL_MS = 500;
 
 function esc(value) {
   return String(value ?? "")
@@ -25,7 +25,7 @@ function render(data) {
   document.getElementById("sub").textContent =
     "Observed at " + data.observed_at + " · " +
     (((data.observation || {}).mode) || "unknown") +
-    " · 每 3s 刷新 · 只读旁路，不影响 Yuan";
+    " · 每 0.5s 刷新 · 只读旁路，不影响 Yuan";
   renderWork(data.snapshot);
   renderAgents(data.snapshot, data.signals, data.registry, data.observation, data.coverage);
   renderSkills(data.snapshot, data.signals, data.registry, data.observation, data.coverage);
