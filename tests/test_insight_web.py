@@ -57,10 +57,8 @@ work: BUG-010
 work_state: active
 workflow: complex-bug
 stage: implement
-activity: specialist_execution
 agent:
   id: backend-dev
-  instance: frontend-fixer
   state: active
 quality:
   test: pending
@@ -271,10 +269,6 @@ class ServerTests(unittest.TestCase):
         self.assertIn("footprint", data)
         self.assertIn("registry", data)
         self.assertEqual(data["snapshot"]["status"]["work"], "BUG-010")
-        self.assertEqual(data["snapshot"]["status"]["activity"], "specialist_execution")
-        self.assertEqual(
-            data["snapshot"]["status"]["agent"]["instance"], "frontend-fixer"
-        )
         self.assertIn("backend-dev", data["registry"]["agents"])
         self.assertEqual(data["coverage"], "PARTIAL")
         self.assertTrue(data["observation"]["mode"].startswith("native-") or data["observation"]["mode"] == "polling-fallback")
