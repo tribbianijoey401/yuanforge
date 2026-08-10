@@ -1,0 +1,34 @@
+{
+  "work_id": "2026-08-10_state-commit-contract",
+  "transition_count": 7,
+  "first_observed_at": "1786362811.656420",
+  "last_observed_at": "1786363523.641169",
+  "stages": [
+    "implement",
+    "regression"
+  ],
+  "agents": [
+    "ux-reviewer",
+    "tester",
+    "frontend-dev"
+  ],
+  "skills": [],
+  "files_changed": [
+    "docs/ARCHITECTURE.md",
+    "docs/DECISIONS.md",
+    "docs/MEMORY.md",
+    "docs/STATUS.md",
+    "docs/WORK.md"
+  ],
+  "sessions": [
+    "OBS-20260810T115206-36b79a4e"
+  ],
+  "coverage": "PARTIAL",
+  "gaps": [
+    {
+      "session_id": "OBS-20260810T115206-36b79a4e",
+      "gap_start": "2026-08-10T11:48:43.126803Z",
+      "gap_end": "2026-08-10T11:52:05.940729Z"
+    }
+  ]
+}

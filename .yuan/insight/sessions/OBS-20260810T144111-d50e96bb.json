@@ -1,0 +1,10 @@
+{
+  "session_id": "OBS-20260810T144111-d50e96bb",
+  "started_at": "2026-08-10T14:41:11.063189Z",
+  "baseline_fingerprint": "6199909d3c3959b814695d36d89c7c81d4eeb17ed7435a5a03459ffbe2b44cc0",
+  "status": "active",
+  "coverage": "FULL",
+  "baseline_work_id": "2026-08-10_insight-light-workbench",
+  "last_observed_at": "1786376258.380448",
+  "current_work_id": "2026-08-10_insight-workflow-full-entities"
+}

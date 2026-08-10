@@ -1,0 +1,10 @@
+{
+  "session_id": "OBS-20260810T115206-36b79a4e",
+  "started_at": "2026-08-10T11:52:05.940729Z",
+  "baseline_fingerprint": "4597ea908dd0e1d2b71540da27db8de6f5e9647746f4a048ccb7b2b1de34111b",
+  "status": "active",
+  "coverage": "FULL",
+  "baseline_work_id": "2026-08-10_state-commit-contract",
+  "last_observed_at": "1786373806.316765",
+  "current_work_id": "2026-08-10_insight-light-workbench"
+}

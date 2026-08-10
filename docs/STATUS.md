@@ -1,31 +1,31 @@
 ---
-work: 2026-08-10_insight-workflow-full-entities
+work: 2026-08-11_content-driven-interface-design
 work_state: active
-workflow: complex-bug
-stage: reproduce
+workflow: new-feature
+stage: design
 agent:
-  id: tester
+  id: ui-designer
   state: active
 quality:
   test: pending
-  review: not_required
+  review: pending
 ---
 
 # Current Situation
 
-正在修正 Insight 首屏对 Workflow 涉及 Agent / Skill 的截断与混合汇总问题。
+正在把故事驱动、内容驱动的 UI 设计方法沉淀为 Yuan Skill 与 Agent Contract。
 
 ## Current Task
 
-复现固定数量上限会隐藏必要 Agent / Skill，并确认 Optional 汇总计数边界。
+设计新 Skill、Reference Routing、输出 Contract 与跨 Agent 边界。
 
 ## Last Result
 
-用户确认所有 Workflow 涉及项必须完整展示，只有 Optional / Catalog 可以折叠。
+Product Analyst 已完成可验证 Product Contract，无需用户新增决策。
 
 ## Next
 
-建立失败验收后交给 Frontend Dev 实现。
+UI Designer 完成能力设计后交给唯一 Writer 实现。
 
 ## Blocker
 

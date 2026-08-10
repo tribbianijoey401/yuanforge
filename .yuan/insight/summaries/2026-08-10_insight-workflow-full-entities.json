@@ -1,0 +1,35 @@
+{
+  "work_id": "2026-08-10_insight-workflow-full-entities",
+  "transition_count": 10,
+  "first_observed_at": "1786375764.222236",
+  "last_observed_at": "1786376282.796770",
+  "stages": [
+    "reproduce",
+    "implement",
+    "regression",
+    "distill"
+  ],
+  "agents": [
+    "tester",
+    "frontend-dev",
+    "conductor"
+  ],
+  "skills": [],
+  "files_changed": [
+    "docs/MEMORY.md",
+    "docs/STATUS.md",
+    "docs/WORK.md"
+  ],
+  "sessions": [
+    "OBS-20260810T144111-d50e96bb",
+    "OBS-20260810T142409-0740fe9d"
+  ],
+  "coverage": "FULL",
+  "gaps": [
+    {
+      "session_id": "OBS-20260810T142409-0740fe9d",
+      "gap_start": "1786371818.137828",
+      "gap_end": "2026-08-10T14:24:09.351655Z"
+    }
+  ]
+}

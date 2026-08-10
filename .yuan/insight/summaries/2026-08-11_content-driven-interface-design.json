@@ -1,0 +1,30 @@
+{
+  "work_id": "2026-08-11_content-driven-interface-design",
+  "transition_count": 2,
+  "first_observed_at": "1786379222.215574",
+  "last_observed_at": "1786379253.703461",
+  "stages": [
+    "discover",
+    "verify-plan"
+  ],
+  "agents": [
+    "product-analyst",
+    "backend-dev"
+  ],
+  "skills": [],
+  "files_changed": [
+    "docs/STATUS.md",
+    "docs/WORK.md"
+  ],
+  "sessions": [
+    "OBS-20260810T142409-0740fe9d"
+  ],
+  "coverage": "FULL",
+  "gaps": [
+    {
+      "session_id": "OBS-20260810T142409-0740fe9d",
+      "gap_start": "1786371818.137828",
+      "gap_end": "2026-08-10T14:24:09.351655Z"
+    }
+  ]
+}

@@ -129,7 +129,7 @@ description: 可复用的 Verified Finding、Pitfall、Preference 和 Convention
 
 ### M-021：Insight Dashboard 首屏优先事实流程与状态
 
-- **Rule**：Insight 使用中性温白 Canvas 与集中 Design Token；1280×720 首屏优先完整 Workflow、Overall Status、关键 Agent 与关键 Skill，Goal/Task/Result/Context/History 下移。Unknown、Partial 与 Unavailable 必须显式可见；状态用颜色、形态和文字共同表达。Motion 只在真实状态签名变化时有限播放，常驻界面无 infinite 动画；Signal 折叠状态以稳定 ID 跨轮询保存并恢复焦点；窄屏 DOM、视觉与键盘顺序一致且不得横向溢出。
+- **Rule**：Insight 使用中性温白 Canvas 与集中 Design Token；1280×720 首屏优先完整 Workflow、Overall Status、关键 Agent 与关键 Skill，Goal/Task/Result/Context/History 下移。当前 Workflow 涉及的 Current、Required、Observed、Missing、Unknown Agent / Skill 必须全量展示，只有 Optional、Not Required 或 Catalog 项可以折叠为准确的独立数量汇总。Unknown、Partial 与 Unavailable 必须显式可见；状态用颜色、形态和文字共同表达。Motion 只在真实状态签名变化时有限播放，常驻界面无 infinite 动画；Signal 折叠状态以稳定 ID 跨轮询保存并恢复焦点；窄屏 DOM、视觉与键盘顺序一致且不得横向溢出。
 
 ## Engineering Conventions
 
