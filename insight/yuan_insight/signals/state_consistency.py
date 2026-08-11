@@ -46,6 +46,30 @@ def compute_state_consistency(
             )
         ]
 
+    canonical_issues = snapshot.get("state_validation")
+    if canonical_issues is not None:
+        if not canonical_issues:
+            return []
+        details = "; ".join(
+            f"{issue.get('code')}: {issue.get('field')}={issue.get('actual')!r}; "
+            f"repair={issue.get('repair')}"
+            for issue in canonical_issues
+        )
+        return [
+            Signal(
+                signal_id="STATE_DIVERGENCE",
+                level="INCONSISTENT",
+                entity="project-state",
+                summary=details,
+                why=WhyProvenance(
+                    expected_rule="framework://policies/state-contract.md",
+                    observed=details,
+                    derived="framework://tools/state_guard.py read-only validation",
+                    check="Have Conductor repair the same State Commit; do not dispatch until STATE_VALID",
+                ),
+            )
+        ]
+
     if has_active_work and not status_has_work:
         issues.append("WORK has an Active Goal but STATUS is idle or unknown")
     if status_has_work and not has_active_work:

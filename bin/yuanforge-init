@@ -14,6 +14,7 @@ Override 与业务内容保持不变。
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import os
 import re
@@ -382,96 +383,32 @@ def parse_frontmatter_lists(frontmatter: str) -> dict[str, list[str]]:
     return result
 
 
-def _frontmatter_scalar(frontmatter: str, field: str) -> str | None:
-    match = re.search(
-        rf"^[ \t]*{re.escape(field)}:\s*([^#\r\n]+)",
-        frontmatter,
-        re.MULTILINE,
-    )
-    if not match:
-        return None
-    value = match.group(1).strip().strip("'\"")
-    return None if value.lower() in {"", "null", "none", "~"} else value
-
-
-def _markdown_section(text: str, heading: str) -> str:
-    match = re.search(
-        rf"^##\s+{re.escape(heading)}\s*$\r?\n(.*?)(?=^##\s+|\Z)",
-        text,
-        re.MULTILINE | re.DOTALL,
-    )
-    return match.group(1).strip() if match else ""
-
-
 def validate_project_state(target: Path, framework_root: Path) -> list[str]:
-    """只读检查 Project State 一致性；不迁移、不修复，也不阻断 update。"""
-    status_path = target / "docs" / "STATUS.md"
-    work_path = target / "docs" / "WORK.md"
-    if not status_path.is_file() or not work_path.is_file():
-        return []
+    """复用 Framework State Guard；Installer 不维护第二套状态语义。"""
+    # Installer 从 Yuan Source Repository 外部运行。执行 Source 自己的受信 Guard，
+    # 仅把目标 Framework 作为数据读取；不得 import 被检查 Project 中的 Python。
+    guard_path = SOURCE_FRAMEWORK / "tools" / "state_guard.py"
+    if not guard_path.is_file():
+        return [
+            "STATE_CHECK_UNAVAILABLE: 缺少 framework/tools/state_guard.py；"
+            "请先 update Framework"
+        ]
     try:
-        status_text = status_path.read_text(encoding="utf-8")
-        work_text = work_path.read_text(encoding="utf-8")
-    except (OSError, UnicodeError):
-        return ["STATE_CHECK_UNAVAILABLE: 无法读取 docs/STATUS.md 或 docs/WORK.md"]
-
-    goal = _markdown_section(work_text, "Goal")
-    has_active_work = bool(goal) and "No active work." not in work_text
-    if not status_text.startswith("---") or len(status_text.split("---", 2)) < 3:
-        return (
-            ["STATE_DIVERGENCE: WORK 存在 Active Goal，但 STATUS 没有结构化 checkpoint"]
-            if has_active_work
-            else []
+        spec = importlib.util.spec_from_file_location(
+            "yuan_installed_state_guard", guard_path
         )
-
-    frontmatter = status_text.split("---", 2)[1]
-    work_id = _frontmatter_scalar(frontmatter, "work")
-    work_state = (_frontmatter_scalar(frontmatter, "work_state") or "unknown").lower()
-    workflow = _frontmatter_scalar(frontmatter, "workflow")
-    stage = _frontmatter_scalar(frontmatter, "stage")
-    agent_block = re.search(
-        r"^agent:\s*$\r?\n(?P<body>(?:^[ \t]+.*(?:\r?\n|$))*)",
-        frontmatter,
-        re.MULTILINE,
-    )
-    agent_body = agent_block.group("body") if agent_block else ""
-    agent_id = _frontmatter_scalar(agent_body, "id")
-    agent_state = (_frontmatter_scalar(agent_body, "state") or "unknown").lower()
-    warnings: list[str] = []
-
-    status_has_work = bool(work_id) or work_state in {"active", "paused"}
-    if has_active_work and not status_has_work:
-        warnings.append("STATE_DIVERGENCE: WORK 存在 Active Goal，但 STATUS 声明 idle/unknown")
-    if status_has_work and not has_active_work:
-        warnings.append("STATE_DIVERGENCE: STATUS 声明 Active/Paused Work，但 WORK 没有 Active Goal")
-    if not status_has_work:
-        return warnings
-
-    if work_state not in {"active", "paused"}:
-        warnings.append(f"STATE_CHECKPOINT_INCOMPLETE: work_state={work_state}")
-    for field, value in (("work", work_id), ("workflow", workflow), ("stage", stage), ("agent.id", agent_id)):
-        if not value:
-            warnings.append(f"STATE_CHECKPOINT_INCOMPLETE: 缺少 {field}")
-
-    if workflow:
-        workflow_path = framework_root / "workflows" / f"{workflow}.md"
-        if not workflow_path.is_file():
-            warnings.append(f"STATE_REFERENCE_UNKNOWN: workflow={workflow}")
-        elif stage:
-            workflow_text = workflow_path.read_text(encoding="utf-8")
-            parts = workflow_text.split("---", 2)
-            stages = parse_frontmatter_lists(parts[1]).get("stages", []) if len(parts) == 3 else []
-            if stage not in stages:
-                warnings.append(f"STATE_REFERENCE_UNKNOWN: stage={stage} 不属于 workflow={workflow}")
-    if agent_id and not (framework_root / "agents" / f"{agent_id}.md").is_file():
-        warnings.append(f"STATE_REFERENCE_UNKNOWN: agent.id={agent_id}")
-    if work_state == "paused" and agent_state != "paused":
-        warnings.append("STATE_DIVERGENCE: paused Work 的 agent.state 必须为 paused")
-    if work_state == "active" and not _markdown_section(work_text, "Current Task"):
-        warnings.append("STATE_CHECKPOINT_INCOMPLETE: Active Work 缺少 Current Task")
-    if work_state == "paused" and not _markdown_section(work_text, "Next Action"):
-        warnings.append("STATE_CHECKPOINT_INCOMPLETE: Paused Work 缺少 Next Action")
-    return sorted(set(warnings))
+        if spec is None or spec.loader is None:
+            raise ImportError("无法创建 State Guard module spec")
+        guard = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(guard)
+        issues = guard.validate_project_state(target, framework_root)
+    except (OSError, UnicodeError, ImportError, AttributeError) as exc:
+        return [f"STATE_CHECK_UNAVAILABLE: {type(exc).__name__}: {exc}"]
+    return [
+        f"STATE_DIVERGENCE[{issue.code}]: {issue.field}={issue.actual!r}; "
+        f"expected={issue.expected}; repair={issue.repair}"
+        for issue in issues
+    ]
 
 
 def validate_framework(root: Path) -> tuple[list[str], list[str]]:
@@ -484,6 +421,7 @@ def validate_framework(root: Path) -> tuple[list[str], list[str]]:
         "policies/core.md",
         "policies/routing.md",
         "policies/documents.md",
+        "policies/state-contract.md",
         "policies/review.md",
         "agents/conductor.md",
         "workflows/small-change.md",
@@ -492,6 +430,7 @@ def validate_framework(root: Path) -> tuple[list[str], list[str]]:
         "workflows/large-project.md",
         "templates/project/WORK.md",
         "templates/project/STATUS.md",
+        "tools/state_guard.py",
     )
     for relative in required:
         if not (root / relative).is_file():

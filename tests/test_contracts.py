@@ -336,6 +336,41 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertNotRegex(status_template, r"(?im)^revision:")
         self.assertIn("不保存 visualization revision", documents)
 
+    def test_state_commit_has_machine_checked_canonical_contract(self):
+        adapter = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        conductor = (FRAMEWORK / "agents" / "conductor.md").read_text(encoding="utf-8")
+        coordination = (FRAMEWORK / "skills" / "vibecoding-workflow.md").read_text(
+            encoding="utf-8"
+        )
+        contract = (FRAMEWORK / "policies" / "state-contract.md").read_text(
+            encoding="utf-8"
+        )
+        guard = FRAMEWORK / "tools" / "state_guard.py"
+
+        self.assertTrue(guard.is_file())
+        for text in (adapter, conductor, coordination):
+            self.assertIn("state-contract.md", text)
+            self.assertIn("state_guard.py check", text)
+            self.assertIn("校验通过", text)
+            self.assertIn("不得继续 Dispatch", text)
+        self.assertIn("agent.instance", contract)
+        self.assertNotIn("activity", contract)
+        self.assertIn("Workflow frontmatter", contract)
+        self.assertIn("Agent Contract", contract)
+        self.assertIn("文件名 stem", contract)
+        self.assertIn("当前 Workflow", contract)
+
+    def test_state_check_does_not_execute_python_from_arbitrary_project(self):
+        installer = (ROOT / "bin" / "yuanforge-init").read_text(encoding="utf-8")
+        insight_validation = (
+            ROOT / "insight" / "yuan_insight" / "state_validation.py"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('SOURCE_FRAMEWORK / "tools" / "state_guard.py"', installer)
+        self.assertIn("source_guard", insight_validation)
+        self.assertIn("installed_yuan_root", insight_validation)
+        self.assertIn("return None", insight_validation)
+
 
 if __name__ == "__main__":
     unittest.main()

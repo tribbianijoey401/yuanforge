@@ -5,6 +5,7 @@ workflow: null
 stage: null
 agent:
   id: null
+  instance: null
   state: null
 quality:
   test: pending
@@ -27,4 +28,7 @@ Agent 接管/完成、重要结果确认、Blocker 变化、Test/Review 状态�
 并将 Agent state 设为 paused。Agent 完成后、下一 Agent 接管前保留
 id + state: completed，不要置 none。
 Agent state 取值：idle / active / paused / completed / blocked
+`stage` 必须来自当前 Workflow frontmatter；`agent.id` 必须是 Agent Contract
+文件名。具体动作只写入 WORK 的 Current Task；Persona/Subagent/Session 标签写入
+可选 `agent.instance`，不得污染规范 Stage 与 Agent ID。
 -->

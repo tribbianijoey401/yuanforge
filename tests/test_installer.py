@@ -307,6 +307,37 @@ stage: null
             self.assertIn("STATE_DIVERGENCE", checked.stdout)
             self.assertIn("PASS", checked.stdout)
 
+    def test_check_reuses_state_guard_for_unknown_stage_and_agent(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-state-guard-check-") as parent:
+            project = Path(parent) / "project"
+            installed = self.run_command(str(INSTALLER), str(project), "--force")
+            self.assertEqual(0, installed.returncode, installed.stdout + installed.stderr)
+            (project / "docs" / "STATUS.md").write_text(
+                """---
+work: BUG-contract
+work_state: active
+workflow: complex-bug
+stage: specialist_execution
+agent:
+  id: frontend-fixer
+  state: running
+---
+""",
+                encoding="utf-8",
+            )
+            (project / "docs" / "WORK.md").write_text(
+                "# Active Work\n\n## Goal\n\n修复状态。\n\n"
+                "## Current Task\n\n执行实现。\n",
+                encoding="utf-8",
+            )
+
+            checked = self.run_command(str(SYNC), "check", str(project))
+
+            self.assertEqual(0, checked.returncode, checked.stdout + checked.stderr)
+            self.assertIn("STATE_DIVERGENCE[STATE_STAGE_UNKNOWN]", checked.stdout)
+            self.assertIn("STATE_DIVERGENCE[STATE_AGENT_UNKNOWN]", checked.stdout)
+            self.assertIn("STATE_DIVERGENCE[STATE_AGENT_STATE_UNKNOWN]", checked.stdout)
+
     def test_update_repairs_only_missing_project_documents(self):
         with tempfile.TemporaryDirectory(prefix="yuan-vnext-repair-docs-") as parent:
             project = Path(parent) / "project"

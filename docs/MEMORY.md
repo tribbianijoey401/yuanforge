@@ -116,6 +116,21 @@ description: 可复用的 Verified Finding、Pitfall、Preference 和 Convention
 - **Symptom**：WORK/STATUS 缺失时，空 Parser 结果会让 Dashboard 显示 IDLE/FULL，掩盖 Framework 未实例化或状态丢失。
 - **Rule**：Snapshot 必须携带 source availability；WORK 或 STATUS 缺失/不可读时产生 `STATE_FILES_MISSING`、Coverage 为 `UNKNOWN`、UI 显示 `STATE UNAVAILABLE`。字段不完整但文件存在时，逐字段显示事实与 `UNKNOWN`。
 
+### M-019：状态规范必须有单一可执行提交门
+
+- **Symptom**：LLM 把自由动作或 Persona 名称写入规范 `stage` / `agent.id`；Insight 虽能事后报警，但 Workflow 已由非法状态继续执行。
+- **Cause**：规范仅存在于分散自然语言，Installer 与 Insight 又各自维护校验逻辑，没有 State Commit 级硬门。
+- **Rule**：Canonical Source 统一到 `state-contract.md`；Workflow Stage 来自当前 Workflow frontmatter，Agent ID 来自 Agent Contract 文件名且必须被当前 Workflow 声明。每次 Conductor Commit 后运行同一只读 State Guard，未得到 `STATE_VALID` 不得 Dispatch。具体动作只维护在 WORK Current Task，Insight 从中派生展示；执行实例标签可放入 `agent.instance`。Installer 与 Insight 只复用 Guard 结果。
+
+### M-020：`hidden` 必须验证计算样式而不只验证 DOM 属性
+
+- **Symptom**：组件已有 `hidden=true`，但 author CSS 的 `display:flex/grid` 覆盖 UA 默认 `[hidden] { display:none }`，导致健康状态仍显示错误条带。
+- **Rule**：使用 `hidden` 控制自定义布局组件时显式声明 `<component>[hidden] { display:none; }`；回归同时检查 DOM 属性与浏览器计算后的实际可见性，并验证失败态能恢复显示。
+
+### M-021：Insight Dashboard 首屏优先事实流程与状态
+
+- **Rule**：Insight 使用中性温白 Canvas 与集中 Design Token；1280×720 首屏优先完整 Workflow、Overall Status、关键 Agent 与关键 Skill，Goal/Task/Result/Context/History 下移。当前 Workflow 涉及的 Current、Required、Observed、Missing、Unknown Agent / Skill 必须全量展示，只有 Optional、Not Required 或 Catalog 项可以折叠为准确的独立数量汇总。Unknown、Partial 与 Unavailable 必须显式可见；状态用颜色、形态和文字共同表达。Motion 只在真实状态签名变化时有限播放，常驻界面无 infinite 动画；Signal 折叠状态以稳定 ID 跨轮询保存并恢复焦点；窄屏 DOM、视觉与键盘顺序一致且不得横向溢出。
+
 ## Engineering Conventions
 
 - 任何新机制先回答是否直接改善非技术用户的软件交付质量，是否减少 Token、确认和维护成本。

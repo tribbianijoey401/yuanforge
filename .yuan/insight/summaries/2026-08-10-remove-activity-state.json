@@ -1,0 +1,37 @@
+{
+  "work_id": "2026-08-10-remove-activity-state",
+  "transition_count": 14,
+  "first_observed_at": "1786375202.753721",
+  "last_observed_at": "1786375559.995134",
+  "stages": [
+    "implement",
+    "verify",
+    "distill"
+  ],
+  "agents": [
+    "backend-dev",
+    "frontend-dev",
+    "tester",
+    "conductor"
+  ],
+  "skills": [],
+  "files_changed": [
+    "docs/ARCHITECTURE.md",
+    "docs/DECISIONS.md",
+    "docs/MEMORY.md",
+    "docs/STATUS.md",
+    "docs/WORK.md"
+  ],
+  "sessions": [
+    "OBS-20260810T144111-d50e96bb",
+    "OBS-20260810T142409-0740fe9d"
+  ],
+  "coverage": "FULL",
+  "gaps": [
+    {
+      "session_id": "OBS-20260810T142409-0740fe9d",
+      "gap_start": "1786371818.137828",
+      "gap_end": "2026-08-10T14:24:09.351655Z"
+    }
+  ]
+}

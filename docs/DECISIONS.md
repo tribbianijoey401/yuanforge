@@ -63,6 +63,12 @@
 - **Decision**：运行时契约使用 `project://`、`framework://`、`skill://` 分别表示 Project Root、带 Override 优先级的 Framework Root、当前 Skill Root。定位符不是文件夹名、环境变量或 URL，必须在文件操作前解析；禁止使用 `PROJECT_ROOT/...` 这类容易被误认为真实目录的占位表达。
 - **Reason**：根信息必须存在于每个路径本身，单 LLM、多 Agent 与不同 Platform 才能在没有隐含当前目录假设时得到同一解析结果。
 
+## D-011：规范状态采用单一可执行 State Guard
+
+- **Status**：Confirmed
+- **Decision**：状态词汇由 `framework://policies/state-contract.md` 定义，合法 Workflow Stage 与 Agent ID 分别动态来自 Workflow frontmatter 和 Agent Contract 文件名，且 Agent 必须被当前 Workflow 声明；`framework://tools/state_guard.py` 在每次 Conductor State Commit 后只读校验。Installer Check 与 Insight 加载同一 Guard，不复制校验逻辑、不自动改写 Project State。具体动作以 WORK 的 Current Task 为唯一真相源，Insight 只做派生展示；执行实例标签可进入 `agent.instance`。
+- **Reason**：自然语言提示无法可靠阻止 LLM 创造 `specialist_execution`、`frontend-fixer` 等非规范值；多套事后校验又会漂移。一个轻量、无后台进程、无状态写权限的可执行提交门能在保留 Markdown 与单 LLM 架构的同时阻止错误状态继续驱动 Dispatch。
+
 ## Historical Decision
 
 旧 `ADR-001` 曾把 Human Gate 与 Quality Gate 统一到 v3 Workflow Protocol。该 Decision 在 v3 内部解决了命名冲突，但其固定 Gate/Protocol 前提已被 D-001 与 D-005 Supersede；其中“减少重复定义、缩小变更爆炸半径”的工程经验仍保留在 `MEMORY.md`。

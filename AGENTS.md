@@ -23,7 +23,7 @@ Framework Root 按顺序选择第一个存在的目录：
 
 每个新 Session 先做有限恢复，不全量读取历史：
 
-1. 解析 Project Root 与 Framework Root，并确认 `framework://policies/core.md`、`framework://policies/routing.md`、`framework://policies/documents.md`、`framework://agents/conductor.md` 和四个 `framework://workflows/*.md` 存在。Framework Asset 缺失时停止 Dispatch，提示从 Yuan Source Repository 执行 update。
+1. 解析 Project Root 与 Framework Root，并确认 `framework://policies/core.md`、`framework://policies/routing.md`、`framework://policies/documents.md`、`framework://policies/state-contract.md`、`framework://tools/state_guard.py`、`framework://agents/conductor.md` 和四个 `framework://workflows/*.md` 存在。Framework Asset 缺失时停止 Dispatch，提示从 Yuan Source Repository 执行 update。
 2. 检查七类 `project://docs/` Project Document。缺失时使用对应 `framework://templates/project/<name>` **只补缺失文件**；已有文件不得覆盖或迁移。
 3. 读取 `project://docs/STATUS.md`，确认当前恢复点。
 4. `project://docs/WORK.md` 有 Active Work 时读取其 Goal、Scope、Acceptance 和 Next Action。
@@ -57,7 +57,9 @@ Conductor 是 `project://docs/WORK.md` 与 `project://docs/STATUS.md` 的唯一�
 
 ### Mutation Gate
 
-第一次修改 Project Artifact 前必须全部满足：Framework Root 已解析；Core、Routing、Conductor 和 Primary Workflow 已读取；`project://docs/WORK.md` / `project://docs/STATUS.md` 已存在；当前 Work 已写入 `work_state: active`、Workflow、Stage、Agent、Current Task 与 Verification。任何一项不满足，只允许继续只读诊断或修复缺失的 Yuan 状态文件。
+第一次修改 Project Artifact 前必须全部满足：Framework Root 已解析；Core、Routing、`framework://policies/state-contract.md`、Conductor 和 Primary Workflow 已读取；`project://docs/WORK.md` / `project://docs/STATUS.md` 已存在；当前 Work 已写入 `work_state: active`、Workflow、Stage、Agent、Current Task 与 Verification；解析 State Guard 后执行 `python -B <resolved-state_guard.py> check <project-root>` 且校验通过。任何一项不满足，只允许继续只读诊断或修复缺失的 Yuan 状态文件。
+
+State Guard 是每个 State Commit 的硬门，不只用于首次激活。Workflow / Stage / Agent 变化、Focused Result、Pause、Resume 与 Distill 落盘后都要执行同一条 `state_guard.py check`；只有输出 `STATE_VALID` 才能继续。失败时由 Conductor 按 `framework://policies/state-contract.md` 修正同一次 Commit，校验通过前不得继续 Dispatch。规范 `stage` 只能来自当前 Workflow frontmatter；规范 `agent.id` 必须同时来自 Agent Contract 文件名并被当前 Workflow 声明。具体动作只写入 `project://docs/WORK.md` 的 Current Task；Persona/Subagent/Session 标签写入可选 `agent.instance`。
 
 Platform 的 Task、Todo、Plan、Thread、Subagent 状态或聊天 Summary 都不是 Yuan Work State，不能替代 `project://docs/WORK.md` / `project://docs/STATUS.md`。
 
@@ -78,7 +80,7 @@ Conductor Routing → Agent Contract → Skill → Reference Section
 ## Work and Verification
 
 - 一个 Project 默认只有一个 Active Work，记录在 `project://docs/WORK.md`。
-- Resume 或 Dispatch 前若 Check / Insight 报告 `STATE_DIVERGENCE`，Conductor 先根据当前 Work 与可验证 Repository Fact 修复 checkpoint，再继续工作；Check 只报告，不自动改写 Project 内容。
+- Resume 或 Dispatch 前若 State Guard、Check 或 Insight 报告 `STATE_DIVERGENCE`，Conductor 先根据当前 Work、`framework://policies/state-contract.md` 与可验证 Repository Fact 修复 checkpoint，再继续工作；Guard / Check / Insight 都只报告，不自动改写 Project 内容。
 - 激活新 Work 时，必须在同一逻辑步骤写入 `project://docs/WORK.md` 与结构化 `project://docs/STATUS.md`：至少包含 Work id、`work_state: active`、Workflow、Stage 和当前 Agent；不得让 Active Work 只存在于 WORK。
 - Work 未完成但需要退出或更新 Framework 时，覆盖 Current Task / Latest Result 保存可恢复 Checkpoint，将 `project://docs/STATUS.md` 的 `work_state` 设为 `paused`；不得归档或清空 `project://docs/WORK.md`。
 - 用户表达“先离开”“挂起工作”或“暂停”时，Conductor 立即执行 Pause：保存 Checkpoint、保留当前 Workflow / Stage、停止继续派发；用户说继续时从 Next Action 恢复。

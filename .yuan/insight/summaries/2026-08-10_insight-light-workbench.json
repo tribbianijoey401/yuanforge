@@ -1,0 +1,35 @@
+{
+  "work_id": "2026-08-10_insight-light-workbench",
+  "transition_count": 31,
+  "first_observed_at": "1786370293.536930",
+  "last_observed_at": "1786373936.875531",
+  "stages": [
+    "design",
+    "implement",
+    "verify",
+    "review",
+    "distill"
+  ],
+  "agents": [
+    "ui-designer",
+    "frontend-dev",
+    "tester",
+    "ux-reviewer",
+    "conductor"
+  ],
+  "skills": [],
+  "files_changed": [
+    "docs/MEMORY.md",
+    "docs/STATUS.md",
+    "docs/WORK.md"
+  ],
+  "sessions": [
+    "OBS-20260810T115206-36b79a4e",
+    "OBS-20260810T141548-ac43e204",
+    "OBS-20260810T142409-0740fe9d",
+    "OBS-20260810T144111-d50e96bb",
+    "OBS-20260810T145746-750bbb46"
+  ],
+  "coverage": "PARTIAL",
+  "gaps": []
+}

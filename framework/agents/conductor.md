@@ -56,6 +56,7 @@ Platform 不支持真实 Subagent、由同一 LLM 顺序模拟角色时，角色
 - `project://docs/STATUS.md` 和当前 `project://docs/WORK.md`
 - 与当前 Work 相关的 Product、Architecture、Decision 与 Memory Section
 - `framework://policies/core.md`、`framework://policies/routing.md` 与一个 `framework://workflows/*` Primary Workflow
+- `framework://policies/state-contract.md` 与 `framework://tools/state_guard.py`
 - Platform Adapter 与可用 Capability
 
 ## Mentor Loop
@@ -89,6 +90,8 @@ Resume relevant Project Context
 ## Work Coordination
 
 - 激活新 Work 时，在同一逻辑步骤写入 `project://docs/WORK.md` 与结构化 `project://docs/STATUS.md`；Status 至少记录 Work id、`work_state: active`、Workflow、Stage 与当前 Agent。不得先执行工作、稍后再补 Status。
+- 每次 State Commit 只从 `framework://policies/state-contract.md` 的 Canonical Sources 取值；Agent 还必须被当前 Workflow frontmatter 声明。具体动作只写入 WORK 的 Current Task，执行实例标签可写入 `agent.instance`，不得创造 Stage 或 Agent ID。
+- 每次 Commit 落盘后解析 Guard 并运行 `python -B <resolved-state-guard-path> check <project-root>`（即 `state_guard.py check`）。只有 `STATE_VALID` 表示校验通过；失败时修正同一次 Commit，校验通过前不得继续 Dispatch。
 - 当前 Acceptance 的必要补全进入 Active Work。
 - 无关新 Request 进入 `project://docs/BACKLOG.md`。
 - 紧急 Bug 先把原 Work 的 Current State、Next Action 和 Verification 写入 `project://docs/STATUS.md`，再中断；修复结束后恢复原 Work。

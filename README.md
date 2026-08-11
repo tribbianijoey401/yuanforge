@@ -49,11 +49,15 @@ UI Designer 和 Reviewer 都按任务 Signal 与 Risk 加载，不固定启动�
 
 用户说“我要先离开”“工作挂起吧”或“暂停”时，任何 Workflow 都会先把可恢复 Checkpoint 写回 `WORK.md`，保留当前 Workflow / Stage，再将 `STATUS.work_state` 设为 `paused` 并停止派发。Pause 不归档、不清空 Work；下次用户说继续时从 Next Action 恢复。
 
+每次正式 State Commit 还必须通过 Framework 自带的只读 State Guard。Stage 从当前 Workflow frontmatter 取精确值；Agent ID 从 Agent Contract 文件名取精确值，并且必须被当前 Workflow 声明。具体动作以 WORK 的 Current Task 为唯一真相源；Persona/Subagent/Session 标签写入可选 `agent.instance`。Guard 未输出 `STATE_VALID` 时，Conductor 修正同一次 Commit，不能继续 Dispatch。
+
 ## Yuan Insight
 
 Yuan Insight 是 Yuan 官方的只读 Sidecar，通过操作系统文件事件观察 `WORK.md`、`STATUS.md` 与 Framework Definition，生成 Coverage、Trace、Work Summary、Expected vs Observed Signal 和 Dashboard。Windows 使用 `ReadDirectoryChangesW`，Linux 使用 `inotify`；原生监听不可用时明确显示 `polling-fallback` 与 Partial coverage。它不修改 Yuan Core State，失败时不影响 Agent Routing 与 Project Memory。
 
 Yuan Core 不为 Dashboard 维护 revision：Conductor 是 `WORK.md` / `STATUS.md` 的唯一正式 State Writer；Insight 在自己的 Observation Data 中维护 transition index、gap 与 coverage。
+
+Insight 复用 Framework State Guard 的问题码，不维护第二套状态词汇，也不自动改写状态。遇到非法 Stage 或 Agent 时，Dashboard 同时显示原始 `UNKNOWN STAGE` / `UNREGISTERED ACTOR` 和修复指引，不会把未知执行者隐藏掉。
 
 如果 `WORK.md` 或 `STATUS.md` 缺失/不可读，Dashboard 显示 `STATE UNAVAILABLE`、Coverage 为 `UNKNOWN`，并提示通过 update/bootstrap 只补缺失文档；不会把缺失状态误报为 IDLE。
 

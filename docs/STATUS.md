@@ -1,30 +1,32 @@
 ---
-work: null
-work_state: idle
-workflow: null
-stage: null
+work: 2026-08-11_content-driven-interface-design
+work_state: active
+workflow: new-feature
+stage: design
 agent:
-  id: null
-  state: null
+  id: ui-designer
+  state: active
 quality:
-  test: passed
-  review: not_required
+  test: pending
+  review: pending
 ---
 
 # Current Situation
 
-Yuan Insight Dashboard 前端轮询周期已调整为 0.5 秒。
+正在把故事驱动、内容驱动的 UI 设计方法沉淀为 Yuan Skill 与 Agent Contract。
 
-## Last Completed
+## Current Task
 
-- 逻辑定位符、Mutation Gate 与 Conductor State Ownership 已统一。
-- Update/Check、86 项测试、btc-data 升级和实际 Dashboard 验证通过。
-- `POLL_MS = 500`，页面与 Insight README 已同步；Insight 前端回归通过。
+设计新 Skill、Reference Routing、输出 Contract 与跨 Agent 边界。
+
+## Last Result
+
+Product Analyst 已完成可验证 Product Contract，无需用户新增决策。
 
 ## Next
 
-等待下一项工作。
+UI Designer 完成能力设计后交给唯一 Writer 实现。
 
 ## Blocker
 
-无
+无。

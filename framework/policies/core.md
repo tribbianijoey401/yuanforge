@@ -20,3 +20,4 @@ Yuan 是运行在 Codex、Hermes 等 Agent Platform 上的 AI Software Engineeri
 12. Conductor 是 `project://docs/WORK.md` 与 `project://docs/STATUS.md` 的唯一正式 State Writer。每次 Dispatch 前提交当前 Agent / Stage / Task，每个 Specialist Focused Result 返回后先由 Conductor 判断并提交 Latest Result、Finding 与下一状态，再允许下一次 Dispatch。
 13. Platform 只有一个 LLM、通过 Persona 顺序模拟多 Agent 时，同样必须执行 `Conductor commit → Specialist role → Conductor commit`；角色切换不能绕过状态提交。
 14. `project://docs/STATUS.md` 只保存 Yuan 恢复所需的当前状态，不维护仅供 Insight 使用的 revision 或事件序号；观察序号和 Coverage 属于 Insight 自己的数据。
+15. 正式状态值以 `framework://policies/state-contract.md` 为唯一语义契约。每次 Conductor State Commit 后必须通过 `framework://tools/state_guard.py` 的只读检查；校验失败时不得继续 Dispatch。Insight 与 Installer 复用 Guard 结果，不维护第二套词汇，也不自动修复 Project State。

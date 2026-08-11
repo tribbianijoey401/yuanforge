@@ -15,6 +15,7 @@ class StatusState:
     workflow: str | None = None
     stage: str | None = None
     agent_id: str | None = None
+    agent_instance: str | None = None
     agent_state: str | None = None
     quality_test: str | None = None
     quality_review: str | None = None
@@ -77,6 +78,7 @@ def parse_status(text: str) -> StatusState:
     agent = fm.get("agent")
     if isinstance(agent, dict):
         state.agent_id = agent.get("id")
+        state.agent_instance = agent.get("instance")
         state.agent_state = agent.get("state")
     quality = fm.get("quality")
     if isinstance(quality, dict):

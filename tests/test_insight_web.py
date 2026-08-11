@@ -57,8 +57,10 @@ work: BUG-010
 work_state: active
 workflow: complex-bug
 stage: implement
+activity: specialist_execution
 agent:
   id: backend-dev
+  instance: frontend-fixer
   state: active
 quality:
   test: pending
@@ -247,6 +249,8 @@ class ServerTests(unittest.TestCase):
         self.assertIn("UNKNOWN STAGE", app)
         self.assertIn("UNREGISTERED ACTOR", app)
         self.assertIn("agent.instance", app)
+        self.assertIn("status.activity", app)
+        self.assertIn("work.current_task || status.activity || stateFallback(status)", app)
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -269,6 +273,10 @@ class ServerTests(unittest.TestCase):
         self.assertIn("footprint", data)
         self.assertIn("registry", data)
         self.assertEqual(data["snapshot"]["status"]["work"], "BUG-010")
+        self.assertNotIn("activity", data["snapshot"]["status"])
+        self.assertEqual(
+            data["snapshot"]["status"]["agent"]["instance"], "frontend-fixer"
+        )
         self.assertIn("backend-dev", data["registry"]["agents"])
         self.assertEqual(data["coverage"], "PARTIAL")
         self.assertTrue(data["observation"]["mode"].startswith("native-") or data["observation"]["mode"] == "polling-fallback")

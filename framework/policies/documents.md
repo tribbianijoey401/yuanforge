@@ -20,6 +20,8 @@
 
 Conductor 是 `project://docs/WORK.md` 与 `project://docs/STATUS.md` 的唯一正式 State Writer。Specialist 可以修改其职责内的 Product Artifact、Code、Test 与长期 Document，但对 Active Work 只返回 Focused Result 和建议的 `work_updates`，不得直接决定或写入正式 Workflow / Stage / Agent / Current Task / Latest Result / Open Findings 状态。
 
+所有正式字段的 Canonical Source、可选 `agent.instance` 与组合约束见 `framework://policies/state-contract.md`。具体动作只写入 WORK 的 Current Task。Conductor 每次写入后运行 `framework://tools/state_guard.py`；未输出 `STATE_VALID` 的 checkpoint 不构成可继续 Dispatch 的 State Commit。
+
 Conductor 必须在这些 Commit Point 同步维护 Work 与 Status：Work activation、Dispatch 前、Focused Result 返回后、Stage transition、Pause、Resume、Completion / Distill。一个 LLM 顺序切换 Persona 时也适用；每次 Specialist role 结束必须先回到 Conductor commit，才能进入下一个 role。
 
 `project://docs/STATUS.md` 不保存 visualization revision。Insight 对已落盘状态维护自己的 transition index、trace、gap 和 coverage，不能反向写 Project State。

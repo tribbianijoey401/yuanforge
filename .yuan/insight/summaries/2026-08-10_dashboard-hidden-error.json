@@ -1,0 +1,35 @@
+{
+  "work_id": "2026-08-10_dashboard-hidden-error",
+  "transition_count": 6,
+  "first_observed_at": "1786363583.639851",
+  "last_observed_at": "1786363880.713349",
+  "stages": [
+    "reproduce",
+    "regression",
+    "review",
+    "distill"
+  ],
+  "agents": [
+    "frontend-dev",
+    "tester",
+    "ux-reviewer",
+    "conductor"
+  ],
+  "skills": [],
+  "files_changed": [
+    "docs/MEMORY.md",
+    "docs/STATUS.md",
+    "docs/WORK.md"
+  ],
+  "sessions": [
+    "OBS-20260810T115206-36b79a4e"
+  ],
+  "coverage": "FULL",
+  "gaps": [
+    {
+      "session_id": "OBS-20260810T115206-36b79a4e",
+      "gap_start": "2026-08-10T11:48:43.126803Z",
+      "gap_end": "2026-08-10T11:52:05.940729Z"
+    }
+  ]
+}
