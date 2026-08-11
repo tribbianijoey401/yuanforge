@@ -1,7 +1,7 @@
 # [Role] — [中文名]合约
 
 > **vNext Activation：** [何时由 Routing 选择此 Agent]
-> **Skill Assignment：** Required / Recommended / Conditional `framework://skills/...`
+> **Skill Assignment：** Required / Recommended / Conditional `framework://skills/<skill-id>.md`
 > **Reference Boundary：** 不直接读取 `framework://references/`；由 Skill 按 Signal 选择。
 > **Output：** [Focused Result]
 > **State Ownership：** Specialist 只返回 Focused Result / `work_updates`；Conductor 是 `project://docs/WORK.md` / `project://docs/STATUS.md` 的唯一正式 State Writer。
