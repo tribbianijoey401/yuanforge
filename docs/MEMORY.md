@@ -131,6 +131,11 @@ description: 可复用的 Verified Finding、Pitfall、Preference 和 Convention
 
 - **Rule**：Insight 使用中性温白 Canvas 与集中 Design Token；1280×720 首屏优先完整 Workflow、Overall Status、关键 Agent 与关键 Skill，Goal/Task/Result/Context/History 下移。当前 Workflow 涉及的 Current、Required、Observed、Missing、Unknown Agent / Skill 必须全量展示，只有 Optional、Not Required 或 Catalog 项可以折叠为准确的独立数量汇总。Unknown、Partial 与 Unavailable 必须显式可见；状态用颜色、形态和文字共同表达。Motion 只在真实状态签名变化时有限播放，常驻界面无 infinite 动画；Signal 折叠状态以稳定 ID 跨轮询保存并恢复焦点；窄屏 DOM、视觉与键盘顺序一致且不得横向溢出。
 
+### M-022：界面追溯不能伪造 Canonical Identity
+
+- **Symptom**：为了让 Traceability Matrix 看起来完整，Agent 为只有自然语言描述的请求自行创建 `REQ-*`、`PF-*` 或类似 locator / fact ID，并把派生编号称为 canonical。
+- **Rule**：不得创建、推断、重命名或铸造 canonical locator / fact ID。只有真实 canonical source 与稳定 ID 存在时才能冻结 Presentation Contract；无 ID 输入使用 `source: current user request` 与 `canonical ID unavailable`，Contract 保持 provisional。内部锚点必须明确标为 derived / non-canonical，既不能替代 Product Truth，也不能阻止继续进行可逆的展示架构推导。
+
 ## Engineering Conventions
 
 - 任何新机制先回答是否直接改善非技术用户的软件交付质量，是否减少 Token、确认和维护成本。

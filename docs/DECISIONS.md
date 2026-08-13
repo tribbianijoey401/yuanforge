@@ -69,6 +69,12 @@
 - **Decision**：状态词汇由 `framework://policies/state-contract.md` 定义，合法 Workflow Stage 与 Agent ID 分别动态来自 Workflow frontmatter 和 Agent Contract 文件名，且 Agent 必须被当前 Workflow 声明；`framework://tools/state_guard.py` 在每次 Conductor State Commit 后只读校验。Installer Check 与 Insight 加载同一 Guard，不复制校验逻辑、不自动改写 Project State。具体动作以 WORK 的 Current Task 为唯一真相源，Insight 只做派生展示；执行实例标签可进入 `agent.instance`。
 - **Reason**：自然语言提示无法可靠阻止 LLM 创造 `specialist_execution`、`frontend-fixer` 等非规范值；多套事后校验又会漂移。一个轻量、无后台进程、无状态写权限的可执行提交门能在保留 Markdown 与单 LLM 架构的同时阻止错误状态继续驱动 Dispatch。
 
+## D-012：界面设计采用内容驱动的展示架构链
+
+- **Status**：Confirmed
+- **Decision**：Yuan 的界面设计沿 `System Story → Content Model → View Model → Visual Language → Liveness → Verification` 推导。UI Designer 基于 canonical Product Contract 形成并冻结 Presentation Contract；UX Reviewer 审查同一 Contract；Frontend Dev 只消费冻结结果。View Model 由内容量、关系、任务、变化频率、设备与上下文连续性决定，不默认 Dashboard、单屏或长滚动。Liveness 只来自真实操作、状态、进度、成功、失败、同步或恢复，Motion 不能替代语义；query-ux-pro-max 仅在 View Model 之后作为低优先级条件性建议。
+- **Reason**：视觉风格或页面模板先行会让不同产品收敛到同一布局，并把装饰动画误当成生命力。统一因果链能让结构、视觉、反馈和验证追溯到真实产品事实，同时保留清晰骨架、友好层级、细节克制和有目的生命力在不同主题下的表达空间。
+
 ## Historical Decision
 
 旧 `ADR-001` 曾把 Human Gate 与 Quality Gate 统一到 v3 Workflow Protocol。该 Decision 在 v3 内部解决了命名冲突，但其固定 Gate/Protocol 前提已被 D-001 与 D-005 Supersede；其中“减少重复定义、缩小变更爆炸半径”的工程经验仍保留在 `MEMORY.md`。

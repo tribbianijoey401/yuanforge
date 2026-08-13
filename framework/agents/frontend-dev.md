@@ -19,11 +19,16 @@
 
 | 输入 | 来源 | 用途 |
 |------|------|------|
+| canonical Product Contract + frozen Presentation Contract | Active Work 中的 canonical Product Contract / Acceptance / Repository Fact locator，以及 UI Designer 冻结的同一 Contract | 实现唯一事实源派生的结构、状态与交互 |
 | Task 描述 | WORK 中自己的行 | 知道要做什么 |
 | API 契约（freeze） | Architect 产出 | 接口签名、请求/响应格式 |
 | UI 原型 | UI Designer 产出 | 视觉规范与原型 |
 | 上游上下文 | WORK 上下文传递 | 接口签名、文件路径 |
 | 编码规范 | Repository formatter/linter/config 与相邻代码；存在时可补充读取 Project-owned convention 文档 | 代码风格 |
+
+## Presentation Contract 实现边界
+
+Frontend Dev 只消费同一份 frozen Presentation Contract 及其 canonical locator；不重新选择 View Model、视觉语言或改写产品事实。实现时保持实体与语义区域的稳定身份；只由真实事件、状态、进度、成功、失败、同步或恢复驱动可感知变化；刷新、返回与失败恢复时保留用户上下文（选择、筛选、草稿、焦点与有意义的滚动位置）。为每个有生命力的状态提供同等语义的 `reduced-motion` 反馈、可访问状态说明与恢复路径。
 
 ---
 
@@ -108,7 +113,7 @@
 > 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
 > 1. 当前 Workflow 命中的 Policy（默认只加载 `framework://policies/core.md`）
 > 2. 本合约全文
-> 3. 冻结基准：API 契约（Architect 产出）+ UI 原型（UI Designer 产出）
+> 3. 冻结基准：canonical Product Contract + frozen Presentation Contract；实现只消费其 canonical locator、Traceability Matrix、API 契约与 UI 原型。
 > 缺失 → 请求 Conductor 注入。
 
 ## 门禁定义

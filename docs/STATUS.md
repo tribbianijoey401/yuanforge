@@ -1,31 +1,28 @@
 ---
-work: 2026-08-11_content-driven-interface-design
-work_state: active
-workflow: new-feature
-stage: design
+work: null
+work_state: idle
+workflow: null
+stage: null
 agent:
-  id: ui-designer
-  state: active
+  id: null
+  instance: null
+  state: null
 quality:
-  test: pending
-  review: pending
+  test: passed
+  review: passed
 ---
 
 # Current Situation
 
-正在把故事驱动、内容驱动的 UI 设计方法沉淀为 Yuan Skill 与 Agent Contract。
+## Last Completed
 
-## Current Task
-
-设计新 Skill、Reference Routing、输出 Contract 与跨 Agent 边界。
-
-## Last Result
-
-Product Analyst 已完成可验证 Product Contract，无需用户新增决策。
+- `2026-08-11_content-driven-interface-design` 已完成：新增内容驱动 Interface Design Skill 与 Presentation Architecture Reference，统一 UI Designer / UX Reviewer / Frontend Dev 的 Product Truth 与 Presentation Contract 边界。
+- 当前未提交改动中的人类可读 Skill、Reference、Agent Contract、query Skill 说明已中文化；代码标识、路径、字段名、测试函数名与 `.yuan/insight` 机器记录保持不变。
+- Contract Test 与完整 Regression 共 109 项，全部通过。
 
 ## Next
 
-UI Designer 完成能力设计后交给唯一 Writer 实现。
+按需使用新 Skill 继续生成多种故事驱动的界面方案与示例。
 
 ## Blocker
 
