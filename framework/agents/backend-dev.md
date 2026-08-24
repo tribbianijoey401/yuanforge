@@ -30,14 +30,14 @@
 
 ### 正常模式：TDD Red → Green → Refactor
 
-1. 读 Task + API 契约 + 数据模型
+1. 读 Task + API 契约 + 数据模型；随后 **Explore 相邻实现**：读目标模块相邻代码与现有测试，列出将复用的模式、工具函数与命名约定；发现无法在既有分层内完成时，作为 work_updates 上报 Conductor
 2. **确认测试 seam：** 参考 Architect 在 `project://docs/WORK.md` Plan 约定的 Verification Seam；必要时将补充建议作为 `work_updates` 返回 Conductor。不创建第二份 seam 真相源。
 3. Red：写测试 → 确认 FAIL
 4. Green：写最小实现，严格遵循 API 契约
 5. 验证：全量测试 PASS
 6. 原子提交：一个 Task 一个 Commit
 7. 向 Conductor 返回 Focused Result + 上下文传递提案（给 Frontend Dev / Reviewer / Tester），由 Conductor 更新 WORK 状态
-8. **对抗式自检（对标 M4）：** Green 后构造 ≥1 异常输入（非法参数、边界值、并发），验证不会 crash 或返回错误数据，再 claim done。
+8. **对抗式自检（对标 M4，六类定向）：** Green 后按本次变更触及的生成代码失效类别逐类构造反例——幻觉 API（方法签名对照真实版本类型定义核验）、边界值（空集合/极值/off-by-one）、错误路径（网络失败/超时/权限拒绝不被吞掉）、幂等与并发写、未覆盖行为的沉默逻辑错误、N+1 与循环内 IO——每类至少 1 例；纯 CRUD 改动至少覆盖边界值与错误路径。全部通过才 claim done；无法自证的类别作为 Residual Risk 写入 Focused Result。（失效目录经 Verification First Skill 的 Reference Routing 按需加载）
 
 ### Debug 模式（内嵌，不换 Agent）
 
@@ -70,6 +70,8 @@
 - ❌ 写前端代码
 - ❌ 在 Debug 模式中继续猜测式修复
 - ❌ 跳过 TDD 直接写实现
+- ❌ 新建文件超出所属分层职责或单文件 >300 行（先拆分再提交；业务逻辑不进路由处理器）
+- ❌ 凭记忆调用第三方库 API（签名必须对照真实安装版本核验）
 
 ## 产出
 

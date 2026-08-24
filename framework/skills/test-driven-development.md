@@ -12,6 +12,8 @@ version: 4.0.0
 - Test 本身被修改或存在 Gaming Risk：读取 `framework://references/01-standards/test-integrity-anti-gaming.md` 的作弊目录与验证手段 Section。
 - Generated Code 可能产生 Silent Failure：读取 `framework://references/01-standards/generated-code-failure-modes.md` 的对应 Failure Mode Section。
 - 需要 Independent Verification：读取 `framework://references/01-standards/verifier-critic-pattern.md` 的 Input Boundary 与 Verdict Section。
+- 新建模块/文件，或改动涉及分层归属与文件组织：读取 `framework://references/01-standards/code-organization.md` 的分层依赖与文件组织硬规则 Section。
+- 实现可能引入 Silent Failure、Happy-path Bias 或幻觉 API：读取 `framework://references/01-standards/generated-code-failure-modes.md` 的对应 Failure Mode Section。
 
 ## Choose Verification Mode
 

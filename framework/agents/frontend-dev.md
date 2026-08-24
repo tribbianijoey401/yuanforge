@@ -31,14 +31,14 @@
 
 ### 正常模式：TDD Red → Green → Refactor
 
-1. 读 Task + API 契约 + UI 原型
+1. 读 Task + API 契约 + UI 原型；随后 **Explore 相邻实现**：读目标模块相邻代码与现有测试，列出将复用的模式、工具函数与命名约定；发现无法在既有分层内完成时，作为 work_updates 上报 Conductor
 2. **确认测试 seam：** 参考 Architect 在 Plan 约定的 seam，必要时与对端 Dev 在 `seam-agreement.md` 补充。不在未约定 seam 上写测试。
 3. Red：写测试 → 确认 FAIL
 4. Green：写最小实现（精准复刻 UI 原型）
 5. 验证：全量测试 PASS
 6. 原子提交：一个 Task 一个 Commit
 7. 向 Conductor 返回 Focused Result + 上下文传递提案，由 Conductor 更新 WORK 状态
-8. **对抗式自检（对标 M4）：** Green 后构造 ≥1 异常输入（非法 props、空数据、网络失败），验证不会 crash 或渲染错误，再 claim done。
+8. **对抗式自检（对标 M4，六类定向）：** Green 后按本次变更触及的生成代码失效类别逐类构造反例——非法 props 与幻觉 API（签名对照真实安装版本核验）、空数据与边界值、网络失败等错误路径不被吞掉、重复点击与并发、未覆盖行为的沉默逻辑错误、N+1 与循环内 IO——每类至少 1 例验证不中招；纯展示改动至少覆盖前两类。全部通过才 claim done；无法自证的类别作为 Residual Risk 写入 Focused Result。（失效目录经 Verification First Skill 的 Reference Routing 按需加载）
 
 ### Debug 模式（内嵌，不换 Agent）
 
@@ -69,6 +69,13 @@
 - **emoji 正则扫描**：代码完成后跑 `framework://policies/visual-absolutes.md` 的 emoji 检测正则，命中功能图标位置 → 立即替换为锁定图标库的对应 SVG 图标，零容忍
 - VA-2/VA-4/VA-5 同步自查：无紫粉渐变、无硬编码色（除 #fff/#000）、无弹跳缓动
 
+### 前端工程纪律
+
+- **组件拆分**：单组件 >200 行或承担第二个职责即拆分；页面只做组装，可复用 UI 进 components，数据获取进 services/hooks
+- **状态分离**：服务端状态（请求/缓存）与 UI 状态分开管理，不把接口返回整包塞进全局 store
+- **样式来源唯一**：主题相关样式一律走 Token/class，禁止内联样式承载颜色/间距（VA-4 延伸）
+- **响应式**：断点遵循原型声明；原型未声明时沿用项目已有断点体系，不自造
+
 ## 必须遵守的铁律
 
 | 铁律 | 执行点 |
@@ -87,6 +94,8 @@
 - ❌ 硬编码颜色值（VA-4，除 #fff/#000，用 Design Token）
 - ❌ 紫粉渐变主视觉（VA-2）
 - ❌ 弹跳/弹性缓动（VA-5）
+- ❌ 页面组件堆积业务逻辑或直接发起数据请求（拆 components/services，页面只组装）
+- ❌ 交付超 300 行或单一职责之外的组件/样式文件（先拆分再提交）
 
 ## 产出
 
@@ -113,7 +122,7 @@
 
 ## 门禁定义
 - 档位：🟢 Advisory↗（开发阶段）
-- 通过判定：TDD Red→Green→Refactor 完成 + 对抗式自检 ≥1 次通过 + 自检循环（lint/type-check/test）通过 + emoji 正则扫描无命中（VA-1）
+- 通过判定：TDD Red→Green→Refactor 完成 + 六类定向对抗式自检通过 + 自检循环（lint/type-check/test）通过 + 构建（build）零报错 + emoji 正则扫描无命中（VA-1）
 - 稳定性分类：演进型
 
 ## 路由条目
