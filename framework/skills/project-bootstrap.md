@@ -14,6 +14,11 @@ version: 4.0.0
 
 Existing Project 的 Repository Fact 高于 Generic Reference，不得用推荐模板覆盖已经验证的 Architecture。
 
+## Project Boundary
+
+- Project 边界 = 一个仓库 / 一个部署单元。多模块仓库在仓库根安装并视为单一 Project，Task 用产出路径区分模块；禁止在子目录嵌套第二套 `.yuan` 控制面。
+- 子目录确需独立边界（独立 .git、独立发布）时，按独立 Project 单独安装，不在父 Project 内机械嵌套。
+
 ## New Project
 
 1. 运行 Installer 建立 Vendored Framework 与七类 Document。

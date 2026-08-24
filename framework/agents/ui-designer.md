@@ -80,7 +80,7 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 1. 与 Architect 并行时：产出色彩方案、组件风格、布局规范（含 V/M/D 旋钮值）
 2. API 契约冻结后：产出完整页面原型，包含所有状态（加载中/空状态/错误/成功）
 3. 原型应可直接在浏览器打开预览
-4. 产出物写入会话文件夹
+4. 视觉规范与 Token 清单作为 Focused Result 提交 Conductor，持久化到 `project://docs/design/` 并从 PRODUCT.md 的 Design Direction Section 索引；原型文件随附同一目录，不得只留在会话临时目录
 5. 视觉规范中的 Design Token 清单必须按四层结构组织（Primitives → Semantics → Components → Patterns）；具体格式经 `query-ux-pro-max` 的 Design Token Signal 加载规范 Section 后套用，不自造结构
 
 ---

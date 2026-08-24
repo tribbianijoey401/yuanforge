@@ -16,6 +16,15 @@
 
 激活新 Work 时，`project://docs/WORK.md` 与 `project://docs/STATUS.md` 必须在同一逻辑步骤中作为一个状态变更维护：STATUS 至少写入 Work id、`work_state: active`、Workflow、Stage 和当前 Agent。Active Work 不得只写入 WORK，否则恢复与 Insight 只能把缺失字段报告为 Unknown。
 
+## Write Standard
+
+七类 Document 只沉淀「看产物本身看不出来」的长期信息：
+
+- **写入**：设计哲学与心智模型、重大 Decision 及其 Why、跨 Module 契约口径、废弃/禁区约定、非显而易见的 Convention、重要历史节点（带绝对日期）。
+- **不写入**：产物可自证的清单与目录结构、Git History 可查的变更、一次性状态（当前 TODO）、通用常识、单个 Bug 的修复细节。
+- **触发时机**：出现新心智模型、结构/契约调整或长期约定时主动提议写入；先列修改点，重大内容经用户确认后落盘。
+- **设计边界**：为什么这么「做」（方案/结构）归 ARCHITECTURE / DECISIONS；为什么这么「呈现」（视觉/体验方向）归 PRODUCT 的 Design Direction 与其引用的设计产物。
+
 ## State Ownership and Commit Points
 
 Conductor 是 `project://docs/WORK.md` 与 `project://docs/STATUS.md` 的唯一正式 State Writer。Specialist 可以修改其职责内的 Product Artifact、Code、Test 与长期 Document，但对 Active Work 只返回 Focused Result 和建议的 `work_updates`，不得直接决定或写入正式 Workflow / Stage / Agent / Current Task / Latest Result / Open Findings 状态。
