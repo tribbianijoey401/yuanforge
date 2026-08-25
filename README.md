@@ -106,6 +106,8 @@ Update 不迁移或解释这些 Project-owned 文件，只读取 `STATUS.work_st
 
 每次 Update 都逐项输出被替换的 Yuan-managed 路径；实际存在但未替换的 Project Document、Override 与 Insight Observation Data 会以 `PRESERVED <path> | <reason>` 输出。`.gitignore` 只合并 Yuan 必需规则，并明确标记为 `MERGED`。
 
+Framework 的 managed capability 发生变化时必须升级 `framework/VERSION`。Installer 同时把官方 Snapshot 的 SHA-256 内容指纹写入 `.yuan/install.json`；`check` 会比较安装记录、项目 Snapshot 与当前 Source，即使误用了相同版本号也会报告 `FRAMEWORK_FINGERPRINT_MISMATCH` 或 `FRAMEWORK_SOURCE_DRIFT`。更新必须从希望作为权威来源的 Yuan Source Repository 执行，不能只看版本字符串判断能力是否已经进入项目。
+
 需要检查安装结果时运行：
 
 ```powershell

@@ -19,6 +19,11 @@ from typing import Any
 WORK_STATES = ("idle", "active", "paused")
 AGENT_STATES = ("idle", "active", "paused", "completed", "blocked")
 ACTIVE_AGENT_STATES = {"active", "completed", "blocked"}
+PRESENTATION_CONTRACT_STATES = ("n/a", "pending", "frozen")
+UI_GATE_RULES = {
+    "new-feature": frozenset({"implement", "verify", "review"}),
+    "large-project": frozenset({"build", "verify", "review"}),
+}
 
 
 class StateIssue:
@@ -123,6 +128,30 @@ def _section(text: str, heading: str) -> str:
     return re.sub(r"<!--.*?-->", "", match.group(1), flags=re.DOTALL).strip()
 
 
+def _labeled_value(text: str, label: str) -> str:
+    match = re.search(
+        rf"^{re.escape(label)}\s*:\s*(.+?)\s*$",
+        text,
+        re.MULTILINE | re.IGNORECASE,
+    )
+    return match.group(1).strip() if match else ""
+
+
+def _usable_contract_value(value: str) -> bool:
+    return value.strip().lower() not in {
+        "",
+        "n/a",
+        "na",
+        "none",
+        "null",
+        "pending",
+        "tbd",
+        "todo",
+        "unknown",
+        "unavailable",
+    }
+
+
 def build_catalog(framework_root: Path, workflow_id: str | None = None) -> dict[str, Any]:
     agents_dir = framework_root / "agents"
     workflows_dir = framework_root / "workflows"
@@ -155,6 +184,7 @@ def build_catalog(framework_root: Path, workflow_id: str | None = None) -> dict[
     return {
         "work_states": list(WORK_STATES),
         "agent_states": list(AGENT_STATES),
+        "presentation_contract_states": list(PRESENTATION_CONTRACT_STATES),
         "workflows": workflows,
         "stages": stages,
         "agents": agents,
@@ -226,6 +256,7 @@ def validate_project_state(project_root: Path, framework_root: Path) -> list[Sta
     agent_id = agent.get("id")
     agent_state_raw = agent.get("state")
     agent_state = str(agent_state_raw).lower() if agent_state_raw is not None else None
+    presentation_contract = status.get("presentation_contract")
 
     if work_state not in WORK_STATES:
         issues.append(
@@ -396,6 +427,70 @@ def validate_project_state(project_root: Path, framework_root: Path) -> list[Sta
                 "Commit the actual dispatch boundary using a canonical active-work Agent state.",
             )
         )
+
+    if (
+        presentation_contract is not None
+        and presentation_contract not in PRESENTATION_CONTRACT_STATES
+    ):
+        issues.append(
+            _issue(
+                "STATE_PRESENTATION_CONTRACT_UNKNOWN",
+                "presentation_contract",
+                presentation_contract,
+                " | ".join(PRESENTATION_CONTRACT_STATES),
+                "Use exactly one canonical presentation_contract value from state-contract.md.",
+            )
+        )
+
+    ui_stages = UI_GATE_RULES.get(str(workflow) if workflow else "")
+    if (
+        ui_stages
+        and agent_id == "frontend-dev"
+        and stage in ui_stages
+        and presentation_contract != "frozen"
+    ):
+        issues.append(
+            _issue(
+                "STATE_UI_DESIGN_MISSING",
+                "presentation_contract",
+                presentation_contract,
+                "frozen before frontend-dev enters implementation stages",
+                "Dispatch ui-designer to freeze the Presentation Contract before frontend-dev implements.",
+            )
+        )
+
+    if (
+        ui_stages
+        and agent_id == "frontend-dev"
+        and stage in ui_stages
+        and presentation_contract == "frozen"
+    ):
+        contract_section = _section(work_text, "Presentation Contract")
+        required_contract_fields = {
+            "Status": "frozen",
+            "Product Truth": None,
+            "Contract Locator": None,
+            "Prototype / Verification": None,
+        }
+        missing_fields = []
+        for label, expected_value in required_contract_fields.items():
+            actual_value = _labeled_value(contract_section, label)
+            if expected_value is not None:
+                valid = actual_value.lower() == expected_value
+            else:
+                valid = _usable_contract_value(actual_value)
+            if not valid:
+                missing_fields.append(label)
+        if missing_fields:
+            issues.append(
+                _issue(
+                    "STATE_UI_PRESENTATION_CONTRACT_INCOMPLETE",
+                    "WORK.Presentation Contract",
+                    ", ".join(missing_fields),
+                    "Status=frozen plus Product Truth, Contract Locator, and Prototype / Verification evidence",
+                    "Complete the locatable Presentation Contract evidence in WORK.md before frontend-dev dispatch.",
+                )
+            )
 
     if work_state == "active" and not _section(work_text, "Current Task"):
         issues.append(

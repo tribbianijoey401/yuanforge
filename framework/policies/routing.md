@@ -23,8 +23,10 @@ Bug、Regression、Failed Attempt、Partial Previous Fix 信号高于“文件�
 |---|---|---|
 | Small Change | Conductor、一个相关 Dev | Tester 或 Reviewer，仅在 Risk 需要时 |
 | Complex Bug | Conductor、相关 Dev、Tester | Architect；按风险选择 Spec / Security / Quality / UX Reviewer |
-| New Feature | Conductor、Product Analyst、相关 Dev、Tester | 跨模块时 Architect；涉及 UI 时 UI Designer；按风险选择 Reviewer |
-| Large Project | Conductor、Product Analyst、Architect、相关 Dev、Tester | UI Designer、Design Reviewer 与按风险选择的 Reviewer |
+| New Feature | Conductor、Product Analyst、相关 Dev、Tester | 涉及 UI 时必选 UI Designer（前端开工前冻结 Presentation Contract）；跨模块时 Architect；按风险选择 Reviewer |
+| Large Project | Conductor、Product Analyst、Architect、相关 Dev、Tester | 涉及 UI 时必选 UI Designer（前端开工前冻结 Presentation Contract）；Design Reviewer 与按风险选择的 Reviewer |
+
+> **UI Design Gate：** 涉及 UI 的 New Feature / Large Project 中，`frontend-dev` 进入实现阶段（`implement` / `build` 及之后）前，`presentation_contract` 必须为 `frozen`。该硬门由 `framework://tools/state_guard.py` 校验；UI Designer 未冻结 Presentation Contract 时，Conductor 不得 dispatch `frontend-dev`。Complex Bug 与 Small Change 不触发此门。
 
 Frontend 与 Backend 同时涉及代码时仍保持一个 Writer，按可验证 Slice 顺序切换，不并行修改同一 Workspace。
 

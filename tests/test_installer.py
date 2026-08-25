@@ -133,10 +133,31 @@ class InstallerTests(unittest.TestCase):
             )
             self.assertEqual(".yuan/framework", record["layout"])
             self.assertEqual(".yuan/insight/tool", record["insight_tool"])
+            self.assertEqual(64, len(record["framework_fingerprint"]))
+            self.assertEqual(
+                (ROOT / "framework" / "VERSION").read_text(encoding="utf-8").strip(),
+                record["version"],
+            )
 
             checked = self.run_command(str(SYNC), "check", str(project))
             self.assertEqual(0, checked.returncode, checked.stdout + checked.stderr)
             self.assertIn("PASS", checked.stdout)
+
+    def test_check_detects_same_version_framework_content_drift(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-fingerprint-") as parent:
+            project = Path(parent) / "project"
+            installed = self.run_command(str(INSTALLER), str(project), "--force")
+            self.assertEqual(0, installed.returncode, installed.stdout + installed.stderr)
+            readme = project / ".yuan" / "framework" / "README.md"
+            readme.write_text(
+                readme.read_text(encoding="utf-8") + "\nlocal drift\n",
+                encoding="utf-8",
+            )
+
+            checked = self.run_command(str(SYNC), "check", str(project))
+
+            self.assertNotEqual(0, checked.returncode)
+            self.assertIn("FRAMEWORK_FINGERPRINT_MISMATCH", checked.stdout)
 
     def test_update_blocks_active_work_before_changing_managed_files(self):
         with tempfile.TemporaryDirectory(prefix="yuan-vnext-active-update-") as parent:

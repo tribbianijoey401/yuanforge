@@ -26,6 +26,9 @@ Product Analyst 建立 Problem Model
 → Recommend
 → Confirm Product Contract
 → Plan by Slice
+→ 涉及 UI 的 Slice 先执行 Repository Capability Audit 与内容/页面边界建模
+→ UI Designer 通过 Prototype Convergence 冻结可定位的 Presentation Contract
+→ Independent Review 同一 Contract
 → Conductor 提交 Active Work、Stage、Agent 与 Current Task
 → Build
 → 每个 Focused Result 后由 Conductor 提交 Result 与下一状态
@@ -37,7 +40,7 @@ Product Analyst 建立 Problem Model
 
 复杂 Work 可以在 `project://docs/WORK.md` 内嵌 Task Board。出现紧急 Bug 时，保存 Goal、Progress、Changed Path、Unfinished Edit、Verification、Git Checkpoint 与 Risk，暂停原 Work；Bug 完成后检查 API、Data、Architecture、Business Rule 与 Dependency Impact，再恢复原 Work。
 
-> **Writer 语义：** `frontend-dev` 与 `backend-dev` 至少启用一个作为唯一 Implementation Writer，由 Conductor 按当前 Slice 涉及的代码域顺序切换，不并行修改同一 Workspace。`ui-designer` 在涉及 UI 时启用；`design-reviewer` 在 Plan 编码前启用；其余 `optional_agents` 仅在 Risk Signal 命中时启用。
+> **Writer 语义：** `frontend-dev` 与 `backend-dev` 至少启用一个作为唯一 Implementation Writer，由 Conductor 按当前 Slice 涉及的代码域顺序切换，不并行修改同一 Workspace。涉及 UI 时必须先启用 `ui-designer` 冻结 Presentation Contract（`presentation_contract: frozen`），之后才能 dispatch `frontend-dev`；`design-reviewer` 在 Plan 编码前启用；其余 `optional_agents` 仅在 Risk Signal 命中时启用。
 
 
 ## State Commit

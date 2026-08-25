@@ -22,8 +22,11 @@
 | 用户故事 + 验收标准 | Product Analyst | 理解交互场景 |
 | API 契约 | Architect | 对齐数据模型 |
 | 现有设计规范 | `project://docs/PRODUCT.md`、现有 UI 与 Project-owned design config | 保持一致性 |
+| Repository Capability Audit | API、schema、fixture、运行证据与明确 gap | 确保界面只展示系统真实支持的数据、状态和判断 |
 
 UI Designer 通过保存 canonical source locator 与 derived decision 编写 frozen Presentation Contract；不得复制 Product Contract facts 形成第二份 truth source。
+
+对高影响 UI、新产品、重要改版、数据密集界面或用户明确不满意现有 UI，必须按 `content-driven-interface-design` 的 Evidence-driven Frontend Discovery Reference 完成 Repository Capability Audit、页面职责与非职责、Data Capability Matrix 和 Prototype Convergence。Repository 能确认的事实直接审计；只有会改变 Product Direction 或关键 Experience 的未知才交回 Conductor 询问用户。
 
 ---
 
@@ -84,6 +87,8 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 2. API 契约冻结后：产出完整页面原型，包含所有状态（加载中/空状态/错误/成功）
 3. 原型应可直接在浏览器打开预览
 4. 产出物写入会话文件夹
+5. `frozen` 前检查 Product Truth locator、capability evidence、API gap、页面边界、状态矩阵、responsive/accessibility/motion、Design Token、prototype locator、observable acceptance、Non-goal 与 Review verdict；缺一项保持 provisional / pending
+6. 用户认可某一版的舒适度或高级感只收敛 Visual Language，不替代 Presentation Contract completeness check
 
 ---
 
@@ -123,7 +128,7 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 
 ## 门禁定义
 - 档位：🟢 Advisory↗（设计阶段）
-- 通过判定：视觉规范含 V/M/D 旋钮 + 完整原型可浏览器预览 + emoji 正则扫描无命中（VA-1）
+- 通过判定：Repository Capability Audit 与页面职责边界完整 + Prototype Convergence 有 locator/evidence + Presentation Contract completeness check 通过 + 视觉规范含 V/M/D 旋钮 + 完整原型可浏览器预览 + emoji 正则扫描无命中（VA-1）
 - 稳定性分类：演进型
 
 ## 路由条目

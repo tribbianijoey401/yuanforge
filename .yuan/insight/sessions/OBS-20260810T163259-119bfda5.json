@@ -1,0 +1,11 @@
+{
+  "session_id": "OBS-20260810T163259-119bfda5",
+  "started_at": "2026-08-10T16:32:59.356901Z",
+  "baseline_fingerprint": "1b6ebd051462578a6e13565b8abcb7e1bce397b3b412d28c75c12a0480bb9e96",
+  "status": "stopped",
+  "coverage": "PARTIAL",
+  "baseline_work_id": "2026-08-11_content-driven-interface-design",
+  "last_observed_at": "2026-08-10T16:33:13.856441Z",
+  "ended_at": "2026-08-10T16:33:13.856441Z",
+  "current_work_id": "2026-08-11_content-driven-interface-design"
+}

@@ -7,6 +7,7 @@ agent:
   id: null
   instance: null
   state: null
+presentation_contract: n/a
 quality:
   test: pending
   review: pending
@@ -31,4 +32,7 @@ Agent state 取值：idle / active / paused / completed / blocked
 `stage` 必须来自当前 Workflow frontmatter；`agent.id` 必须是 Agent Contract
 文件名。具体动作只写入 WORK 的 Current Task；Persona/Subagent/Session 标签写入
 可选 `agent.instance`，不得污染规范 Stage 与 Agent ID。
+`presentation_contract` 取值：n/a（无 UI Work）/ pending（有 UI 未冻结）/
+frozen（UI Designer 已冻结 Presentation Contract）。涉及 UI 的 New Feature /
+Large Project 在 frontend-dev 进入实现阶段前必须为 frozen。
 -->

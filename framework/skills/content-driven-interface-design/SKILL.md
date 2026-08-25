@@ -15,15 +15,17 @@ description: 根据可用的 Product Truth、系统行为与 Content Topology，
 
 有上游 fact ID 时，每个下游选择都必须引用它。临时路径则引用明确的 source description 与带标签的 derived anchor：
 
-`System Story → Content Model → View Model → Visual Language → Liveness → Verification`
+`System Story → Repository Capability Audit → Content Model → View Model → Visual Language → Prototype Convergence → Liveness → Verification`
 
 1. 建立完整 System Story：user and context、task and intended outcome、key object old → new change、why the user must perceive the change、consequence if they do not，以及 truth source locator 和 fact ID；临时路径改用明确的 provisional source description 与 identity gap。
-2. 建立完整 Content Model：content and entity types、volume、relationships、priority and co-visibility、states and transitions、change frequency and freshness、key actions、device、context continuity requirements。
-3. 选择 Primary View Model，并引用支撑它的 content facts。只有独立的 subordinate task 无法由主模型清晰表达时，才增加 Secondary View Model 并说明 rationale。至少记录一个 rejected candidate 及其被冲突事实否决的原因。仅在匹配 topology、detail、continuity 或 anti-convergence 决策时读取 `skill://references/presentation-architecture.md`。
-4. 推导其余决策：
+2. 对高影响 UI、新产品、重要改版、数据密集界面，或用户明确不满意现有界面时，读取 `skill://references/evidence-driven-frontend-discovery.md`，完成 Repository Capability Audit。持续区分 Product Truth、System Capability Evidence 与 Presentation Decision；后端或 Repository 无证据支持的能力不得由前端文案伪造。
+3. 建立完整 Content Model：content and entity types、volume、relationships、priority and co-visibility、states and transitions、change frequency and freshness、key actions、device、context continuity requirements。每个数据型 UI 区域必须声明 canonical source、fields、freshness、failure / empty semantics 与 ownership。
+4. 先声明页面职责与非职责、global context 和 navigation，再选择 Primary View Model，并引用支撑它的 content facts。只有独立的 subordinate task 无法由主模型清晰表达时，才增加 Secondary View Model 并说明 rationale。至少记录一个 rejected candidate 及其被冲突事实否决的原因。仅在匹配 topology、detail、continuity 或 anti-convergence 决策时读取 `skill://references/presentation-architecture.md`。
+5. 推导其余决策：
    - Visual Language：引用决定 hierarchy、density、emphasis、accessibility 与 project-owned tokens 的上游 fact ID；临时路径引用回明确 source description 的 derived anchor。
    - Liveness：为每个真实操作或 transition 引用上游 fact ID，或使用同一 provisional trace；写明 semantic event、truth source、perceptible change、recovery path 与 reduced-motion equivalent。
    - Verification：引用上游 fact ID，或使用同一 provisional trace；说明 normal、empty、loading、failure、success、recovery 与 continuity 的 observable acceptance step。
+6. 高影响设计通过 Prototype Convergence 验证 dominant device 与 constrained width，并覆盖 capability evidence 支持的关键状态。多轮由未决风险驱动，不规定固定轮数。用户认可信息密度或视觉高级感，只确认 Visual Language；视觉方向获得认可不等于 Presentation Contract 已完整。
 
 ## Presentation Contract 状态
 
@@ -31,9 +33,13 @@ description: 根据可用的 Product Truth、系统行为与 Content Topology，
 
 - 真实 canonical source locator 与稳定 fact ID，或明确的 provisional source description 与 identity gap。
 - 完整 System Story 与 Content Model，每个字段都链接到 source fact。
+- Repository Capability Audit、数据区域 capability matrix 与 API gap；系统没有的判断不得由前端伪造。
+- 页面职责与非职责、IA、global context、navigation 与 information priority。
 - Primary View Model、可选 Secondary View Model、rationale 与 rejected candidate。
-- Information priority、Detail Strategy、Context Continuity、Visual Language 与语义 Liveness。
-- Observable acceptance 与 recovery behavior。
+- normal 及适用的 loading、empty、failure、stale、pending、blocked、success、recovery state matrix。
+- Detail Strategy、Context Continuity、Visual Language、Design Token、responsive、accessibility、motion 与 reduced-motion。
+- Prototype Convergence 的 locator、验证视口/状态与限制。
+- Observable acceptance、Non-goal 与 independent review verdict。
 
 UI Designer 编写 Contract，并仅在 identity condition 满足时冻结。UX Reviewer 审查同一 Contract，不重新编写。Frontend Dev 只消费该 Contract。
 
@@ -54,6 +60,7 @@ UI Designer 编写 Contract，并仅在 identity condition 满足时冻结。UX 
 
 ## vNext Reference Routing
 
+- 高影响 UI、新产品、重要改版、数据密集界面或用户明确不满意现有 UI → Evidence-driven Frontend Discovery。
 - Topology、task shape 或 rejected candidates → View Models and Selection Contract。
 - Focused inspection 或 edit → Detail Strategy。
 - Return path、selection、filter、draft、focus 或 scroll preservation → Context Continuity。

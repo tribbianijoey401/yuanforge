@@ -136,6 +136,24 @@ description: 可复用的 Verified Finding、Pitfall、Preference 和 Convention
 - **Symptom**：为了让 Traceability Matrix 看起来完整，Agent 为只有自然语言描述的请求自行创建 `REQ-*`、`PF-*` 或类似 locator / fact ID，并把派生编号称为 canonical。
 - **Rule**：不得创建、推断、重命名或铸造 canonical locator / fact ID。只有真实 canonical source 与稳定 ID 存在时才能冻结 Presentation Contract；无 ID 输入使用 `source: current user request` 与 `canonical ID unavailable`，Contract 保持 provisional。内部锚点必须明确标为 derived / non-canonical，既不能替代 Product Truth，也不能阻止继续进行可逆的展示架构推导。
 
+### M-023：质量关卡若只是 optional 会默认不启动
+
+- **Symptom**：UI Designer / UX Reviewer 放在 `optional_agents`，前端无原型裸写、页面模板味重；用户每次手动说"优化前端"才触发设计环节。
+- **Cause**：质量关卡靠 LLM 自觉启动，无机器硬门；`frontend-dev` 被禁止自由发挥样式，却拿不到 UI 原型，只能违规裸写。
+- **Rule**：凡"某个 Writer 开工前必须存在的产出"，都要把该产出冻结为状态信号并由 State Guard 硬门校验（如 `presentation_contract: frozen`），不能只写在 optional 路由里。
+
+### M-024：数据型 UI 先审计系统能力，再设计展示
+
+- **Symptom**：原型看起来像 Agent 在做“人类判断”，但 Repository 只提供原始数据；前端被迫用固定文案伪造趋势、原因或风险结论。
+- **Cause**：Product Fact、System Capability Evidence 与 Presentation Decision 混在一起，设计访谈替代了 API / schema / fixture / runtime audit。
+- **Rule**：高影响 UI 先完成 Repository Capability Audit；每个数据区域记录 canonical source、fields、freshness、failure/empty semantics 与 ownership。无法证明的能力标为 API gap，不向非技术用户追问 Repository 可验证事实，也不由前端补写权威判断。原型获得视觉认可后仍必须检查页面职责、状态矩阵、响应式、可访问性和实现 locator。
+
+### M-025：相同 Version 不等于相同 Framework 内容
+
+- **Symptom**：Source 已增加 Skill 或 Gate，项目 Snapshot / Codex 安装副本仍缺失，但它们显示同一 VERSION，Agent 因而误以为能力可用。
+- **Cause**：managed capability 变更未 bump version，安装记录也没有内容身份。
+- **Rule**：managed Framework 变化必须 bump `framework/VERSION`，Installer 记录 deterministic SHA-256 fingerprint，Check 同时比较 record、installed snapshot 与 authoritative Source。内容漂移必须显式失败并要求从正确 Source update。
+
 ## Engineering Conventions
 
 - 任何新机制先回答是否直接改善非技术用户的软件交付质量，是否减少 Token、确认和维护成本。

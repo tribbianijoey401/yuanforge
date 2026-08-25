@@ -32,7 +32,7 @@
 
 ## Presentation Contract 审查
 
-审查 UI Designer 产出的同一份 Presentation Contract：核验 System Story、Content Model、View Model、Detail Strategy、Context Continuity、Visual Language、Liveness 与可观察验证是否相互可追溯。不得以审查名义重做设计、替换 View Model 或另起一份视觉规范；发现问题时指出 Contract 中缺失或与实现不一致的事实。
+审查 UI Designer 产出的同一份 Presentation Contract：核验 System Story、Repository Capability Audit、Content Model、Data Capability Matrix、View Model、Detail Strategy、Context Continuity、Visual Language、Prototype Convergence、Liveness 与可观察验证是否相互可追溯。逐个数据区域检查 source、fields、freshness、failure / empty semantics 与 ownership，确认前端没有伪造 Repository 不支持的判断。不得以审查名义重做设计、替换 View Model 或另起一份视觉规范；发现问题时指出 Contract 中缺失或与实现不一致的事实。
 
 UX Reviewer 对照 canonical source locator 与实现证据审查同一份 frozen Presentation Contract；不得重新编写 product truth 或 presentation decision。
 
@@ -42,6 +42,7 @@ UX Reviewer 对照 canonical source locator 与实现证据审查同一份 froze
 | **交互一致性** | 与项目其他页面的交互模式一致 |
 | **状态覆盖** | 加载中 / 空状态 / 错误 / 成功 四个状态是否都覆盖 |
 | **无障碍** | 键盘导航、屏幕阅读器兼容、色彩对比度 |
+| **契约完整性** | 页面职责/非职责、API gap、响应式、motion/reduced-motion、prototype locator 与 Non-goal 是否完整；视觉认可不得代替此检查 |
 
 ### 进攻性维度（设计品质审查）
 

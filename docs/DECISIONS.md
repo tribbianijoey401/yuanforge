@@ -72,8 +72,20 @@
 ## D-012：界面设计采用内容驱动的展示架构链
 
 - **Status**：Confirmed
-- **Decision**：Yuan 的界面设计沿 `System Story → Content Model → View Model → Visual Language → Liveness → Verification` 推导。UI Designer 基于 canonical Product Contract 形成并冻结 Presentation Contract；UX Reviewer 审查同一 Contract；Frontend Dev 只消费冻结结果。View Model 由内容量、关系、任务、变化频率、设备与上下文连续性决定，不默认 Dashboard、单屏或长滚动。Liveness 只来自真实操作、状态、进度、成功、失败、同步或恢复，Motion 不能替代语义；query-ux-pro-max 仅在 View Model 之后作为低优先级条件性建议。
-- **Reason**：视觉风格或页面模板先行会让不同产品收敛到同一布局，并把装饰动画误当成生命力。统一因果链能让结构、视觉、反馈和验证追溯到真实产品事实，同时保留清晰骨架、友好层级、细节克制和有目的生命力在不同主题下的表达空间。
+- **Decision**：Yuan 的高影响界面设计沿 `Outcome / Task → Product Contract → Repository Capability Audit → Content / Data Model → View Model / IA → Visual Language → Prototype Convergence → Presentation Contract → Independent Review → Frontend Implementation` 推导。全过程分开 Product Truth、System Capability Evidence 与 Presentation Decision；每个数据型 UI 区域声明 source、fields、freshness、failure/empty semantics 与 ownership。UI Designer 冻结同一 Presentation Contract，UX Reviewer 审查，Frontend Dev 只消费。View Model 由内容量、关系、任务、变化频率、设备与上下文连续性决定，不默认 Dashboard、单屏或长滚动；query-ux-pro-max 仅在 View Model 之后作为条件性建议。
+- **Reason**：视觉风格或页面模板先行会让不同产品收敛到同一布局；跳过 Repository Evidence 又会让前端用固定文案伪造后端没有的判断。统一因果链让页面结构、数据语义、视觉、反馈和验证都可追溯，同时允许用户偏好覆盖行业默认配方。用户认可“舒服/高级”只收敛视觉方向，不证明数据契约和实施条件完整。
+
+## D-013：UI 设计是前端实现的前置硬门
+
+- **Status**：Confirmed
+- **Decision**：涉及 UI 的 New Feature / Large Project 中，`frontend-dev` 进入实现阶段（`implement` / `build` 及之后）前，`presentation_contract` 必须为 `frozen`，且 WORK 必须提供 `Status: frozen`、Product Truth、Contract Locator 与 Prototype / Verification evidence。未冻结时报 `STATE_UI_DESIGN_MISSING`；只有状态、没有内容时报 `STATE_UI_PRESENTATION_CONTRACT_INCOMPLETE`。Complex Bug 与 Small Change 不触发此门。
+- **Reason**：UI Designer 与 UX Reviewer 原本只是 optional，导致前端在无原型时裸写界面、风格趋同于 AI 模板。把"frontend-dev 被启用"本身当作"有 UI"的铁证，让审美环节从依赖 LLM 自觉变成机器可校验的前置条件。
+
+## D-014：Framework 分发使用 Version + 内容指纹双重身份
+
+- **Status**：Confirmed
+- **Decision**：任何 managed Framework capability 变化都升级 `framework/VERSION`；Installer 同时将 Framework tree 的 SHA-256 content fingerprint 写入 `.yuan/install.json`。`check` 比较安装记录、项目 Snapshot 与当前 Source，内容不一致即报告 fingerprint mismatch / source drift，即使版本字符串相同也不能判定能力已安装。
+- **Reason**：`content-driven-interface-design` 已进入 Source，但 Codex 安装副本和 BTC-data snapshot 仍缺失该能力，三者却同标 `4.0.0-alpha.10`。只有版本字符串无法识别漏发、陈旧副本或受管内容被直接修改。
 
 ## Historical Decision
 

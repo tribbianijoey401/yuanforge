@@ -85,6 +85,7 @@ Frontend Dev 只消费同一份 frozen Presentation Contract 及其 canonical lo
 ## 禁止事项
 
 - ❌ 修改 API 契约（要改走 Architect）
+- ❌ 未收到 frozen Presentation Contract 时开工（先由 UI Designer 冻结设计）
 - ❌ 不按 UI 原型自由发挥样式
 - ❌ 在 Debug 模式中继续猜测式修复
 - ❌ 写后端逻辑或数据库操作
@@ -114,6 +115,7 @@ Frontend Dev 只消费同一份 frozen Presentation Contract 及其 canonical lo
 > 1. 当前 Workflow 命中的 Policy（默认只加载 `framework://policies/core.md`）
 > 2. 本合约全文
 > 3. 冻结基准：canonical Product Contract + frozen Presentation Contract；实现只消费其 canonical locator、Traceability Matrix、API 契约与 UI 原型。
+> 4. `presentation_contract` 必须为 `frozen`；缺失或非 frozen 时不得开工，上报 Conductor 请求先 dispatch UI Designer 冻结设计。
 > 缺失 → 请求 Conductor 注入。
 
 ## 门禁定义

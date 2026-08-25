@@ -11,8 +11,11 @@
 | `stage` | 当前 Workflow frontmatter 的 `stages` | 使用列表中的精确值，不创造别名或执行动作名 |
 | `agent.id` | 当前 Workflow frontmatter + `framework://agents/*.md` | 使用当前 Workflow 已声明且确有 Agent Contract 的文件名 stem |
 | `agent.state` | 本契约 | 只能是 `idle`、`active`、`paused`、`completed`、`blocked` |
+| `presentation_contract` | 本契约 | 只能是 `n/a`、`pending`、`frozen` |
 
 `work_state: active` 时，`agent.state` 只能是 `active`、`completed` 或 `blocked`；`work_state: paused` 时，`agent.state` 必须为 `paused`。完成并 Distill 后使用 `work_state: idle`，同时清空 Work、Workflow、Stage 和 Agent 引用，不新增 `completed` Work state。
+
+`presentation_contract` 是 UI 设计冻结信号：`n/a`（无 UI Work）、`pending`（有 UI 但 Presentation Contract 尚未冻结）、`frozen`（UI Designer 已产出并冻结 Presentation Contract）。涉及 UI 的 New Feature / Large Project 在 `frontend-dev` 进入实现阶段前必须为 `frozen`；同时 `WORK.md` 的 `Presentation Contract` Section 必须包含 `Status: frozen`、可用的 Product Truth、Contract Locator 与 Prototype / Verification evidence。状态字段不能作为空壳替代设计内容。该硬门由 `framework://tools/state_guard.py` 校验。纯后端或 Bug 修复 Work 使用 `n/a`，不触发硬门。
 
 ## Execution Identity
 

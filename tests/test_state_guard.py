@@ -21,11 +21,21 @@ def load_guard():
     return module
 
 
-def write_work(root: Path, *, next_action: bool = False) -> None:
+def write_work(
+    root: Path,
+    *,
+    next_action: bool = False,
+    presentation_contract: str | None = None,
+) -> None:
     suffix = "\n## Next Action\n\n继续验证。\n" if next_action else ""
+    contract = (
+        f"\n## Presentation Contract\n\n{presentation_contract}\n"
+        if presentation_contract is not None
+        else ""
+    )
     (root / "docs" / "WORK.md").write_text(
         "# Active Work\n\n## Goal\n\n修复状态提交。\n\n"
-        "## Current Task\n\n- Agent: backend-dev\n" + suffix,
+        "## Current Task\n\n- Agent: backend-dev\n" + contract + suffix,
         encoding="utf-8",
     )
 
@@ -37,13 +47,14 @@ def write_status(
     agent_id: str = "backend-dev",
     work_state: str = "active",
     agent_state: str = "active",
+    workflow: str = "complex-bug",
     extras: str = "",
 ) -> None:
     (root / "docs" / "STATUS.md").write_text(
         f"""---
 work: BUG-state-contract
 work_state: {work_state}
-workflow: complex-bug
+workflow: {workflow}
 stage: {stage}
 activity: specialist_execution
 agent:
@@ -121,6 +132,69 @@ class StateGuardTests(unittest.TestCase):
         issues = self.guard.validate_project_state(self.root, self.framework)
 
         self.assertIn("STATE_AGENT_NOT_ALLOWED", {issue.code for issue in issues})
+
+    def test_ui_new_feature_requires_frozen_presentation_contract(self):
+        write_work(self.root)
+        write_status(
+            self.root,
+            workflow="new-feature",
+            agent_id="frontend-dev",
+            extras="presentation_contract: pending\n",
+        )
+
+        issues = self.guard.validate_project_state(self.root, self.framework)
+
+        self.assertIn("STATE_UI_DESIGN_MISSING", {issue.code for issue in issues})
+
+    def test_ui_frozen_state_rejects_empty_contract_shell(self):
+        write_work(self.root, presentation_contract="Status: frozen")
+        write_status(
+            self.root,
+            workflow="new-feature",
+            agent_id="frontend-dev",
+            extras="presentation_contract: frozen\n",
+        )
+
+        issues = self.guard.validate_project_state(self.root, self.framework)
+
+        self.assertIn(
+            "STATE_UI_PRESENTATION_CONTRACT_INCOMPLETE",
+            {issue.code for issue in issues},
+        )
+
+    def test_ui_frozen_state_accepts_locatable_contract_and_evidence(self):
+        write_work(
+            self.root,
+            presentation_contract=(
+                "Status: frozen\n"
+                "Product Truth: project://docs/WORK.md#acceptance\n"
+                "Contract Locator: project://docs/design/ui-contract.md\n"
+                "Prototype / Verification: project://prototypes/ui/index.html"
+            ),
+        )
+        write_status(
+            self.root,
+            workflow="new-feature",
+            agent_id="frontend-dev",
+            extras="presentation_contract: frozen\n",
+        )
+
+        issues = self.guard.validate_project_state(self.root, self.framework)
+
+        self.assertEqual([], issues)
+
+    def test_complex_bug_does_not_require_ui_presentation_contract_evidence(self):
+        write_work(self.root)
+        write_status(
+            self.root,
+            workflow="complex-bug",
+            agent_id="frontend-dev",
+            extras="presentation_contract: n/a\n",
+        )
+
+        issues = self.guard.validate_project_state(self.root, self.framework)
+
+        self.assertEqual([], issues)
 
 
 if __name__ == "__main__":

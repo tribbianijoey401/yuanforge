@@ -1,23 +1,36 @@
 {
   "work_id": "2026-08-11_content-driven-interface-design",
-  "transition_count": 2,
+  "transition_count": 29,
   "first_observed_at": "1786379222.215574",
-  "last_observed_at": "1786379253.703461",
+  "last_observed_at": "1786382871.417901",
   "stages": [
     "discover",
-    "verify-plan"
+    "verify-plan",
+    "design",
+    "implement",
+    "verify",
+    "review",
+    "distill"
   ],
   "agents": [
     "product-analyst",
-    "backend-dev"
+    "backend-dev",
+    "ui-designer",
+    "frontend-dev",
+    "tester",
+    "spec-reviewer",
+    "conductor"
   ],
   "skills": [],
   "files_changed": [
+    "docs/DECISIONS.md",
+    "docs/MEMORY.md",
     "docs/STATUS.md",
     "docs/WORK.md"
   ],
   "sessions": [
-    "OBS-20260810T142409-0740fe9d"
+    "OBS-20260810T142409-0740fe9d",
+    "OBS-20260810T163327-3b232d10"
   ],
   "coverage": "FULL",
   "gaps": [

@@ -16,6 +16,17 @@
 
 <!-- 只写当前 Work 需要的步骤。Complex Work 可在此增加 Task Board。 -->
 
+## Presentation Contract
+
+<!-- 涉及 UI 的 New Feature / Large Project 使用下列可机检字段；纯后端 Work 填 n/a。Status=frozen 只表示完整契约已冻结，不能代替 locator/evidence。 -->
+
+Status: n/a
+Product Truth: n/a
+Contract Locator: n/a
+Prototype / Verification: n/a
+
+<!-- frontend-dev 进入实现阶段前，Status 与 STATUS.presentation_contract 都必须为 frozen，后三项必须是可用 locator/evidence；由 state_guard.py 硬门校验。详细内容保存在 Contract Locator 指向的同一份 Presentation Contract，不在 WORK 复制第二份 Product Truth。 -->
+
 ---
 
 # Active Workspace

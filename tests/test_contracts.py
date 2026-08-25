@@ -375,13 +375,18 @@ class FrameworkContractTests(unittest.TestCase):
         skill_root = FRAMEWORK / "skills" / "content-driven-interface-design"
         skill = skill_root / "SKILL.md"
         reference = skill_root / "references" / "presentation-architecture.md"
+        discovery_reference = (
+            skill_root / "references" / "evidence-driven-frontend-discovery.md"
+        )
         metadata = skill_root / "agents" / "openai.yaml"
         self.assertTrue(skill.is_file())
         self.assertTrue(reference.is_file())
+        self.assertTrue(discovery_reference.is_file())
         self.assertTrue(metadata.is_file())
 
         skill_text = skill.read_text(encoding="utf-8")
         reference_text = reference.read_text(encoding="utf-8")
+        discovery_text = discovery_reference.read_text(encoding="utf-8")
         metadata_text = metadata.read_text(encoding="utf-8")
         for phrase in (
             "System Story",
@@ -466,6 +471,15 @@ class FrameworkContractTests(unittest.TestCase):
         ):
             self.assertIn(downstream_decision, skill_text)
         self.assertIn("presentation-architecture.md", skill_text)
+        self.assertIn("evidence-driven-frontend-discovery.md", skill_text)
+        for phrase in (
+            "Repository Capability Audit",
+            "System Capability Evidence",
+            "Prototype Convergence",
+            "页面职责与非职责",
+            "视觉方向获得认可不等于 Presentation Contract 已完整",
+        ):
+            self.assertIn(phrase, skill_text)
         self.assertNotIn("Dashboard", skill_text)
         self.assertNotIn("Liveness Score", skill_text)
         self.assertIn('default_prompt: "使用 $content-driven-interface-design', metadata_text)
@@ -491,6 +505,22 @@ class FrameworkContractTests(unittest.TestCase):
         ):
             self.assertIn(phrase, reference_text)
 
+        for phrase in (
+            "Product Truth",
+            "System Capability Evidence",
+            "Presentation Decision",
+            "canonical source",
+            "fields",
+            "freshness",
+            "failure / empty semantics",
+            "ownership",
+            "page responsibility",
+            "prototype convergence",
+            "高影响",
+            "Small Change",
+        ):
+            self.assertIn(phrase, discovery_text)
+
         ui_designer = (FRAMEWORK / "agents" / "ui-designer.md").read_text(
             encoding="utf-8"
         )
@@ -512,7 +542,13 @@ class FrameworkContractTests(unittest.TestCase):
             r"Required `framework://skills/content-driven-interface-design/SKILL\.md`",
         )
         self.assertIn("Presentation Contract", ui_designer)
+        self.assertIn("Repository Capability Audit", ui_designer)
+        self.assertIn("页面职责与非职责", ui_designer)
+        self.assertIn("Prototype Convergence", ui_designer)
         self.assertIn("Presentation Contract", reviewer)
+        self.assertIn("Repository Capability Audit", reviewer)
+        self.assertIn("Data Capability Matrix", reviewer)
+        self.assertIn("Prototype Convergence", reviewer)
         self.assertIn(
             "不得以审查名义重做设计、替换 View Model 或另起一份视觉规范",
             reviewer,
@@ -549,6 +585,27 @@ class FrameworkContractTests(unittest.TestCase):
             query,
         )
         self.assertIn("View Model 之后", query)
+
+        for workflow_name in ("new-feature.md", "large-project.md"):
+            workflow_text = (FRAMEWORK / "workflows" / workflow_name).read_text(
+                encoding="utf-8"
+            )
+            self.assertIn("Repository Capability Audit", workflow_text)
+            self.assertIn("Prototype Convergence", workflow_text)
+            self.assertIn("Independent Review", workflow_text)
+
+        product_analyst = (FRAMEWORK / "agents" / "product-analyst.md").read_text(
+            encoding="utf-8"
+        )
+        for phrase in (
+            "用户熟练度",
+            "主要任务",
+            "设备与语言",
+            "信息层级与密度",
+            "系统判断与用户判断的边界",
+            "Repository Capability Audit",
+        ):
+            self.assertIn(phrase, product_analyst)
 
         for path in skill_root.rglob("*"):
             if not path.is_file():

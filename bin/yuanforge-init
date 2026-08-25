@@ -14,6 +14,7 @@ Override 与业务内容保持不变。
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import os
@@ -81,6 +82,20 @@ def installed_framework_version(root: Path) -> str:
         return version_file.read_text(encoding="utf-8").strip()
     except (OSError, UnicodeError):
         return "unknown"
+
+
+def framework_fingerprint(root: Path) -> str:
+    """Return a deterministic content identity for a managed Framework tree."""
+    digest = hashlib.sha256()
+    for path in sorted(item for item in root.rglob("*") if item.is_file()):
+        if "__pycache__" in path.parts or path.suffix in {".pyc", ".pyo"}:
+            continue
+        relative = path.relative_to(root).as_posix().encode("utf-8")
+        digest.update(relative)
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
 
 
 def read_update_work_state(target: Path) -> str | None:
@@ -323,6 +338,7 @@ def write_install_record(target: Path, dry_run: bool = False) -> None:
     record = {
         "framework": "yuan-vnext",
         "version": framework_version(),
+        "framework_fingerprint": framework_fingerprint(SOURCE_FRAMEWORK),
         "layout": ".yuan/framework",
         "override": ".yuan/overrides",
         "insight_tool": ".yuan/insight/tool",
@@ -557,6 +573,30 @@ def check_project(target: Path) -> int:
         framework_errors, framework_warnings = validate_framework(managed)
         errors.extend(framework_errors)
         warnings.extend(framework_warnings)
+
+    if installed_framework.is_dir():
+        record_path = target / ".yuan" / "install.json"
+        try:
+            record = json.loads(record_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            errors.append(
+                "FRAMEWORK_INSTALL_RECORD_INVALID: "
+                f"{type(exc).__name__}；请从预期 Yuan Source Repository 执行 update"
+            )
+        else:
+            recorded_fingerprint = record.get("framework_fingerprint")
+            actual_fingerprint = framework_fingerprint(installed_framework)
+            if recorded_fingerprint != actual_fingerprint:
+                errors.append(
+                    "FRAMEWORK_FINGERPRINT_MISMATCH: installed snapshot 与 "
+                    "install.json 内容指纹不一致；请勿直接修改 managed snapshot，改用 override 或 update"
+                )
+            source_fingerprint = framework_fingerprint(SOURCE_FRAMEWORK)
+            if actual_fingerprint != source_fingerprint:
+                errors.append(
+                    "FRAMEWORK_SOURCE_DRIFT: installed snapshot 与当前 Source 内容不同；"
+                    "即使版本号相同也必须执行 update"
+                )
 
     installed_insight = target / ".yuan" / "insight" / "tool" / "yuan_insight" / "cli.py"
     source_insight = target / "insight" / "yuan_insight" / "cli.py"
