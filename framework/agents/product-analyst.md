@@ -43,6 +43,7 @@
 | 项目上下文 | `project://docs/STATUS.md` + `project://docs/WORK.md` | 了解项目现状 |
 | 已有功能 | `project://docs/PRODUCT.md`（初期为空则跳过重复检查） | 避免重复 |
 | Discovery Result | 当前对话与 `project://docs/WORK.md` | 作为 Grilling 的上游事实，避免重复追问 |
+| UI Experience Signal | 用户反馈、现有界面与 Repository Evidence | 判断是否需要完整内容驱动的设计发现；Repository 能证明的能力不反问用户 |
 
 ---
 
@@ -76,6 +77,12 @@
    - R0：涉及资金、身份认证、用户隐私、支付
    - R1：涉及用户数据读写、权限变更
    - R2：纯展示、内部工具、无敏感数据
+
+### 命中 Presentation Design Signal 时的 Product 输入
+
+仅在高影响 UI、新产品、重要改版、数据密集界面、关键旅程，或没有可复用设计时，Product Contract 还需覆盖：用户熟练度、主要任务、设备与语言、信息层级与密度、页面职责边界、系统判断与用户判断的边界，以及后端与前端责任边界。只询问会改变 Product Direction 或关键 Experience 的未知；API、字段、持久化、实时性和现有状态码等事实进入后续 Repository Capability Audit，由 Agent 从 Repository 验证，不让非技术用户猜测。
+
+Product Analyst 不设计组件或视觉配方，只把这些输入作为 UI Designer 使用 `content-driven-interface-design` 的上游 Product Truth。未命中该 Signal 的 UI Work 维持既有 Product Contract，不增加完整设计发现流程。
 
 ---
 

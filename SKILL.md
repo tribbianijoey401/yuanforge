@@ -2,7 +2,7 @@
 name: yuanforge
 title: YuanForge Vibecoding 元框架入口
 description: 用 YuanForge 元框架进行 vibecoding 软件开发。当用户要开发功能、加需求、修 Bug、调试、重构、写测试、做 UI/界面设计、审查代码、规划项目，或说"vibecoding""用 yuan""元框架"，以及启动需要跨会话记忆的大型项目迭代时使用。轻任务按需加载方法论直接执行；大任务建立 docs/ 状态文档支持多会话持续推进。
-version: 4.0.0-alpha.10
+version: 4.0.0-alpha.12
 ---
 
 # YuanForge — Vibecoding 元框架（伞形入口）

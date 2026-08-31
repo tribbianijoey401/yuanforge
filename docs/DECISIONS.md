@@ -69,6 +69,12 @@
 - **Decision**：状态词汇由 `framework://policies/state-contract.md` 定义，合法 Workflow Stage 与 Agent ID 分别动态来自 Workflow frontmatter 和 Agent Contract 文件名，且 Agent 必须被当前 Workflow 声明；`framework://tools/state_guard.py` 在每次 Conductor State Commit 后只读校验。Installer Check 与 Insight 加载同一 Guard，不复制校验逻辑、不自动改写 Project State。具体动作以 WORK 的 Current Task 为唯一真相源，Insight 只做派生展示；执行实例标签可进入 `agent.instance`。
 - **Reason**：自然语言提示无法可靠阻止 LLM 创造 `specialist_execution`、`frontend-fixer` 等非规范值；多套事后校验又会漂移。一个轻量、无后台进程、无状态写权限的可执行提交门能在保留 Markdown 与单 LLM 架构的同时阻止错误状态继续驱动 Dispatch。
 
+## D-012：Presentation Contract 是条件性 UI Quality Artifact
+
+- **Status**：Confirmed
+- **Decision**：完整内容驱动设计只在 Presentation Design Signal（高影响 UI、新产品、重要改版、数据密集界面、关键旅程或没有可复用设计）命中时触发。UI Designer 把 provisional/frozen Presentation Contract 持久化在 `project://docs/design/`，UX Reviewer 与 Frontend Dev 仅消费该 Artifact；它不进入 `STATUS.md`、State Contract 或 State Guard。
+- **Reason**：设计追溯与可实现性需要可定位 Artifact，但将其作为所有 Project 的 Core State 会把局部 UI 质量流程扩张为全局状态机，并不必要地阻塞普通 UI Work。
+
 ## Historical Decision
 
 旧 `ADR-001` 曾把 Human Gate 与 Quality Gate 统一到 v3 Workflow Protocol。该 Decision 在 v3 内部解决了命名冲突，但其固定 Gate/Protocol 前提已被 D-001 与 D-005 Supersede；其中“减少重复定义、缩小变更爆炸半径”的工程经验仍保留在 `MEMORY.md`。

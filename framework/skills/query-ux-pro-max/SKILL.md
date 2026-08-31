@@ -6,6 +6,14 @@ trigger: UI Designer 或 UX Reviewer 遇到特定行业/产品类型的 UX 惯�
 
 # Query UX Pro Max — 行业 UX 知识查询
 
+## 权限与时机
+
+仅在 Presentation Contract 已选择 View Model、且仍有未决 industry convention 时使用本 Skill（即 View Model 之后）。它只提供条件性建议，不选择 View Model、不替换 content topology，也不规定 visual recipe。
+
+按以下固定优先级应用约束：Product Contract / Acceptance / Repository Fact → Presentation Architecture → Visual Absolutes → Project Design System → query。
+
+不得使用 query 结果覆盖上游事实、frozen Presentation Contract、accessibility requirement 或 project-owned design constraint。
+
 ## vNext Reference Routing
 
 - 首先根据 Industry / Product Signal 查询本 Skill 的 `skill://references/*.csv`，只读取匹配行。

@@ -371,6 +371,68 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("installed_yuan_root", insight_validation)
         self.assertIn("return None", insight_validation)
 
+    def test_content_driven_interface_design_is_artifact_local_and_conditional(self):
+        skill_root = FRAMEWORK / "skills" / "content-driven-interface-design"
+        skill = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+        discovery = (skill_root / "references" / "evidence-driven-frontend-discovery.md").read_text(encoding="utf-8")
+        architecture = (skill_root / "references" / "presentation-architecture.md").read_text(encoding="utf-8")
+        metadata = (skill_root / "agents" / "openai.yaml").read_text(encoding="utf-8")
+
+        for phrase in ("System Story", "Repository Capability Audit", "Content Model", "View Model", "Visual Language", "Liveness", "Verification", "Traceability Matrix", "provisional Presentation Contract", "不能被冻结", "不得创建、推断、重命名或铸造 canonical locator 或 fact ID。"):
+            self.assertIn(phrase, skill)
+        self.assertIn("状态是该设计 Artifact 的局部质量字段", skill)
+        self.assertIn("`project://docs/design/`", skill)
+        self.assertIn("关键旅程", skill)
+        self.assertIn("没有可复用设计", skill)
+        self.assertIn("Data Capability Matrix", discovery)
+        self.assertIn("page responsibility", discovery)
+        self.assertIn("System Capability Evidence", discovery)
+        for model in ("Queue", "Timeline", "Table", "Board", "Detail workspace"):
+            self.assertIn(model, architecture)
+        self.assertIn("$content-driven-interface-design", metadata)
+
+        product = (FRAMEWORK / "agents" / "product-analyst.md").read_text(encoding="utf-8")
+        designer = (FRAMEWORK / "agents" / "ui-designer.md").read_text(encoding="utf-8")
+        reviewer = (FRAMEWORK / "agents" / "ux-reviewer.md").read_text(encoding="utf-8")
+        frontend = (FRAMEWORK / "agents" / "frontend-dev.md").read_text(encoding="utf-8")
+        routing = (FRAMEWORK / "policies" / "routing.md").read_text(encoding="utf-8")
+        query = (FRAMEWORK / "skills" / "query-ux-pro-max" / "SKILL.md").read_text(encoding="utf-8")
+
+        self.assertIn("Presentation Design Signal", product)
+        self.assertIn("Repository Capability Audit", product)
+        self.assertIn("content-driven-interface-design", designer)
+        self.assertIn("`project://docs/design/`", designer)
+        self.assertIn("Repository Capability Audit", designer)
+        self.assertIn("Presentation Contract Traceability Review", reviewer)
+        self.assertIn("Data Capability Matrix", reviewer)
+        self.assertIn("不得以审查名义重做设计、替换 View Model 或另起一份视觉规范", reviewer)
+        self.assertIn("Presentation Contract 消费边界", frontend)
+        self.assertIn("稳定身份", frontend)
+        self.assertIn("reduced-motion", frontend)
+        self.assertIn("六类定向", frontend)
+        self.assertIn("前端工程纪律", frontend)
+        self.assertIn("Presentation Design Signal", routing)
+        self.assertNotIn("UI Design Gate", routing)
+        self.assertIn("Product Contract / Acceptance / Repository Fact → Presentation Architecture → Visual Absolutes → Project Design System → query", query)
+
+        for workflow_name in ("new-feature.md", "large-project.md"):
+            workflow = (FRAMEWORK / "workflows" / workflow_name).read_text(encoding="utf-8")
+            self.assertIn("Presentation Design Signal", workflow)
+            self.assertIn("Repository Capability Audit", workflow)
+            self.assertIn("`project://docs/design/`", workflow)
+            self.assertNotIn("presentation_contract", workflow)
+
+        for path in (FRAMEWORK / "policies" / "state-contract.md", FRAMEWORK / "tools" / "state_guard.py", FRAMEWORK / "templates" / "project" / "STATUS.md"):
+            self.assertNotIn("presentation_contract", path.read_text(encoding="utf-8"))
+
+    def test_installer_records_framework_fingerprint(self):
+        installer = load_installer()
+        fingerprint = installer.framework_fingerprint(FRAMEWORK)
+        self.assertRegex(fingerprint, r"^[0-9a-f]{64}$")
+        self.assertEqual(fingerprint, installer.framework_fingerprint(FRAMEWORK))
+        self.assertEqual("4.0.0-alpha.12", (FRAMEWORK / "VERSION").read_text(encoding="utf-8").strip())
+        self.assertIn("version: 4.0.0-alpha.12", (ROOT / "SKILL.md").read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -26,6 +26,10 @@ Bug、Regression、Failed Attempt、Partial Previous Fix 信号高于“文件�
 | New Feature | Conductor、Product Analyst、相关 Dev、Tester | 跨模块时 Architect；涉及 UI 时 UI Designer；按风险选择 Reviewer |
 | Large Project | Conductor、Product Analyst、Architect、相关 Dev、Tester | UI Designer、Design Reviewer 与按风险选择的 Reviewer |
 
+### Presentation Design Signal
+
+完整 `content-driven-interface-design` 仅在高影响 UI、新产品、重要改版、数据密集界面、关键旅程，或没有可复用设计时触发。此时 UI Designer 负责 Repository Capability Audit、Content / View Model 与 Artifact-local Presentation Contract；UX Reviewer 按同一 Artifact 做 traceability review，Frontend Dev 只消费该 Artifact。普通 UI New Feature 不因 UI 身份自动进入完整设计流程，也不使用 State Guard 作为冻结门禁。
+
 Frontend 与 Backend 同时涉及代码时仍保持一个 Writer，按可验证 Slice 顺序切换，不并行修改同一 Workspace。
 
 ## Reviewer Routing

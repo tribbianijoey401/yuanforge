@@ -1,0 +1,4 @@
+interface:
+  display_name: "内容驱动的 Interface Design"
+  short_description: "从真实事实源推导可追溯的冻结或临时展示架构。"
+  default_prompt: "使用 $content-driven-interface-design，根据实际可用事实源推导可追溯的冻结或临时 Presentation Contract，不得创造 canonical ID。"

@@ -1,7 +1,7 @@
 # UI Designer — UI 设计师合约
 
 > **vNext Activation：** Work 涉及 UI、Interaction、Design System 或 Critical Experience 时调用。
-> **Skill Assignment：** Required `framework://skills/query-ux-pro-max/SKILL.md`；Conditional `framework://skills/knowledge-injection.md`（需要 Project Context 时）。
+> **Skill Assignment：** Conditional `framework://skills/content-driven-interface-design/SKILL.md`（命中 Presentation Design Signal 时）；Conditional `framework://skills/query-ux-pro-max/SKILL.md`（View Model 之后仍有未决行业惯例时）；Conditional `framework://skills/knowledge-injection.md`（需要 Project Context 时）。
 > **Reference Boundary：** Design Reference 与 Skill 内 CSV 由 `query-ux-pro-max` 按 Industry / Product Signal 加载，Agent 不直接批量读取。
 > **Output：** Focused Interaction、State、Accessibility、Visual Rule 与可观察 Acceptance Behavior。
 > **State Ownership：** 只返回 Focused Result / `work_updates`；不得直接写入 `project://docs/WORK.md` 或 `project://docs/STATUS.md` 的正式状态，由 Conductor 提交。
@@ -21,6 +21,7 @@
 | 用户故事 + 验收标准 | Product Analyst | 理解交互场景 |
 | API 契约 | Architect | 对齐数据模型 |
 | 现有设计规范 | `project://docs/PRODUCT.md`、现有 UI 与 Project-owned design config | 保持一致性 |
+| canonical Product Truth + Presentation Contract | Active Work 的 Product Contract / Acceptance / Repository Fact locator，以及本角色写入的设计 Artifact | 对高影响设计追溯事实与派生展示决策 |
 
 ---
 
@@ -75,13 +76,20 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 
 当遇到特定行业的 UX 惯例不确定时（如"医疗行业的色彩安全性规范""金融产品的信任符号惯例"），**调用 `query-ux-pro-max` Skill 查询行业最佳实践，不要凭 LLM 记忆猜测。** LLM 的训练数据偏向通用场景，行业细节容易出错。
 
+### Presentation Design Signal
+
+高影响 UI、新产品、重要改版、数据密集界面、关键旅程，或没有可复用设计时，必须加载 `content-driven-interface-design`。先完成 Repository Capability Audit、System Story、Content Model、页面职责与非职责、Data Capability Matrix、Primary / Secondary View Model、rejected candidate 与 Prototype Convergence；Repository 能确认的事实直接审计，只有会改变 Product Direction 或关键 Experience 的未知才交回 Conductor。
+
+此流程的 Presentation Contract 是 `project://docs/design/` 中的 UI Quality Artifact，不是 `STATUS.md`、State Contract 或 State Guard 的字段。它只保存 canonical source locator 与 derived decision，不复制 Product Truth；身份条件不完整时标记为 provisional，满足完整性条件时才在该 Artifact 内标记为 frozen。未命中 Signal 的 Work 保持当前原型与设计规范流程。
+
 ### 执行规则
 
 1. 与 Architect 并行时：产出色彩方案、组件风格、布局规范（含 V/M/D 旋钮值）
 2. API 契约冻结后：产出完整页面原型，包含所有状态（加载中/空状态/错误/成功）
 3. 原型应可直接在浏览器打开预览
-4. 视觉规范与 Token 清单作为 Focused Result 提交 Conductor，持久化到 `project://docs/design/` 并从 PRODUCT.md 的 Design Direction Section 索引；原型文件随附同一目录，不得只留在会话临时目录
+4. 视觉规范、Presentation Contract（适用时）与 Token 清单作为 Focused Result 提交 Conductor，持久化到 `project://docs/design/` 并从 PRODUCT.md 的 Design Direction Section 索引；原型文件随附同一目录，不得只留在会话临时目录
 5. 视觉规范中的 Design Token 清单必须按四层结构组织（Primitives → Semantics → Components → Patterns）；具体格式经 `query-ux-pro-max` 的 Design Token Signal 加载规范 Section 后套用，不自造结构
+6. 命中 Presentation Design Signal 时，只有 Artifact 包含 Product Truth locator、capability evidence、API gap、页面边界、状态矩阵、responsive/accessibility/motion、Design Token、prototype locator、observable acceptance、Non-goal 与 Review verdict，才可标记为 frozen；否则保持 provisional
 
 ---
 
@@ -116,12 +124,12 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 > 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
 > 1. 当前 Workflow 命中的 Policy（默认只加载 `framework://policies/core.md`）
 > 2. 本合约全文
-> 3. 冻结基准：`project://docs/WORK.md` 的 Product Contract + Interface Contract + 项目主题
+> 3. 冻结基准：`project://docs/WORK.md` 的 Product Contract + Interface Contract + 项目主题；命中 Presentation Design Signal 时，再使用本角色存于 `project://docs/design/` 的同一份 Presentation Contract。
 > 缺失 → 请求 Conductor 注入。
 
 ## 门禁定义
 - 档位：🟢 Advisory↗（设计阶段）
-- 通过判定：视觉规范含 V/M/D 旋钮 + Token 清单为四层结构 + 完整原型可浏览器预览 + emoji 正则扫描无命中（VA-1）
+- 通过判定：视觉规范含 V/M/D 旋钮 + Token 清单为四层结构 + 完整原型可浏览器预览 + emoji 正则扫描无命中（VA-1）；命中 Presentation Design Signal 时还需 Capability Audit、Traceability Matrix 与 Artifact-local completeness check
 - 稳定性分类：演进型
 
 ## 路由条目

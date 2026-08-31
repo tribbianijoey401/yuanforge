@@ -22,8 +22,17 @@
 | Task 描述 | WORK 中自己的行 | 知道要做什么 |
 | API 契约（freeze） | Architect 产出 | 接口签名、请求/响应格式 |
 | UI 原型 | UI Designer 产出 | 视觉规范与原型 |
+| Presentation Contract（适用时） | `project://docs/design/` 中 UI Designer 产出 | 消费已确认的 View Model、状态、可访问性与可观察 Acceptance |
 | 上游上下文 | WORK 上下文传递 | 接口签名、文件路径 |
 | 编码规范 | Repository formatter/linter/config 与相邻代码；存在时可补充读取 Project-owned convention 文档 | 代码风格 |
+
+---
+
+## Presentation Contract 消费边界
+
+命中 Presentation Design Signal 且 UI Designer 已提供 frozen Presentation Contract 时，Frontend Dev 只消费该 Artifact 及其 canonical locator；不重新选择 View Model、视觉语言或改写 Product Truth。实现时保持实体与语义区域的稳定身份；只由真实事件、状态、进度、成功、失败、同步或恢复驱动可感知变化；刷新、返回与失败恢复时保留选择、筛选、草稿、焦点与有意义的滚动位置。为每个有生命力的状态提供同等语义的 `reduced-motion` 反馈、可访问状态说明与恢复路径。
+
+Contract 的 provisional/frozen 状态仅由 Artifact 表达，Frontend Dev 不读取或写入 Core State，也不因未命中 Signal 的普通 UI Work 被阻止开工。
 
 ---
 
@@ -117,7 +126,7 @@
 > 须满足 contract-conventions.md「防御性指令 · 格式要求」；本 agent 执行前校验清单：
 > 1. 当前 Workflow 命中的 Policy（默认只加载 `framework://policies/core.md`）
 > 2. 本合约全文
-> 3. 冻结基准：API 契约（Architect 产出）+ UI 原型（UI Designer 产出）
+> 3. 冻结基准：API 契约（Architect 产出）+ UI 原型（UI Designer 产出）；适用时消费 `project://docs/design/` 中的 frozen Presentation Contract 及其 canonical locator。
 > 缺失 → 请求 Conductor 注入。
 
 ## 门禁定义

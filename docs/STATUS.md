@@ -1,31 +1,26 @@
 ---
-work: 2026-08-11_content-driven-interface-design
-work_state: active
-workflow: new-feature
-stage: design
+work: null
+work_state: idle
+workflow: null
+stage: null
 agent:
-  id: ui-designer
-  state: active
+  id: null
+  instance: null
+  state: null
 quality:
-  test: pending
-  review: pending
+  test: passed
+  review: passed
 ---
 
 # Current Situation
 
-正在把故事驱动、内容驱动的 UI 设计方法沉淀为 Yuan Skill 与 Agent Contract。
+## Last Completed
 
-## Current Task
-
-设计新 Skill、Reference Routing、输出 Contract 与跨 Agent 边界。
-
-## Last Result
-
-Product Analyst 已完成可验证 Product Contract，无需用户新增决策。
+- `2026-08-11_content-driven-interface-design`：以 main 为基础手工 graft 内容驱动的 Interface Design Skill、References、条件性 Agent Contract 与 installer Framework Fingerprint；版本升至 `4.0.0-alpha.12`。Presentation Contract 只作为 `docs/design/` 中的条件性 UI Quality Artifact，不进入 Core State 或 State Guard。
 
 ## Next
 
-UI Designer 完成能力设计后交给唯一 Writer 实现。
+无 Active Work。
 
 ## Blocker
 
