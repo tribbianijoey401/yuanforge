@@ -37,6 +37,8 @@ references/
 │   └── ai-agent-patterns.md    # AI Agent 工程化模式
 ├── cost-models/                 # 成本模型
 │   └── development-costs.md    # 开发成本参考
+├── stacks/                      # 按真实版本路由的技术栈知识
+│   └── python-unittest.md       # Python >=3.10 / unittest 生命周期与测试语义
 └── design-systems/              # 设计系统参考（7 篇商业级）
     ├── token-standard.md            # 四层 Token + DESIGN.md 9节 + Master+Overrides
     ├── design-commands.md           # 设计动作命令库（23 命令 + 寄存器 + 平台轴 + denylist）
@@ -61,6 +63,7 @@ Agent 不直接读取本目录。Agent 只加载 Routing 分配的 Skill，Skill
 | `requesting-code-review` | `verifier-critic-pattern`、`test-integrity-anti-gaming`、`production-readiness-scorecard` | Material Review、Test Change、Production Acceptance |
 | `project-audit` | `code-organization`、`generated-code-failure-modes`、`production-readiness-scorecard` | Existing Project Audit 与对应 Risk Dimension |
 | `project-bootstrap` | `mvp-stack`、`code-organization`、匹配的 `platforms/` | New Project Stack、Module Boundary、特定 Platform |
+| `engineering-context-compilation` | `context-engineering`、`code-organization`、匹配的 `stacks/` | Writer 编码前、Project-native pattern、真实版本与 Task-relevant risk |
 | `query-ux-pro-max` | Skill 内 CSV、`design-systems/`、匹配的 `industries/` | UI、Design System、Industry Experience |
 | `project-memory` / `distill-workspace` / `promotion` | `self-improving-memory`、`context-engineering` | Session Recovery、Memory Distillation、Knowledge Promotion |
 | `subagent-driven-development` | `context-engineering`、`verifier-critic-pattern` | Context Isolation 与 Independent Review |
@@ -76,4 +79,4 @@ Agent 不直接读取本目录。Agent 只加载 Routing 分配的 Skill，Skill
 
 ## 01-standards/ 文件来源
 
-`01-standards/` 下 11 篇文档中，10 篇改编自 [UmaDev](https://github.com/umacloud/umadev) 知识库（MIT License，原文件位于 `knowledge/agentic-delivery/01-standards/`，每篇顶部有来源标注），`code-organization.md` 为本专家团自有的代码组织规范（分层·分包·单文件≤300行·单一职责）。
+`01-standards/` 下 11 篇文档中，10 篇改编自 [UmaDev](https://github.com/umacloud/umadev) 知识库（MIT License，原文件位于 `knowledge/agentic-delivery/01-standards/`，每篇顶部有来源标注），`code-organization.md` 为本专家团自有的 Project-native 代码组织启发式。

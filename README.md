@@ -119,7 +119,7 @@ yuanforge/
 ├── AGENTS.md                 Agent Platform 入口
 ├── framework/
 │   ├── agents/               13 个成熟 Agent Contract
-│   ├── skills/               17 个工程 Skill
+│   ├── skills/               20 个工程 Skill
 │   ├── references/           32 个专业 Reference（原知识资产全部保留并补入迁移经验）
 │   ├── policies/             Core、Routing、Review 与可选纪律
 │   ├── workflows/            四种 Primary Workflow

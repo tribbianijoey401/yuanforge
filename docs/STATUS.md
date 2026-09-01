@@ -1,12 +1,12 @@
 ---
-work: null
-work_state: idle
-workflow: null
-stage: null
+work: 2026-09-01_quality-v0
+work_state: active
+workflow: large-project
+stage: review
 agent:
-  id: null
-  instance: null
-  state: null
+  id: quality-auditor
+  instance: persona-degraded
+  state: completed
 quality:
   test: passed
   review: passed
@@ -20,7 +20,7 @@ quality:
 
 ## Next
 
-无 Active Work。
+Quality v0 Framework / protocol review 已通过；等待真实同模型三臂 Benchmark 执行。
 
 ## Blocker
 

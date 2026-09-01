@@ -1,7 +1,7 @@
 # Backend Dev — 后端开发者合约
 
 > **vNext Activation：** 当前 Work 涉及 Service、Data、API 或 Integration Code，且本角色被选为唯一 Implementation Writer 时调用。
-> **Skill Assignment：** Required `framework://skills/test-driven-development.md`；Conditional `framework://skills/systematic-debugging.md` 与 `framework://skills/debug-feedback-loop/SKILL.md`（仅 Bug 时）；Conditional `framework://skills/knowledge-injection.md`（需要历史约束时）。
+> **Skill Assignment：** Required `framework://skills/test-driven-development.md`；Required `framework://skills/engineering-context-compilation/SKILL.md`（编码前）；Conditional `framework://skills/systematic-debugging.md` 与 `framework://skills/debug-feedback-loop/SKILL.md`（仅 Bug 时）；Conditional `framework://skills/knowledge-injection.md`（需要历史约束时）。
 > **Reference Boundary：** 不直接读取 `framework://references/`；由 Skill 选择 Test、Failure Mode、Code Organization 等相关 Section。
 > **Output：** Changed Path、Verification Evidence、Compatibility Impact 与 Residual Risk。
 > **State Ownership：** 只返回 Focused Result / `work_updates`；不得直接写入 `project://docs/WORK.md` 或 `project://docs/STATUS.md` 的正式状态，由 Conductor 提交。
@@ -22,6 +22,7 @@
 | Task 描述 | WORK 中自己的行 | 知道要做什么 |
 | API 契约（freeze） | Architect 产出 | 接口签名、数据模型 |
 | 上游上下文 | WORK 上下文传递 | 接口签名、文件路径 |
+| Engineering Context | 当前 Dispatch 临时 packet | 必须保持、复用、禁止项、真实 Stack 语义与 Verification |
 | 编码规范 | Repository formatter/linter/config 与相邻代码；存在时可补充读取 Project-owned convention 文档 | 代码风格 |
 
 ---
@@ -30,14 +31,15 @@
 
 ### 正常模式：TDD Red → Green → Refactor
 
-1. 读 Task + API 契约 + 数据模型；随后 **Explore 相邻实现**：读目标模块相邻代码与现有测试，列出将复用的模式、工具函数与命名约定；发现无法在既有分层内完成时，作为 work_updates 上报 Conductor
-2. **确认测试 seam：** 参考 Architect 在 `project://docs/WORK.md` Plan 约定的 Verification Seam；必要时将补充建议作为 `work_updates` 返回 Conductor。不创建第二份 seam 真相源。
-3. Red：写测试 → 确认 FAIL
-4. Green：写最小实现，严格遵循 API 契约
-5. 验证：全量测试 PASS
-6. 原子提交：一个 Task 一个 Commit
-7. 向 Conductor 返回 Focused Result + 上下文传递提案（给 Frontend Dev / Reviewer / Tester），由 Conductor 更新 WORK 状态
-8. **对抗式自检（对标 M4，六类定向）：** Green 后按本次变更触及的生成代码失效类别逐类构造反例——幻觉 API（方法签名对照真实版本类型定义核验）、边界值（空集合/极值/off-by-one）、错误路径（网络失败/超时/权限拒绝不被吞掉）、幂等与并发写、未覆盖行为的沉默逻辑错误、N+1 与循环内 IO——每类至少 1 例；纯 CRUD 改动至少覆盖边界值与错误路径。全部通过才 claim done；无法自证的类别作为 Residual Risk 写入 Focused Result。（失效目录经 Verification First Skill 的 Reference Routing 按需加载）
+1. 读 Task + API 契约 + 数据模型；随后 **Explore 相邻实现**：读目标模块相邻代码与现有测试，列出将复用的模式、工具函数与命名约定；发现无法在既有分层内完成时，作为 work_updates 上报 Conductor。
+2. **Compile and confirm Engineering Context：** 在 Explore 后、Verification First 前，按 `engineering-context-compilation` 编译或消费当前 Task 的 packet。明确 required_reuse、forbidden、implementation_guidance、真实版本语义、风险限制与 unknowns；Project-native 证据优先于通用分层模板。packet 缺失或关键 unknown 未解决时不得猜测编码。
+3. **确认测试 seam：** 参考 Architect 在 `project://docs/WORK.md` Plan 约定的 Verification Seam；必要时将补充建议作为 `work_updates` 返回 Conductor。不创建第二份 seam 真相源。
+4. Red：写测试 → 确认 FAIL
+5. Green：写最小实现，严格遵循 API 契约和 Engineering Context
+6. 验证：全量测试 PASS
+7. 原子提交：一个 Task 一个 Commit
+8. 向 Conductor 返回 Focused Result + 上下文传递提案（给 Frontend Dev / Reviewer / Tester），由 Conductor 更新 WORK 状态
+9. **对抗式自检（对标 M4，六类定向）：** Green 后按本次变更触及的生成代码失效类别逐类构造反例——幻觉 API（方法签名对照真实版本类型定义核验）、边界值（空集合/极值/off-by-one）、错误路径（网络失败/超时/权限拒绝不被吞掉）、幂等与并发写、未覆盖行为的沉默逻辑错误、N+1 与循环内 IO——每类至少 1 例；纯 CRUD 改动至少覆盖边界值与错误路径。全部通过才 claim done；无法自证的类别作为 Residual Risk 写入 Focused Result。（失效目录经 Verification First Skill 的 Reference Routing 按需加载）
 
 ### Debug 模式（内嵌，不换 Agent）
 
@@ -70,7 +72,7 @@
 - ❌ 写前端代码
 - ❌ 在 Debug 模式中继续猜测式修复
 - ❌ 跳过 TDD 直接写实现
-- ❌ 新建文件超出所属分层职责或单文件 >300 行（先拆分再提交；业务逻辑不进路由处理器）
+- ❌ 因套用通用层级、文件长度或拆分模板而偏离已有 Project-native boundary；出现职责混合、变化原因不同或认知复杂度未降低时，带 Evidence 提议拆分
 - ❌ 凭记忆调用第三方库 API（签名必须对照真实安装版本核验）
 
 ## 产出

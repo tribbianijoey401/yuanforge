@@ -459,13 +459,96 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertIn(phrase, designer)
         self.assertNotIn("不要用 Inter/Roboto/Arial", designer)
 
+    def test_engineering_context_compilation_is_project_native_and_bounded(self):
+        skill = (
+            FRAMEWORK / "skills" / "engineering-context-compilation" / "SKILL.md"
+        ).read_text(encoding="utf-8")
+
+        for phrase in (
+            "Engineering Context Compilation",
+            "当前 Repository 真实代码与配置",
+            "Project ARCHITECTURE / DECISIONS",
+            "Project MEMORY",
+            "当前实际依赖及版本",
+            "Stack-specific Engineering Knowledge",
+            "Yuan Universal Engineering Knowledge",
+            "implementation_guidance",
+            "required_reuse",
+            "forbidden",
+            "unknowns",
+            "运行时 Dispatch Context",
+            "不创建新的 Project Truth Source",
+            "Project-native facts 必须优先",
+            "transaction",
+            "concurrency",
+            "lifecycle",
+        ):
+            self.assertIn(phrase, skill)
+        self.assertNotIn("一次性加载全部 Reference", skill)
+
+    def test_quality_v0_integrates_writers_and_contract_diff_review(self):
+        backend = (FRAMEWORK / "agents" / "backend-dev.md").read_text(encoding="utf-8")
+        frontend = (FRAMEWORK / "agents" / "frontend-dev.md").read_text(encoding="utf-8")
+        auditor = (FRAMEWORK / "agents" / "quality-auditor.md").read_text(encoding="utf-8")
+        review_skill = (FRAMEWORK / "skills" / "requesting-code-review.md").read_text(encoding="utf-8")
+
+        for writer in (backend, frontend):
+            self.assertIn("engineering-context-compilation/SKILL.md", writer)
+            self.assertIn("Engineering Context", writer)
+            self.assertIn("Explore", writer)
+            self.assertIn("Verification First", writer)
+            self.assertIn("Project-native", writer)
+            self.assertNotIn("单文件 >300 行", writer)
+            self.assertNotIn("交付超 300 行", writer)
+        for text in (auditor, review_skill):
+            self.assertIn("Contract → Diff Review", text)
+            self.assertIn("Engineering Context", text)
+            self.assertIn("未经解释的 deviation", text)
+        self.assertNotIn("单文件 ≤300 行", auditor)
+        self.assertNotIn("routes → controllers → services → repositories", auditor)
+
+    def test_quality_v0_benchmark_and_python_stack_reference_are_actionable(self):
+        benchmark_root = FRAMEWORK / "benchmarks" / "quality-v0"
+        protocol = (benchmark_root / "README.md").read_text(encoding="utf-8")
+        scorecard = (benchmark_root / "scorecard.md").read_text(encoding="utf-8")
+        stack = (FRAMEWORK / "references" / "stacks" / "python-unittest.md").read_text(
+            encoding="utf-8"
+        )
+
+        for name in ("feature.md", "bug.md", "refactor.md"):
+            self.assertTrue((benchmark_root / "tasks" / name).is_file(), name)
+        fixtures = {
+            "feature.md": "feature-config",
+            "bug.md": "bug-cleanup",
+            "refactor.md": "refactor-parser",
+        }
+        for task_name, fixture_name in fixtures.items():
+            task = (benchmark_root / "tasks" / task_name).read_text(encoding="utf-8")
+            fixture = benchmark_root / "fixtures" / fixture_name
+            self.assertIn(fixture_name, task)
+            self.assertTrue((fixture / "README.md").is_file(), fixture_name)
+            self.assertTrue((fixture / "tests").is_dir(), fixture_name)
+        for phrase in ("Bare Agent", "Current Yuan", "Quality Yuan", "同一个模型", "同一个任务", "实际 patch", "测试输出", "不得伪称"):
+            self.assertIn(phrase, protocol)
+        for dimension in (
+            "Correctness",
+            "Architecture Fit",
+            "Code Quality",
+            "Stack Correctness",
+            "Robustness",
+            "Overengineering Control",
+        ):
+            self.assertIn(dimension, scorecard)
+        for phrase in ("Python >=3.10", "unittest", "生命周期", "异常", "版本锚定"):
+            self.assertIn(phrase, stack)
+
     def test_installer_records_framework_fingerprint(self):
         installer = load_installer()
         fingerprint = installer.framework_fingerprint(FRAMEWORK)
         self.assertRegex(fingerprint, r"^[0-9a-f]{64}$")
         self.assertEqual(fingerprint, installer.framework_fingerprint(FRAMEWORK))
-        self.assertEqual("4.0.0-alpha.12", (FRAMEWORK / "VERSION").read_text(encoding="utf-8").strip())
-        self.assertIn("version: 4.0.0-alpha.12", (ROOT / "SKILL.md").read_text(encoding="utf-8"))
+        self.assertEqual("4.0.0-alpha.13", (FRAMEWORK / "VERSION").read_text(encoding="utf-8").strip())
+        self.assertIn("version: 4.0.0-alpha.13", (ROOT / "SKILL.md").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

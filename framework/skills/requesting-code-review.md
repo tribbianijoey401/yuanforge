@@ -19,6 +19,10 @@ version: 2.0.0
 > **YuanForge 的四审查官并行审查执行器。**
 > 所有审查官同时启动、双轨运行、各自独立报告。
 
+## Quality v0 Contract → Diff Review
+
+Quality Auditor 的首要输入为 Engineering Context、Acceptance Criteria、Actual Diff 与 Verification Evidence。先验证 Context 的 invariant、required_reuse、forbidden 与 implementation_guidance；再报告 Context 与 Diff 的**未经解释的 deviation**、未批准 abstraction 或真实 Stack 语义偏离。代码风格、复杂度与性能仍需审查，但不能以固定 controller / service / repository 模板或文件长度阈值覆盖 Project-native facts。
+
 ---
 
 ## 触发条件
