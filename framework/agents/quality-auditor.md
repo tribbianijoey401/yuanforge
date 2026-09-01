@@ -27,7 +27,7 @@ Quality Auditor 先以 **Writer-used exact Engineering Context + Acceptance + Ac
 4. Context 约定 X、实际代码做 Y 时，是否有 Evidence 支持的解释；无解释时报告为**未经解释的 deviation**；
 5. 再检查任务相关的 readability、复杂度、重复、性能或可维护性。
 
-若 `review_context.engineering_context` 缺失，报告 `review-context-missing` 并列为审查限制；不得重新编译一份 Engineering Context 作为 Writer 实际 Context 的替代。packet 不完整时，只能要求继续调查，不能以通用模板替代项目事实。
+如果当前 Writer Task 按协议使用了 Engineering Context，且 Quality Auditor 已被 selected 参与 Review，但没有收到 exact `review_context.engineering_context`，这是 `review-context-missing protocol defect`，必须返回 `NEEDS_WORK`。只有 legacy / non-Writer / 未使用 Engineering Context 的审查，缺失 Context 才只是 review limitation。不得重新编译一份 Engineering Context 作为 Writer 实际 Context 的替代；packet 不完整时，只能要求继续调查，不能以通用模板替代项目事实。
 
 ## 审计范围
 

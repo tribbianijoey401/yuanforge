@@ -527,6 +527,9 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertNotIn("交付超 300 行", writer)
             self.assertIn("review_context", writer)
             self.assertIn("engineering_context", writer)
+            self.assertIn("只要本 Task 使用 Engineering Context", writer)
+            self.assertIn("始终返回", writer)
+            self.assertNotIn("若本 Task 需要审查", writer)
         for text in (auditor, review_skill):
             self.assertIn("Contract → Diff Review", text)
             self.assertIn("Engineering Context", text)
@@ -536,8 +539,27 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("原样", conductor)
         self.assertIn("review_context", conductor)
         self.assertIn("不得写入 WORK / STATUS / Memory / Project Truth", conductor)
+        self.assertIn("transient 接收", conductor)
+        self.assertIn("最终 Actual Diff + Acceptance + Risk", conductor)
+        self.assertIn("不需要 Reviewer → 立即丢弃", conductor)
+        self.assertIn("Review 完成后立即丢弃", conductor)
         self.assertIn("不得重新编译", auditor)
         self.assertIn("实际使用", auditor)
+        self.assertIn("review-context-missing protocol defect", auditor)
+        self.assertIn("NEEDS_WORK", auditor)
+        self.assertIn("legacy / non-Writer / 未使用 Engineering Context", auditor)
+
+        for path in (
+            FRAMEWORK / "policies" / "state-contract.md",
+            FRAMEWORK / "tools" / "state_guard.py",
+            FRAMEWORK / "templates" / "project" / "WORK.md",
+            FRAMEWORK / "templates" / "project" / "STATUS.md",
+        ):
+            self.assertNotIn("review_context", path.read_text(encoding="utf-8"), path.name)
+        for path in (ROOT / "docs" / "WORK.md", ROOT / "docs" / "STATUS.md", ROOT / "docs" / "MEMORY.md"):
+            self.assertNotRegex(
+                path.read_text(encoding="utf-8"), r"(?m)^review_context:\s*$", path.name
+            )
 
     def test_review_selection_and_quality_audit_are_risk_driven(self):
         policy = (FRAMEWORK / "policies" / "review.md").read_text(encoding="utf-8")

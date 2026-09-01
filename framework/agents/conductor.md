@@ -46,7 +46,13 @@ Conductor
 
 其他 Agent 可以改代码、测试、做 Review，但不各自随意决定哪些结果成为 WORK/STATUS 的正式状态。
 
-当 Writer 的 Focused Result 含 `review_context.engineering_context` 且当前 Task 进入 Review 时，Conductor 只在**当前 review chain**中将该 payload 原样交给被选中的 Reviewer。不得重新编译、摘要、合并或用另一份 Context 替代；不得写入 WORK / STATUS / Memory / Project Truth，也不得带到下一 Task。Reviewer 返回 verdict 后即丢弃这份 transient payload。
+当 Writer 的 Focused Result 含 `review_context.engineering_context` 时，Conductor 先在**当前 execution chain transient 接收**该 exact payload。随后依据最终 Actual Diff + Acceptance + Risk，并以 `framework://policies/review.md` 做 Risk-driven Review selection：
+
+- 不需要 Reviewer → 立即丢弃 Context。
+- 需要 Reviewer → 只向 selected Reviewer 原样转发；不得摘要、重新编译、合并或用另一份 Context 替代。
+- Review 完成后立即丢弃 Context。
+
+`review_context` 不得写入 WORK / STATUS / Memory / Project Truth，不得进入 Core State 或 State Contract，也不得带到下一 Task。
 
 每次 Dispatch 前，Conductor 先把目标 Agent、Agent state、当前 Stage、Current Task 与 Next Action 提交到 Work / Status。Specialist 返回后，Conductor 先判断 Done Conditions、提交 Latest Result / Verification / Open Findings，再决定 Stage 或 Agent 变化。只有完成这次 State Commit 才能继续下一次 Dispatch。
 
@@ -118,13 +124,13 @@ constraints:
   - <constraint>
 context_refs:
   - <declared relevant context ref>
-review_context: # optional; only Writer → Conductor → current Reviewer chain
-  engineering_context: <exact Writer-used packet; relay unchanged>
+review_context: # optional; Writer-used packet, transient in current execution chain
+  engineering_context: <exact Writer-used packet; retain only until selection/discard/review completion>
 ```
 
 默认不要求 Agent 完整读取 WORK 或整个项目；Conductor 选择与任务相关的 Context。Agent 之后若发现需要额外信息，可自行读取，不要求向 Conductor 申请，也不做 file-read telemetry。
 
-角色输出只保留 Focused Result：outcome（completed/partial/blocked/failed）、summary、skills_applied、verification、risks、next；Writer 需要 Review 时可附 `review_context.engineering_context`。无关探索、完整推理和未验证 Hypothesis 不进入 Handoff 或 Memory。`review_context` 是临时原样 relay，绝不进入正式 State；outcome 不等于 task done，由 Conductor 根据 done_conditions 判断。
+角色输出只保留 Focused Result：outcome（completed/partial/blocked/failed）、summary、skills_applied、verification、risks、next；使用 Engineering Context 的 Writer 始终附 `review_context.engineering_context`。无关探索、完整推理和未验证 Hypothesis 不进入 Handoff 或 Memory。`review_context` 是临时原样 payload，Conductor 在最终 Risk-driven selection 后丢弃或 relay，绝不进入正式 State；outcome 不等于 task done，由 Conductor 根据 done_conditions 判断。
 
 ## Failure and Escalation
 
