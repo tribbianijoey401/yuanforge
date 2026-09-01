@@ -599,7 +599,7 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertIn(phrase, protocol)
         for phrase in (
             "5a42bbfafdddc7e0c81c8f74d4a88bd10f0fa543",
-            "quality-v0.1",
+            "quality-v0.1.1",
             "immutable",
             "model-comparison-pending",
             "复杂多文件边界、生命周期、事务、状态或集成",
