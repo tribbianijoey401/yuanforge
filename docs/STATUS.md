@@ -20,7 +20,7 @@ quality:
 
 ## Next
 
-Quality Auditor returned READY; Conductor is committing and pushing v0.1, after which real three-arm model comparison remains pending.
+Quality Auditor returned READY; v0.1 commit and immutable tag have been pushed. Real three-arm model comparison remains pending.
 
 ## Blocker
 

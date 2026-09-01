@@ -46,13 +46,13 @@
 
 **Agent:** conductor (persona-degraded)
 
-**Task:** 提交 v0.1 fixes，push `main`，创建并 push 未存在的 immutable `quality-v0.1` tag；保留 Work active 和 `model-comparison-pending`，以真实三臂模型运行作为唯一 Next Action。
+**Task:** 在固定 arm identities 下执行真实的 Bare / Current Yuan / Quality Yuan 三臂模型运行，并交由未参与实现的裁判按 scorecard 评分；保留 `model-comparison-pending` 直到真实 artifacts 收集完成。
 
 **Done conditions:**
 
-- Commit 与 `origin/main` 成功同步。
-- `quality-v0.1` 仅在本地和 origin 均不存在时创建、推送，且指向本次 release commit。
-- Work 仍为 active，Open Findings 仅保留 model comparison pending。
+- 三臂均有真实 prompt、patch、测试输出、diff review 和 scorecard Evidence。
+- 使用固定 Current commit 与 immutable `quality-v0.1`，不使用可变 main。
+- 只有独立裁判完成评分后才更新或解除 `model-comparison-pending`。
 
 **Declared Context Refs:** 用户 v0.1 规格；当前 `WORK.md`；`framework/policies/review.md`；相关 Agent / Skill / Benchmark assets；`tests/test_contracts.py`。
 
@@ -60,9 +60,9 @@
 
 **Outcome:** completed
 
-**Summary:** Quality Auditor verdict: READY. Contract → Diff confirms Product Truth ordering, exact transient Context relay and target-version grounding; shared tasks contain no fixture-specific engineering answer; Review selection is risk-driven and Quality output is Task-relevant. No unexplained deviation or scope creep found.
+**Summary:** Quality Auditor verdict: READY. v0.1 was committed as `929791ac7eb1863d276e4cae4ce7bff4c41cb524`, pushed to `origin/main`, and permanently tagged `quality-v0.1` (annotated tag object `6dc310a7207852455f641e93a3518ac178e72ba2`). No unexplained deviation or scope creep found.
 
-**Next:** Commit and push v0.1, then execute the still-pending real three-arm model comparison with an independent judge.
+**Next:** Obtain authorization and execution environment for the real three-arm model comparison with an independent judge.
 
 ## Open Findings
 
