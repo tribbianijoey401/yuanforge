@@ -136,6 +136,11 @@ description: 可复用的 Verified Finding、Pitfall、Preference 和 Convention
 - **Symptom**：将 Presentation Contract 的 provisional/frozen 状态写入 STATUS 或交由 State Guard 解释，导致普通 UI Work 被全局门禁阻塞，且 Core State 混入 Artifact 生命周期。
 - **Rule**：只在 Presentation Design Signal 命中时，由 UI Designer 把 Contract 状态与完整性证据保存在 `project://docs/design/`；UX Reviewer 和 Frontend Dev 消费同一 Artifact。Routing 只条件性触发完整流程，State Contract、State Guard 和 STATUS template 不理解 Presentation Contract。
 
+### M-023：局部 Artifact Traceability 不要求全局 Fact ID Registry
+
+- **Symptom**：把 stable fact ID 作为 Presentation Contract frozen 的全局前提，标准 WORK 没有此 ID 时所有 Contract 都永久 provisional。
+- **Rule**：真实 canonical source locator 是必要条件；已有 stable fact ID 必须复用，没有时使用同一 canonical document 中可重新定位的 section / item reference。derived anchor 只用于 Contract 内部追踪，不能伪造上游 identity，也不要求修改 WORK template。
+
 ## Engineering Conventions
 
 - 任何新机制先回答是否直接改善非技术用户的软件交付质量，是否减少 Token、确认和维护成本。

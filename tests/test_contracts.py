@@ -425,6 +425,37 @@ class FrameworkContractTests(unittest.TestCase):
         for path in (FRAMEWORK / "policies" / "state-contract.md", FRAMEWORK / "tools" / "state_guard.py", FRAMEWORK / "templates" / "project" / "STATUS.md"):
             self.assertNotIn("presentation_contract", path.read_text(encoding="utf-8"))
 
+    def test_presentation_contract_freeze_uses_relocatable_canonical_references(self):
+        skill = (FRAMEWORK / "skills" / "content-driven-interface-design" / "SKILL.md").read_text(encoding="utf-8")
+        work_template = (FRAMEWORK / "templates" / "project" / "WORK.md").read_text(encoding="utf-8")
+
+        for phrase in (
+            "canonical source locator 必须真实存在",
+            "stable fact ID 如果上游真实存在则必须复用",
+            "明确、可重新定位的 section / item reference",
+            "canonical source locator + section / item reference",
+            "不得创建、推断、重命名或铸造 canonical locator 或 fact ID。",
+            "derived decision anchor",
+            "永远不是 canonical",
+        ):
+            self.assertIn(phrase, skill)
+        self.assertNotIn("只有真实 canonical source 与稳定 canonical locator、fact ID 才允许冻结", skill)
+        self.assertNotIn("Fact ID", work_template)
+        self.assertIn("section / item reference", skill)
+
+    def test_ui_designer_typography_is_project_native_first(self):
+        designer = (FRAMEWORK / "agents" / "ui-designer.md").read_text(encoding="utf-8")
+
+        for phrase in (
+            "Project-native First",
+            "Project Design System",
+            "平台规范",
+            "优先沿用",
+            "Inter / Roboto / Arial 本身不是违规",
+        ):
+            self.assertIn(phrase, designer)
+        self.assertNotIn("不要用 Inter/Roboto/Arial", designer)
+
     def test_installer_records_framework_fingerprint(self):
         installer = load_installer()
         fingerprint = installer.framework_fingerprint(FRAMEWORK)

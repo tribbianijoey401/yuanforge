@@ -72,7 +72,7 @@
 ## D-012：Presentation Contract 是条件性 UI Quality Artifact
 
 - **Status**：Confirmed
-- **Decision**：完整内容驱动设计只在 Presentation Design Signal（高影响 UI、新产品、重要改版、数据密集界面、关键旅程或没有可复用设计）命中时触发。UI Designer 把 provisional/frozen Presentation Contract 持久化在 `project://docs/design/`，UX Reviewer 与 Frontend Dev 仅消费该 Artifact；它不进入 `STATUS.md`、State Contract 或 State Guard。
+- **Decision**：完整内容驱动设计只在 Presentation Design Signal（高影响 UI、新产品、重要改版、数据密集界面、关键旅程或没有可复用设计）命中时触发。UI Designer 把 provisional/frozen Presentation Contract 持久化在 `project://docs/design/`，UX Reviewer 与 Frontend Dev 仅消费该 Artifact；它不进入 `STATUS.md`、State Contract 或 State Guard。freeze 依赖真实 canonical source 与可重新定位的 upstream reference；stable fact ID 若存在则复用，但 Yuan 不为 UI Contract 新建全局 Fact ID Protocol。
 - **Reason**：设计追溯与可实现性需要可定位 Artifact，但将其作为所有 Project 的 Core State 会把局部 UI 质量流程扩张为全局状态机，并不必要地阻塞普通 UI Work。
 
 ## Historical Decision
