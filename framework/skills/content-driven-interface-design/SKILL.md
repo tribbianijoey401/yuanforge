@@ -40,7 +40,9 @@ description: 根据可用的 Product Truth、系统行为与 Content Topology，
 - normal 及适用的 loading、empty、failure、stale、pending、blocked、success、recovery state matrix。
 - Detail Strategy、Context Continuity、Visual Language、Design Token、responsive、accessibility、motion 与 reduced-motion。
 - Prototype Convergence 的 locator、验证视口/状态与限制。
-- Observable acceptance、Non-goal 与 independent review verdict。
+- Observable acceptance 与 Non-goal。
+
+Independent review verdict 是独立 Review Evidence，不是 Artifact freeze 的必要条件。命中 Reviewer Risk Signal 时，Reviewer 审查 frozen Contract；NEEDS_WORK 时 Contract 返回 UI Designer 修订并产生新的 frozen revision。
 
 UI Designer 将 Contract、原型和相关 Token 持久化至 `project://docs/design/`，并只在上述 freeze 条件满足时将该 Artifact 标记为 frozen。UX Reviewer 审查同一 Contract，不重新编写。Frontend Dev 只消费该 Contract。
 

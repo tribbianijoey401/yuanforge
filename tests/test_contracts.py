@@ -381,6 +381,9 @@ class FrameworkContractTests(unittest.TestCase):
         for phrase in ("System Story", "Repository Capability Audit", "Content Model", "View Model", "Visual Language", "Liveness", "Verification", "Traceability Matrix", "provisional Presentation Contract", "不能被冻结", "不得创建、推断、重命名或铸造 canonical locator 或 fact ID。"):
             self.assertIn(phrase, skill)
         self.assertIn("状态是该设计 Artifact 的局部质量字段", skill)
+        self.assertIn("Independent review verdict 是独立 Review Evidence，不是 Artifact freeze 的必要条件。", skill)
+        self.assertIn("NEEDS_WORK 时 Contract 返回 UI Designer 修订并产生新的 frozen revision。", skill)
+        self.assertNotIn("Observable acceptance、Non-goal 与 independent review verdict。", skill)
         self.assertIn("`project://docs/design/`", skill)
         self.assertIn("关键旅程", skill)
         self.assertIn("没有可复用设计", skill)
