@@ -23,19 +23,22 @@ Engineering Context 不创建新的 Project Truth Source，不写入 `project://
 
 冲突时严格按下列优先级裁决，并在 packet 中保留 Evidence locator：
 
-1. 当前 Repository 真实代码与配置
-2. Project ARCHITECTURE / DECISIONS
-3. Project MEMORY
-4. 当前实际依赖及版本
-5. Stack-specific Engineering Knowledge
-6. Yuan Universal Engineering Knowledge
+1. Current confirmed Product Contract / Acceptance / explicit Task constraints
+2. Current Repository implementation/tests/config
+3. Project ARCHITECTURE / DECISIONS
+4. Project MEMORY
+5. Actual dependency/runtime/version facts
+6. Stack-specific Engineering Knowledge
+7. Yuan Universal Engineering Knowledge
 
-Project-native facts 必须优先。通用 Reference 只能帮助解释或补齐未知，不能把一个使用 adapter → application → domain 的项目改造成 controller → service → repository，也不能仅因行数跨过阈值而要求拆分。
+Product Truth 定义本次要发生的**desired_changes**；Repository Evidence 只描述 **current_behavior**、既有边界、未受影响的兼容性与可复用模式。不得把被明确改变的旧行为写成 invariant。例如任务要求修复“重复提交会创建两笔订单”时，现有重复创建是 current_behavior，不是必须保持的 invariant。
+
+Project-native facts 必须优先于通用 Reference，但确认的 Product Truth 高于当前实现。通用 Reference 只能帮助解释或补齐未知，不能把一个使用 adapter → application → domain 的项目改造成 controller → service → repository，也不能仅因行数跨过阈值而要求拆分。
 
 ## Compilation Procedure
 
-1. **Bound task.** 从 Work 的 Goal、Acceptance、Scope、Non-goals 确定要改变和必须保持的 Behavior。
-2. **Explore project evidence.** 读取目标模块、相邻实现、相邻测试、相关配置和 dependency / lock file；提取 module、existing_patterns、boundaries、error_model、state_model、transaction_model 与 test seam。不要只读目录树。
+1. **Bound task.** 先从确认的 Product Contract、Acceptance、explicit Task constraints 提取 desired_changes；再明确哪些未变行为才是 invariants。不得由旧实现反推 Product Truth。
+2. **Explore project evidence.** 读取目标模块、相邻实现、相邻测试、相关配置和 dependency / lock file；提取 current_behavior、module、existing_patterns、boundaries、error_model、state_model、transaction_model 与 test seam。不要只读目录树。
 3. **Ground the stack.** 从真实 manifest、lock file、类型定义或 installed metadata 提取 language、framework、relevant_versions 与本任务真正会调用的语义。无法证实的版本不得以模型记忆补齐。
 4. **Select real risks.** 仅对任务涉及的 transaction、concurrency、async、cache、lifecycle、error_handling、performance、security、compatibility、migration、state_transition 或 external_io 做调查；未涉及的风险不进入 packet。
 5. **Retrieve narrowly.** 以已验证 Project Fact 为问题选择必要的 Stack-specific Engineering Knowledge 或 Yuan Universal Engineering Knowledge；每条规则必须能指出它为何适用或为何被上层事实覆盖。
@@ -48,6 +51,8 @@ Project-native facts 必须优先。通用 Reference 只能帮助解释或补齐
 task:
   goal: <observable change>
   acceptance: [<verifiable criterion>]
+desired_changes: [<confirmed behavior to change>]
+current_behavior: [<repository-observed behavior; never an invariant when explicitly changed>]
 existing_design:
   module: <target module>
   existing_patterns: [<evidence-backed pattern>]
@@ -82,7 +87,7 @@ verification: [<test, static check, or repeatable manual observation>]
 - **Bounded:** include only facts that affect this Task. Use locators and compact explanations instead of codebase dumps.
 - **Traceable:** Project Fact and version claims include their source; Reference guidance identifies the Signal that selected it.
 - **Project-native:** when local evidence and a generic pattern differ, preserve local architecture unless the Task explicitly changes it.
-- **Reviewable:** Writer returns the packet or a compact reference to it with the Diff; Quality Auditor compares its required_reuse, forbidden and implementation_guidance against evidence.
+- **Reviewable:** Writer returns the exact packet it actually used as `review_context.engineering_context` with the Diff; Quality Auditor compares that packet's required_reuse, forbidden and implementation_guidance against evidence.
 
 ## Stop Condition
 

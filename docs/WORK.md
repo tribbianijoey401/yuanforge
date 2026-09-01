@@ -2,11 +2,11 @@
 
 ## Goal
 
-交付 Yuan Quality v0：以项目优先的运行时 Engineering Context 约束 Writer，并建立可复现的 Bare / Current Yuan / Quality Yuan Benchmark，用实际代码与设计证据衡量 Artifact Quality。
+完成 Quality v0.1 的六项闭环修复：Product Truth 优先、Writer-to-Reviewer exact Context handoff、target-version grounding、固定 Benchmark arm identity、shared-task treatment isolation，以及 risk-driven review 语义。
 
 ## Scope
 
-- 新增 Engineering Context Compilation Skill、Writer / Quality Auditor 接入、一个真实 Stack Reference 与 Quality Benchmark。
+- 修复 Engineering Context、Writer / Conductor / Quality Auditor、Review Skill、Python Stack Reference、Benchmark protocol / tasks 与 Contract Tests。
 - 保持 Project-native first；不新增 Agent、Primary Workflow、长期 Project Document、Runtime 或 Core State。
 
 ## Non-goals
@@ -16,27 +16,27 @@
 
 ## Acceptance
 
-- [ ] Context 从 Repository、Project Documents、实际版本和按需知识生成具体、受限的 implementation guidance。
-- [ ] backend-dev、frontend-dev 消费 Context；Quality Auditor 可报告 Context 与 Diff 的未经解释 deviation。
-- [ ] 通用架构与文件组织规则是 Project-native-first heuristic，而非绝对模板。
-- [ ] Benchmark 具有 Feature / Bug / Refactor 的可运行 fixture、三臂运行协议和六维 scorecard。
-- [ ] 自动测试、Framework validation 与 risk-driven Quality Review 通过；无新 State / Runtime。
+- [ ] Current confirmed Product Contract / Acceptance / explicit Task constraints 高于 Repository current behavior；被明确改变的旧行为不会成为 invariant。
+- [ ] Writer 返回实际使用的 Context，Conductor 仅在当前 review chain 原样转发，Quality Auditor 不得用重新编译的 Context 替代。
+- [ ] Python version-specific semantics 只由 target Repository / runtime 的真实版本 Evidence 启用；未知版本进入 unknowns。
+- [ ] Benchmark arm identity 固定：Current Yuan 为 `5a42bbfafdddc7e0c81c8f74d4a88bd10f0fa543`，Quality arm 为本次创建的 immutable tag；shared tasks 不泄漏工程答案。
+- [ ] Reviewer 集合遵从 `review.md` 的 Risk-driven policy；Quality Audit 仅覆盖 Task-relevant dimensions。
+- [ ] 全部 Contract / fixture / Framework verification 通过，且维持 `model-comparison-pending`、无新 Core State / Runtime。
 
 ## Assumptions and Risks
 
-- 用户提供的 Yuan Quality v0 与 P0–P6 顺序是已确认方向。
-- 首个 Stack Reference 以 Repository Evidence 支持的 Python >=3.10 / standard-library `unittest` 为起点。
-- 真实同模型三臂效果需要外部模型运行与独立裁判，不能由 fixture 或 Contract Test 代替。
+- 用户提供的 v0.1 修复规格和 arm identity 是已确认方向。
+- 实际同模型三臂效果仍需要外部模型运行与独立裁判；本次只使 protocol 正确、可复现且隔离。
 
 ## Plan
 
 | Slice | Outcome | Artifact | Verification |
 |---|---|---|---|
-| P0 | Runtime Engineering Context packet | `framework/skills/engineering-context-compilation/SKILL.md` | Contract Test |
-| P1–P2 | Writer Context consumption / Contract → Diff Review | Writer、Auditor、review Skill Contracts | Contract Test |
-| P3–P4 | Benchmark protocol / Python Stack Reference | `framework/benchmarks/quality-v0/`、`references/stacks/` | Contract Test |
-| P5 | 每任务可复制的 initial Repository fixture 和 baseline command | `framework/benchmarks/quality-v0/fixtures/` | fixture `unittest` + Contract Test |
-| P6 | Full regression、review、distill | docs / tests | commands + review verdict |
+| v0.1-A | Product truth / current behavior distinction | Context Compiler | Contract Test |
+| v0.1-B | Exact transient review_context handoff | Writer、Conductor、Auditor Contracts | Contract Test |
+| v0.1-C | Target-version grounding / review routing | Stack Reference、review Skill、Auditor | Contract Test |
+| v0.1-D | Immutable benchmark arms / treatment isolation | Benchmark README、tasks | Contract Test |
+| v0.1-E | Regression, fixtures, Framework check and final review | tests / docs | commands + review verdict |
 
 ---
 
@@ -44,23 +44,25 @@
 
 ## Current Task
 
-**Next:** 在获得同一模型、固定运行参数与独立评分条件后，按 `framework/benchmarks/quality-v0/README.md` 对每个 fixture 运行 Bare Agent、Current Yuan、Quality Yuan，并写入实际 patch、测试输出与 scorecard。
+**Agent:** conductor (persona-degraded)
+
+**Task:** 提交 v0.1 fixes，push `main`，创建并 push 未存在的 immutable `quality-v0.1` tag；保留 Work active 和 `model-comparison-pending`，以真实三臂模型运行作为唯一 Next Action。
+
+**Done conditions:**
+
+- Commit 与 `origin/main` 成功同步。
+- `quality-v0.1` 仅在本地和 origin 均不存在时创建、推送，且指向本次 release commit。
+- Work 仍为 active，Open Findings 仅保留 model comparison pending。
+
+**Declared Context Refs:** 用户 v0.1 规格；当前 `WORK.md`；`framework/policies/review.md`；相关 Agent / Skill / Benchmark assets；`tests/test_contracts.py`。
 
 ## Latest Result
 
-**Outcome:** ready
+**Outcome:** completed
 
-**Summary:** Final Contract → Diff Review 为 READY（本地 Framework / protocol 范围）。Compiler 的事实优先级、Writer 的 Explore → Context → Verification First 顺序、Auditor 的 Contract → Diff 输入、Project-native heuristic、Python >=3.10 / unittest version grounding、三套 initial Repository fixture、三臂证据字段与六维 scorecard 一致。未发现新的 Workflow、Agent、长期 State、Runtime 或误导性的“已提升”声明。
+**Summary:** Quality Auditor verdict: READY. Contract → Diff confirms Product Truth ordering, exact transient Context relay and target-version grounding; shared tasks contain no fixture-specific engineering answer; Review selection is risk-driven and Quality output is Task-relevant. No unexplained deviation or scope creep found.
 
-**Adversarial checks:** 检查了固定行数 / 三层模板残留、隐藏的长效 Context、无版本 API 断言、fixture 被用作效果证据、以及 README 自述漂移；均已消除或受明确边界约束。
-
-**Verdict:** READY（protocol-validated）。
-
-**Verification:** `python -m unittest discover -s tests -v` (pass)；三个 fixture baseline (2 / 1 / 2 tests pass)；`python -B scripts/sync_project.py check G:\yuanforge` (pass, 0 warnings)；`git diff --check` (pass)。
-
-**Residual risk:** `model-comparison-pending`。没有相同模型三臂的真实 patch、测试输出与独立评分，不能声称 Artifact Quality 已被 Benchmark 证明提升。
-
-**Next:** 获得同模型运行权限后执行三臂 Benchmark。
+**Next:** Commit and push v0.1, then execute the still-pending real three-arm model comparison with an independent judge.
 
 ## Open Findings
 
@@ -70,3 +72,4 @@
 
 - Engineering Context 是 Dispatch 时的临时 packet；长期信息仍进入既有 Project Documents。
 - Benchmark fixture 只提供相同起始状态和协议验证，不是模型质量结论。
+- v0.1 的 `review_context` 只能是 transient Writer → Conductor → Reviewer handoff，不能成为 Work / Status / Memory 字段。

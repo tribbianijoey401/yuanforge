@@ -466,10 +466,10 @@ class FrameworkContractTests(unittest.TestCase):
 
         for phrase in (
             "Engineering Context Compilation",
-            "当前 Repository 真实代码与配置",
+            "Current Repository implementation/tests/config",
             "Project ARCHITECTURE / DECISIONS",
             "Project MEMORY",
-            "当前实际依赖及版本",
+            "Actual dependency/runtime/version facts",
             "Stack-specific Engineering Knowledge",
             "Yuan Universal Engineering Knowledge",
             "implementation_guidance",
@@ -486,9 +486,34 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertIn(phrase, skill)
         self.assertNotIn("一次性加载全部 Reference", skill)
 
+    def test_engineering_context_product_truth_precedes_current_behavior(self):
+        skill = (
+            FRAMEWORK / "skills" / "engineering-context-compilation" / "SKILL.md"
+        ).read_text(encoding="utf-8")
+
+        ordered = (
+            "Current confirmed Product Contract / Acceptance / explicit Task constraints",
+            "Current Repository implementation/tests/config",
+            "Project ARCHITECTURE / DECISIONS",
+            "Project MEMORY",
+            "Actual dependency/runtime/version facts",
+            "Stack-specific Engineering Knowledge",
+            "Yuan Universal Engineering Knowledge",
+        )
+        positions = [skill.index(item) for item in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for phrase in (
+            "desired_changes",
+            "current_behavior",
+            "不得把被明确改变的旧行为写成 invariant",
+            "重复提交",
+        ):
+            self.assertIn(phrase, skill)
+
     def test_quality_v0_integrates_writers_and_contract_diff_review(self):
         backend = (FRAMEWORK / "agents" / "backend-dev.md").read_text(encoding="utf-8")
         frontend = (FRAMEWORK / "agents" / "frontend-dev.md").read_text(encoding="utf-8")
+        conductor = (FRAMEWORK / "agents" / "conductor.md").read_text(encoding="utf-8")
         auditor = (FRAMEWORK / "agents" / "quality-auditor.md").read_text(encoding="utf-8")
         review_skill = (FRAMEWORK / "skills" / "requesting-code-review.md").read_text(encoding="utf-8")
 
@@ -500,12 +525,32 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertIn("Project-native", writer)
             self.assertNotIn("单文件 >300 行", writer)
             self.assertNotIn("交付超 300 行", writer)
+            self.assertIn("review_context", writer)
+            self.assertIn("engineering_context", writer)
         for text in (auditor, review_skill):
             self.assertIn("Contract → Diff Review", text)
             self.assertIn("Engineering Context", text)
             self.assertIn("未经解释的 deviation", text)
         self.assertNotIn("单文件 ≤300 行", auditor)
         self.assertNotIn("routes → controllers → services → repositories", auditor)
+        self.assertIn("原样", conductor)
+        self.assertIn("review_context", conductor)
+        self.assertIn("不得写入 WORK / STATUS / Memory / Project Truth", conductor)
+        self.assertIn("不得重新编译", auditor)
+        self.assertIn("实际使用", auditor)
+
+    def test_review_selection_and_quality_audit_are_risk_driven(self):
+        policy = (FRAMEWORK / "policies" / "review.md").read_text(encoding="utf-8")
+        review_skill = (FRAMEWORK / "skills" / "requesting-code-review.md").read_text(encoding="utf-8")
+        auditor = (FRAMEWORK / "agents" / "quality-auditor.md").read_text(encoding="utf-8")
+
+        self.assertIn("Risk-driven", review_skill)
+        self.assertIn("最小充分", review_skill)
+        self.assertIn("极小机械修改", policy)
+        self.assertNotIn("所有审查官同时启动", review_skill)
+        self.assertNotIn("四个审查官同时启动", review_skill)
+        self.assertIn("Task-relevant", auditor)
+        self.assertIn("不要求固定五段", auditor)
 
     def test_quality_v0_benchmark_and_python_stack_reference_are_actionable(self):
         benchmark_root = FRAMEWORK / "benchmarks" / "quality-v0"
@@ -530,6 +575,14 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertTrue((fixture / "tests").is_dir(), fixture_name)
         for phrase in ("Bare Agent", "Current Yuan", "Quality Yuan", "同一个模型", "同一个任务", "实际 patch", "测试输出", "不得伪称"):
             self.assertIn(phrase, protocol)
+        for phrase in (
+            "5a42bbfafdddc7e0c81c8f74d4a88bd10f0fa543",
+            "quality-v0.1",
+            "immutable",
+            "model-comparison-pending",
+            "复杂多文件边界、生命周期、事务、状态或集成",
+        ):
+            self.assertIn(phrase, protocol)
         for dimension in (
             "Correctness",
             "Architecture Fit",
@@ -539,8 +592,29 @@ class FrameworkContractTests(unittest.TestCase):
             "Overengineering Control",
         ):
             self.assertIn(dimension, scorecard)
-        for phrase in ("Python >=3.10", "unittest", "生命周期", "异常", "版本锚定"):
+        for phrase in ("目标 Repository", "generic", "version-specific", "unknowns", "unittest", "生命周期", "异常", "Version Anchor"):
             self.assertIn(phrase, stack)
+        self.assertNotIn("Yuan 本仓库的 Evidence", stack)
+
+    def test_quality_v0_shared_tasks_do_not_leak_engineering_answers(self):
+        task_root = FRAMEWORK / "benchmarks" / "quality-v0" / "tasks"
+        feature = (task_root / "feature.md").read_text(encoding="utf-8")
+        bug = (task_root / "bug.md").read_text(encoding="utf-8")
+        refactor = (task_root / "refactor.md").read_text(encoding="utf-8")
+
+        for forbidden in ("ConfigError", "singleton", "重写配置格式", "既有错误 / 默认机制"):
+            self.assertNotIn(forbidden, feature)
+        for forbidden in ("TemporaryDirectory", "pathlib.Path"):
+            self.assertNotIn(forbidden, bug)
+        for forbidden in (
+            "认知复杂度",
+            "repository / service",
+            "文件长度阈值",
+            "frontmatter 解析",
+            "state normalization",
+            "rendering helper",
+        ):
+            self.assertNotIn(forbidden, refactor)
 
     def test_installer_records_framework_fingerprint(self):
         installer = load_installer()

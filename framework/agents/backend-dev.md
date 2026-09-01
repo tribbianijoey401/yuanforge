@@ -38,7 +38,7 @@
 5. Green：写最小实现，严格遵循 API 契约和 Engineering Context
 6. 验证：全量测试 PASS
 7. 原子提交：一个 Task 一个 Commit
-8. 向 Conductor 返回 Focused Result + 上下文传递提案（给 Frontend Dev / Reviewer / Tester），由 Conductor 更新 WORK 状态
+8. 向 Conductor 返回 Focused Result。若本 Task 需要审查，必须在 `review_context.engineering_context` 返回**实际用于编码的完整 Engineering Context packet**，不重编译、不摘要替换；它只供当前 review chain 原样转发，不是 `work_updates` 或长期状态。
 9. **对抗式自检（对标 M4，六类定向）：** Green 后按本次变更触及的生成代码失效类别逐类构造反例——幻觉 API（方法签名对照真实版本类型定义核验）、边界值（空集合/极值/off-by-one）、错误路径（网络失败/超时/权限拒绝不被吞掉）、幂等与并发写、未覆盖行为的沉默逻辑错误、N+1 与循环内 IO——每类至少 1 例；纯 CRUD 改动至少覆盖边界值与错误路径。全部通过才 claim done；无法自证的类别作为 Residual Risk 写入 Focused Result。（失效目录经 Verification First Skill 的 Reference Routing 按需加载）
 
 ### Debug 模式（内嵌，不换 Agent）
@@ -83,6 +83,15 @@
 | 测试代码 | `tests/` | Red→Green→Refactor + 对抗式自检 |
 | 原子提交 | git commit | `feat(task-NNN): 简短描述` |
 | 上下文传递提案 | Focused Result `work_updates` | 接口签名、文件路径、待办事项；由 Conductor 写入 WORK |
+
+### Writer → Reviewer transient handoff
+
+```yaml
+review_context:
+  engineering_context: <exact packet actually used by this Writer>
+```
+
+此字段只在当前 Writer → Conductor → Reviewer chain 中使用。Writer 不把它写入 WORK、STATUS、Memory 或 Project Truth；Conductor 负责原样转发。
 
 ---
 

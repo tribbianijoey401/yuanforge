@@ -1,136 +1,44 @@
 ---
 name: requesting-code-review
 description: >
-  代码审查 Skill。4 审查官并行：Spec Reviewer (🔴Blocker) + Security Auditor (🔴Blocker)
-  + Quality Auditor (🟢Advisory↗) + UX Reviewer (🟢Advisory↗)。
-  触发：Phase 4 质量层、Dev 完成 Task 后、用户说「审查」「review」。
-  所有审查官双轨运行（合规路径 + 对抗路径），报告独立呈现。
-version: 2.0.0
+  Risk-driven 代码审查：Conductor 依据 framework://policies/review.md 选择最小充分 Reviewer 集合，
+  并保持 Contract → Diff、独立 evidence 与对抗式检查。
+version: 2.1.0
 ---
 
 # 代码审查 Skill
 
+## Authority and selection
+
+`framework://policies/review.md` 是审查是否需要、需要哪些 Reviewer 的唯一权威。Conductor 根据当前 Diff、Acceptance 与风险选择**最小充分 Reviewer 集合**：小型机械改动通常无需独立审查；Bug、Public Interface、Data Model、Security、Concurrency、Migration、Dependency、Architecture、Test Modification 或可信 Cross-module Impact 才选择相称的审查。
+
+以下是可能的 Reviewer，不是每次必选清单：
+
+- Spec Reviewer：Acceptance、Public Contract、scope 与行为回归。
+- Security Auditor：输入、权限、敏感数据、注入、依赖风险。
+- Quality Auditor：Context → Diff、边界、可维护性、性能或可靠性。
+- UX Reviewer：只有界面、交互或可访问性风险时参与。
+
+Platform 支持时，Material Review 使用 Independent Context；不支持时明确 Persona Switch 和共享 Context 的限制。Reviewer 不修改被审 Artifact。
+
 ## vNext Reference Routing
 
-- 所有 Material Review：读取 `framework://references/01-standards/verifier-critic-pattern.md` 的 Actor / Checker、Input Boundary 与 Verdict Section。
+- Material Review：读取 `framework://references/01-standards/verifier-critic-pattern.md` 的 Actor / Checker、Input Boundary 与 Verdict Section。
 - Test 或 Assertion 被修改：读取 `framework://references/01-standards/test-integrity-anti-gaming.md` 的 Integrity Difference 与 Reviewer Section。
 - Production Readiness 是 Acceptance 一部分：读取 `framework://references/01-standards/production-readiness-scorecard.md` 的相关 Level 与 Dimension Section。
 
-> **YuanForge 的四审查官并行审查执行器。**
-> 所有审查官同时启动、双轨运行、各自独立报告。
-
 ## Quality v0 Contract → Diff Review
 
-Quality Auditor 的首要输入为 Engineering Context、Acceptance Criteria、Actual Diff 与 Verification Evidence。先验证 Context 的 invariant、required_reuse、forbidden 与 implementation_guidance；再报告 Context 与 Diff 的**未经解释的 deviation**、未批准 abstraction 或真实 Stack 语义偏离。代码风格、复杂度与性能仍需审查，但不能以固定 controller / service / repository 模板或文件长度阈值覆盖 Project-native facts。
+Quality Auditor 的首要输入为 Writer 实际使用且经 Conductor 原样转发的 Engineering Context、Acceptance Criteria、Actual Diff 与 Verification Evidence。先验证 Context 的 invariant、required_reuse、forbidden 与 implementation_guidance；再报告 Context 与 Diff 的**未经解释的 deviation**、未批准 abstraction 或真实 Stack 语义偏离。代码风格、复杂度与性能只在 Task-relevant 时审查，不能以固定 controller / service / repository 模板或文件长度阈值覆盖 Project-native facts。
 
----
+## Review protocol
 
-## 触发条件
+1. Conductor 依据风险选择 Reviewer，并给出 Acceptance、Diff、Verification Evidence 与所需 Context。
+2. 每个被选 Reviewer 独立检查自己负责的维度；不参与的维度不假装已审。
+3. 每个 Material Review 记录至少一次任务相关的对抗式尝试，或说明为什么没有适用场景。
+4. 报告包含 verdict（`READY` / `NEEDS_WORK`）、Finding、Evidence、Affected Path 与 Residual Risk。
+5. `NEEDS_WORK` 交回唯一 Writer 修正；Artifact 改变后重跑受影响验证，并按新的风险重新选择审查。
 
-- Phase 4 质量层：所有 Dev Task Complete
-- Conductor 收集所有 ✅完成 信号 → 同时派发 4 个审查官
-- 用户说「审查」「review」「检查」
+## Result handling
 
----
-
-## 四审查官并行
-
-```
-Dev Task ✅完成
-  │
-  ├── Spec Reviewer     [🔴 Blocker]  — 对照验收标准 + API 契约
-  ├── Security Auditor  [🔴 Blocker]  — P0 全量 / P1 关键 / P2 跳过
-  ├── Quality Auditor   [🟢 Advisory]  — 代码质量 + 性能 + DB（同类 3 次升级）
-  └── UX Reviewer       [🟢 Advisory]  — UI 还原度 + 无障碍（有界面时触发）
-
-并行规则:
-  - 四个审查官同时启动，互不等待
-  - 任意 Blocker → 通知其他审查官暂停 → 解决后断点恢复
-  - 审查报告各自独立呈现，Conductor 不合并/不重排序/不跨轴比较
-```
-
----
-
-## 审查协议
-
-### 双轨运行（所有审查官）
-
-| 路径 | 行为 | 目的 |
-|------|------|------|
-| 合规路径 | 逐条对照验收标准/安全清单/质量规范/UI 原型 | 确保显式要求满足 |
-| 对抗路径 | 主动构造边界条件、异常输入、极端场景 | 发现验收标准未覆盖的漏洞 |
-
-**硬要求**：每份审查报告必须包含至少 1 条对抗路径尝试记录（即使未发现缺陷，也须记录「已尝试 X 边界条件，未发现缺陷」）。
-
----
-
-## 各审查官详程
-
-### Spec Reviewer — 🔴 Blocker
-
-对照验收标准 + API 契约：
-
-|| 检查项 | 方法 |
-||--------|------|
-|| 功能完整性 | 所有验收标准是否实现？ |
-|| API 契约一致性 | 接口签名是否匹配 freeze 的契约？ |
-|| Scope Creep | 有没有超出范围的改动？ |
-|| 遗漏 | 有没有遗漏的验收标准？ |
-
-**输出**：PASS 或 BLOCKER（具体差距列表）
-
-### Security Auditor — 🔴 Blocker
-
-按风险分级投入：
-
-|| 风险等级 | 审计范围 |
-||---------|---------|
-|| R0（高敏） | 全量：输入验证、权限、注入、加密、依赖漏洞 |
-|| R1（标准） | 关键路径：认证、授权、敏感数据流 |
-|| R2（低敏） | 跳过 |
-
-**输出**：PASS 或 BLOCKER（具体漏洞 + 风险等级）
-
-### Quality Auditor — 🟢 Advisory↗
-
-代码质量 + 性能 + DB：
-
-|| 检查项 | 方法 |
-||--------|------|
-|| 代码质量 | 可读性、错误处理、测试覆盖 |
-|| 性能 | N+1 查询、不必要的循环、内存 |
-|| 数据库 | 索引、迁移、schema 变更 |
-|| 模块深度 | 同模块深度自检 |
-
-🟠 警告同模块 ≥ 3 次 → 自动升级 🔴 Blocker
-
-### UX Reviewer — 🟢 Advisory↗
-
-有界面时触发。以 UI Designer 的 V/M/D 旋钮值为基准：
-
-|| 检查维度 | 方法 |
-||---------|------|
-|| 视觉还原度 | 对照原型，逐像素比对 |
-|| 交互一致性 | 对照交互规范 |
-|| 无障碍 | 键盘导航、ARIA 标签、色对比度 |
-|| 响应式 | 移动/平板/桌面 |
-
-🟠 警告同模块 ≥ 3 次 → 自动升级 🔴 Blocker
-
----
-
-## 审查结果处理
-
-```
-Conductor 收集所有审查结果
-  │
-  ├─ 四个审查官报告各自独立呈现（不合并）
-  │
-  ├─ 🔴 Blocker → 全部解决 → 打回对应 Dev → 重新审查
-  │   └─ 任意 Blocker → 通知其他审查官暂停 → 解决后断点恢复
-  │
-  ├─ 🟡 Hard Gate (Tester) → 所有 Blocker 解决后触发
-  │
-  └─ 🟢 Advisory → 采纳的创建 backlog，豁免的写理由
-       └─ 🟠 同模块 ≥3 次 → 强制升级 🔴 Blocker
-```
+Conductor 保留各 Reviewer 的证据与 verdict。Blocker 必须修复；Advisory 可采纳、进入 backlog 或有理由豁免。不得把“启动四个审查官”当作完成质量工作的替代，也不得为小机械改动制造固定四人仪式。

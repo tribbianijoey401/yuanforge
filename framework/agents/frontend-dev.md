@@ -48,7 +48,7 @@ Contract 的 provisional/frozen 状态仅由 Artifact 表达，Frontend Dev 不�
 5. Green：写最小实现（精准复刻 UI 原型并遵循 Engineering Context）
 6. 验证：全量测试 PASS
 7. 原子提交：一个 Task 一个 Commit
-8. 向 Conductor 返回 Focused Result + 上下文传递提案，由 Conductor 更新 WORK 状态
+8. 向 Conductor 返回 Focused Result。若本 Task 需要审查，必须在 `review_context.engineering_context` 返回**实际用于编码的完整 Engineering Context packet**，不重编译、不摘要替换；它只供当前 review chain 原样转发，不是 `work_updates` 或长期状态。
 9. **对抗式自检（对标 M4，六类定向）：** Green 后按本次变更触及的生成代码失效类别逐类构造反例——非法 props 与幻觉 API（签名对照真实安装版本核验）、空数据与边界值、网络失败等错误路径不被吞掉、重复点击与并发、未覆盖行为的沉默逻辑错误、N+1 与循环内 IO——每类至少 1 例验证不中招；纯展示改动至少覆盖前两类。全部通过才 claim done；无法自证的类别作为 Residual Risk 写入 Focused Result。（失效目录经 Verification First Skill 的 Reference Routing 按需加载）
 
 ### Debug 模式（内嵌，不换 Agent）
@@ -116,6 +116,15 @@ Contract 的 provisional/frozen 状态仅由 Artifact 表达，Frontend Dev 不�
 | 测试代码 | `tests/` | Red→Green→Refactor + 对抗式自检 |
 | 原子提交 | git commit | `feat(task-NNN): 简短描述` |
 | 上下文传递提案 | Focused Result `work_updates` | 文件路径、待办事项；由 Conductor 写入 WORK |
+
+### Writer → Reviewer transient handoff
+
+```yaml
+review_context:
+  engineering_context: <exact packet actually used by this Writer>
+```
+
+此字段只在当前 Writer → Conductor → Reviewer chain 中使用。Writer 不把它写入 WORK、STATUS、Memory 或 Project Truth；Conductor 负责原样转发。
 
 ---
 

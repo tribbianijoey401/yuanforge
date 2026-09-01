@@ -4,9 +4,9 @@ work_state: active
 workflow: large-project
 stage: review
 agent:
-  id: quality-auditor
+  id: conductor
   instance: persona-degraded
-  state: completed
+  state: active
 quality:
   test: passed
   review: passed
@@ -20,7 +20,7 @@ quality:
 
 ## Next
 
-Quality v0 Framework / protocol review 已通过；等待真实同模型三臂 Benchmark 执行。
+Quality Auditor returned READY; Conductor is committing and pushing v0.1, after which real three-arm model comparison remains pending.
 
 ## Blocker
 
