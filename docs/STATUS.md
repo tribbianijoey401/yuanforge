@@ -20,7 +20,7 @@ quality:
 
 ## Next
 
-Quality Auditor returned READY; Conductor is committing and pushing the narrow correction without changing the existing immutable tag.
+Quality Auditor returned READY; the narrow correction is committed and pushed without changing the existing immutable tag. Real three-arm model comparison remains pending.
 
 ## Blocker
 

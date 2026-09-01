@@ -46,13 +46,13 @@
 
 **Agent:** conductor (persona-degraded)
 
-**Task:** 提交并 push exact Context handoff review-safe correction；不移动或覆盖 `quality-v0.1`，然后恢复真实三臂模型比较为唯一 pending Next Action。
+**Task:** 在固定 arm identities 下执行真实的 Bare / Current Yuan / Quality Yuan 三臂模型运行，并交由未参与实现的裁判按 scorecard 评分；保留 `model-comparison-pending` 直到真实 artifacts 收集完成。
 
 **Done conditions:**
 
-- Commit 使用 `fix: make quality context handoff review-safe` 并推送 `origin/main`。
-- `quality-v0.1` 的 tag object 与 peeled commit 保持不变。
-- Work 仍 active，唯一 Open Finding 是真实三臂模型比较 pending。
+- 三臂均有真实 prompt、patch、测试输出、diff review 和 scorecard Evidence。
+- 使用固定 Current commit 与 immutable `quality-v0.1`，不使用可变 main。
+- 只有独立裁判完成评分后才更新或解除 `model-comparison-pending`。
 
 **Declared Context Refs:** 用户 v0.1 规格；当前 `WORK.md`；`framework/policies/review.md`；相关 Agent / Skill / Benchmark assets；`tests/test_contracts.py`。
 
@@ -60,9 +60,9 @@
 
 **Outcome:** completed
 
-**Summary:** Quality Auditor verdict: READY. Writer now always returns the exact Context it used; Conductor receives before Risk-driven selection and discards in both no-review and completed-review paths; selected Quality Auditor missing Context is a `NEEDS_WORK` protocol defect. Diff is limited to contracts, tests, package marker and required Work/Status checkpoints; tag remains unchanged.
+**Summary:** Quality Auditor verdict: READY. The post-tag correction was committed as `543b4cba62e052eefa8b7f859df193a956a0de7f` and pushed to `origin/main`. Writer now always returns the exact Context it used; Conductor receives before Risk-driven selection and discards in both no-review and completed-review paths; selected Quality Auditor missing Context is a `NEEDS_WORK` protocol defect. `quality-v0.1` was not moved or overwritten.
 
-**Next:** Commit and push the post-tag protocol correction, then obtain an execution environment and independent judge for the real three-arm model comparison.
+**Next:** Obtain an execution environment and independent judge for the real three-arm model comparison.
 
 ## Open Findings
 
