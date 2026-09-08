@@ -1,42 +1,12 @@
-# Yuan Quality v0 Scorecard
+# Quality v0 Scorecard
 
-## Per-task score
+| Dimension | Score 1 | Score 3 | Score 5 | Evidence required |
+|---|---|---|---|---|
+| Correctness | 关键行为或边界错误 | 主路径正确但有未处理边界 | Acceptance 与关键边界均正确 | tests、diff、manual observation |
+| Architecture Fit | 破坏已观察的边界 | 基本兼容但有无解释偏移 | 复用现有模式并保持边界 | context evidence、diff |
+| Code Quality | 职责混乱或重复 | 可读但抽象浅 / 复杂 | 职责清楚、复杂度与抽象有证据支撑 | diff review |
+| Stack Correctness | 使用不存在或版本不符 API | 语义未证实 | API / 生命周期 / 错误语义按真实版本使用 | manifest、types、tests |
+| Robustness | 错误 / 状态 / 资源边界缺失 | 覆盖常见错误 | Task-relevant risks 有防线和验证 | tests、review |
+| Overengineering Control | 无理由新增层 / runtime / abstraction | 少量可疑抽象 | 新增机制有明确必要性，或复用现有机制 | context、diff |
 
-Score each dimension from 1 to 5. Use the initial repository, task, actual patch, test output, and review evidence. Do not score from the agent's explanation alone.
-
-| Dimension | 1 | 3 | 5 |
-|---|---|---|---|
-| Correctness | wrong / incomplete | mostly correct with gaps | fully satisfies task and invariants |
-| Architecture Fit | fights repository structure | acceptable but awkward | project-native boundaries and reuse |
-| Code Quality | brittle or hard to read | serviceable | clear, minimal, maintainable |
-| Stack Correctness | guesses APIs / semantics | mostly correct | grounded in actual stack/version |
-| Robustness | happy-path only | some edge handling | task-relevant failure modes covered |
-| Overengineering Control | unnecessary concepts/scope | some excess | minimum sufficient solution |
-
-Total: **6–30**.
-
-## Blockers
-
-Record separately; blockers cannot be offset by score:
-
-- Contract / Acceptance violation
-- Test failure or regression
-- Repository invariant break
-- Unsupported stack/API usage
-- Scope creep that changes unrelated behavior
-
-## Run record
-
-For each arm save:
-
-- arm identity
-- task
-- model/config
-- prompt/dispatch
-- Engineering Context (Quality only)
-- patch/diff
-- tests
-- review verdict/findings
-- scorecard with evidence locators
-
-Do not combine different tasks into one opaque score without preserving per-task results.
+总分为六维相加（6–30），但 Blocker、未解释的 Contract deviation、测试失败或超出 Scope 时不得以高分抵消。裁判应独立评分；每个分数须引用实际 patch 或验证证据，不得仅复述模型自评。
