@@ -92,7 +92,7 @@ General Taste Heuristics
 ```
 [\x{1F300}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{FE00}-\x{FE0F}\x{1F000}-\x{1F02F}\x{1F0A0}-\x{1F0FF}\x{1F100}-\x{1F64F}\x{1F680}-\x{1F6FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{200D}\x{20E3}\x{E0020}-\x{E007F}]
 ```
-- **例外**：emoji 仅允许出现在 UGC / 即时通讯消息中，不作为 UI 功能图标。
+- **Scope of this signal**：UGC / chat 中的 emoji 不属于 functional-icon signal（excluded from this signal）。其他 emoji 使用（包括 functional use）一律按 Product / Brand / Accessibility / Project Design Evidence 在同一 Taste 优先级下判断——playful 儿童产品以 emoji 为品牌交互语言时，凭 Project Evidence 可以合法成立。
 
 ### VA-2 紫粉渐变（Taste Signal）
 

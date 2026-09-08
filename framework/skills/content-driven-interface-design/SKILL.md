@@ -64,7 +64,9 @@ Signature != decoration。Signature 必须受 Task Fit、Usability、Product Ide
 
 ## Presentation Contract 状态
 
-生成一份供实现与审查共用的 Contract，只包含 source reference 与 derived decision。状态是该设计 Artifact 的局部质量字段，不写入 `STATUS.md`、State Contract 或 State Guard。canonical source locator 必须真实存在。Contract 当且仅当关键 decision 都能追溯到真实 stable fact ID（存在时）或 canonical source locator + section / item reference，且下列完整性条件通过时才能冻结；否则保持 provisional：
+**Completeness 总则：** Completeness means all applicable material decisions are resolved, not that every named field must contain a non-empty design. Non-applicable dimensions may be explicitly omitted or marked N/A with reason（例如纯静态展示没有 motion / reduced-motion 决策，本地渲染页面没有 Design Token 决策——适用才要求，不适用写明即可，不为"完整"制造无意义条目）。
+
+生成一份供实现与审查共用的 Contract，只包含 source reference 与 derived decision。状态是该设计 Artifact 的局部质量字段，不写入 `STATUS.md`、State Contract 或 State Guard。canonical source locator 必须真实存在。Contract 当且仅当关键 decision 都能追溯到真实 stable fact ID（存在时）或 canonical source locator + section / item reference，且下列完整性条件**在适用范围内**通过时才能冻结；否则保持 provisional：
 
 - 真实 canonical source locator；stable fact ID 如果上游真实存在则必须复用，否则每个关键上游事实有明确、可重新定位的 section / item reference。
 - 完整 System Story 与 Content Model，每个字段都链接到 source fact。

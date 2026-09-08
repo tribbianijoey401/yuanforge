@@ -148,7 +148,7 @@ visual_intent:
 ### 执行规则
 
 1. 与 Architect 并行时：产出色彩方案、组件风格、布局规范（含 visual_intent 声明）
-2. API 契约冻结后：产出完整页面原型，包含所有状态（加载中/空状态/错误/成功）
+2. API 契约冻结后：产出完整页面原型，覆盖 **task-relevant states**——由 Product behavior + system capability + Interaction Architecture 推导（normal / loading / empty / error / pending / blocked / stale / success / recovery 是状态词汇表，不是必选清单；纯本地同步页 / 静态 landing page 可能只有 normal 与 error，不为"完整"制造系统不存在的状态）
 3. 原型应可直接在浏览器打开预览
 4. 视觉规范、Presentation Contract（适用时）与 Token 清单作为 Focused Result 提交 Conductor，持久化到 `project://docs/design/` 并从 PRODUCT.md 的 Design Direction Section 索引；原型文件随附同一目录，不得只留在会话临时目录
 5. **Design Token 架构按项目状态适用：** Existing Project 的 token 架构连贯可用时必须保留（无论是 2 层 / 3 层、CSS variables、theme object、Tailwind tokens 还是 design-system package），Yuan 不强制重构。New Project / No Token System 时，四层结构（Primitives → Semantics → Components → Patterns）可作为 starting heuristic / reference model，不是唯一正确结构；具体格式经 `query-ux-pro-max` 的 Design Token Signal 加载规范 Section 后参考套用
@@ -160,7 +160,7 @@ visual_intent:
 
 > 参考 `framework://policies/visual-absolutes.md`。下列信号的模式识别知识保留，但**强度已去绝对化**：单条信号不构成 universal violation，只有当它（或多条信号叠加）与 Product/Brand Contract、Accessibility、Platform Constraint 或 Project Design System 的 Evidence 冲突时才 hard fail。UI Designer 原型产出后仍对本节跑一遍 emoji 正则扫描（VA-1）作为聚合 Signal 来源。
 
-- **VA-1 emoji 作功能图标（Taste Signal → 条件性 hard）**：功能图标优先统一描边、可矢量缩放的 SVG 图标方案。项目明确锁定 SVG 图标集，或 Product/Accessibility 要求时 → violation。无上游 Evidence 时是 Taste Signal，交审查判断。UGC / 即时通讯消息中的 emoji 不在扫描范围。
+- **VA-1 emoji 作功能图标（Taste Signal → 条件性 hard）**：功能图标优先统一描边、可矢量缩放的 SVG 图标方案。项目明确锁定 SVG 图标集，或 Product/Accessibility 要求时 → violation。无上游 Evidence 时是 Taste Signal，交审查判断；项目以 emoji 为品牌交互语言（如 playful 儿童产品）凭 Project Evidence 可合法成立。UGC / 即时通讯消息中的 emoji 不属于 functional-icon signal。
 - **VA-2 紫粉渐变（Taste Signal）**：识别"Indigo→Pink 渐变 + 发光边框 + 毛玻璃"三位一体模板套路；有 Product/Brand Evidence 时可以是 violation，否则是 anti-convergence 信号。
 - **VA-3 占位 / 未确认文案（conditional hard）**：判定对象是 "unconfirmed placeholder masquerading as product copy"，不是特定字符串。Product Contract 已明确真实内容却用无来源占位替换 → violation；文案尚未确认的临时 prototype → 标记 provisional / unresolved copy，不 hard fail。
 - **VA-4 硬编码颜色（conditional hard）**：Project Design System 已 tokens 化且当前区域有 token path（或本 Task 正在建立统一 Design System）时绕开 token → hard divergence；项目本身使用 CSS literals 且只做局部小改 → 至多 maintainability signal，不强迫 token 化。

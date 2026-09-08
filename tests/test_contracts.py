@@ -786,6 +786,24 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("genuinely plausible", cds)
         self.assertNotIn("至少记录一个 rejected candidate", cds)
 
+        # v0.2.1 final: states are task-relevant, not fixed four-state checklist
+        self.assertNotIn("加载中/空状态/错误/成功", ui_designer)
+        self.assertNotIn("加载中 / 空状态 / 错误 / 成功", ux_reviewer)
+        self.assertIn("task-relevant states", ui_designer)
+        self.assertIn("task-relevant states", ux_reviewer)
+        self.assertIn("状态词汇表，不是必选清单", ui_designer)
+        self.assertIn("状态词汇表，不是必选清单", ux_reviewer)
+        # impact-based escalation, count-based removed
+        self.assertNotIn("≥3 升级 Blocker", ux_reviewer)
+        self.assertIn("Escalation is impact-based, not count-based", ux_reviewer)
+        # VA-1: UGC exclusion is signal scope, not universal prohibition
+        self.assertNotIn("emoji 仅允许出现在 UGC / 即时通讯消息中", visual)
+        self.assertIn("excluded from this signal", visual)
+        self.assertIn("凭 Project Evidence 可以合法成立", visual)
+        # presentation contract completeness applicability principle
+        self.assertIn("Completeness means all applicable material decisions are resolved", cds)
+        self.assertIn("Non-applicable dimensions may be explicitly omitted or marked N/A", cds)
+
         # UI designer anti-template is a hypothesis, not automatic conclusion
         self.assertIn("anti-convergence hypothesis", ui_designer)
         self.assertNotIn("说明你在套模板而非做设计", ui_designer)

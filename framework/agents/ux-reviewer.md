@@ -73,7 +73,7 @@ Fidelity 的重点是 **material visual / interaction fidelity**：hierarchy、s
 |------|--------|
 | **还原度** | Frontend Dev 实现 vs UI Designer 原型 — material visual / interaction fidelity（unexplained material deviation 才是 Finding；见 Prototype Fidelity 原则） |
 | **交互一致性** | 与项目其他页面的交互模式一致 |
-| **状态覆盖** | 加载中 / 空状态 / 错误 / 成功 四个状态是否都覆盖 |
+| **状态覆盖** | task-relevant states 是否都覆盖（由 Product behavior + system capability + Interaction Architecture 推导；normal / loading / empty / error / pending / blocked / stale / success / recovery 是状态词汇表，不是必选清单——本地同步界面没有 loading/empty 不是缺陷） |
 | **无障碍** | 键盘导航、屏幕阅读器兼容、色彩对比度（Hard Constraint 层） |
 | **契约完整性** | 页面职责/非职责、API gap、响应式、motion/reduced-motion、prototype locator 与 Non-goal 是否完整；视觉认可不得代替此检查 |
 
@@ -139,7 +139,7 @@ Fidelity 的重点是 **material visual / interaction fidelity**：hierarchy、s
 
 ## Emoji 正则扫描（VA-1 Signal）
 
-对 Frontend Dev 实现跑 `framework://policies/visual-absolutes.md` 的 emoji 检测正则。命中功能图标位置时按 severity 处理：项目锁定 SVG 图标集或存在 Product/Accessibility 要求 → violation，打回 Frontend Dev；仅命中 Taste Signal → 按 Taste 优先级与聚合规则判断。UGC / 即时通讯消息中的 emoji 不在扫描范围。
+对 Frontend Dev 实现跑 `framework://policies/visual-absolutes.md` 的 emoji 检测正则。命中功能图标位置时按 severity 处理：项目锁定 SVG 图标集或存在 Product/Accessibility 要求 → violation，打回 Frontend Dev；仅命中 Taste Signal → 按 Taste 优先级与聚合规则判断（项目以 emoji 为品牌交互语言且凭 Project Evidence 成立时不打回）。UGC / 即时通讯消息中的 emoji 不属于 functional-icon signal。
 
 ## 五源对齐
 
@@ -184,4 +184,4 @@ evidence: [{artifact_ref, line, note}]            # 必填
 - 稳定性分类：稳定型
 
 ## 路由条目
-- 我可能提出：Advisory（还原度偏差/无障碍问题）→ 路由：回 Frontend Dev 修正（≥3 升级 Blocker）
+- 我可能提出：Advisory（还原度偏差/无障碍问题）→ 路由：回 Frontend Dev 修正。**Escalation is impact-based, not count-based**——严重度来自 user impact、contract violation、accessibility impact、recoverability、scope 与 Evidence，不是 Finding 数量；单个无法键盘操作的关键支付按钮单条即可 Blocker，多个 2px spacing advisory 也不因数量升级。Multiple advisories may indicate a systemic issue only when they share one underlying material defect.
