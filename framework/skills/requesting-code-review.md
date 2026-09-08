@@ -37,7 +37,7 @@ Independent Artifact Critique (Pass A)
 Context Compliance (Pass B)
 ```
 
-**Pass A — Independent Artifact Critique：** 先基于 Task、Acceptance、Actual Diff 与 Relevant Repository Evidence 独立判断方案与实现本身的质量（Problem Fit、Simplicity、不必要的 abstraction、ownership 清晰度、failure / operational 问题、被忽略的 Repository invariant）。此阶段不把 Writer Engineering Context 当作正确答案——Context 本身可能漏事实或推导错误。
+**Pass A — Independent Artifact Critique：** 先基于 Task、Acceptance、Repository Evidence 与 Actual Diff（事实来源是 Task + Acceptance + Repository + Diff，Actual Diff 不是唯一事实来源）独立判断方案与实现本身的质量（Problem Fit、Simplicity、不必要的 abstraction、ownership 清晰度、failure / operational 问题、被忽略的 Repository invariant、缺失的应有行为）。此阶段不把 Writer Engineering Context 当作正确答案——Context 本身可能漏事实或推导错误。
 
 **Pass B — Context Compliance：** 然后以 Writer 实际使用且经 Conductor 原样转发的 Engineering Context、Acceptance Criteria、Actual Diff 与 Verification Evidence，验证 invariant、required_reuse、forbidden 与 implementation_guidance 的执行情况，报告**未经解释的 deviation**、未批准 abstraction 或真实 Stack 语义偏离。
 

@@ -16,9 +16,18 @@
 
 ## 核心原则：Applicability before best practice
 
-Design Reviewer 不检查"一个成熟系统通常应该有什么"，只检查"这个系统在这个任务下真正需要什么"。
+Design Reviewer 不检查"一个成熟系统通常应该有什么"，只检查"这个系统在这个任务下真正需要什么"。**只有被实际信号触发的 concern 才进入审查**：
 
-成熟系统的通用默认（rate limiting、refresh token、soft delete、UNIQUE 约束、429 响应……）**不是默认 checklist**。任何一项只有在 Task / Product / Repository Evidence 显示它适用时才是要求。
+```text
+Task signal / Acceptance signal
+→ Repository invariant
+→ Architecture change
+→ Affected lifecycle / boundary
+```
+
+例如：新增公开 API → auth / abuse / error contract 可能适用；修改 account deletion → deletion semantics 适用；修改 session refresh → token lifecycle 适用。Task 根本不触及 auth 时，refresh token 不应出现在报告里——也不需要逐项解释它为何缺席。
+
+成熟系统的通用默认（rate limiting、refresh token、soft delete、UNIQUE 约束、429 响应……）**不是默认 checklist，也不是必须逐项解释的清单**。它们只是常见触发信号的示例库；任何一项只有在 Task / Product / Repository Evidence 显示它适用时才是要求。
 
 判断方式不是问"有没有 X？"，而是问 applicability 链：
 
@@ -97,10 +106,14 @@ Design Reviewer 不检查"一个成熟系统通常应该有什么"，只检查"�
 ```
 ## Design Review: [Session ID]
 
-### Applicability 结论
-- 本次 Task 改变的行为与触及的 lifecycle：<AC / Plan locator>
-- 已核对 applicability 的通用默认（rate limit / refresh token / soft delete / UNIQUE / 429）：
-  <对每一项给出"适用并要求 / 不适用及原因 / 本次不触及"，不允许默认放行或默认打回>
+### Applicable design concerns
+- <only concern triggered by actual Task / Acceptance / Repository / Architecture-change evidence>
+  - evidence: <AC / Plan / Repository locator>
+  - impact: <what goes wrong if unaddressed>
+
+### Non-applicable dimensions
+Only mention when omission itself could be ambiguous.
+Do not enumerate generic best practices.
 
 ### API 契约审查
 | 端点 | 问题 | 严重度 | 建议 |
@@ -120,6 +133,8 @@ Design Reviewer 不检查"一个成熟系统通常应该有什么"，只检查"�
 ## 判定
 🔴 Blocker (N 项未通过) / ✅ 设计审查通过
 ```
+
+允许 `Applicable design concerns: none beyond declared API/data-model scope.`——Task 未触发任何通用关注点时不输出无关项。通用最佳实践（rate limit、refresh token、soft delete、UNIQUE、429……）只作为**触发信号示例**存在于核心原则节，不在报告中逐项核对、不为完整性枚举。
 
 ---
 

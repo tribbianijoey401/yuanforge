@@ -121,19 +121,19 @@ visual_intent:
 1. **扎根主题。** 在动手设计前，先陈述：这个产品的主题是什么？受众是谁？这个页面要传达什么？设计语言应从主题中生长出来，不套用模板。
 2. **Project-native First 的字体选择。** 若现有 Project Design System、平台规范、品牌规范或相邻界面已经明确字体体系，必须优先沿用，不因 Yuan 的通用审美偏好自行替换。只有项目没有既有字体约束，且当前 Work 确实需要建立新的 typography direction 时，才根据内容层级、受众、可读性、品牌表达与平台能力选择字体组合。Inter / Roboto / Arial 本身不是违规；问题只在于无依据地默认套用。字体层级（字阶、粗细、间距）本身应是设计的一部分，不只是内容载体。
 3. **结构编码信息。** 编号、分隔线、标签等结构性元素必须传达真实的语义。01/02/03 只在内容是序列时使用，不是装饰。
-4. **克制原则。** 只在一个地方大胆。让签名元素（一个独特的 layout moment / 交互 / 动效）成为页面的记忆点，其余保持克制。删掉不服务主题的任何装饰。
+4. **强调要有意图，签名时刻是可选的。** Use emphasis deliberately and preserve hierarchy——视觉重量的分配必须有理由。signature moment（一个独特的 layout moment / 交互 / 动效）是 optional 且 task-dependent 的选择，不是每个页面必须的仪式；多个强视觉元素若有真实产品理由，可以成立。删掉不服务主题的装饰，但不为了"克制"教条削掉有 Evidence 的表达。
 
-### AI 模板陷阱（必须避免）
+### AI 模板信号（anti-convergence hypothesis，不是 universal style law）
 
-LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以下任何一种，说明你在套模板而非做设计：
+以下模式是 LLM 输出趋同的常见收敛信号。**落入任何一种不自动等于"套模板"**——它触发的是一个 anti-convergence hypothesis，需要结合 Product Evidence、Project-native design 与 Task fit 判断；有 brand / product identity / existing project 支持的选择是合法的：
 
-| 模板 | 特征 | 问题 |
+| 模式 | 特征 | 判断 |
 |------|------|------|
-| 奶油底 + 陶土色 | 暖奶油背景 #F4F1EA + 高对比衬线体 + 陶土色强调 | 所有产品都用，不管主题 |
-| 纯黑 + 荧光绿 | 近黑背景 + 酸绿/朱红单色强调 | 只适合游戏/加密，不该出现在 SaaS |
-| 报纸式密集排版 | 细线分隔 + 零圆角 + 密集多栏 | 只有编辑类产品适用 |
+| 奶油底 + 陶土色 | 暖奶油背景 #F4F1EA + 高对比衬线体 + 陶土色强调 | 无产品理由地出现在所有产品上时是收敛信号 |
+| 纯黑 + 荧光绿 | 近黑背景 + 酸绿/朱红单色强调 | 常见收敛信号；brand/产品身份支持时合法，不绑定"只适合游戏/加密"的绝对判断 |
+| 报纸式密集排版 | 细线分隔 + 零圆角 + 密集多栏 | topology-fit heuristic：data-heavy research / financial / monitoring 工具也可能合理，不绑定单一行业 |
 
-**检查方法：** 原型完成后，问自己——如果换一个完全不相关的产品，这个原型是否还适用？如果是，就是模板。
+**检查方法：** 原型完成后，问自己——这个风格选择有没有 Product Evidence / Project-native 依据，还是只是"看起来高级"的默认？没有依据的收敛才需要修正。
 
 ### 行业惯例
 
@@ -141,7 +141,7 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 
 ### Presentation Design Signal
 
-高影响 UI、新产品、重要改版、数据密集界面、关键旅程，或没有可复用设计时，必须加载 `content-driven-interface-design`。先完成 Repository Capability Audit、System Story、Content Model、页面职责与非职责、Data Capability Matrix、Primary / Secondary View Model、rejected candidate、Interaction Architecture 与 Prototype Convergence；Repository 能确认的事实直接审计，只有会改变 Product Direction 或关键 Experience 的未知才交回 Conductor。
+高影响 UI、新产品、重要改版、数据密集界面、关键旅程，或没有可复用设计时，必须加载 `content-driven-interface-design`。先完成 Repository Capability Audit、System Story、Content Model、页面职责与非职责、Data Capability Matrix、Primary / Secondary View Model、条件性 rejected candidate、Interaction Architecture 与 Prototype Convergence；Repository 能确认的事实直接审计，只有会改变 Product Direction 或关键 Experience 的未知才交回 Conductor。
 
 此流程的 Presentation Contract 是 `project://docs/design/` 中的 UI Quality Artifact，不是 `STATUS.md`、State Contract 或 State Guard 的字段。它只保存 canonical source locator 与 derived decision，不复制 Product Truth；身份条件不完整时标记为 provisional，满足完整性条件时才在该 Artifact 内标记为 frozen。未命中 Signal 的 Work 保持当前原型与设计规范流程。
 
@@ -151,7 +151,7 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 2. API 契约冻结后：产出完整页面原型，包含所有状态（加载中/空状态/错误/成功）
 3. 原型应可直接在浏览器打开预览
 4. 视觉规范、Presentation Contract（适用时）与 Token 清单作为 Focused Result 提交 Conductor，持久化到 `project://docs/design/` 并从 PRODUCT.md 的 Design Direction Section 索引；原型文件随附同一目录，不得只留在会话临时目录
-5. 视觉规范中的 Design Token 清单必须按四层结构组织（Primitives → Semantics → Components → Patterns）；具体格式经 `query-ux-pro-max` 的 Design Token Signal 加载规范 Section 后套用，不自造结构
+5. **Design Token 架构按项目状态适用：** Existing Project 的 token 架构连贯可用时必须保留（无论是 2 层 / 3 层、CSS variables、theme object、Tailwind tokens 还是 design-system package），Yuan 不强制重构。New Project / No Token System 时，四层结构（Primitives → Semantics → Components → Patterns）可作为 starting heuristic / reference model，不是唯一正确结构；具体格式经 `query-ux-pro-max` 的 Design Token Signal 加载规范 Section 后参考套用
 6. 命中 Presentation Design Signal 时，只有 Artifact 包含 Product Truth locator、capability evidence、API gap、页面边界、状态矩阵、responsive/accessibility/motion、Design Token、prototype locator、observable acceptance、Non-goal 与 Review verdict，才可标记为 frozen；否则保持 provisional
 
 ---
@@ -162,8 +162,8 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 
 - **VA-1 emoji 作功能图标（Taste Signal → 条件性 hard）**：功能图标优先统一描边、可矢量缩放的 SVG 图标方案。项目明确锁定 SVG 图标集，或 Product/Accessibility 要求时 → violation。无上游 Evidence 时是 Taste Signal，交审查判断。UGC / 即时通讯消息中的 emoji 不在扫描范围。
 - **VA-2 紫粉渐变（Taste Signal）**：识别"Indigo→Pink 渐变 + 发光边框 + 毛玻璃"三位一体模板套路；有 Product/Brand Evidence 时可以是 violation，否则是 anti-convergence 信号。
-- **VA-3 AI 模板味占位文案（仍 hard）**：禁止 "Lorem ipsum" / "Welcome to Our App" / "Sign up today" 等空洞占位；文案必须来自已确认的 Product Contract。这是 Product Truth 纪律，不是 taste。
-- **VA-4 禁止硬编码颜色（仍 hard）**：除 `#fff` `#000` 外，所有颜色通过 Design Token 引用（Token 体系来自 Architect Plan 的 Spec 段或 Project Design System）。这是可维护性契约，不是 taste。
+- **VA-3 占位 / 未确认文案（conditional hard）**：判定对象是 "unconfirmed placeholder masquerading as product copy"，不是特定字符串。Product Contract 已明确真实内容却用无来源占位替换 → violation；文案尚未确认的临时 prototype → 标记 provisional / unresolved copy，不 hard fail。
+- **VA-4 硬编码颜色（conditional hard）**：Project Design System 已 tokens 化且当前区域有 token path（或本 Task 正在建立统一 Design System）时绕开 token → hard divergence；项目本身使用 CSS literals 且只做局部小改 → 至多 maintainability signal，不强迫 token 化。
 - **VA-5 弹跳/弹性缓动（Taste Signal）**：识别无 purpose 的 decorative bounce；当项目设计语言本身就是 playful/bounce 时不得反向改造（Project-native 优先），当 motion 干扰任务或有 accessibility 影响时升级。
 
 ---
@@ -174,8 +174,8 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 - ❌ 产出与 API 契约不一致的界面
 - ❌ 在设计规范中写实现代码
 - ❌ 视觉先于交互：跳过 Interaction Architecture 直接做视觉语言（Material UI Work）
-- ❌ AI 模板味占位文案（VA-3）
-- ❌ 硬编码颜色值（VA-4，除 #fff/#000）
+- ❌ 用无来源占位文案替换已确认的 Product Contract 内容（VA-3 hard 分支）
+- ❌ 在已 tokens 化的 Design System 区域绕开 token 硬编码颜色（VA-4 hard 分支）
 - ❌ 无 Evidence 的 taste 偏好写进 Contract（visual_intent 缺 evidence）
 - ❌ 因 Yuan 通用偏好改造已有 playful 设计语言；local design debt 调整必须带 Evidence + Impact + why preserving is worse
 
@@ -191,7 +191,7 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 
 ## 门禁定义
 - 档位：🟢 Advisory↗（设计阶段）
-- 通过判定：视觉规范含 visual_intent（intent + evidence）+ Token 清单为四层结构 + 完整原型可浏览器预览；Material UI Work 还需 Interaction Architecture 与 Signature Quality 判断（适用时）；命中 Presentation Design Signal 时还需 Capability Audit、Traceability Matrix 与 Artifact-local completeness check
+- 通过判定：视觉规范含 visual_intent（intent + evidence）+ Token 清单可追溯（Existing Project 沿用其自有 token 架构；New Project 参考四层 heuristic）+ 完整原型可浏览器预览；Material UI Work 还需 Interaction Architecture 与 Signature Quality 判断（适用时）；命中 Presentation Design Signal 时还需 Capability Audit、Traceability Matrix 与 Artifact-local completeness check
 - 稳定性分类：演进型
 
 ## 路由条目

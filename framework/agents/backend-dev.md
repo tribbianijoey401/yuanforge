@@ -39,11 +39,23 @@
 6. 验证：全量测试 PASS
 7. 原子提交：一个 Task 一个 Commit
 8. 向 Conductor 返回 Focused Result。只要本 Task 使用 Engineering Context，必须始终在 `review_context.engineering_context` 返回**实际用于编码的完整 exact packet**，不重编译、不摘要替换。Writer 不负责预测是否会触发 Review；该 packet 只供当前 execution chain 临时处理，不是 `work_updates` 或长期状态。
-9. **对抗式自检：Failure Hypothesis 模型。** Green 后从 Actual Diff 出发构造失败假设并证伪，替代固定失效目录逐类打钩。只检查 Task / Diff 真正相关的失败模式——不因 checklist 存在就机械测试所有 security / performance / concurrency / N+1 / network：
+9. **对抗式自检：Failure Hypothesis 模型。** Green 后从多源信号构造失败假设并证伪，替代固定失效目录逐类打钩。触发信号不只来自 Actual Diff——**某段应该存在的逻辑完全没有写时，Diff 中不会有对应 signal，恰恰是最危险的漏检**：
 
    ```text
-   Actual Diff signal → applicable failure mode → failure hypothesis → falsifying verification
+   Task / Acceptance
+   + Affected Boundary
+   + Repository Invariants
+   + Actual Diff
+   → Applicable Failure Hypotheses
+   → Falsifying Verification
    ```
+
+   简写：expected behavior + affected boundary + actual implementation → failure hypothesis。只对 Task 真正相关的失败模式构造假设——不因新增 API 就机械把 auth / performance / concurrency / rate-limit / cache 全测一遍。
+
+   例（缺失行为也能触发假设）：
+   - 新增 public write endpoint，Repository 中既有 write endpoints 均需 auth，Diff 中无 auth 处理 → hypothesis: unauthorized caller can mutate state（Diff 没有 auth signal，假设照样成立）
+   - Acceptance 要求 failed pricing 不留 partial order，Repository 有 transaction boundary，Diff 在 pricing 前写 order → hypothesis: pricing failure leaves durable partial state
+   - 改动幂等逻辑 → hypothesis: concurrent retries can both pass check-before-insert（幻觉 API 仍对照真实安装版本签名核验）
 
    ```yaml
    adversarial_checks:
@@ -53,7 +65,7 @@
        result: <what actually happened>
    ```
 
-   例：改动幂等逻辑 → 构造并发重试假设；改错误路径 → 构造"失败被吞掉"假设（幻觉 API 仍对照真实安装版本签名核验）。全部相关假设通过才 claim done；无法自证的假设作为 Residual Risk 写入 Focused Result。（失效目录经 Verification First Skill 的 Reference Routing 按需加载；Failure catalog 是检索起点，不是 mandatory checklist——Applicability First。）
+   全部相关假设通过才 claim done；无法自证的假设作为 Residual Risk 写入 Focused Result。（失效目录经 Verification First Skill 的 Reference Routing 按需加载；Failure catalog 是检索起点，不是 mandatory checklist——Applicability First。）
 
 ### Debug 模式（内嵌，不换 Agent）
 

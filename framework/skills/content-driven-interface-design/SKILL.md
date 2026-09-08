@@ -22,7 +22,7 @@ description: 根据可用的 Product Truth、系统行为与 Content Topology，
 1. 建立完整 System Story：user and context、task and intended outcome、key object old → new change、why the user must perceive the change、consequence if they do not，以及 truth source locator 和 stable fact ID（存在时）或 canonical section / item reference；临时路径改用明确的 provisional source description 与 identity gap。
 2. 对命中 Presentation Design Signal 的 Work（高影响 UI、新产品、重要改版、数据密集界面、关键旅程或没有可复用设计）读取 `skill://references/evidence-driven-frontend-discovery.md`，完成 Repository Capability Audit。持续区分 Product Truth、System Capability Evidence 与 Presentation Decision；后端或 Repository 无证据支持的能力不得由前端文案伪造。
 3. 建立完整 Content Model：content and entity types、volume、relationships、priority and co-visibility、states and transitions、change frequency and freshness、key actions、device、context continuity requirements。每个数据型 UI 区域必须声明 canonical source、fields、freshness、failure / empty semantics 与 ownership。
-4. 先声明页面职责与非职责、global context 和 navigation，再选择 Primary View Model，并引用支撑它的 content facts。只有独立的 subordinate task 无法由主模型清晰表达时，才增加 Secondary View Model 并说明 rationale。至少记录一个 rejected candidate 及其被冲突事实否决的原因。仅在匹配 topology、detail、continuity 或 anti-convergence 决策时读取 `skill://references/presentation-architecture.md`。
+4. 先声明页面职责与非职责、global context 和 navigation，再选择 Primary View Model，并引用支撑它的 content facts。只有独立的 subordinate task 无法由主模型清晰表达时，才增加 Secondary View Model 并说明 rationale。**当 genuinely plausible 的竞争 View Model 真实存在时**，记录 rejected candidate 及其被冲突事实否决的原因；**当 topology 明显只有一个合理模型时，不要为了仪式硬造 alternative**——目标是 real comparison，不是 pseudo-rigor。仅在匹配 topology、detail、continuity 或 anti-convergence 决策时读取 `skill://references/presentation-architecture.md`。
 5. **推导 Interaction Architecture（Material UI Work 条件性，作为 Presentation Contract 的 derived decision，不是新的长期 Artifact）：**
 
    ```yaml
@@ -71,7 +71,7 @@ Signature != decoration。Signature 必须受 Task Fit、Usability、Product Ide
 - Repository Capability Audit、数据区域 capability matrix 与 API gap；系统没有的判断不得由前端伪造。
 - Product Truth 没有未解决冲突，关键 Repository Capability 不是猜测。
 - 页面职责与非职责、IA、global context、navigation 与 information priority。
-- Primary View Model、可选 Secondary View Model、rationale 与 rejected candidate。
+- Primary View Model、可选 Secondary View Model 与 rationale；存在 genuinely plausible 的竞争模型时附 rejected candidate（topology 只有一个合理模型时不硬造）。
 - normal 及适用的 loading、empty、failure、stale、pending、blocked、success、recovery state matrix。
 - Detail Strategy、Context Continuity、Visual Language、Design Token、responsive、accessibility、motion 与 reduced-motion。
 - Prototype Convergence 的 locator、验证视口/状态与限制。

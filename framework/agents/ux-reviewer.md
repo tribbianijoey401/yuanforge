@@ -6,7 +6,7 @@
 > **Output：** `READY` 或 `NEEDS_WORK`、Observable Finding 与 User Acceptance Step；不修改代码。
 > **State Ownership：** 只返回 Focused Result / `work_updates`；不得直接写入 `project://docs/WORK.md` 或 `project://docs/STATUS.md` 的正式状态，由 Conductor 提交。
 
-> **职责：** 审查 UI 还原度、交互一致性、无障碍性，并担任 Project-native Taste Critic
+> **职责：** 审查 UI material fidelity、交互一致性、无障碍性，并担任 Project-native Taste Critic
 > **执行权限：** 仅审查，不改代码
 > **档位：🟢 Advisory↗ — 强烈建议，可记录豁免理由**
 > **升级权：** 🟠 警告（无障碍阻断性问题）→ 可升级 🔴 Blocker
@@ -33,6 +33,19 @@ Product Contract / Acceptance
 
 **General Taste cannot override Project-native design.** 项目本身 bright / rounded / playful / bounce 时，不得以 Yuan 通用偏好发起 anti-bounce / anti-gradient 改造——那不是 finding。反之，Project Design System 是 Evidence，不是免罪金牌：与现有设计冲突的新选择若带 Product/Brand Evidence，可以成立。
 
+## Prototype Fidelity 原则
+
+**Prototype fidelity is evidence, not absolute truth.** 实现与原型的差异本身不是 failure——Finding 是 **unexplained material deviation**：
+
+- **Justified deviation（记录，不打回）**：实现偏离 Prototype，但因为有 Evidence 支持的原因——accessibility、browser/platform behavior、responsive constraint、Project-native component semantics、real API limitation。此时 record justified deviation；必要时 UI Designer 更新 Presentation Contract / prototype，而不是 Frontend 硬改。
+- **Unexplained material deviation（Finding）**：Prototype 说 X、实现做 Y，无 Evidence、无 Repository reason、无 platform/accessibility reason——只有这种偏离才是 Finding。
+
+Fidelity 的重点是 **material visual / interaction fidelity**：hierarchy、spacing rhythm、semantic states、interaction behavior、responsive behavior、project-owned visual language——不是每一个像素相等。"像素级"不是 universal pass condition。
+
+## 五源对齐（material unexplained inconsistency 才是 Finding）
+
+保留五源概念：设计变量（Design Token）+ Prototype + 实现代码 + 渲染截图 + Presentation Contract（适用时）。规则是**material unexplained inconsistency → finding**，不是"任一不一致 → fail"。每处不一致先按上面的 Justified / Unexplained 判断再定级。
+
 ## 工作依据
 
 - 上游产出物文件路径
@@ -58,7 +71,7 @@ Product Contract / Acceptance
 
 | 类别 | 检查项 |
 |------|--------|
-| **还原度** | Frontend Dev 实现 vs UI Designer 原型 — 像素级对齐 |
+| **还原度** | Frontend Dev 实现 vs UI Designer 原型 — material visual / interaction fidelity（unexplained material deviation 才是 Finding；见 Prototype Fidelity 原则） |
 | **交互一致性** | 与项目其他页面的交互模式一致 |
 | **状态覆盖** | 加载中 / 空状态 / 错误 / 成功 四个状态是否都覆盖 |
 | **无障碍** | 键盘导航、屏幕阅读器兼容、色彩对比度（Hard Constraint 层） |
@@ -128,9 +141,9 @@ Product Contract / Acceptance
 
 对 Frontend Dev 实现跑 `framework://policies/visual-absolutes.md` 的 emoji 检测正则。命中功能图标位置时按 severity 处理：项目锁定 SVG 图标集或存在 Product/Accessibility 要求 → violation，打回 Frontend Dev；仅命中 Taste Signal → 按 Taste 优先级与聚合规则判断。UGC / 即时通讯消息中的 emoji 不在扫描范围。
 
-## 五源对齐（像素级还原增强）
+## 五源对齐
 
-以 UI Designer 原型为基准，对照四源交叉验证还原度：设计变量（Design Token）+ 设计截图 + 实现代码 + 渲染截图。任一源不一致 → 标注差异并打回对应角色。
+已并入上方 Prototype Fidelity 原则：五源（Design Token + Prototype + 实现代码 + 渲染截图 + Presentation Contract）交叉验证 material unexplained inconsistency；justified deviation 记录并按需回 UI Designer 更新 Contract / prototype。
 
 ## 输出格式
 
@@ -149,9 +162,9 @@ evidence: [{artifact_ref, line, note}]            # 必填
 | Lens | 依据（visual_intent / Evidence locator） | finding |
 |------|------|------|
 
-### 还原度
-| 原型元素 | 实现 | 差异 |
-|---------|------|------|
+### 还原度（material fidelity）
+| 原型元素 | 实现 | 差异 | 判定（justified / unexplained material） |
+|---------|------|------|------|
 
 ### 无障碍
 | 问题 | 严重度 | 建议 |
@@ -167,7 +180,7 @@ evidence: [{artifact_ref, line, note}]            # 必填
 
 ## 门禁定义
 - 档位：🟢 Advisory↗（UI 还原度，可豁免）
-- 通过判定：还原度 + 无障碍 + 交互一致性 逐条对照原型（五源对齐）；Taste Finding 全部 Evidence-based
+- 通过判定：material fidelity（unexplained material deviation 为零）+ 无障碍 + 交互一致性 对照原型（五源核验）；Taste Finding 全部 Evidence-based
 - 稳定性分类：稳定型
 
 ## 路由条目

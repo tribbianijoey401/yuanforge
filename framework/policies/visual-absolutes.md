@@ -63,19 +63,23 @@ General Taste Heuristics
 | decorative motion | 不服务任务反馈的装饰动效 |
 | multiple accent hues | 多强调色混用无角色体系 |
 
-## 保留的 always-hard 规则
+## 保留的 conditional 规则（同样服从 Taste 优先级）
 
-以下两条与 taste 无关，是 Product Truth / 可维护性纪律，无条件适用：
+以下两条不是 universal 禁令，也不构成绕过 Taste 优先级的后门；它们的 hard 分支同样来自上游 Evidence：
 
-## VA-3 禁止 AI 模板味占位 / 文案（hard）
+### VA-3 占位 / 未确认文案（conditional hard）
 
-- 禁止 "Lorem ipsum" / "Welcome to Our App" / "Sign up today" 等空洞占位。
-- 文案由 `project://docs/WORK.md` 中已确认的 Product Contract 驱动，体现真实业务语义。
+判定对象不是特定字符串（"Lorem ipsum" 等本身不是 violation），而是 **unconfirmed placeholder masquerading as product copy**：
 
-## VA-4 禁止硬编码颜色（hard）
+- **Hard**：Product Contract / Content Source 已明确真实内容，Candidate 用无来源占位文案替换它 → violation（Evidence source：Product Contract）。
+- **Signal / Advisory**：产品文案尚未确认，临时 prototype 使用 placeholder → 标记 `provisional / unresolved copy`，不 hard fail。
 
-- 除 `#fff` `#000` 外，所有颜色通过 Design Token 引用。
-- Token 体系由 Architect 在 Plan 的 Spec 段锁定，或沿用 Project Design System。
+### VA-4 硬编码颜色（conditional hard）
+
+判定依据是 Project Design System 的适用性，不是 universal token 化要求：
+
+- **Hard**：Project Design System 明确使用 tokens 且当前区域已有 token path，或当前 Task 明确正在建立统一 Design System，而 Candidate 绕开 token → hard design-system divergence（Evidence source：Project Design System / Task 契约）。
+- **Advisory / Signal**：existing project 本来就使用 CSS literals、没有 token system、当前只是局部小改 → 不强迫整个项目 token 化（避免 scope creep）；至多报告 `design-system maintainability signal`。
 
 ## 其他信号的判定
 
@@ -108,7 +112,7 @@ General Taste Heuristics
 | 阶段 | 触发角色 | 动作 |
 |------|----------|------|
 | Phase 2 设计 | UI Designer 原型 + Conductor 抽查 | emoji 正则扫描（Signal 聚合）+ Hard Constraint 核对 |
-| Phase 3 实现 | Frontend Dev 实现 + Conductor 联调 | Evidence 冲突的 Signal 修正；VA-3/VA-4 修正 |
+| Phase 3 实现 | Frontend Dev 实现 + Conductor 联调 | Evidence 冲突的 Signal 修正；VA-3/VA-4 的 hard 分支触发时修正 |
 | Phase 4 审查 | UX Reviewer 审查 | 按 Taste 优先级与聚合规则出 finding，打回对应角色 |
 
 > *注：`ui-designer.md` 的 AI 模板味反模式（三种收敛风格、占位英雄区等）与本节互补，共同压制"看起来能跑"的模板 UI。*

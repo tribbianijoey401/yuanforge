@@ -687,8 +687,9 @@ class FrameworkContractTests(unittest.TestCase):
             "heuristic",
         ):
             self.assertIn(kind, skill)
-        self.assertIn("不得直接成为 hard prohibition", skill)
-        self.assertIn("单个 local example 不应轻易变成 forbidden", skill)
+        self.assertIn("默认强度上限", skill)
+        self.assertIn("kind X 不自动授权 decision Y", skill)
+        self.assertIn("把 heuristic 直接写成 hard prohibition 是编译错误", skill)
         # Applicability before best practice
         self.assertIn("Applicability before best practice", design_reviewer)
         # Project Design System precedence over General Taste
@@ -728,6 +729,70 @@ class FrameworkContractTests(unittest.TestCase):
         # Project design facts in engineering context (UI tasks)
         self.assertIn("design_tokens", skill)
         self.assertIn("component_primitives", skill)
+
+    def test_quality_v021_dedogma_correction_semantics(self):
+        design_reviewer = (FRAMEWORK / "agents" / "design-reviewer.md").read_text(encoding="utf-8")
+        skill = (
+            FRAMEWORK / "skills" / "engineering-context-compilation" / "SKILL.md"
+        ).read_text(encoding="utf-8")
+        backend = (FRAMEWORK / "agents" / "backend-dev.md").read_text(encoding="utf-8")
+        frontend = (FRAMEWORK / "agents" / "frontend-dev.md").read_text(encoding="utf-8")
+        visual = (FRAMEWORK / "policies" / "visual-absolutes.md").read_text(encoding="utf-8")
+        ui_designer = (FRAMEWORK / "agents" / "ui-designer.md").read_text(encoding="utf-8")
+        ux_reviewer = (FRAMEWORK / "agents" / "ux-reviewer.md").read_text(encoding="utf-8")
+        cds = (FRAMEWORK / "skills" / "content-driven-interface-design" / "SKILL.md").read_text(encoding="utf-8")
+
+        # 41: no per-report fixed applicability checklist
+        self.assertNotIn("已核对 applicability 的通用默认", design_reviewer)
+        self.assertNotIn("不允许默认放行或默认打回", design_reviewer)
+        self.assertIn("Applicable design concerns", design_reviewer)
+        self.assertIn("Do not enumerate generic best practices", design_reviewer)
+        self.assertIn("只有被实际信号触发的 concern 才进入审查", design_reviewer)
+
+        # 42: strength vs entailment distinguished; contract not automatic permission
+        self.assertIn("Evidence Strength ≠ Decision Entailment", skill)
+        self.assertIn("默认强度上限", skill)
+        self.assertIn("the decision logically follows from that evidence", skill)
+
+        # 43: frontend design facts require locators
+        self.assertIn("No project design fact without a locator", skill)
+
+        # 44: failure hypothesis multi-source triggering
+        for writer in (backend, frontend):
+            self.assertIn("Repository Invariants", writer)
+            self.assertIn("Affected Boundary", writer)
+            self.assertIn("expected behavior + affected boundary + actual implementation", writer)
+
+        # 45: VA-3 / VA-4 conditional, evidence-gated
+        self.assertNotIn("always-hard", visual)
+        self.assertIn("conditional hard", visual)
+        self.assertIn("unconfirmed placeholder masquerading as product copy", visual)
+        self.assertIn("不强迫整个项目 token 化", visual)
+        self.assertIn("conditional hard", ui_designer)
+        self.assertNotIn("除 `#fff` `#000` 外，所有颜色通过 Design Token 引用", ui_designer)
+
+        # 46: four-layer token architecture not universal for existing projects
+        self.assertIn("Yuan 不强制重构", ui_designer)
+        self.assertIn("starting heuristic", ui_designer)
+        self.assertNotIn("Token 清单为四层结构", ui_designer)
+
+        # 47: prototype deviation is evidence-based, not any-mismatch fail
+        self.assertIn("Prototype fidelity is evidence, not absolute truth", ux_reviewer)
+        self.assertIn("unexplained material deviation", ux_reviewer)
+        self.assertNotIn("像素级对齐", ux_reviewer)
+        self.assertNotIn("任一源不一致 → 标注差异并打回", ux_reviewer)
+
+        # 48: rejected candidate only when genuinely plausible
+        self.assertIn("genuinely plausible", cds)
+        self.assertNotIn("至少记录一个 rejected candidate", cds)
+
+        # UI designer anti-template is a hypothesis, not automatic conclusion
+        self.assertIn("anti-convergence hypothesis", ui_designer)
+        self.assertNotIn("说明你在套模板而非做设计", ui_designer)
+        self.assertIn("不绑定\"只适合游戏/加密\"的绝对判断", ui_designer)
+        self.assertIn("不绑定单一行业", ui_designer)
+        self.assertIn("强调要有意图", ui_designer)
+        self.assertNotIn("只在一个地方大胆", ui_designer)
 
     def test_installer_records_framework_fingerprint(self):
         installer = load_installer()

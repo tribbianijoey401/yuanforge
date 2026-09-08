@@ -37,7 +37,7 @@ Project-native facts 必须优先于通用 Reference，但确认的 Product Trut
 
 Project-native is default, not automatic excellence：现有设计不是自动优秀的。当现有设计存在明显 local design debt 且会实质影响当前 Task 时，可以指出并建议调整，但必须给出 Evidence、Impact 与"为什么保持现状更差"；不能因为 Yuan 偏好另一种风格就改。没有这三样东西，现有设计按原样编译。
 
-## Evidence Kind 与决策强度
+## Evidence Kind、Strength 与 Entailment
 
 改变 Writer 实现路线的高级判断（required_reuse / forbidden / implementation_guidance 中的实质决策）必须能表达 **decision + evidence + reason**，并标注 evidence_kind：
 
@@ -53,16 +53,31 @@ required_reuse:
 
 允许的 evidence_kind（不引入数字 confidence score）：
 
-| kind | 含义 | 可支持的决策强度 |
+| kind | 含义 | 默认强度上限 |
 |------|------|----------------|
-| contract | Product Contract / Acceptance / Task 约束的明确条款 | 任意，包括 forbidden 与 required_reuse |
-| repository-invariant | Repository 中跨调用点稳定成立、本次 Task 未授权改变的既有机制 | required_reuse、forbidden |
-| repeated-project-pattern | 项目内 ≥2 处独立出现的同一模式 | required_reuse；forbidden 需要补充上层 Evidence |
-| local-example | 项目内仅 1 处的实例 | 通常只能支持 implementation_guidance；单个 local example 不应轻易变成 forbidden |
-| stack-fact | 已验证的框架 / 依赖版本语义 | implementation_guidance、明确的版本兼容 forbidden |
-| heuristic | Stack / Universal Knowledge 中的一般经验，无本仓库直接证据 | implementation_guidance；不得直接成为 hard prohibition，除非有更高层 Evidence |
+| contract | Product Contract / Acceptance / Task 约束的明确条款 | 最高层事实来源 |
+| repository-invariant | Repository 中跨调用点稳定成立、本次 Task 未授权改变的既有机制 | 高 |
+| repeated-project-pattern | 项目内 ≥2 处独立出现的同一模式 | 中高 |
+| local-example | 项目内仅 1 处的实例 | 低 |
+| stack-fact | 已验证的框架 / 依赖版本语义 | 中（仅对版本兼容问题高） |
+| heuristic | Stack / Universal Knowledge 中的一般经验，无本仓库直接证据 | 最低 |
 
-Evidence strength 决定决策强度：`heuristic` 或单个 `local-example` 不支撑 forbidden；把 heuristic 直接写成 hard prohibition 是编译错误。
+### Evidence Strength ≠ Decision Entailment
+
+evidence_kind 提供的是**默认强度上限（default strength ceiling）**，不是决策许可表——kind X 不自动授权 decision Y。两个问题必须同时成立：
+
+- **Evidence strength** 回答："这个事实有多可信？"
+- **Decision entailment** 回答："这个事实是否真的能推出这个实现决策？"
+
+例如 Acceptance "same request_id must not create duplicate order" 是 strong contract evidence——它能直接推出 **idempotency must be durable**，但不能单独推出 **must reuse `OrderRepository.find_by_request_id()`**；后者还需要 Repository boundary evidence、既有持久化设计与既有 durable lookup pattern 的支撑。
+
+**在发出任何 hard implementation decision（required_reuse / forbidden / strong implementation_guidance）之前，逐一验证：**
+
+1. the evidence is trustworthy（强度足够）；
+2. the evidence is relevant（与本决策直接相关，不是只证明了一个相邻事实）;
+3. the decision logically follows from that evidence（entailment 成立）。
+
+strength ceiling 仍保留：`heuristic` 或单个 `local-example` 不支撑 forbidden；把 heuristic 直接写成 hard prohibition 是编译错误。但 contract / repository-invariant 也不会因为"强"就自动支持任意 implementation choice——强度不够不行，强度够而推不出也不行。
 
 ## Compilation Procedure
 
@@ -77,22 +92,47 @@ Evidence strength 决定决策强度：`heuristic` 或单个 `local-example` 不
 
 ## Frontend Design Facts（仅 UI Task）
 
-UI Task 的 packet 在 `existing_design` 中条件性编译 project design facts。字段全部可选：只填 task-relevant 且有 Repository Evidence（组件文件、token 文件、样式表、config locator）的内容：
+UI Task 的 packet 在 `existing_design` 中条件性编译 project design facts。核心纪律：**No project design fact without a locator.** 每个字段必须能回到实际 Repository Evidence（组件文件、token 文件、样式表、config locator）。字段格式不要求完全统一，但值必须与 locator 成对出现：
 
 ```yaml
 existing_design:
-  component_primitives: [<evidence-backed reusable component>]
-  design_tokens: <token file / locator or none observed>
-  spacing_scale: <observed scale or none observed>
-  typography_roles: <observed role system or none observed>
-  color_roles: <observed color role system or none observed>
-  surface_model: <how surfaces/cards/panels are built here, or none observed>
-  radius_model: <observed radius system or none observed>
-  shadow_model: <observed shadow usage or none observed>
-  interaction_patterns: [<observed interaction pattern>]
-  responsive_pattern: <observed breakpoint/layout approach or none observed>
-  accessibility_pattern: <observed a11y approach or none observed>
+  component_primitives:
+    - pattern: Panel
+      evidence: [src/components/Panel.tsx]
+  design_tokens:
+    observed: <token system summary or none observed>
+    evidence: [src/styles/tokens.css]
+  spacing_scale:
+    observed: [4, 8, 12, 16, 24]
+    evidence: [src/styles/tokens.css, src/pages/Jobs.tsx]
+  typography_roles:
+    page_title: text-2xl/font-semibold
+    metadata: text-xs/text-muted
+    evidence: [src/pages/Dashboard.tsx]
+  color_roles:
+    observed: <role system summary>
+    evidence: [src/styles/tokens.css]
+  surface_model:
+    pattern: sections separated by whitespace/divider; Panel only for elevated groups
+    evidence: [src/pages/Dashboard.tsx, src/components/Panel.tsx]
+  radius_model:
+    observed: <radius system or none observed>
+    evidence: [<locator>]
+  shadow_model:
+    observed: <shadow usage or none observed>
+    evidence: [<locator>]
+  interaction_patterns:
+    - pattern: <observed interaction pattern>
+      evidence: [<locator>]
+  responsive_pattern:
+    observed: <breakpoint/layout approach or none observed>
+    evidence: [<locator>]
+  accessibility_pattern:
+    observed: <a11y approach or none observed>
+    evidence: [<locator>]
 ```
+
+**缺 Evidence 时的处理：** 只能推测的内容（如"spacing seems mostly 8px based"）不得写成 Project Fact——写入 `unknowns`，或标注为 observed local-example 并把据此做出的决策降为 implementation_guidance 强度。UX Reviewer 会用同一 locator 验证这些 facts，写不出来的就不要写。
 
 Frontend Design Facts 同样受"Project-native is default, not automatic excellence"约束：发现会实质影响本 Task 的 local design debt 时，在 packet 的 unknowns / guidance 中指出（带 Evidence、Impact、why preserving is worse），不静默沿用，也不静默改造。
 

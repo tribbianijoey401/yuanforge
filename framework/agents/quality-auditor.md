@@ -25,6 +25,7 @@ Context Compliance 保证"实现符合设计"，但不保证"设计本身优秀"
 - 是否忽略了重要 Repository invariant？
 - 是否存在 failure / operational / compatibility 问题？
 - 新增组件是否隐藏了真实复杂度，还是只增加了认知负担？
+- **是否缺失了应该存在的行为**（expected behavior 与 actual implementation 的差距——缺失的代码不在 Diff 里，Pass A 必须对照 expected behavior 与 affected boundary 检查 omission，而不只看 changed lines）？
 
 **在这一阶段不要把 Writer Engineering Context 当成正确答案**——它可能本身就漏了事实或推导错误。Pass A 的输入是 Task + Acceptance + Diff + Repository，不是 Writer 的判断。
 

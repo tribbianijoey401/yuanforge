@@ -49,14 +49,22 @@ Contract 的 provisional/frozen 状态仅由 Artifact 表达，Frontend Dev 不�
 6. 验证：全量测试 PASS
 7. 原子提交：一个 Task 一个 Commit
 8. 向 Conductor 返回 Focused Result。只要本 Task 使用 Engineering Context，必须始终在 `review_context.engineering_context` 返回**实际用于编码的完整 exact packet**，不重编译、不摘要替换。Writer 不负责预测是否会触发 Review；该 packet 只供当前 execution chain 临时处理，不是 `work_updates` 或长期状态。
-9. **对抗式自检：Failure Hypothesis 模型。** Green 后从 Actual Diff 出发构造失败假设并证伪，替代固定失效目录逐类打钩。只检查 Task / Diff 真正相关的失败模式——不机械要求每次都测"非法 props、空状态、网络错误、重复点击、N+1"，而是由 Diff 提出风险假设：
+9. **对抗式自检：Failure Hypothesis 模型。** Green 后从多源信号构造失败假设并证伪，替代固定失效目录逐类打钩。触发信号不只来自 Actual Diff——**应该存在但完全没写的逻辑，在 Diff 中不会有 signal，恰恰最容易漏检**：
 
    ```text
-   Actual Diff signal → applicable failure mode → failure hypothesis → falsifying verification
+   Task / Acceptance
+   + Affected Boundary
+   + Repository Invariants
+   + Actual Diff
+   → Applicable Failure Hypotheses
+   → Falsifying Verification
    ```
+
+   简写：expected behavior + affected boundary + actual implementation → failure hypothesis。不机械要求每次都测"非法 props、空状态、网络错误、重复点击、N+1"——由 Task、Acceptance、boundary 与 Diff 共同决定具体假设：
 
    例：
    - 新增 save action → duplicate submit risk → 连续触发两次提交验证
+   - Acceptance 要求 failed save 保留输入，Diff 中 error toast 存在但 draft reset 逻辑未变 → hypothesis: failed submit clears unsaved input
    - 新增 responsive data layout → narrow viewport information-loss risk → 320px 宽度核对关键信息
    - 改动 props 传递 → 幻觉 props/API 假设（签名对照真实安装版本核验）
 
@@ -97,7 +105,7 @@ Contract 的 provisional/frozen 状态仅由 Artifact 表达，Frontend Dev 不�
 
 - 3 轮内未通过 → 停止，进入 Debug 模式（上节）
 - **emoji 正则扫描**：代码完成后跑 `framework://policies/visual-absolutes.md` 的 emoji 检测正则，命中功能图标位置 → 按扫描结果的 severity 处理：有上游 Evidence（项目明确锁定 SVG 图标集 / Product 或 Accessibility 要求）→ 立即替换为对应图标；仅命中通用 Taste Signal → 作为 Advisory 记录，交 Conductor/UX Reviewer 判断
-- VA-3 / VA-4 同步自查：无模板占位文案、无硬编码色（除 #fff/#000）
+- VA-3 / VA-4 同步自查（conditional hard，见 `visual-absolutes.md`）：Product Contract 已确认内容却用无来源占位文案 → 修正；Project Design System 已 tokens 化的区域绕开 token → 修正。项目本身无 token system / 文案未确认 → 至多 Advisory signal，不自行扩大 scope
 
 ### 前端工程纪律
 
