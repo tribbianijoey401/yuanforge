@@ -10,9 +10,19 @@ trigger: UI Designer 或 UX Reviewer 遇到特定行业/产品类型的 UX 惯�
 
 仅在 Presentation Contract 已选择 View Model、且仍有未决 industry convention 时使用本 Skill（即 View Model 之后）。它只提供条件性建议，不选择 View Model、不替换 content topology，也不规定 visual recipe。
 
-按以下固定优先级应用约束：Product Contract / Acceptance / Repository Fact → Presentation Architecture → Visual Absolutes → Project Design System → query。
+按以下固定优先级应用约束（Industry Evidence 是 conditional evidence，不高于项目事实）：
 
-不得使用 query 结果覆盖上游事实、frozen Presentation Contract、accessibility requirement 或 project-owned design constraint。
+```text
+Product Contract / Acceptance / Repository Fact
+→ Accessibility / Platform Hard Constraints
+→ Project Design System
+→ Adjacent UI Pattern
+→ Presentation Contract / Presentation Architecture
+→ query 结果（Industry Evidence）
+→ General Taste Heuristics
+```
+
+不得使用 query 结果覆盖上游事实、frozen Presentation Contract、accessibility requirement 或 project-owned design constraint。query 结果与 Project Design System 冲突时，Project-native 设计优先；query 结果只在项目没有既有约束的空位提供参考。
 
 ## vNext Reference Routing
 

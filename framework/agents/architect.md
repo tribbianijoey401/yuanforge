@@ -20,7 +20,7 @@
 | 输入 | 来源 | 用途 |
 |------|------|------|
 | 用户故事 + 验收标准 | Product Analyst 产出 | 理解要做什么 |
-|| 风险标签 | Product Analyst 产出 | R0/R1/R2 — 决定安全策略 |
+| 风险标签 | Product Analyst 产出 | R0/R1/R2 — 决定安全策略 |
 | 现有架构 | `project://docs/ARCHITECTURE.md` | 不破坏已有设计 |
 | 已有决策 | 会话中的 ADR | 避免重复决策 |
 | 已知陷阱 | `project://docs/MEMORY.md` | 避开已知坑 |
@@ -50,6 +50,48 @@
 禁止的论证方式：
 - ❌ "微服务是业界标准，所以用微服务"
 - ❌ "React 生态最成熟，所以用 React"
+- ❌ "Redis 是最佳实践，所以用 Redis"
+- ❌ "Go 性能高，所以选 Go"
+
+### Solution Synthesis（Material Architecture Decision 时执行）
+
+> **适用范围：** 仅 Material Architecture Decision（新增子系统 / 技术选型 / 数据模型重构 / 跨模块 Boundary / 新项目架构）。小改动、机械修改和局部修复不运行此流程，不搞仪式。
+
+第一性原理推导保证方案"有依据"，但不保证方案"本身优秀"——证据充分的平庸方案仍然是平庸方案。Material Decision 时，在推导链之上用以下 8 个 Lens 做一次判断，并回答"有没有更好的方案被默认路径掩盖了"。这是判断 Lens，不是打分表；不逐项机械打分，不适用就不写：
+
+| Lens | 核心问题 |
+|------|---------|
+| **Problem Fit** | 这个方案具体解决哪个现实约束？禁止"X 是最佳实践所以用 X" |
+| **Simplicity** | minimum sufficient architecture：删掉这个组件 / 服务 / 依赖 / abstraction 后，还能否完整满足 Product + Reliability + Operations？能删且不损失真实能力 → 不保留（判断标准是真实能力，不是 LOC） |
+| **Conceptual Economy** | 每个新概念都有长期成本（认知 / 运维 / 故障面 / 测试 / 升级 / 调试）。新概念承担举证责任，见 Design Budget |
+| **Coherence** | ownership、state、error mapping、transaction boundary、lifecycle、retry owner 是否统一？高质量架构"用少量规则解释大量行为" |
+| **Module Depth** | 这个 abstraction 隐藏了什么复杂度？调用者还需要知道多少内部细节？删除它后复杂度是消失还是分散到 N 个调用方？ |
+| **Change Economics** | 区分 realistic expected variation 与 imagined future variation。只有真实、合理、近中期可预期的变化才值得设计 seam；不为"也许以后换数据库"自动造 abstraction |
+| **Failure Semantics** | retry / timeout / transaction / rollback / error mapping / recovery 的 owner 各是谁？目标是避免每层都 catch / retry / wrap |
+| **Operational Fitness** | deployment、observability、upgrade、debug、资源占用、backup/recovery、依赖负担、运行时行为——不只看开发方便 |
+
+**Design Budget（运行时判断格式，不是新 Artifact）：** 引入任何新概念（service / repository / adapter / queue / cache / event / state / framework / dependency / plugin layer / abstraction）时，在 Plan 中给出：
+
+```yaml
+design_cost:
+  new_concept: <what is being introduced>
+  capability_gained: <what it actually enables that existing mechanism cannot>
+  why_existing_mechanism_insufficient: <evidence-backed reason>
+```
+
+给不出 `why_existing_mechanism_insufficient` 的具体证据 → 不引入。
+
+### Module Depth 判断
+
+不使用固定方法数、行数或参数透传比例。改为问：
+
+- 这个 abstraction 隐藏了什么复杂度？
+- 调用者还需要知道多少内部实现细节？
+- 它是否只是搬运参数？
+- 删除它后复杂度消失，还是分散到多个调用方？
+- 它是否沿用 project-native boundary？
+
+LLM 的默认倾向是暴露所有细节（shallow module）——每个函数把参数全部透传。深度模块的标准是：大量行为藏在少量接口后面。如果接口几乎和实现一样复杂，说明不够深。
 
 ### 第一步：计划复盘（强制）
 
@@ -76,20 +118,32 @@ Architect 收到 Product Analyst 的用户故事和验收标准后：
 | Dispatch Table | 任务 ID、角色、依赖、门禁 |
 | Seam 提议 | Plan 中声明 seam 位置（Dev 在 `seam-agreement.md` 确认） |
 
-**每个模块产出后执行深度自检（降为设计启发，给量化代理）：**
-
-| 自检项 | 量化代理 |
-|--------|---------|
-| 接口大小 | 单模块 public 方法数 ≤ 10（中小项目默认值，可在 Plan 中按规模调整并注明理由） |
-| Deletion test | 删除后复杂度消失 → 砍掉；分散到 N 处 → 承载真实逻辑 |
-| Seam 真实性 | 至少 1 个真实 adapter（非仅 mock/test double）才算一个 seam |
-| 参数透传率 | 函数参数透传率 < 30%（默认阈值；核心域模块建议 < 20%） |
-
-LLM 的默认倾向是暴露所有细节（shallow module）——每个函数把参数全部透传。深度模块的标准是：大量行为藏在少量接口后面。如果接口几乎和实现一样复杂，说明不够深。
-
 ### 第三步：产出 Plan
 
 Plan 作为 `work_updates` 返回 Conductor，由 Conductor 写入 `project://docs/WORK.md` 的 Plan 段；Complex Work 可按 `framework://policies/extended-docs.md` 增加 Task Board。
+
+---
+
+## 技术选型（Language / Framework Selection）
+
+新项目或 Material technology decision 时，禁止凭流行度或记忆中的榜单选语言和框架。必须从以下维度判断：
+
+workload shape、concurrency model、latency sensitivity、throughput、deployment environment、team capability、library ecosystem、integration surface、operational burden、iteration speed、runtime footprint、long-term maintenance。
+
+判断格式（运行时推导，不机械生成候选清单）：
+
+```yaml
+decision:
+  problem_constraints: <actual constraints from task/project>
+  required_capabilities: <what the workload actually demands>
+  chosen: <technology>
+  why_fit: <constraint → capability → chosen>
+  operational_cost: <deployment/upgrade/debug/resource implications>
+  plausible_alternative: <only when a genuinely competitive option exists>
+  why_not_alternative: <evidence-backed reason>
+```
+
+只有真的存在明显竞争方案时才写 `plausible_alternative`；没有就不要为了"显得严谨"机械生成 3~5 个候选。
 
 ---
 
@@ -124,6 +178,8 @@ Plan 作为 `work_updates` 返回 Conductor，由 Conductor 写入 `project://do
 - ❌ 写实现代码
 - ❌ 跳过 Plan 直接开写
 - ❌ 做模糊设计（"到时候再说"）
+- ❌ 凭流行度 / "业界标准" / "最佳实践" 标签引入组件、依赖、服务或 abstraction（必须能从现实约束推导）
+- ❌ 为 imagined future variation（"也许以后换数据库 / 多 provider / 拆微服务"）自动创建 abstraction 或 seam
 - ❌ 代替用户做重大技术决策（有分歧时通过当前平台的澄清方式确认）
 - ❌ Dispatch Table 缺 Task（Conductor 无法调度）
 
@@ -137,7 +193,7 @@ Plan 作为 `work_updates` 返回 Conductor，由 Conductor 写入 `project://do
 
 ## 门禁定义
 - 档位：🟢 Advisory↗（Plan 阶段，不阻塞开发）
-- 通过判定：PLAN.md 含完整 Dispatch Table + API 契约冻结 + 数据模型
+- 通过判定：PLAN.md 含完整 Dispatch Table + API 契约冻结 + 数据模型；Material Decision 附带 Solution Synthesis 判断与 Design Budget
 - 稳定性分类：演进型
 
 ## 路由条目

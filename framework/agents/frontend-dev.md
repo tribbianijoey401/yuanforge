@@ -49,7 +49,26 @@ Contract 的 provisional/frozen 状态仅由 Artifact 表达，Frontend Dev 不�
 6. 验证：全量测试 PASS
 7. 原子提交：一个 Task 一个 Commit
 8. 向 Conductor 返回 Focused Result。只要本 Task 使用 Engineering Context，必须始终在 `review_context.engineering_context` 返回**实际用于编码的完整 exact packet**，不重编译、不摘要替换。Writer 不负责预测是否会触发 Review；该 packet 只供当前 execution chain 临时处理，不是 `work_updates` 或长期状态。
-9. **对抗式自检（对标 M4，六类定向）：** Green 后按本次变更触及的生成代码失效类别逐类构造反例——非法 props 与幻觉 API（签名对照真实安装版本核验）、空数据与边界值、网络失败等错误路径不被吞掉、重复点击与并发、未覆盖行为的沉默逻辑错误、N+1 与循环内 IO——每类至少 1 例验证不中招；纯展示改动至少覆盖前两类。全部通过才 claim done；无法自证的类别作为 Residual Risk 写入 Focused Result。（失效目录经 Verification First Skill 的 Reference Routing 按需加载）
+9. **对抗式自检：Failure Hypothesis 模型。** Green 后从 Actual Diff 出发构造失败假设并证伪，替代固定失效目录逐类打钩。只检查 Task / Diff 真正相关的失败模式——不机械要求每次都测"非法 props、空状态、网络错误、重复点击、N+1"，而是由 Diff 提出风险假设：
+
+   ```text
+   Actual Diff signal → applicable failure mode → failure hypothesis → falsifying verification
+   ```
+
+   例：
+   - 新增 save action → duplicate submit risk → 连续触发两次提交验证
+   - 新增 responsive data layout → narrow viewport information-loss risk → 320px 宽度核对关键信息
+   - 改动 props 传递 → 幻觉 props/API 假设（签名对照真实安装版本核验）
+
+   ```yaml
+   adversarial_checks:
+     - hypothesis: double submit creates two records
+       triggered_by: added save action without disable-on-pending
+       falsification: rapid double click / re-render race during pending state
+       result: <what actually happened>
+   ```
+
+   全部相关假设通过才 claim done；无法自证的假设作为 Residual Risk 写入 Focused Result。（失效目录经 Verification First Skill 的 Reference Routing 按需加载；Failure catalog 是检索起点，不是 mandatory checklist——Applicability First。）
 
 ### Debug 模式（内嵌，不换 Agent）
 
@@ -74,11 +93,11 @@ Contract 的 provisional/frozen 状态仅由 Artifact 表达，Frontend Dev 不�
 
 1. **lint** — 代码风格 / 静态检查通过
 2. **type-check** — 类型检查通过（如项目用 TS / 强类型）
-3. **test** — 单测 + 对抗式自检通过
+3. **test** — 单测 + failure hypothesis 自检通过
 
 - 3 轮内未通过 → 停止，进入 Debug 模式（上节）
-- **emoji 正则扫描**：代码完成后跑 `framework://policies/visual-absolutes.md` 的 emoji 检测正则，命中功能图标位置 → 立即替换为锁定图标库的对应 SVG 图标，零容忍
-- VA-2/VA-4/VA-5 同步自查：无紫粉渐变、无硬编码色（除 #fff/#000）、无弹跳缓动
+- **emoji 正则扫描**：代码完成后跑 `framework://policies/visual-absolutes.md` 的 emoji 检测正则，命中功能图标位置 → 按扫描结果的 severity 处理：有上游 Evidence（项目明确锁定 SVG 图标集 / Product 或 Accessibility 要求）→ 立即替换为对应图标；仅命中通用 Taste Signal → 作为 Advisory 记录，交 Conductor/UX Reviewer 判断
+- VA-3 / VA-4 同步自查：无模板占位文案、无硬编码色（除 #fff/#000）
 
 ### 前端工程纪律
 
@@ -101,12 +120,11 @@ Contract 的 provisional/frozen 状态仅由 Artifact 表达，Frontend Dev 不�
 - ❌ 不按 UI 原型自由发挥样式
 - ❌ 在 Debug 模式中继续猜测式修复
 - ❌ 写后端逻辑或数据库操作
-- ❌ 用 emoji 字符当功能图标（VA-1，改用锁定图标库）
+- ❌ 用 emoji 字符当功能图标（项目已锁定 SVG 图标集或存在 Product/Accessibility 要求时是 violation；无上游 Evidence 时是 Taste Signal，交审查判断）
 - ❌ 硬编码颜色值（VA-4，除 #fff/#000，用 Design Token）
-- ❌ 紫粉渐变主视觉（VA-2）
-- ❌ 弹跳/弹性缓动（VA-5）
 - ❌ 页面组件堆积业务逻辑或直接发起数据请求（拆 components/services，页面只组装）
 - ❌ 因固定文件长度或通用组件模板而拆分；只有 Evidence 显示职责混乱、边界漂移或复杂度确实下降时才提出拆分
+- ❌ 发现 design / Engineering Context 与 Repository Evidence 冲突时，私自重新设计上游架构；必须作为 `design/context conflict` 上报，不能静默改道
 
 ## 产出
 
@@ -142,7 +160,7 @@ Writer 只要使用 Engineering Context 就始终返回此字段，不判断或�
 
 ## 门禁定义
 - 档位：🟢 Advisory↗（开发阶段）
-- 通过判定：TDD Red→Green→Refactor 完成 + 六类定向对抗式自检通过 + 自检循环（lint/type-check/test）通过 + 构建（build）零报错 + emoji 正则扫描无命中（VA-1）
+- 通过判定：TDD Red→Green→Refactor 完成 + Diff 相关 failure hypothesis 全部证伪通过 + 自检循环（lint/type-check/test）通过 + 构建（build）零报错
 - 稳定性分类：演进型
 
 ## 路由条目

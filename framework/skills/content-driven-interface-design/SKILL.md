@@ -15,17 +15,52 @@ description: 根据可用的 Product Truth、系统行为与 Content Topology，
 
 有上游 stable fact ID 时，每个下游选择都必须复用它；没有 stable fact ID 时，必须引用 canonical source locator + 明确、可重新定位的 section / item reference，例如 `project://docs/WORK.md#Acceptance[2]`、`project://docs/WORK.md#Scope` 或 `project://docs/PRODUCT.md#Business-Rules/Payment`。只有没有真实 canonical source locator 的临时路径才引用明确的 provisional source description 与带标签的 derived anchor：
 
-`System Story → Repository Capability Audit → Content Model → View Model → Visual Language → Prototype Convergence → Liveness → Verification`
+`System Story → Repository Capability Audit → Content Model → View Model → Interaction Architecture → Information Hierarchy → State/Recovery/Continuity → Visual Language → Prototype Convergence → Liveness → Verification`
+
+视觉不能先于交互：Visual Language 只能在 Interaction Architecture 与 Information Hierarchy 之后推导。
 
 1. 建立完整 System Story：user and context、task and intended outcome、key object old → new change、why the user must perceive the change、consequence if they do not，以及 truth source locator 和 stable fact ID（存在时）或 canonical section / item reference；临时路径改用明确的 provisional source description 与 identity gap。
 2. 对命中 Presentation Design Signal 的 Work（高影响 UI、新产品、重要改版、数据密集界面、关键旅程或没有可复用设计）读取 `skill://references/evidence-driven-frontend-discovery.md`，完成 Repository Capability Audit。持续区分 Product Truth、System Capability Evidence 与 Presentation Decision；后端或 Repository 无证据支持的能力不得由前端文案伪造。
 3. 建立完整 Content Model：content and entity types、volume、relationships、priority and co-visibility、states and transitions、change frequency and freshness、key actions、device、context continuity requirements。每个数据型 UI 区域必须声明 canonical source、fields、freshness、failure / empty semantics 与 ownership。
 4. 先声明页面职责与非职责、global context 和 navigation，再选择 Primary View Model，并引用支撑它的 content facts。只有独立的 subordinate task 无法由主模型清晰表达时，才增加 Secondary View Model 并说明 rationale。至少记录一个 rejected candidate 及其被冲突事实否决的原因。仅在匹配 topology、detail、continuity 或 anti-convergence 决策时读取 `skill://references/presentation-architecture.md`。
-5. 推导其余决策：
+5. **推导 Interaction Architecture（Material UI Work 条件性，作为 Presentation Contract 的 derived decision，不是新的长期 Artifact）：**
+
+   ```yaml
+   interaction_architecture:
+     primary_user_task:
+     primary_object:
+     primary_action:
+     supporting_actions:
+     information_that_must_be_co_visible:
+     information_that_can_be_deferred:
+     primary_feedback:
+     recovery_path:
+     continuity_requirements:
+   ```
+
+   它决定 Information Hierarchy（什么必须 co-visible、什么可以 defer）与 State / Recovery / Continuity，是后续 Visual Language 的输入。不要把它变成独立的持久化对象；它记录在 Contract 的 derived decision 区，可追溯即可。
+
+6. 推导其余决策：
    - Visual Language：引用决定 hierarchy、density、emphasis、accessibility 与 project-owned tokens 的上游 canonical reference；临时路径引用回明确 source description 的 derived anchor。
    - Liveness：为每个真实操作或 transition 引用上游 canonical reference，或使用同一 provisional trace；写明 semantic event、truth source、perceptible change、recovery path 与 reduced-motion equivalent。
    - Verification：引用上游 canonical reference，或使用同一 provisional trace；说明 normal、empty、loading、failure、success、recovery 与 continuity 的 observable acceptance step。
-6. 高影响设计通过 Prototype Convergence 验证 dominant device 与 constrained width，并覆盖 capability evidence 支持的关键状态。多轮由未决风险驱动，不规定固定轮数。用户认可信息密度或视觉高级感，只确认 Visual Language；视觉方向获得认可不等于 Presentation Contract 已完整。
+7. 高影响设计通过 Prototype Convergence 验证 dominant device 与 constrained width，并覆盖 capability evidence 支持的关键状态。多轮由未决风险驱动，不规定固定轮数。用户认可信息密度或视觉高级感，只确认 Visual Language；视觉方向获得认可不等于 Presentation Contract 已完整。
+
+## Design System Synthesis（New Project / No Design System）
+
+没有可复用 Design System 时，UI Designer 必须从产品事实合成设计系统，而不是默认 SaaS 模板。推导输入：
+
+product personality、user type、task frequency、information density、device、usage environment、trust requirements、emotional tone。
+
+推导输出：typography、spacing、color roles、surface model、radius、motion、component language。
+
+每个输出必须能指出它由哪个输入推导而来（如 high-frequency operator dashboard → compact scan-friendly density → 紧凑行高与固定栏位，而非宽松留白卡片）。
+
+## Signature Quality（条件性）
+
+仅对 New Product、Major Redesign、Critical Experience，回答：哪一个设计选择最能体现这个产品，而不是任何 SaaS 都能套？（候选载体：information model、command interaction、state visualization、typography、navigation、data visualization。）
+
+Signature != decoration。Signature 必须受 Task Fit、Usability、Product Identity 约束；不满足 Task Fit 的独特性是负资产。
 
 ## Presentation Contract 状态
 

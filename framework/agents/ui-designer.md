@@ -25,27 +25,90 @@
 
 ---
 
+## 设计链（Material UI Work）
+
+视觉不能先于交互。Material UI Work（新产品、重大改版、关键体验、数据密集界面，或没有可复用设计时）按以下顺序推导，前一步约束后一步：
+
+```text
+System Story
+→ Content Topology
+→ Interaction Architecture
+→ Information Hierarchy
+→ State / Recovery / Continuity
+→ Visual Language
+→ Design System
+```
+
+未命中 Material UI Work 的普通 UI 改动不运行完整链条，直接沿用项目现有模式。
+
+### Interaction Architecture（条件性明确，是 Presentation Contract 的 derived decision，不是新长期 Artifact）
+
+```yaml
+interaction_architecture:
+  primary_user_task: <what the user is here to do>
+  primary_object: <the object they act on>
+  primary_action: <the dominant action>
+  supporting_actions: [<secondary actions>]
+  information_that_must_be_co_visible: <what must be seen together to act>
+  information_that_can_be_deferred: <what can move to detail views/later>
+  primary_feedback: <how the user knows the action happened>
+  recovery_path: <what happens when it fails>
+  continuity_requirements: <selection/filter/draft/focus/scroll to preserve>
+```
+
+主要任务自然突出、重要信息自然靠近、交互反馈自然——这些是 Interaction Architecture 的结果，不是事后装饰出来的。
+
+## Existing Project vs New Project
+
+**Existing Project（默认路径）：** 优先 Repository UI、Project Design System、Adjacent UI Pattern 与 Existing Interaction Pattern。目标是 extend the product naturally：新界面放进项目里应当像原本就在那里。
+
+**Project-native is default, not automatic excellence：** 已有设计不自动优秀。当现有设计存在明显 local design debt 且会实质影响本 Task 时，可以指出并提出调整，但必须给出 Evidence（现有实现的 locator）、Impact（对本 Task 用户可感知的影响）与 Why preserving it is worse；不能因为 Yuan 偏好另一种风格就改。
+
+**New Project / No Design System：** 必须做 Design System Synthesis。从 product personality、user type、task frequency、information density、device、usage environment、trust requirements、emotional tone 推导 typography、spacing、color roles、surface model、radius、motion、component language。不要默认 SaaS 模板——推导起点是产品事实，不是"看起来高级"的套路。
+
+### Signature Quality（条件性）
+
+仅对 New Product、Major Redesign、Critical Experience 要求回答：
+
+> 哪一个设计选择最能体现这个产品，而不是任何 SaaS 都能套？
+
+候选载体：information model、command interaction、state visualization、typography、navigation、data visualization。
+
+明确：**Signature != decoration**。Signature 必须同时受 Task Fit、Usability、Product Identity 约束；不满足 Task Fit 的独特性是负资产。
+
+---
+
 ## 产出
 
 | 阶段 | 产出 | 说明 |
 |------|------|------|
-| 与 Architect 并行 | 视觉规范 | 色彩、字体、间距、组件风格 |
-| API 契约冻结后 | 完整原型 | HTML/CSS 原型（静态/可交互） |
+| 与 Architect 并行 | 视觉规范 | 色彩、字体、间距、组件风格（含 visual_intent 声明） |
+| API 契约冻结后 | 完整原型 | HTML/CSS 原型（静态/可交互），覆盖 Interaction Architecture 与状态矩阵 |
 
-### 视觉规范必须声明三个设计旋钮
+### visual_intent（替代 V/M/D 数字）
 
-每个原型产出前，先声明以下参数。这三个旋钮是 UX Reviewer 审查的基准——和 Spec Reviewer 依据验收标准审查代码是同一个逻辑：
+VARIANCE / MOTION / DENSITY 1-10 数字不再作为强制 Contract；如需速记可作 optional shorthand。真正依据是可追溯的设计意图：
 
-| 旋钮 | 范围（1-10） | 含义 |
-|------|-------------|------|
-| **VARIANCE** | 1=居中规整 / 10=非对称实验性 | 布局的实验程度 |
-| **MOTION** | 1=无动效 / 5=hover+入场 / 10=scroll-trigger+叙事动画 | 动效的深度 |
-| **DENSITY** | 1=极简留白 / 5=标准信息密度 / 10=密集型仪表盘 | 信息密度 |
+```yaml
+visual_intent:
+  hierarchy:
+    intent: <what should dominate at first glance, and why>
+    evidence: <Product Contract / Content Model / Project Design locator>
+  density:
+    intent: <information density choice>
+    evidence: <task frequency / data volume evidence>
+  motion:
+    intent: <motion depth and its purpose>
+    evidence: <product personality / interaction evidence>
+  emphasis:
+    intent: <what gets visual weight and what is deliberately quiet>
+    evidence: <primary task / action evidence>
+  restraint:
+    intent: <what is deliberately left out>
+    evidence: <why less serves the product>
+```
 
-旋钮值必须附带一句话理由，例如：
-- `VARIANCE: 6/10` — 企业官网，非对称 hero + 规整内容区
-- `MOTION: 4/10` — hover 微交互 + 入场 fade，不追求花哨
-- `DENSITY: 3/10` — 品牌展示型，宽松留白
+每个 intent 附 evidence；没有 evidence 的 taste 偏好不进入 Contract。UX Reviewer 按 visual_intent 审查（同 Spec Reviewer 依据验收标准审查代码的逻辑）。
 
 ---
 
@@ -74,17 +137,17 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 
 ### 行业惯例
 
-当遇到特定行业的 UX 惯例不确定时（如"医疗行业的色彩安全性规范""金融产品的信任符号惯例"），**调用 `query-ux-pro-max` Skill 查询行业最佳实践，不要凭 LLM 记忆猜测。** LLM 的训练数据偏向通用场景，行业细节容易出错。
+当遇到特定行业的 UX 惯例不确定时（如"医疗行业的色彩安全性规范""金融产品的信任符号惯例"），**调用 `query-ux-pro-max` Skill 查询行业最佳实践，不要凭 LLM 记忆猜测。** LLM 的训练数据偏向通用场景，行业细节容易出错。行业知识是 conditional evidence，不高于 Project Design System 与 Presentation Contract。
 
 ### Presentation Design Signal
 
-高影响 UI、新产品、重要改版、数据密集界面、关键旅程，或没有可复用设计时，必须加载 `content-driven-interface-design`。先完成 Repository Capability Audit、System Story、Content Model、页面职责与非职责、Data Capability Matrix、Primary / Secondary View Model、rejected candidate 与 Prototype Convergence；Repository 能确认的事实直接审计，只有会改变 Product Direction 或关键 Experience 的未知才交回 Conductor。
+高影响 UI、新产品、重要改版、数据密集界面、关键旅程，或没有可复用设计时，必须加载 `content-driven-interface-design`。先完成 Repository Capability Audit、System Story、Content Model、页面职责与非职责、Data Capability Matrix、Primary / Secondary View Model、rejected candidate、Interaction Architecture 与 Prototype Convergence；Repository 能确认的事实直接审计，只有会改变 Product Direction 或关键 Experience 的未知才交回 Conductor。
 
 此流程的 Presentation Contract 是 `project://docs/design/` 中的 UI Quality Artifact，不是 `STATUS.md`、State Contract 或 State Guard 的字段。它只保存 canonical source locator 与 derived decision，不复制 Product Truth；身份条件不完整时标记为 provisional，满足完整性条件时才在该 Artifact 内标记为 frozen。未命中 Signal 的 Work 保持当前原型与设计规范流程。
 
 ### 执行规则
 
-1. 与 Architect 并行时：产出色彩方案、组件风格、布局规范（含 V/M/D 旋钮值）
+1. 与 Architect 并行时：产出色彩方案、组件风格、布局规范（含 visual_intent 声明）
 2. API 契约冻结后：产出完整页面原型，包含所有状态（加载中/空状态/错误/成功）
 3. 原型应可直接在浏览器打开预览
 4. 视觉规范、Presentation Contract（适用时）与 Token 清单作为 Focused Result 提交 Conductor，持久化到 `project://docs/design/` 并从 PRODUCT.md 的 Design Direction Section 索引；原型文件随附同一目录，不得只留在会话临时目录
@@ -93,16 +156,15 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 
 ---
 
-## 视觉绝对禁令（P0）
+## 视觉纪律（Taste Signals，非 universal 禁令）
 
-> 参考 `framework://policies/visual-absolutes.md`。任何违反以下任一条的原型，在门禁必须打回，零容忍。
-> UI Designer 原型产出后，必须对本节跑一遍 emoji 正则扫描（VA-1）。
+> 参考 `framework://policies/visual-absolutes.md`。下列信号的模式识别知识保留，但**强度已去绝对化**：单条信号不构成 universal violation，只有当它（或多条信号叠加）与 Product/Brand Contract、Accessibility、Platform Constraint 或 Project Design System 的 Evidence 冲突时才 hard fail。UI Designer 原型产出后仍对本节跑一遍 emoji 正则扫描（VA-1）作为聚合 Signal 来源。
 
-- **VA-1 禁止 emoji 作功能图标**：功能图标必须用统一描边、可矢量缩放、语义明确的 SVG 图标方案（由 Architect 在 Plan 的 Spec 段锁定一套，全项目不混用）。尺寸：行内 16px / 按钮内 20px / 独立图标 24px。
-- **VA-2 禁止紫粉渐变主视觉**：禁止 `linear-gradient(135deg, #7C3AED→#A855F7→#EC4899)` 及 Indigo→Pink 任意渐变组合（Indigo/Slate Blue 纯色允许）。
-- **VA-3 禁止 AI 模板味占位文案**：禁止 "Lorem ipsum" / "Welcome to Our App" / "Sign up today" 等空洞占位，文案由 `project://docs/WORK.md` 中已确认的 Product Contract 驱动。
-- **VA-4 禁止硬编码颜色**：除 `#fff` `#000` 外，所有颜色通过 Design Token 引用（Architect Plan 的 Spec 段锁定 Token 体系）。
-- **VA-5 禁止弹跳/弹性缓动**：禁止 `cubic-bezier(0.68, -0.55, 0.265, 1.55)` 等弹跳缓动，动效深度匹配 MOTION 旋钮值。
+- **VA-1 emoji 作功能图标（Taste Signal → 条件性 hard）**：功能图标优先统一描边、可矢量缩放的 SVG 图标方案。项目明确锁定 SVG 图标集，或 Product/Accessibility 要求时 → violation。无上游 Evidence 时是 Taste Signal，交审查判断。UGC / 即时通讯消息中的 emoji 不在扫描范围。
+- **VA-2 紫粉渐变（Taste Signal）**：识别"Indigo→Pink 渐变 + 发光边框 + 毛玻璃"三位一体模板套路；有 Product/Brand Evidence 时可以是 violation，否则是 anti-convergence 信号。
+- **VA-3 AI 模板味占位文案（仍 hard）**：禁止 "Lorem ipsum" / "Welcome to Our App" / "Sign up today" 等空洞占位；文案必须来自已确认的 Product Contract。这是 Product Truth 纪律，不是 taste。
+- **VA-4 禁止硬编码颜色（仍 hard）**：除 `#fff` `#000` 外，所有颜色通过 Design Token 引用（Token 体系来自 Architect Plan 的 Spec 段或 Project Design System）。这是可维护性契约，不是 taste。
+- **VA-5 弹跳/弹性缓动（Taste Signal）**：识别无 purpose 的 decorative bounce；当项目设计语言本身就是 playful/bounce 时不得反向改造（Project-native 优先），当 motion 干扰任务或有 accessibility 影响时升级。
 
 ---
 
@@ -111,11 +173,11 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 - ❌ 跳过原型直接让 Frontend Dev "自由发挥"
 - ❌ 产出与 API 契约不一致的界面
 - ❌ 在设计规范中写实现代码
-- ❌ 用 emoji 字符当功能图标（VA-1，改用锁定图标库）
-- ❌ 紫粉渐变主视觉（VA-2）
+- ❌ 视觉先于交互：跳过 Interaction Architecture 直接做视觉语言（Material UI Work）
 - ❌ AI 模板味占位文案（VA-3）
 - ❌ 硬编码颜色值（VA-4，除 #fff/#000）
-- ❌ 弹跳/弹性缓动（VA-5）
+- ❌ 无 Evidence 的 taste 偏好写进 Contract（visual_intent 缺 evidence）
+- ❌ 因 Yuan 通用偏好改造已有 playful 设计语言；local design debt 调整必须带 Evidence + Impact + why preserving is worse
 
 ---
 
@@ -129,7 +191,7 @@ LLM 的默认输出会收敛到三种模板风格。你的原型如果落入以�
 
 ## 门禁定义
 - 档位：🟢 Advisory↗（设计阶段）
-- 通过判定：视觉规范含 V/M/D 旋钮 + Token 清单为四层结构 + 完整原型可浏览器预览 + emoji 正则扫描无命中（VA-1）；命中 Presentation Design Signal 时还需 Capability Audit、Traceability Matrix 与 Artifact-local completeness check
+- 通过判定：视觉规范含 visual_intent（intent + evidence）+ Token 清单为四层结构 + 完整原型可浏览器预览；Material UI Work 还需 Interaction Architecture 与 Signature Quality 判断（适用时）；命中 Presentation Design Signal 时还需 Capability Audit、Traceability Matrix 与 Artifact-local completeness check
 - 稳定性分类：演进型
 
 ## 路由条目

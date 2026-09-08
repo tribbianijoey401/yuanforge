@@ -412,11 +412,17 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("Presentation Contract 消费边界", frontend)
         self.assertIn("稳定身份", frontend)
         self.assertIn("reduced-motion", frontend)
-        self.assertIn("六类定向", frontend)
+        self.assertIn("Failure Hypothesis", frontend)
+        self.assertIn("Applicability First", frontend)
+        self.assertNotIn("六类定向", frontend)
         self.assertIn("前端工程纪律", frontend)
         self.assertIn("Presentation Design Signal", routing)
         self.assertNotIn("UI Design Gate", routing)
-        self.assertIn("Product Contract / Acceptance / Repository Fact → Presentation Architecture → Visual Absolutes → Project Design System → query", query)
+        self.assertIn("Product Contract / Acceptance / Repository Fact", query)
+        self.assertIn("Project Design System", query)
+        self.assertIn("General Taste Heuristics", query)
+        self.assertIn("conditional evidence", query)
+        self.assertIn("Project-native 设计优先", query)
 
         for workflow_name in ("new-feature.md", "large-project.md"):
             workflow = (FRAMEWORK / "workflows" / workflow_name).read_text(encoding="utf-8")
@@ -531,7 +537,8 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertIn("始终返回", writer)
             self.assertNotIn("若本 Task 需要审查", writer)
         for text in (auditor, review_skill):
-            self.assertIn("Contract → Diff Review", text)
+            self.assertIn("Independent Artifact Critique", text)
+            self.assertIn("Context Compliance", text)
             self.assertIn("Engineering Context", text)
             self.assertIn("未经解释的 deviation", text)
         self.assertNotIn("单文件 ≤300 行", auditor)
@@ -637,6 +644,90 @@ class FrameworkContractTests(unittest.TestCase):
             "rendering helper",
         ):
             self.assertNotIn(forbidden, refactor)
+
+    def test_quality_v02_solution_excellence_and_judgment_semantics(self):
+        architect = (FRAMEWORK / "agents" / "architect.md").read_text(encoding="utf-8")
+        design_reviewer = (FRAMEWORK / "agents" / "design-reviewer.md").read_text(encoding="utf-8")
+        skill = (
+            FRAMEWORK / "skills" / "engineering-context-compilation" / "SKILL.md"
+        ).read_text(encoding="utf-8")
+        backend = (FRAMEWORK / "agents" / "backend-dev.md").read_text(encoding="utf-8")
+        frontend = (FRAMEWORK / "agents" / "frontend-dev.md").read_text(encoding="utf-8")
+        auditor = (FRAMEWORK / "agents" / "quality-auditor.md").read_text(encoding="utf-8")
+        ui_designer = (FRAMEWORK / "agents" / "ui-designer.md").read_text(encoding="utf-8")
+        ux_reviewer = (FRAMEWORK / "agents" / "ux-reviewer.md").read_text(encoding="utf-8")
+        visual = (FRAMEWORK / "policies" / "visual-absolutes.md").read_text(encoding="utf-8")
+
+        # --- Old dogmas must no longer exist as enforced rules ---
+        self.assertNotIn("public 方法数", architect)
+        self.assertNotIn("参数透传率", architect)
+        self.assertNotIn("≤ 10", architect)
+        self.assertNotIn("< 30%", architect)
+        self.assertNotIn("< 20%", architect)
+        # Old default blockers must not appear as output examples / enforced expectations
+        for dogma in ("添加 deleted_at 字段", "软删除未设计", "添加 refresh token 端点", "缺少 rate limiting 设计"):
+            self.assertNotIn(dogma, design_reviewer)
+        for dogma in ("必须是默认 checklist",):
+            self.assertNotIn(dogma, design_reviewer)
+        for dogma in ("4px 网格基准",):
+            self.assertNotIn(dogma, ux_reviewer)
+        for dogma in ("紫粉渐变主视觉",):
+            self.assertNotIn(dogma, frontend)
+
+        # --- Core new semantics must exist ---
+        # Evidence-backed decisions with evidence_kind
+        for phrase in ("decision:", "evidence:", "reason:", "evidence_kind:"):
+            self.assertIn(phrase, skill)
+        for kind in (
+            "contract",
+            "repository-invariant",
+            "repeated-project-pattern",
+            "local-example",
+            "stack-fact",
+            "heuristic",
+        ):
+            self.assertIn(kind, skill)
+        self.assertIn("不得直接成为 hard prohibition", skill)
+        self.assertIn("单个 local example 不应轻易变成 forbidden", skill)
+        # Applicability before best practice
+        self.assertIn("Applicability before best practice", design_reviewer)
+        # Project Design System precedence over General Taste
+        self.assertIn("General Taste cannot override Project-native design", ux_reviewer)
+        self.assertIn("General Taste cannot override Project-native design", visual)
+        self.assertIn("Project Design System", visual)
+        # Independent Artifact Critique + finding types
+        self.assertIn("Independent Artifact Critique", auditor)
+        self.assertIn("solution-quality-defect", auditor)
+        self.assertIn("context-gap", auditor)
+        self.assertIn("不得重新编译", auditor)
+        # Failure hypothesis model
+        self.assertIn("hypothesis:", backend)
+        self.assertIn("falsification:", backend)
+        self.assertIn("hypothesis:", frontend)
+        # Solution synthesis lenses in architect
+        for lens in (
+            "Problem Fit",
+            "Simplicity",
+            "Conceptual Economy",
+            "Coherence",
+            "Module Depth",
+            "Change Economics",
+            "Failure Semantics",
+            "Operational Fitness",
+        ):
+            self.assertIn(lens, architect)
+        # Interaction architecture + design system synthesis in UI designer
+        self.assertIn("interaction_architecture", ui_designer)
+        self.assertIn("Design System Synthesis", ui_designer)
+        self.assertIn("Signature", ui_designer)
+        self.assertIn("visual_intent", ui_designer)
+        # V/M/D demoted: no longer a mandatory knob contract
+        self.assertIn("不再作为强制 Contract", ui_designer)
+        self.assertNotIn("旋钮", ui_designer)
+        self.assertIn("Design System Synthesis", (FRAMEWORK / "skills" / "content-driven-interface-design" / "SKILL.md").read_text(encoding="utf-8"))
+        # Project design facts in engineering context (UI tasks)
+        self.assertIn("design_tokens", skill)
+        self.assertIn("component_primitives", skill)
 
     def test_installer_records_framework_fingerprint(self):
         installer = load_installer()

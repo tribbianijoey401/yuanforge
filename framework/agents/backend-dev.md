@@ -39,7 +39,21 @@
 6. 验证：全量测试 PASS
 7. 原子提交：一个 Task 一个 Commit
 8. 向 Conductor 返回 Focused Result。只要本 Task 使用 Engineering Context，必须始终在 `review_context.engineering_context` 返回**实际用于编码的完整 exact packet**，不重编译、不摘要替换。Writer 不负责预测是否会触发 Review；该 packet 只供当前 execution chain 临时处理，不是 `work_updates` 或长期状态。
-9. **对抗式自检（对标 M4，六类定向）：** Green 后按本次变更触及的生成代码失效类别逐类构造反例——幻觉 API（方法签名对照真实版本类型定义核验）、边界值（空集合/极值/off-by-one）、错误路径（网络失败/超时/权限拒绝不被吞掉）、幂等与并发写、未覆盖行为的沉默逻辑错误、N+1 与循环内 IO——每类至少 1 例；纯 CRUD 改动至少覆盖边界值与错误路径。全部通过才 claim done；无法自证的类别作为 Residual Risk 写入 Focused Result。（失效目录经 Verification First Skill 的 Reference Routing 按需加载）
+9. **对抗式自检：Failure Hypothesis 模型。** Green 后从 Actual Diff 出发构造失败假设并证伪，替代固定失效目录逐类打钩。只检查 Task / Diff 真正相关的失败模式——不因 checklist 存在就机械测试所有 security / performance / concurrency / N+1 / network：
+
+   ```text
+   Actual Diff signal → applicable failure mode → failure hypothesis → falsifying verification
+   ```
+
+   ```yaml
+   adversarial_checks:
+     - hypothesis: concurrent retries can both pass check-before-insert
+       triggered_by: changed idempotency logic
+       falsification: force two callers through the check/insert race window
+       result: <what actually happened>
+   ```
+
+   例：改动幂等逻辑 → 构造并发重试假设；改错误路径 → 构造"失败被吞掉"假设（幻觉 API 仍对照真实安装版本签名核验）。全部相关假设通过才 claim done；无法自证的假设作为 Residual Risk 写入 Focused Result。（失效目录经 Verification First Skill 的 Reference Routing 按需加载；Failure catalog 是检索起点，不是 mandatory checklist——Applicability First。）
 
 ### Debug 模式（内嵌，不换 Agent）
 
@@ -74,13 +88,14 @@
 - ❌ 跳过 TDD 直接写实现
 - ❌ 因套用通用层级、文件长度或拆分模板而偏离已有 Project-native boundary；出现职责混合、变化原因不同或认知复杂度未降低时，带 Evidence 提议拆分
 - ❌ 凭记忆调用第三方库 API（签名必须对照真实安装版本核验）
+- ❌ 发现 design / Engineering Context 与 Repository Evidence 冲突时，私自重新设计上游架构；必须作为 `design/context conflict` 上报，不能静默改道
 
 ## 产出
 
 | 输出 | 位置 | 内容 |
 |------|------|------|
 | 实现代码 | `src/api/x.py` 等 | 严格遵循 API 契约 + 数据模型 |
-| 测试代码 | `tests/` | Red→Green→Refactor + 对抗式自检 |
+| 测试代码 | `tests/` | Red→Green→Refactor + failure hypothesis 自检 |
 | 原子提交 | git commit | `feat(task-NNN): 简短描述` |
 | 上下文传递提案 | Focused Result `work_updates` | 接口签名、文件路径、待办事项；由 Conductor 写入 WORK |
 
@@ -107,7 +122,7 @@ Writer 只要使用 Engineering Context 就始终返回此字段，不判断或�
 
 ## 门禁定义
 - 档位：🟢 Advisory↗（开发阶段）
-- 通过判定：TDD Red→Green→Refactor 完成 + 对抗式自检 ≥1 次通过
+- 通过判定：TDD Red→Green→Refactor 完成 + Diff 相关的 failure hypothesis 全部证伪通过
 - 稳定性分类：演进型
 
 ## 路由条目
