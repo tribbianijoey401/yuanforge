@@ -82,7 +82,7 @@ class _ThreadedEventSource(FileEventSource):
 
 
 class WindowsFileEventSource(_ThreadedEventSource):
-    """ReadDirectoryChangesW 事件源。"""
+    """ReadDirectoryChangesW 事件源。Project Root 递归监听。"""
 
     mode = "native-windows"
 
@@ -174,7 +174,10 @@ class WindowsFileEventSource(_ThreadedEventSource):
                     name = payload[name_start : name_start + name_length].decode(
                         "utf-16-le", errors="replace"
                     )
-                    if name.replace("\\", "/") in self._watched:
+                    normalized = name.replace("\\", "/")
+                    if normalized in self._watched or (
+                        normalized.startswith("docs/works/") and normalized.endswith(".md")
+                    ):
                         self._notify()
                     if next_offset == 0:
                         break
@@ -198,16 +201,17 @@ class WindowsFileEventSource(_ThreadedEventSource):
 
 
 class LinuxFileEventSource(_ThreadedEventSource):
-    """inotify 事件源，只监听 Project docs 目录。"""
+    """inotify 事件源：监听 docs/ 与动态的 docs/works/。"""
 
     mode = "native-inotify"
 
     def __init__(self, root: Path, watched: Iterable[str]) -> None:
         if not sys.platform.startswith("linux"):
             raise OSError("inotify 仅适用于 Linux")
-        docs = root.resolve() / "docs"
-        if not docs.is_dir():
-            raise OSError(f"docs 目录不存在：{docs}")
+        self._root = root.resolve()
+        self._docs = self._root / "docs"
+        if not self._docs.is_dir():
+            raise OSError(f"docs 目录不存在：{self._docs}")
         super().__init__()
         import ctypes
 
@@ -218,21 +222,40 @@ class LinuxFileEventSource(_ThreadedEventSource):
         self._libc.inotify_add_watch.argtypes = (ctypes.c_int, ctypes.c_char_p, ctypes.c_uint32)
         self._libc.inotify_add_watch.restype = ctypes.c_int
         self._watched_names = {
-            Path(path).name for path in watched if path.replace("\\", "/").startswith("docs/")
+            Path(path).name
+            for path in watched
+            if path.replace("\\", "/").startswith("docs/")
+            and "/works/" not in path.replace("\\", "/")
         }
         self._fd = self._libc.inotify_init1(os.O_NONBLOCK | getattr(os, "O_CLOEXEC", 0))
         if self._fd < 0:
             raise OSError(ctypes.get_errno(), "inotify_init1 failed")
-        mask = 0x00000004 | 0x00000008 | 0x00000080 | 0x00000100 | 0x00000200
-        self._watch_descriptor = self._libc.inotify_add_watch(
-            self._fd, os.fsencode(docs), mask
+
+        # ATTRIB | CLOSE_WRITE | MOVED_TO | CREATE | DELETE | DELETE_SELF | MOVE_SELF
+        self._mask = (
+            0x00000004
+            | 0x00000008
+            | 0x00000080
+            | 0x00000100
+            | 0x00000200
+            | 0x00000400
+            | 0x00000800
         )
-        if self._watch_descriptor < 0:
-            error = ctypes.get_errno()
-            os.close(self._fd)
-            raise OSError(error, "inotify_add_watch failed")
+        self._watch_labels: dict[int, str] = {}
+        self._add_watch(self._docs, "docs")
+        works = self._docs / "works"
+        if works.is_dir():
+            self._add_watch(works, "works")
         self._closed = False
         self._start("yuan-insight-inotify")
+
+    def _add_watch(self, path: Path, label: str) -> None:
+        if not path.is_dir() or label in self._watch_labels.values():
+            return
+        descriptor = self._libc.inotify_add_watch(self._fd, os.fsencode(path), self._mask)
+        if descriptor < 0:
+            raise OSError(self._ctypes.get_errno(), f"inotify_add_watch failed: {path}")
+        self._watch_labels[descriptor] = label
 
     def _run(self) -> None:
         self._ready.set()
@@ -247,14 +270,23 @@ class LinuxFileEventSource(_ThreadedEventSource):
                     continue
                 offset = 0
                 while offset + 16 <= len(payload):
-                    _wd, _mask, _cookie, name_length = struct.unpack_from(
-                        "iIII", payload, offset
-                    )
+                    wd, _mask, _cookie, name_length = struct.unpack_from("iIII", payload, offset)
                     name_start = offset + 16
                     raw_name = payload[name_start : name_start + name_length]
                     name = os.fsdecode(raw_name.split(b"\0", 1)[0])
-                    if name in self._watched_names:
+                    label = self._watch_labels.get(wd)
+
+                    if label == "docs":
+                        if name in self._watched_names:
+                            self._notify()
+                        if name == "works":
+                            self._notify()
+                            works = self._docs / "works"
+                            if works.is_dir() and "works" not in self._watch_labels.values():
+                                self._add_watch(works, "works")
+                    elif label == "works" and name.endswith(".md"):
                         self._notify()
+
                     offset = name_start + name_length
         except BaseException as exc:
             if not self._stop.is_set():
