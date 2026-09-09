@@ -69,7 +69,7 @@ def append_transition(
     insight_dir: Path,
     transition: dict,
 ) -> Path:
-    """把 Transition 追加到当前 Work 的 JSONL Trace。"""
+    """把 Transition 追加到当前 focused Work 的 JSONL Trace。"""
     traces = insight_dir / "traces"
     traces.mkdir(parents=True, exist_ok=True)
     trace_path = traces / "current.jsonl"
@@ -83,8 +83,13 @@ def archive_trace(
     work_id: str | None,
     coverage: str = "UNKNOWN",
     gaps: list[dict] | None = None,
+    summarize: bool = True,
 ) -> Path | None:
-    """Work 变化时把 current.jsonl 归档到 traces/<work>.jsonl（方案 §43）。
+    """把 current.jsonl 旋转到 traces/<work>.jsonl。
+
+    Multi-Work 下 focus switch 只是执行上下文切换，不代表 Work completion；调用方
+    此时传 ``summarize=False``，只保存该 Work 已观察到的 Trace。只有 canonical Work
+    被 Distill/移除时才 ``summarize=True`` 并写长期 Work Summary。
 
     返回归档路径；无当前 Trace 或 work_id 为空时返回 None。
     """
@@ -101,15 +106,17 @@ def archive_trace(
         current.unlink()
     else:
         current.rename(archive_path)
-    from .history import write_work_summary
 
-    write_work_summary(
-        insight_dir,
-        work_id,
-        archive_path,
-        coverage=coverage,
-        gaps=gaps,
-    )
+    if summarize:
+        from .history import write_work_summary
+
+        write_work_summary(
+            insight_dir,
+            work_id,
+            archive_path,
+            coverage=coverage,
+            gaps=gaps,
+        )
     return archive_path
 
 
