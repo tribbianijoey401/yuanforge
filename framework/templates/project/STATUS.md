@@ -1,4 +1,5 @@
 ---
+focus: null
 work: null
 work_state: idle
 workflow: null
@@ -12,7 +13,9 @@ quality:
   review: pending
 ---
 
-# Current Situation
+# Project Recovery Index
+
+## Current Situation
 
 ## Last Completed
 
@@ -21,14 +24,17 @@ quality:
 ## Blocker
 
 <!--
-更新策略：STATUS 是 Session Recovery Index，覆盖当前值，不追加历史。
-只在语义状态变化时更新：Work 激活/完成/暂停、Workflow 或 Stage 变化、
-Agent 接管/完成、重要结果确认、Blocker 变化、Test/Review 状态变化。
-`work_state` 取值：idle / active / paused；暂停时保留 Work、Workflow、Stage，
-并将 Agent state 设为 paused。Agent 完成后、下一 Agent 接管前保留
-id + state: completed，不要置 none。
-Agent state 取值：idle / active / paused / completed / blocked
-`stage` 必须来自当前 Workflow frontmatter；`agent.id` 必须是 Agent Contract
-文件名。具体动作只写入 WORK 的 Current Task；Persona/Subagent/Session 标签写入
-可选 `agent.instance`，不得污染规范 Stage 与 Agent ID。
+STATUS 是 Project-level Recovery Index，不是第二份 Work State。
+
+`focus` 指向 `project://docs/works/<work-id>.md` 的文件名 stem；一次交互只 focus 一个 Work。
+当 focus 非空时，work/work_state/workflow/stage/agent/quality 只是 focused Work 的派生投影，
+用于快速恢复与兼容现有观察工具；Canonical State 永远以对应 Work 文件为准，Conductor
+必须在同一逻辑步骤同步写入并由 State Guard 校验一致。
+
+Phase 1 允许 Project 同时持久化多个 Work，但最多一个 Work 为 active。其它 Work 可为
+ready / paused / blocked。暂停时保留全文，work_state 投影为 paused，
+Agent state 为 paused；完成一个 Work 不清空其它 Work。
+
+`work_state: idle` 只表示当前没有 focus，不是任何 Work 文件的生命周期状态。
+STATUS 不保存 visualization revision。
 -->
