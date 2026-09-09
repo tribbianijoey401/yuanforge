@@ -121,10 +121,11 @@ Resume Project + focused Work
 
 ### Focus / Switch
 
-`STATUS.focus` 表示本次 interaction 正在操作的 Work。
+`STATUS.focus` 是唯一恢复锚点，表示当前 Conductor interaction 正式操作的 Work。
 
-- 如果当前 focused Work 为 `active`，切换正式执行到另一个 Work 前必须先完成、Pause 或 Block 原 Work，保存可恢复 Checkpoint。
-- 只是查看/讨论另一个 Work 时，可以切 focus 到 `ready` / `paused` / `blocked`；正式 Dispatch 前才切为 `active`。
+- 如果存在 `active` Work，它必须保持为 `STATUS.focus`。在不改变 focus 的前提下，可以只读查看其它 Work 的最小元数据；这不构成 Switch。
+- 任何真正的 focus change 都必须先让当前 `active` Work 完成、Pause 或 Block，并形成可恢复 Checkpoint。
+- 当前没有 active Work 时，focus 可以指向 `ready` / `paused` / `blocked` Work 用于讨论或恢复；正式 Dispatch 前再切为 `active`。
 - Phase 1 最多一个 `active` Work；不得把 Multi-Work 解释为同时推进多个 Writer Work。
 - 切换 Work 不复制上一 Work 的 Current Task、Latest Result、Open Findings、Work Learnings 或 transient `review_context`。
 
