@@ -10,6 +10,7 @@ from typing import Any
 
 @dataclass
 class StatusState:
+    focus: str | None = None
     work: str | None = None
     work_state: str | None = None
     workflow: str | None = None
@@ -71,6 +72,7 @@ def parse_status(text: str) -> StatusState:
     """从 STATUS.md 提取可观察语义状态。无法解析的字段为 None（= Unknown）。"""
     fm = parse_frontmatter(text)
     state = StatusState(raw=fm)
+    state.focus = fm.get("focus")
     state.work = fm.get("work")
     state.work_state = fm.get("work_state")
     state.workflow = fm.get("workflow")
