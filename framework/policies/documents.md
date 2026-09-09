@@ -21,8 +21,9 @@ Yuan 的 Project Memory 分为长期 Project Truth、多个持久化 Work，以�
 
 - 一个 Project 可以同时持久化多个 Work。
 - Phase 1 最多一个 `active` Work；其它 Work 可以 `ready` / `paused` / `blocked`。
-- `STATUS.focus` 表示本次交互正在恢复/操作哪个 Work，不代表其它 Work 被关闭。
-- 与当前 Request 无关但已经形成明确 Goal / Scope / Acceptance 的独立工作，可以成为新的 `ready` Work；只是未来想法或未成形需求仍进入 BACKLOG。
+- 如果存在 active Work，它必须保持为 `STATUS.focus`；其它 Work 可以只读查看，但不能在 active Work 未收敛时抢占 focus。
+- `STATUS.focus` 表示本次交互正在正式恢复/操作哪个 Work，不代表其它 Work 被关闭。
+- 与当前 Request 无关但已经形成明确 Goal / Scope / Acceptance 的独立工作，可以成为新的非 focused `ready` Work；只是未来想法或未成形需求仍进入 BACKLOG。
 - 不引入 Scheduler、Worker Pool、后台 Daemon、branch/worktree 自动调度或多个并行 Writer。
 
 ## Work Activation and State Commit
@@ -49,11 +50,11 @@ Conductor 必须在这些 Commit Point 维护当前 Work 与 Status：Work activ
 
 ## Switch
 
-切换正式执行到另一个 Work 时：
+切换 focus 或正式执行到另一个 Work 时：
 
-1. 如果当前 focused Work 仍为 `active`，先完成、Pause 或 Block，并形成可恢复 Checkpoint。
-2. 将 `STATUS.focus` 指向目标 Work。
-3. 仅在即将 Dispatch 时把目标 Work 切到 `active`；只是查看/讨论时可以保持 `ready` / `paused` / `blocked`。
+1. 如果当前存在 `active` Work，先完成、Pause 或 Block，并形成可恢复 Checkpoint；在此之前只允许只读查看候选 Work，不改变 `STATUS.focus`。
+2. 当前没有 active Work 后，将 `STATUS.focus` 指向目标 Work。
+3. 目标 Work 可以保持 `ready` / `paused` / `blocked` 用于讨论或恢复；仅在即将 Dispatch 时切到 `active`。
 4. 同步 STATUS recovery projection 并通过 State Guard。
 5. `review_context`、临时 Writer Context 与未提交 Attempt 不得跨 Work 携带。
 
