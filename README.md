@@ -8,12 +8,13 @@ Yuan 的首要目标是提高 Vibe Coding 的代码质量，不是建设独立 R
 
 ```text
 自然语言 Request
+  → 恢复或选择 persisted Work
   → Dynamic Routing 选择一个 Primary Workflow
   → 只加载需要的 Agent
   → Agent 根据自己的 Contract 与当前 Signal 调用需要的 Skill
   → Skill 按 Signal 读取相关 Reference Section
   → 一个 Writer 实施，Test / Reviewer 按 Risk 验证
-  → 更新 Status 与长期 Memory
+  → 更新 focused Work、Status 与长期 Memory
 ```
 
 核心依赖关系只有一条：`Routing → Agent → Skill → References`。这保证了角色负责“谁来做”，Skill 负责“怎么做”，References 负责“需要哪些专业知识”，避免全部资产同时进入 Context。
@@ -31,35 +32,51 @@ Yuan 的首要目标是提高 Vibe Coding 的代码质量，不是建设独立 R
 
 UI Designer 和 Reviewer 都按任务 Signal 与 Risk 加载，不固定启动完整专家团。
 
-## Project Memory
+## Project Memory 与 Multi-Work
 
-安装后的 Project 默认使用七类人类可读文档：
+Project 的长期 Truth 与执行状态分开：
 
-| Document | 职责 |
+| Path | 职责 |
 |---|---|
-| `PRODUCT.md` | 稳定 Product Fact、Target User、Business Rule 与 Boundary |
-| `ARCHITECTURE.md` | 当前 System Structure、Module、Interface 与 Constraint |
-| `DECISIONS.md` | 已确认重大 Product / Architecture Decision |
-| `BACKLOG.md` | 未激活 Request 与 Deferred Item |
-| `WORK.md` | 唯一 Active Work、Scope、Acceptance、Plan 与 Progress |
-| `STATUS.md` | 短小的跨 Session Recovery Checkpoint |
-| `MEMORY.md` | 可复用 Pitfall、Verified Finding、Preference 与 Convention |
+| `docs/PRODUCT.md` | 稳定 Product Fact、Target User、Business Rule 与 Boundary |
+| `docs/ARCHITECTURE.md` | 当前 System Structure、Module、Interface 与 Constraint |
+| `docs/DECISIONS.md` | 已确认重大 Product / Architecture Decision |
+| `docs/BACKLOG.md` | 尚未形成独立 Work Contract 的 Future / Deferred Item |
+| `docs/works/<work-id>.md` | 一个 persisted Work 的 Goal、Scope、Acceptance、Workflow、Progress 与恢复状态 |
+| `docs/STATUS.md` | 当前 `focus` 与 focused Work 的短 Recovery Projection |
+| `docs/MEMORY.md` | 可复用 Pitfall、Verified Finding、Preference 与 Convention |
+| `docs/WORK.md` | 仅用于旧 v4 single-work Project 的 compatibility |
 
-`TASK_BOARD` 只在复杂 Work 中按需嵌入 `WORK.md`；`SESSION` 默认取消；`PROGRESS` 合并到 `WORK.md` 与 `STATUS.md`。
+一个 Project 可以同时持久化多个 Work。`docs/works/` 目录本身就是 Registry，不再维护第二份 Work Registry。
 
-用户说“我要先离开”“工作挂起吧”或“暂停”时，任何 Workflow 都会先把可恢复 Checkpoint 写回 `WORK.md`，保留当前 Workflow / Stage，再将 `STATUS.work_state` 设为 `paused` 并停止派发。Pause 不归档、不清空 Work；下次用户说继续时从 Next Action 恢复。
+Phase 1 的边界是：
 
-每次正式 State Commit 还必须通过 Framework 自带的只读 State Guard。Stage 从当前 Workflow frontmatter 取精确值；Agent ID 从 Agent Contract 文件名取精确值，并且必须被当前 Workflow 声明。具体动作以 WORK 的 Current Task 为唯一真相源；Persona/Subagent/Session 标签写入可选 `agent.instance`。Guard 未输出 `STATE_VALID` 时，Conductor 修正同一次 Commit，不能继续 Dispatch。
+```text
+multiple persisted Works
++ one focused interaction
++ at most one active Work
++ one Implementation Writer
+```
+
+其它 Work 可以是 `ready` / `paused` / `blocked`。正式切换执行前，当前 active Work 必须完成、Pause 或 Block。紧急 Bug 因此可以成为独立 Work：暂停原 Work → 激活 Bug Work → 完成并 Distill → 恢复原 Work。
+
+`TASK_BOARD` 仍只在复杂 Work 内按需使用；Multi-Work 不引入 Scheduler、Worker Pool、后台 Daemon、自动 branch/worktree 调度或多个并行 Writer。
+
+用户说“我要先离开”“工作挂起吧”或“暂停”时，任何 Workflow 都会先把可恢复 Checkpoint 写回当前 `docs/works/<work-id>.md`，保留 Workflow / Stage，再将 focused Work 与 STATUS projection 设为 `paused` 并停止派发。Pause 不归档、不删除 Work；下次用户说继续时从 Next Action 恢复。
+
+每次正式 State Commit 必须通过 Framework 自带的只读 State Guard。Guard 校验每个 Work 的 canonical state、Phase 1 最多一个 active Work、active Work 必须被 focus，以及 STATUS projection 必须与 focused Work 一致。Stage 从当前 Workflow frontmatter 取精确值；Agent ID 从 Agent Contract 文件名取精确值，并且必须被当前 Workflow 声明。Guard 未输出 `STATE_VALID` 时，Conductor 不能继续 Dispatch。
+
+旧 Project 如果仍只有 `docs/WORK.md + docs/STATUS.md`，Framework Update 不静默迁移这些 Project-owned State；State Guard 继续兼容读取，下一次 Conductor 能可靠取得 Work identity 的正式 State Commit 才迁入 `docs/works/<work-id>.md`。
 
 ## Yuan Insight
 
-Yuan Insight 是 Yuan 官方的只读 Sidecar，通过操作系统文件事件观察 `WORK.md`、`STATUS.md` 与 Framework Definition，生成 Coverage、Trace、Work Summary、Expected vs Observed Signal 和 Dashboard。Windows 使用 `ReadDirectoryChangesW`，Linux 使用 `inotify`；原生监听不可用时明确显示 `polling-fallback` 与 Partial coverage。它不修改 Yuan Core State，失败时不影响 Agent Routing 与 Project Memory。
+Yuan Insight 是 Yuan 官方的只读 Sidecar，通过操作系统文件事件观察 `docs/STATUS.md`、focused `docs/works/*.md`、其它 persisted Work 以及 Framework Definition，生成 Coverage、Trace、Work Summary、Expected vs Observed Signal 和 Dashboard。Windows 使用 `ReadDirectoryChangesW`，Linux 使用 `inotify`；原生监听不可用时明确显示 `polling-fallback` 与 Partial coverage。它不修改 Yuan Core State，失败时不影响 Agent Routing 与 Project Memory。
 
-Yuan Core 不为 Dashboard 维护 revision：Conductor 是 `WORK.md` / `STATUS.md` 的唯一正式 State Writer；Insight 在自己的 Observation Data 中维护 transition index、gap 与 coverage。
+Insight 把 **focus switch** 与 **Work completion** 分开：从 W1 切到 W2 时只轮转并保留 W1 Trace；只有 canonical `docs/works/W1.md` 在 Distill 后真正移除时才生成 W1 的完成 Summary。这样多个 paused/ready Work 不会被误报成已完成。
 
-Insight 复用 Framework State Guard 的问题码，不维护第二套状态词汇，也不自动改写状态。遇到非法 Stage 或 Agent 时，Dashboard 同时显示原始 `UNKNOWN STAGE` / `UNREGISTERED ACTOR` 和修复指引，不会把未知执行者隐藏掉。
+Yuan Core 不为 Dashboard 维护 revision：Conductor 是 `docs/works/*.md` / `STATUS.md` 的唯一正式 State Writer；Insight 在自己的 Observation Data 中维护 transition index、gap 与 coverage。
 
-如果 `WORK.md` 或 `STATUS.md` 缺失/不可读，Dashboard 显示 `STATE UNAVAILABLE`、Coverage 为 `UNKNOWN`，并提示通过 update/bootstrap 只补缺失文档；不会把缺失状态误报为 IDLE。
+Insight 复用 Framework State Guard 的问题码，不维护第二套状态词汇，也不自动改写状态。非法但可读的 Stage / Agent / focus projection 仍原样展示并给出修复指引。
 
 Installer 将官方 Tool 安装到 `.yuan/insight/tool/`，同目录中的 `sessions/`、`traces/`、`summaries/`、`gaps/` 和 `cache/` 是 Project 的 Insight Observation Data。`update` 只替换 `tool/` 与 Launcher，不删除已有 Observation Data。
 
@@ -98,11 +115,11 @@ python -B scripts/sync_project.py update C:\path\to\project
 
 `update` 总是用当前 Source 的最新官方资产替换 Project 中的 `.yuan/framework/`，不会因旧 Version、Integrity 或旧 Runtime 损坏而拒绝。以下内容保持不变：
 
-- `docs/` Project Memory
+- `docs/` Project Memory，包括 `docs/works/` 中所有 persisted Work
 - `.yuan/overrides/` Project Override
 - Project Source、Test、Config 与其他业务内容
 
-Update 不迁移或解释这些 Project-owned 文件，只读取 `STATUS.work_state` 做最小安全检查：已识别的 `active` Work 必须先完成并 Distill，或显式 Pause；旧格式、缺失或无法判定的状态直接更新，不需要迁移或额外参数。
+Update 不迁移或解释这些 Project-owned 文件。它只读取 `STATUS.work_state` 做最小安全检查：focused Work 明确为 `active` 时必须先完成、Pause 或 Block；旧格式、缺失或无法判定的状态按 compatibility 规则处理。
 
 每次 Update 都逐项输出被替换的 Yuan-managed 路径；实际存在但未替换的 Project Document、Override 与 Insight Observation Data 会以 `PRESERVED <path> | <reason>` 输出。`.gitignore` 只合并 Yuan 必需规则，并明确标记为 `MERGED`。
 
@@ -118,18 +135,19 @@ python -B scripts/sync_project.py check C:\path\to\project
 yuanforge/
 ├── AGENTS.md                 Agent Platform 入口
 ├── framework/
-│   ├── agents/               13 个成熟 Agent Contract
-│   ├── skills/               20 个工程 Skill
-│   ├── references/           32 个专业 Reference（原知识资产全部保留并补入迁移经验）
-│   ├── policies/             Core、Routing、Review 与可选纪律
+│   ├── agents/               Agent Contract
+│   ├── skills/               工程 Skill
+│   ├── references/           专业 Reference
+│   ├── policies/             Core、Routing、Document、State、Review
 │   ├── workflows/            四种 Primary Workflow
 │   ├── adapters/             Platform Mapping 与降级
-│   └── templates/project/    七类 Project Document 模板
+│   └── templates/project/    Project Document / Work body 模板
 ├── bin/yuanforge-init        Init / Update / Check 实现
 ├── scripts/sync_project.py   兼容更新入口
 ├── insight/                  可选的 Yuan Insight Sidecar 与 Dashboard
 ├── tests/                    Contract 与 Installer Regression
+├── benchmarks/               Evaluation Asset，不属于 Framework runtime
 └── docs/                     Yuan 自身的 Project Memory
 ```
 
-详细产品边界见 [`docs/PRODUCT.md`](docs/PRODUCT.md)，Architecture 与调用规则见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)，当前迁移进度见 [`docs/WORK.md`](docs/WORK.md)。
+详细产品边界见 [`docs/PRODUCT.md`](docs/PRODUCT.md)，Architecture 与调用规则见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)。
