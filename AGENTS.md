@@ -27,7 +27,7 @@ Framework Root 按顺序选择第一个存在的目录：
 2. 检查官方 Project Document；缺失时使用 `framework://templates/project/<name>` 只补缺，不覆盖已有文件。`project://docs/WORK.md` 保留为 legacy compatibility；新 Work 的 canonical store 是 `project://docs/works/`。
 3. 读取 `project://docs/STATUS.md`。
 4. STATUS 有 `focus` 时，只读取 `project://docs/works/<focus>.md` 的 Goal、Scope、Acceptance、Current Task、Verification、Next Action 与 Blocker。
-5. 用户点名另一个 Work 时，只读候选 Work 的 frontmatter、Goal 和 Next Action，避免把全部 persisted Works 装入 Context。
+5. 用户点名另一个 Work 时，只读候选 Work 的 frontmatter、Goal 和 Next Action；若当前存在 active Work，这种只读检查不改变 `STATUS.focus`。
 6. STATUS 没有 `focus`、但 legacy `project://docs/WORK.md` 有旧 checkpoint 时继续兼容恢复；Framework Update 不迁移它，下一次可靠 Conductor State Commit 才迁入 `docs/works/<work-id>.md`。
 7. 只读取与当前 Request 相关的 PRODUCT、ARCHITECTURE、DECISIONS、MEMORY Section。
 
@@ -81,8 +81,9 @@ Phase 1：
 
 - 可以同时存在多个 persisted Work；
 - **最多一个 `active` Work**；
+- 如果存在 active Work，它必须保持为 `STATUS.focus`；
 - 其它 Work 可以 `ready` / `paused` / `blocked`；
-- `STATUS.focus` 表示本次 interaction 正在恢复/操作哪个 Work；
+- `STATUS.focus` 表示本次 interaction 正在正式恢复/操作哪个 Work；
 - Focus 不代表其它 Work 被关闭；
 - Multi-Work 不等于并行 Scheduler，不引入 Worker Pool、后台 Daemon、branch/worktree 自动调度或多个并行 Writer。
 
@@ -94,11 +95,13 @@ Phase 1：
 
 ### Focus / Switch
 
-如果当前 Work 仍 `active`，正式切换执行到另一个 Work 前必须先把当前 Work 完成、Pause 或 Block，并形成可恢复 Checkpoint。只是查看/讨论另一个 Work 时，可以 focus 一个 `ready` / `paused` / `blocked` Work；真正 Dispatch 前才切为 `active`。
+`STATUS.focus` 是唯一恢复锚点。
 
-紧急 Bug 可以成为独立 Work：Pause 当前 active Work → 建立并激活 Bug Work → 完成 Bug → 再恢复原 Work。
-
-Work 切换时不得携带上一 Work 的 Current Task、Open Findings、Work Learnings 或 transient `review_context`。
+- 如果当前存在 active Work，可以只读查看其它 Work 的最小元数据，但不改变 focus。
+- 任何真正的 focus change 都必须先把当前 active Work完成、Pause 或 Block，并形成可恢复 Checkpoint。
+- 当前没有 active Work 时，focus 可以指向 `ready` / `paused` / `blocked` Work用于讨论或恢复；正式 Dispatch 前才切为 `active`。
+- 紧急 Bug 可以成为独立 Work：Pause 当前 active Work → 建立并激活 Bug Work → 完成 Bug → 再恢复原 Work。
+- Work 切换时不得携带上一 Work 的 Current Task、Open Findings、Work Learnings 或 transient `review_context`。
 
 ## STATUS Recovery Index
 
@@ -151,7 +154,7 @@ Conductor 不直接加载 References；Agent 只加载自己声明的 Skill；Sk
 - 一个 Project 可以有多个 persisted Works，但 Phase 1 最多一个 `active` Work。
 - 新 Work 激活时，focused Work 与 STATUS projection 必须在**同一逻辑步骤**写入；STATUS 至少投影 Work id、`work_state: active`、Workflow、Stage 和**当前 Agent**。
 - Pause 时把 Current Task / Latest Result / Verification / Open Findings / 唯一 Next Action 保存到当前 Work，Work 与 STATUS projection 设为 `paused`；**不得归档或清空**该 Work。
-- Block 时记录 Blocker，Work / agent 都设为 `blocked`；Blocked Work 不阻止用户选择另一个 persisted Work。
+- Block 时记录 Blocker，Work / agent 都设为 `blocked`；Blocked Work 不阻止用户在之后切换到另一个 persisted Work。
 - Resume 从 STATUS.focus + 对应 Work 的 Next Action 恢复。
 - 实现前先定义自动 Test 或 Manual Verification；Bug 先复现，Refactor 使用 risk-scoped Baseline。
 - Reviewer 不修改被审对象；发现问题交回当前 Work 的唯一 Writer。
@@ -192,7 +195,7 @@ Framework Update 不自动迁移 Project-owned State。下一次 Conductor 能�
 
 Framework 更新从 Yuan Source Repository 外部运行。Update 必须保留 `project://docs/`、`project://.yuan/overrides/` 与业务内容，也不解释或迁移 Work 文件。
 
-安全检查继续读取 `STATUS.work_state`：因为它是 focused Work 的 projection，明确 `active` 时必须先完成、Pause 或 Block；`idle` / `paused` / `blocked`、旧格式、缺失或无法判定的状态按 Installer compatibility 规则处理。
+安全检查继续读取 `STATUS.work_state`：因为它是 focused Work 的 projection，明确 `active` 时必须先完成、Pause 或 Block；`idle` / `paused` / `blocked` / `ready`、旧格式、缺失或无法判定的状态按 Installer compatibility 规则处理。
 
 ## Precedence
 
