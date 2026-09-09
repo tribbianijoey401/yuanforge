@@ -8,6 +8,7 @@ Yuan 是 Agent Platform 内的 Markdown Framework，不是独立 Runtime。Sourc
 User Request
   → Project AGENTS.md
   → Conductor + Core Policy
+  → select / restore focused Work
   → Dynamic Routing + Primary Workflow
   → Selected Agent
   → Agent-declared Skill
@@ -37,16 +38,17 @@ yuanforge/
 │   ├── agents/               专业角色、边界与 Skill Assignment
 │   ├── skills/               可复用工程方法与 Reference Routing
 │   ├── references/           只供 Skill 按 Signal 读取的专业知识
-│   ├── policies/             Core、Routing、Document、Review 与可选纪律
+│   ├── policies/             Core、Routing、Document、State、Review
 │   ├── workflows/            四种 Primary Workflow
 │   ├── adapters/             Platform 能力映射与降级策略
-│   ├── templates/project/    七类 Project Document 模板
+│   ├── templates/project/    Project Document 与 Work body 模板
 │   └── VERSION               唯一 Framework Version
 ├── bin/yuanforge-init        Init、Update 与 Check
 ├── scripts/sync_project.py   兼容的 Source 外部 Update 入口
 ├── insight/                  可选、只读的 Insight Sidecar 源码与 Dashboard
 ├── tests/                    Contract 与 Installer Regression
-└── docs/                     Yuan Repository 自身的七类 Project Document
+├── benchmarks/               Evaluation Asset，不属于 Framework runtime
+└── docs/                     Yuan Repository 自身的 Project Memory
 ```
 
 ## Dependency Direction
@@ -75,10 +77,10 @@ project/
 │   ├── framework/            官方 Vendored Snapshot，Update 可整体替换
 │   ├── insight/
 │   │   ├── tool/             官方 Insight Tool，Update 只替换此子目录
-│   │   ├── yuan.py           Project-local `yuan observe` Launcher
+│   │   ├── yuan.py           Project-local Launcher
 │   │   ├── sessions/         Observation Session
-│   │   ├── traces/           近期详细 Trace
-│   │   ├── summaries/        长期 Work Observation Summary
+│   │   ├── traces/           当前/历史 Work Trace
+│   │   ├── summaries/        已完成 Work Observation Summary
 │   │   ├── gaps/             Observation Gap
 │   │   └── cache/            当前 Observer Cache
 │   └── overrides/            Project Override，Update 永不覆盖
@@ -87,48 +89,120 @@ project/
     ├── ARCHITECTURE.md
     ├── DECISIONS.md
     ├── BACKLOG.md
-    ├── WORK.md
-    ├── STATUS.md
+    ├── STATUS.md             focus + focused Work recovery projection
     ├── MEMORY.md
-    └── work/archive/         仅保存有长期价值的已完成 Work 摘要
+    ├── WORK.md               legacy v4 single-work compatibility only
+    └── works/
+        ├── W-101.md          persisted Work canonical state
+        ├── W-102.md
+        └── archive/          仅保存有长期价值的已完成 Work 摘要
 ```
 
 Override 优先级为 `Project Override > Vendored Official Asset > Yuan Default`。Override 通过与 Framework Root 相同的相对路径覆盖单个资产；不存在 Override 时直接使用官方文件。
 
-## State and Memory
+## Multi-Work State and Memory
 
-七类 Project Document 是默认 Truth Source：
+长期 Project Truth 与 Work execution state 分离：
 
 - Stable Fact 进入 `PRODUCT.md` 或 `ARCHITECTURE.md`。
 - 已确认重大选择进入 `DECISIONS.md`。
-- 唯一 Active Work 进入 `WORK.md`，短恢复点进入 `STATUS.md`。
+- 未激活、尚未形成清晰 Work Contract 的请求进入 `BACKLOG.md`。
+- 每个 `docs/works/<work-id>.md` 独立保存一个 Work 的 Goal、Scope、Acceptance、Workflow、Stage、Agent、Current Task、Latest Result、Open Findings、Work Learnings、Next Action / Blocker。
+- `STATUS.md` 只保存 `focus` 与 focused Work 的短 Recovery Projection。
 - 可复用经验、Preference、Convention 和 Pitfall 进入 `MEMORY.md`。
-- 未激活需求进入 `BACKLOG.md`。
+- `docs/WORK.md` 只服务 legacy v4 compatibility，不再是新 Multi-Work 的 canonical state。
 
-`TASK_BOARD` 只在 Complex Work 内作为 `WORK.md` 的可选段落；`SESSION` 默认取消；`PROGRESS` 合并到 `WORK.md` 与 `STATUS.md`；Graph、Event 和 Proposal 不属于 vNext MVP。
+`docs/works/` 目录本身就是 Work Registry，不新增 Work Registry Object 或数据库。
 
-Conductor 是 `WORK.md` / `STATUS.md` 的唯一正式 State Writer。每个 Dispatch 前和 Specialist Focused Result 返回后都执行 State Commit；单 LLM Persona Switch 也必须回到 Conductor。Specialist 只返回 `work_updates` 提案。STATUS 不保存 visualization revision。
+### Work lifecycle
 
-`framework://policies/state-contract.md` 是状态词汇的唯一语义契约，`framework://tools/state_guard.py` 是只读执行门。Guard 从实际 Workflow frontmatter 和 Agent Contract 文件名动态取得 Canonical Stage / Agent ID，确认 Agent 已被当前 Workflow 声明，并验证 Work state、Agent state、Current Task 与 Pause Checkpoint 组合。Conductor 落盘后必须得到 `STATE_VALID` 才能继续 Dispatch。Installer Check 与 Insight 动态加载同一 Guard；前者输出问题、后者投影 Signal，二者都不写 Project State。具体动作由 WORK 的 Current Task 保存，Insight 从该事实派生展示；可选 `agent.instance` 只标记执行实例，不参与路由或 Stage 推进。
+Persisted Work state：
+
+```text
+ready | active | paused | blocked
+```
+
+Completion 不是 active-store 的长期状态。一个 Work 满足 Acceptance、Verification、Risk-driven Review、Known Issue disclosure 与 `Open Findings = 0` 后先 Distill；有长期历史价值时写精炼摘要，再移除对应 `docs/works/<id>.md`。其它 Work 原样保留。
+
+### Phase 1 concurrency boundary
+
+Phase 1 是：
+
+```text
+Multiple Persisted Works
++ one focused interaction
++ at most one active Work
++ one Implementation Writer
+```
+
+因此：
+
+- 可以同时保存多个 `ready` / `paused` / `blocked` Work；
+- 最多一个 `active` Work；有 active Work 时 `STATUS.focus` 必须指向它；
+- 查看另一个 ready/paused/blocked Work 不等于并发执行；
+- 正式切换执行前必须先让当前 active Work complete / pause / block；
+- Phase 1 不建设 Scheduler、Worker Pool、后台 Daemon、mutation overlap detector 或自动 branch/worktree manager。
+
+Work 是 execution isolation boundary；Task 是 Work 内部可判定步骤；Attempt 是 Task 的一次执行尝试。这些是功能关系，不要求把它们都升级成新的持久化对象。
+
+## STATUS Recovery Projection
+
+新格式 STATUS 至少表达：
+
+```yaml
+focus: W-102
+work: W-102
+work_state: active
+workflow: complex-bug
+stage: implement
+agent:
+  id: backend-dev
+  state: active
+```
+
+其中 `work/work_state/workflow/stage/agent/quality` 都是 focused Work 的派生投影。Canonical State 在 `docs/works/W-102.md`；Conductor 每次 State Commit 在同一逻辑步骤更新 Work + STATUS，Guard 检查 projection drift。
+
+没有 focus 时 STATUS 为 `focus: null / work_state: idle`。这里 idle 只表示 Project Recovery Index 当前没有 focus，不是 persisted Work state。
+
+## State Commit Guard
+
+`framework://policies/state-contract.md` 是状态词汇的唯一语义契约，`framework://tools/state_guard.py` 是只读执行门。
+
+Guard 动态从 Workflow frontmatter 与 Agent Contract 取得 Canonical Workflow / Stage / Agent，并验证：
+
+- Work 文件名 stem 与 frontmatter `id` 一致；
+- persisted Work state 合法；
+- active / paused / blocked 对 Current Task / Next Action / Blocker 的要求；
+- Phase 1 不允许多个 active Work；
+- active Work 必须被 focus；
+- STATUS projection 与 focused Work 一致。
+
+Conductor 是 `docs/works/*.md` / `STATUS.md` 的唯一正式 State Writer。每个 Dispatch 前、Specialist Focused Result 返回后以及 Create / Focus / Activate / Pause / Resume / Block / Switch / Distill 都执行 State Commit；Guard 未输出 `STATE_VALID` 时不得继续 Dispatch。Specialist 只返回 `work_updates`。
+
+Legacy Project 如果 STATUS 没有 `focus` 字段，Guard 继续按旧 `WORK.md + STATUS.md` contract 读取。Framework Update 不迁移 Project-owned Work State；下一次 Conductor 能可靠取得 Work identity 的正式 Commit 才迁入 `docs/works/<id>.md`。
 
 ## Update Boundary
 
 `update` 不要求旧 Framework 自证，也不以 Version、Integrity 或旧 Runtime 健康状态阻止更新。它强制用最新官方快照替换 `.yuan/framework/` 与 Framework-owned `AGENTS.md`，同时保持以下 Project-owned 内容完整：
 
-- `docs/`
-- `.yuan/overrides/`
-- Project Source、Test、Config 和其他业务文件
+- `docs/`，包括全部 `docs/works/` persisted Work；
+- `.yuan/overrides/`；
+- Project Source、Test、Config 和其他业务文件。
 
-Update 不迁移或解释 Project-owned 内容。它只在任何写入前读取可明确识别的 `STATUS.work_state: active`：仅该状态停止；`idle`、`paused`、旧格式、缺失或无法判定的状态都直接放行。这样保留旧 Project Document 后，后续升级也无需额外开关。放行后直接替换 `AGENTS.md`、`.yuan/framework/`、`.yuan/insight/tool/`、Launcher、Version 与 Install Metadata；实际保留的 Project Document、Override 和 Insight Observation Data 必须逐项输出路径与原因。Pause 本身只保存 `WORK.md` Checkpoint 并标记状态，不引入 Runtime、Archive 或第二状态系统。
+Update 不迁移或解释 Project-owned 内容。它只读取 STATUS 的 focused Work projection 做最小安全判断：明确 `active` 时停止并要求先 complete / pause / block；旧格式、缺失或无法判定的状态按 compatibility 规则放行。更新后的 Check 只报告问题，不自动修复。
 
-安装和更新后的 `check` 只报告当前布局、Dangling Reference 和 Contract 问题，不回滚最新版本。
+## Insight Multi-Work Observation
 
-## Insight Degraded-State Rendering
+Insight 是只读 Sidecar。Snapshot 读取 `STATUS.focus` 后只把 focused Work 装入当前语义 Snapshot，同时对 `docs/works/*.md` 维护 content hash，以观察 Work create/remove/switch。Windows watcher 递归观察 Project Root；Linux inotify 同时监听 `docs/` 和动态 `docs/works/`。
 
-Insight 的事实源可以部分可用：例如 `WORK.md` 已有 Active Work，而 `STATUS.md` 尚未形成结构化 Checkpoint。Dashboard 必须展示已经观察到的 Work Goal、Scope、Current Task 与 Latest Result，并把缺失的 Workflow、Stage、Agent 明确标为 `UNKNOWN`；不得把 Unknown 渲染为“无工作”或“无需 Agent”。非法但可读的值也必须原样可见：Stage 增加 `UNKNOWN STAGE` 节点，Agent Matrix 增加 `UNREGISTERED ACTOR` Tile。WORK/STATUS 文件本身缺失或不可读时，Snapshot source availability 产生 `STATE_FILES_MISSING`，Coverage 为 `UNKNOWN`，Dashboard 显示 `STATE UNAVAILABLE`。Framework 同时要求激活 Work 时在同一逻辑步骤维护 `WORK.md` 与结构化 `STATUS.md`，避免长期处于降级状态。
+Insight 明确区分：
 
-## Insight Observation Backend
+```text
+focus switch != Work completion
+```
 
-Insight Observer 优先订阅操作系统目录事件：Windows `ReadDirectoryChangesW` 递归观察 Project Root，Linux `inotify` 观察 `docs/`。事件只负责唤醒；Snapshot 前仍以 watched file content hash 确认实际变化，避免无关事件进入 Trace。原生源不可用或运行中失效时切换 `polling-fallback`，API/UI 暴露 observation mode 且 Coverage 降为 Partial。
+W1 → W2 时，W1 的当前 Trace 只轮转/保存，不写完成 Summary；只有 canonical `docs/works/W1.md` 在 Distill 后真正移除，才生成 W1 Summary。之后 Resume W1 时新的 Trace 可以继续追加到该 Work 的历史 Trace。
 
-Transition index、Trace、Gap 和 Coverage 全部位于 `.yuan/insight/`，不写回 Project State。Debounce 只合并一次 Conductor Commit 内对 WORK/STATUS 的相邻写入；它不能恢复未曾稳定落盘的中间 Persona。
+Coverage 只要求当前布局真实需要的状态源：Multi-Work 有 focus 时要求 `STATUS.md + focused Work file`；`focus:null` 只要求 STATUS；legacy 模式才要求 `WORK.md + STATUS.md`。因此旧 compatibility 文件不会成为新 Multi-Work Dashboard 的假必需依赖。
+
+Transition index、Trace、Gap 和 Coverage 全部位于 `.yuan/insight/`，不写回 Project State。Insight 复用 Framework State Guard 的问题码，不维护第二套状态词汇，也不自动改写状态。
