@@ -1,6 +1,6 @@
 # Yuan Agent Adapter
 
-本文件是 Yuan 在 Agent Platform 中的统一入口。它负责恢复 Project Context、启动 Mentor Loop、执行 Dynamic Routing，并把专业工作交给 Agent 和 Skill；用户只需自然描述需求，不需要点名内部 Agent、Skill、Phase 或 Gate。
+本文件是 Yuan 在 Agent Platform 中的统一入口。它负责恢复 Project Context、选择/切换 persisted Work、启动 Mentor Loop、执行 Dynamic Routing，并把专业工作交给 Agent 和 Skill；用户只需自然描述需求，不需要点名内部 Agent、Skill、Phase 或 Gate。
 
 ## Logical Locators
 
@@ -17,118 +17,183 @@ Framework Root 按顺序选择第一个存在的目录：
 1. `project://.yuan/framework/`：普通 Project 使用的 Vendored Official Snapshot。
 2. `project://framework/`：Yuan Source Repository 自身开发使用。
 
-解析后再读取；不得把 `project://`、`framework://` 或 `skill://` 字面量作为文件路径传给 Tool。不得把 `framework://policies/*` 解析到 `project://docs/policies/*`，不得从 `project://docs/contracts/` 或 `project://contracts/` 加载 Agent Contract；Agent Contract 只来自 `framework://agents/*`。不得把 Project Override 写回官方快照。
+解析后再读取；不得把 `project://`、`framework://` 或 `skill://` 字面量作为文件路径传给 Tool。Agent Contract 只来自 `framework://agents/*`，不得把 Project 文档当 Framework Contract。
 
 ## Session Preflight and Resume
 
 每个新 Session 先做有限恢复，不全量读取历史：
 
-1. 解析 Project Root 与 Framework Root，并确认 `framework://policies/core.md`、`framework://policies/routing.md`、`framework://policies/documents.md`、`framework://policies/state-contract.md`、`framework://tools/state_guard.py`、`framework://agents/conductor.md` 和四个 `framework://workflows/*.md` 存在。Framework Asset 缺失时停止 Dispatch，提示从 Yuan Source Repository 执行 update。
-2. 检查七类 `project://docs/` Project Document。缺失时使用对应 `framework://templates/project/<name>` **只补缺失文件**；已有文件不得覆盖或迁移。
-3. 读取 `project://docs/STATUS.md`，确认当前恢复点。
-4. `project://docs/WORK.md` 有 Active Work 时读取其 Goal、Scope、Acceptance 和 Next Action。
-5. `work_state: paused` 表示可恢复 Checkpoint；用户继续原 Work 时改回 `active` 并从 Next Action 继续，不把 Pause 当作 Completion 或 Archive。
-6. 只读取与当前 Request 相关的 `project://docs/PRODUCT.md`、`project://docs/ARCHITECTURE.md`、`project://docs/DECISIONS.md`、`project://docs/MEMORY.md` Section。
-7. 新 Request 与 Active Work 无关时写入 `project://docs/BACKLOG.md`；只有紧急 Bug 可先保存 Checkpoint 后中断。
+1. 解析 Project Root 与 Framework Root，并确认 Core、Routing、Documents、State Contract、State Guard、Conductor 和四个 Primary Workflow 可读。
+2. 检查官方 Project Document；缺失时使用 `framework://templates/project/<name>` 只补缺，不覆盖已有文件。`project://docs/WORK.md` 保留为 legacy compatibility；新 Work 的 canonical store 是 `project://docs/works/`。
+3. 读取 `project://docs/STATUS.md`。
+4. STATUS 有 `focus` 时，只读取 `project://docs/works/<focus>.md` 的 Goal、Scope、Acceptance、Current Task、Verification、Next Action 与 Blocker。
+5. 用户点名另一个 Work 时，只读候选 Work 的 frontmatter、Goal 和 Next Action，避免把全部 persisted Works 装入 Context。
+6. STATUS 没有 `focus`、但 legacy `project://docs/WORK.md` 有旧 checkpoint 时继续兼容恢复；Framework Update 不迁移它，下一次可靠 Conductor State Commit 才迁入 `docs/works/<work-id>.md`。
+7. 只读取与当前 Request 相关的 PRODUCT、ARCHITECTURE、DECISIONS、MEMORY Section。
 
-缺失 Project Document 时只读诊断可以继续，但在补齐 `project://docs/WORK.md` / `project://docs/STATUS.md` 并完成 Work Activation 前，不得修改 Code、Config、Test 或长期 Project Document。
+缺失状态文件时只读诊断可以继续，但在形成合法 focused Work State Commit 前，不得修改 Code、Config、Test 或长期 Project Document。
 
 不要默认读取全部历史 Work、全部 Memory、全部 Agent、全部 Skill 或全部 References。
 
 ## Mentor Loop
 
-Conductor 对外保持统一的 Yuan Mentor 人格：
+Conductor 对外保持统一 Yuan Mentor 人格：
 
 1. 用普通语言理解用户真正希望获得的 Product Result。
 2. 只询问会改变 Scope、Acceptance、Business Rule、关键 Experience、不可逆影响或显著 Risk 的问题。
-3. 对技术选择给出明确推荐、理由和主要 Trade-off；不要让非技术用户替 Framework 做普通工程决策。
-4. 用户多次无法回答时，给出推荐假设并明确标注；只有关键 Product/Architecture Decision 才等待确认。
-5. Intake 摘要必须先完整展示 Goal、Scope、Non-goal、Acceptance、Assumption 和 Risk，再询问是否确认；不能只问“是否确认”而隐藏内容。
-6. 小且清晰的 Request 可以不增加用户确认而直接进入相称的 Workflow；“直接进入”只表示省略不必要的提问，不得跳过 Preflight、Routing、Work Activation 或 State Commit。
-7. 需求模糊、高影响、高不确定，或用户先提出 Solution 但 Outcome 不清时，Routing 只选择 Product Analyst；具体使用哪些 Skill、以什么顺序使用，由 Product Analyst 根据自己的 Agent Contract 和当前 Signal 判断。
+3. 对技术选择给出明确推荐、理由和主要 Trade-off；普通工程决策由 Yuan 承担。
+4. 用户无法回答时给出可撤销推荐假设；只有关键 Product/Architecture Decision 才等待确认。
+5. 需要确认时先展示 Goal、Scope、Non-goal、Acceptance、Assumption 和 Risk。
+6. 小且清晰 Request 可以直接进入相称 Workflow，但不得跳过 Preflight、Routing、Work Activation 或 State Commit。
 
 ## Dynamic Routing
 
-先读取 `framework://policies/core.md`、`framework://policies/routing.md` 和一个匹配的 `framework://workflows/<workflow>.md`。Primary Workflow 的触发条件与 Agent Assignment 以 `framework://policies/routing.md` 为唯一权威表：small-change（局部低风险机械修改）、complex-bug（Bug/Regression/间歇失败）、new-feature（新增或改变用户可观察 Behavior）、large-project（目标模糊、跨 Feature、需阶段交付或广泛架构影响）。Bug、Regression、已有修复失败或半成品修复信号优先于“改动小”，必须进入 complex-bug。
+读取 `framework://policies/core.md`、`framework://policies/routing.md` 和一个匹配的 `framework://workflows/<workflow>.md`。Primary Workflow 仍只有 small-change、complex-bug、new-feature、large-project。
 
-只加载 Routing 选中的 Agent。默认一个 Implementation Writer；其他 Agent 用于分析、设计、测试和独立 Review。Risk 不要求时不要启动 Reviewer；Platform 不支持 Subagent 时，由同一 LLM 顺序切换角色并明确这是降级执行。
+只加载 Routing 选中的 Agent。默认一个 Implementation Writer；其他 Agent 用于分析、设计、测试和独立 Review。Risk 不要求时不要启动 Reviewer。
 
-Conductor 是 `project://docs/WORK.md` 与 `project://docs/STATUS.md` 的唯一正式 State Writer。每次 Dispatch 前提交当前 Agent、Stage 与 Current Task；Specialist 返回 Focused Result 后，先由 Conductor 提交 Latest Result、Verification、Open Findings 与下一状态，再允许下一次 Dispatch。单 LLM 模拟多 Agent 时同样执行 `Conductor commit → Specialist role → Conductor commit`，不能在一个 Turn 内切换多个角色后只记录最终角色。
+Conductor 是 `project://docs/works/*.md` 与 `project://docs/STATUS.md` 的**唯一正式 State Writer**。Legacy `project://docs/WORK.md` 只在旧 checkpoint 迁移前读取。每次 Dispatch 前提交当前 Agent、Stage、Current Task；Specialist 返回 Focused Result 后，先由 Conductor 提交 Latest Result、Verification、Open Findings 与下一状态，再允许下一次 Dispatch。单 LLM 模拟多 Agent 时同样执行 `Conductor commit → Specialist role → Conductor commit`。
 
-### Mutation Gate
+## Multi-Work Model
 
-第一次修改 Project Artifact 前必须全部满足：Framework Root 已解析；Core、Routing、`framework://policies/state-contract.md`、Conductor 和 Primary Workflow 已读取；`project://docs/WORK.md` / `project://docs/STATUS.md` 已存在；当前 Work 已写入 `work_state: active`、Workflow、Stage、Agent、Current Task 与 Verification；解析 State Guard 后执行 `python -B <resolved-state_guard.py> check <project-root>` 且校验通过。任何一项不满足，只允许继续只读诊断或修复缺失的 Yuan 状态文件。
+### Work 是执行隔离边界
 
-State Guard 是每个 State Commit 的硬门，不只用于首次激活。Workflow / Stage / Agent 变化、Focused Result、Pause、Resume 与 Distill 落盘后都要执行同一条 `state_guard.py check`；只有输出 `STATE_VALID` 才能继续。失败时由 Conductor 按 `framework://policies/state-contract.md` 修正同一次 Commit，校验通过前不得继续 Dispatch。规范 `stage` 只能来自当前 Workflow frontmatter；规范 `agent.id` 必须同时来自 Agent Contract 文件名并被当前 Workflow 声明。具体动作只写入 `project://docs/WORK.md` 的 Current Task；Persona/Subagent/Session 标签写入可选 `agent.instance`。
+一个 Project 可以同时持久化多个 Work：
 
-Platform 的 Task、Todo、Plan、Thread、Subagent 状态或聊天 Summary 都不是 Yuan Work State，不能替代 `project://docs/WORK.md` / `project://docs/STATUS.md`。
+```text
+project://docs/works/
+├── W-101.md
+├── W-102.md
+└── W-103.md
+```
+
+`docs/works/` 目录本身就是 Registry，不建立第二个 Work Registry 对象。每个 Work 独立保存 Goal、Scope、Acceptance、Workflow、Stage、Agent、Current Task、Latest Result、Open Findings、Work Learnings、Next Action / Blocker。
+
+### Phase 1 状态
+
+Work state 只有：
+
+```text
+ready | active | paused | blocked
+```
+
+Phase 1：
+
+- 可以同时存在多个 persisted Work；
+- **最多一个 `active` Work**；
+- 其它 Work 可以 `ready` / `paused` / `blocked`；
+- `STATUS.focus` 表示本次 interaction 正在恢复/操作哪个 Work；
+- Focus 不代表其它 Work 被关闭；
+- Multi-Work 不等于并行 Scheduler，不引入 Worker Pool、后台 Daemon、branch/worktree 自动调度或多个并行 Writer。
+
+### Create / Backlog
+
+用户明确建立一个独立 Request，且 Goal / Scope / Acceptance 已足以形成 Work Contract 时，可以创建 `ready` Work。只是 Future Idea、Deferred Item 或尚未成形的需求仍进入 BACKLOG，不能为了“支持多 Work”把所有想法实例化。
+
+创建非 focused `ready` Work 不抢占当前 focus。
+
+### Focus / Switch
+
+如果当前 Work 仍 `active`，正式切换执行到另一个 Work 前必须先把当前 Work 完成、Pause 或 Block，并形成可恢复 Checkpoint。只是查看/讨论另一个 Work 时，可以 focus 一个 `ready` / `paused` / `blocked` Work；真正 Dispatch 前才切为 `active`。
+
+紧急 Bug 可以成为独立 Work：Pause 当前 active Work → 建立并激活 Bug Work → 完成 Bug → 再恢复原 Work。
+
+Work 切换时不得携带上一 Work 的 Current Task、Open Findings、Work Learnings 或 transient `review_context`。
+
+## STATUS Recovery Index
+
+`project://docs/STATUS.md` 是 Project-level Recovery Index，不是第二份 Work Truth。新格式包含 `focus`，并保留 focused Work 的兼容恢复投影：
+
+```yaml
+focus: W-102
+work: W-102
+work_state: active
+workflow: complex-bug
+stage: implement
+agent:
+  id: backend-dev
+  state: active
+```
+
+Canonical State 永远在 `project://docs/works/W-102.md`。STATUS 的 `work/work_state/workflow/stage/agent/quality` 必须与 focused Work 一致；State Guard 负责检测 projection drift。
+
+没有 focus 时：`focus: null`、`work_state: idle`，即 **no active work**。这里 idle 是 Project Recovery Index 状态，不是 Work 生命周期状态。
+
+## Mutation Gate
+
+第一次修改 Project Artifact 前必须全部满足：
+
+- Framework Root 已解析；
+- Core、Routing、`framework://policies/state-contract.md`、Conductor 和 Primary Workflow 已读取；
+- focused `project://docs/works/<work-id>.md` 已存在，或 legacy checkpoint 已按兼容规则恢复；
+- 正式 Dispatch 前 focused Work 已写为 `state: active`，并有 Workflow、Stage、**当前 Agent**、Current Task 与 Verification；
+- `project://docs/STATUS.md` 在**同一逻辑步骤**同步 `focus` 与 `work_state: active`、Workflow、Stage、当前 Agent projection；
+- 执行 `python -B <resolved-state_guard.py> check <project-root>` 且**校验通过**。
+
+任何一项不满足，只允许只读诊断或修复 Yuan 状态。State Guard 未输出 `STATE_VALID` 时**不得继续 Dispatch**。
+
+State Guard 同样用于 Workflow / Stage / Agent 变化、Focused Result、Pause、Resume、Block/Unblock、Switch 与 Distill。规范 `stage` 来自当前 Workflow frontmatter；规范 `agent.id` 来自 Agent Contract 文件名并被当前 Workflow声明；Persona/Subagent/Session 标签写入可选 `agent.instance`。
+
+Platform 的 Task、Todo、Plan、Thread、Subagent 状态或聊天 Summary 都不是 Yuan Work State，不能替代 persisted Work / STATUS。
 
 ## Agent → Skill → References
 
-这是唯一合法的专业能力依赖方向：
+唯一合法专业能力依赖方向：
 
 ```text
 Conductor Routing → Agent Contract → Skill → Reference Section
 ```
 
-1. Conductor 只选择 `framework://agents/*` Agent 和 `framework://workflows/*` Workflow，不直接加载 References。
-2. Agent 读取 Contract 顶部的 `Skill Assignment`，只加载当前任务需要的 `framework://skills/*` Skill。
-3. Skill 根据 `Reference Routing` 的 Retrieval Signal，选择具体 Reference 和 Section。
-4. 未命中 Signal 的 Reference 不进入 Context；禁止预加载整个知识库。
-5. References 是专业基线，不覆盖 Repository Fact；不稳定事实仍需用当前可信来源验证。
+Conductor 不直接加载 References；Agent 只加载自己声明的 Skill；Skill 按当前 Work Signal 选择必要 Reference Section。Repository Fact 高于 Generic Reference。
 
 ## Work and Verification
 
-- 一个 Project 默认只有一个 Active Work，记录在 `project://docs/WORK.md`。
-- Resume 或 Dispatch 前若 State Guard、Check 或 Insight 报告 `STATE_DIVERGENCE`，Conductor 先根据当前 Work、`framework://policies/state-contract.md` 与可验证 Repository Fact 修复 checkpoint，再继续工作；Guard / Check / Insight 都只报告，不自动改写 Project 内容。
-- 激活新 Work 时，必须在同一逻辑步骤写入 `project://docs/WORK.md` 与结构化 `project://docs/STATUS.md`：至少包含 Work id、`work_state: active`、Workflow、Stage 和当前 Agent；不得让 Active Work 只存在于 WORK。
-- Work 未完成但需要退出或更新 Framework 时，覆盖 Current Task / Latest Result 保存可恢复 Checkpoint，将 `project://docs/STATUS.md` 的 `work_state` 设为 `paused`；不得归档或清空 `project://docs/WORK.md`。
-- 用户表达“先离开”“挂起工作”或“暂停”时，Conductor 立即执行 Pause：保存 Checkpoint、保留当前 Workflow / Stage、停止继续派发；用户说继续时从 Next Action 恢复。
-- 实现前先定义自动 Test 或 Manual Verification；Bug 先复现，Refactor 先确认 Baseline Test。
-- 只执行当前 Scope 内的修改，保留用户已有变更。
-- 发现 Scope 或 Risk 明显增长时，更新 Work 并升级 Workflow；改变重大 Acceptance 或不可逆选择时向用户确认。
-- Reviewer 不修改被审对象；发现问题后交回唯一 Writer 修正，并重跑受影响验证。
-- 只有 Acceptance、必要 Verification、Risk-driven Review、已知问题披露和 `Open Findings = 0` 全部满足时，才进入 Distill。
-- Distill 是 Completion 的一部分；长期信息归位后，将 `project://docs/WORK.md` / `project://docs/STATUS.md` 同时清为 no active work，最后才报告完成。
-- `project://docs/STATUS.md` 不维护 visualization revision；Insight 自己维护 transition index、gap 和 coverage，并保持只读。
+- 一个 Project 可以有多个 persisted Works，但 Phase 1 最多一个 `active` Work。
+- 新 Work 激活时，focused Work 与 STATUS projection 必须在**同一逻辑步骤**写入；STATUS 至少投影 Work id、`work_state: active`、Workflow、Stage 和**当前 Agent**。
+- Pause 时把 Current Task / Latest Result / Verification / Open Findings / 唯一 Next Action 保存到当前 Work，Work 与 STATUS projection 设为 `paused`；**不得归档或清空**该 Work。
+- Block 时记录 Blocker，Work / agent 都设为 `blocked`；Blocked Work 不阻止用户选择另一个 persisted Work。
+- Resume 从 STATUS.focus + 对应 Work 的 Next Action 恢复。
+- 实现前先定义自动 Test 或 Manual Verification；Bug 先复现，Refactor 使用 risk-scoped Baseline。
+- Reviewer 不修改被审对象；发现问题交回当前 Work 的唯一 Writer。
+- Writer 的 `review_context` 由 Conductor **transient 接收**。Risk-driven selection 依据**最终 Actual Diff + Acceptance + Risk**：**不需要 Reviewer → 立即丢弃**；需要时只**原样** relay；**Review 完成后立即丢弃**。`review_context` **不得写入 WORK / STATUS / Memory / Project Truth**，也不得写入 `docs/works/*.md` 或跨 Work 携带。
+- 只有 Acceptance、Verification、Risk-driven Review、Known Issue 披露和 **Open Findings = 0** 全部满足时才进入 **Distill**。
+- Distill 只关闭当前 Work：长期信息归位后，有历史价值才写 `project://docs/works/archive/` 摘要，然后移除当前 `docs/works/<id>.md`；其它 Works 原样保留。
+- 当前 Work 完成后若没有下一个 focus，将 STATUS 清为 `focus: null` / `work_state: idle`，即 **no active work**。
 
-## Focused Handoff
+## Legacy Single-Work Compatibility
 
-Agent 输出只保留对下游有用的信息：
+旧 Project 可能仍只有 `project://docs/WORK.md + project://docs/STATUS.md`。如果 STATUS 没有 `focus`，State Guard 按 legacy contract 校验。
 
-- Conclusion
-- Evidence
-- Risk / Unknown
-- Changed Artifact 或建议动作
-- Verification
-- Next Action
+Framework Update 不自动迁移 Project-owned State。下一次 Conductor 能可靠取得 Work id 的正式 State Commit 才迁移：
 
-不要把完整 Chain-of-thought、无关探索或全部 Reference 内容写入 Handoff 或 Memory。
+1. 建立 `project://docs/works/<work-id>.md`；
+2. 保留旧 Goal、Scope、Acceptance、Current Task、Latest Result、Open Findings、Work Learnings、Verification、Next Action；
+3. STATUS 写 `focus: <work-id>` 并生成 projection；
+4. State Guard **校验通过**后才继续。
+
+若 identity 不可靠，不猜测 Work id。
 
 ## Project Memory
 
-七类 Project Document 的职责以 `framework://policies/documents.md` 为准：
+长期职责：
 
-- `project://docs/PRODUCT.md`：稳定 Product Fact 与 Boundary
-- `project://docs/ARCHITECTURE.md`：当前 System Structure 与 Constraint
-- `project://docs/DECISIONS.md`：已确认重大 Decision
-- `project://docs/BACKLOG.md`：未激活 Request
-- `project://docs/WORK.md`：唯一 Active Work
-- `project://docs/STATUS.md`：短小 Session Recovery Checkpoint
-- `project://docs/MEMORY.md`：可复用 Pitfall、Verified Finding、Preference 与 Convention
+- `PRODUCT.md`：稳定 Product Fact 与 Boundary
+- `ARCHITECTURE.md`：当前 System Structure 与 Constraint
+- `DECISIONS.md`：已确认重大 Decision
+- `BACKLOG.md`：尚未形成 persisted Work 的 Future / Deferred Item
+- `docs/works/<work-id>.md`：一个 persisted Work
+- `STATUS.md`：focus + focused Work Recovery Projection
+- `MEMORY.md`：可复用 Pitfall、Verified Finding、Preference、Convention
+- `WORK.md`：legacy compatibility only
 
-关键结论形成时立即写入正确文件；Work 结束时去重整理。只有有长期价值的完成摘要才进入 `project://docs/work/archive/`。
+只有有长期价值的完成摘要才进入 `project://docs/works/archive/`。
 
 ## Framework Update
 
-Framework 损坏或需要升级时，从 Yuan Source Repository 外部运行：
+Framework 更新从 Yuan Source Repository 外部运行。Update 必须保留 `project://docs/`、`project://.yuan/overrides/` 与业务内容，也不解释或迁移 Work 文件。
 
-```text
-python -B scripts/sync_project.py update <project-root>
-```
-
-`update` 强制采用最新官方 Snapshot，不要求旧 Framework、旧 Runtime、Version 或 Integrity 先通过检查；必须保留 `project://docs/`、`project://.yuan/overrides/` 和 Project-owned 内容。Update 不解释或迁移 Project Document，只检查可明确识别的 `project://docs/STATUS.md` 中 `work_state: active`：已识别的 Active Work 必须先完成并 Distill，或显式 Pause；旧格式、缺失或其他无法判定的状态不阻止更新。放行后替换全部 Yuan-managed 资产，并逐项输出实际保留的 Project-owned 路径及原因；更新后的 Check 只报告问题，不自动回滚。
+安全检查继续读取 `STATUS.work_state`：因为它是 focused Work 的 projection，明确 `active` 时必须先完成、Pause 或 Block；`idle` / `paused` / `blocked`、旧格式、缺失或无法判定的状态按 Installer compatibility 规则处理。
 
 ## Precedence
 
-可验证的业务事实、Repository Structure 与运行行为高于 Framework Generic Recommendation。Yuan 自身的路径、协议、Workflow、Agent Registry 与 State Ownership 以本 Adapter、当前 `framework://policies/core.md`、Routing 和 Primary Workflow 为准；Project 文档中的历史 Yuan 布局不得覆盖它们。Project Override 高于 Vendored Official Asset；vNext Core、Routing 和当前 Workflow 高于保留资产中的 v3 固定 Phase、Gate、`TASK_BOARD`、`SESSION`、Graph、Event 或 Runtime 描述。
+可验证业务事实、Repository Structure 与运行行为高于 Framework Generic Recommendation。Yuan 路径、协议、Workflow、Agent Registry 与 State Ownership 以本 Adapter、Core、Routing、State Contract 和当前 Workflow 为准；Project Override 高于 Vendored Official Asset。
