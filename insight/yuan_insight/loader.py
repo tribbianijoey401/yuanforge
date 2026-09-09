@@ -49,7 +49,7 @@ def _content_hash(payload: bytes) -> str:
 
 WATCHED_DOCS = (
     "docs/STATUS.md",
-    "docs/WORK.md",
+    "docs/WORK.md",  # legacy compatibility
     "docs/MEMORY.md",
     "docs/DECISIONS.md",
     "docs/ARCHITECTURE.md",
@@ -57,9 +57,18 @@ WATCHED_DOCS = (
 
 
 def collect_project_files(root: Path) -> dict[str, str]:
-    """收集被观察文件的 content hash。文件缺失时记录 MISSING。"""
+    """收集被观察文件的 content hash；Multi-Work 文件动态加入。"""
     files: dict[str, str] = {}
-    for relative in WATCHED_DOCS:
+    relatives = list(WATCHED_DOCS)
+    works_dir = root / "docs" / "works"
+    if works_dir.is_dir():
+        relatives.extend(
+            path.relative_to(root).as_posix()
+            for path in sorted(works_dir.glob("*.md"))
+            if path.is_file()
+        )
+
+    for relative in relatives:
         path = root / relative
         if path.is_file():
             try:
@@ -71,6 +80,20 @@ def collect_project_files(root: Path) -> dict[str, str]:
     return files
 
 
+def _focused_work_path(root: Path, status) -> tuple[Path, str | None, str]:
+    """Return canonical observed Work path, id and source kind.
+
+    Presence of ``focus`` in raw frontmatter distinguishes the new multi-work
+    format from legacy v4. A new-format STATUS with ``focus: null`` must not
+    accidentally resurrect legacy WORK.md as current state.
+    """
+    if "focus" in status.raw:
+        if status.focus:
+            return root / "docs" / "works" / f"{status.focus}.md", status.focus, "multi-work"
+        return root / "docs" / "works" / ".no-focused-work", None, "multi-work"
+    return root / "docs" / "WORK.md", status.work, "legacy"
+
+
 def build_snapshot(root: Path, observed_at: str) -> Snapshot:
     """读取当前可观察语义状态，生成 Snapshot。无法解析的字段保持空（= Unknown）。"""
     snapshot = Snapshot(observed_at=observed_at)
@@ -78,6 +101,7 @@ def build_snapshot(root: Path, observed_at: str) -> Snapshot:
 
     status = load_status(root / "docs" / "STATUS.md")
     snapshot.status = {
+        "focus": status.focus,
         "work": status.work,
         "work_state": status.work_state,
         "workflow": status.workflow,
@@ -94,8 +118,12 @@ def build_snapshot(root: Path, observed_at: str) -> Snapshot:
         "blocker": status.blocker,
     }
 
-    work = load_work(root / "docs" / "WORK.md")
+    work_path, work_id, work_source = _focused_work_path(root, status)
+    work = load_work(work_path)
     snapshot.work = {
+        "id": work_id,
+        "source": work_source,
+        "path": work_path.relative_to(root).as_posix() if work_source != "multi-work" or work_id else None,
         "has_active_work": work.has_active_work,
         "goal": work.goal,
         "scope": work.scope,
@@ -106,7 +134,7 @@ def build_snapshot(root: Path, observed_at: str) -> Snapshot:
         "work_learnings": work.work_learnings,
     }
 
-    # Expected：从 workflow 定义提取（Framework 静态定义，变化时才重读）
+    # Expected：从 focused Work 的 STATUS projection 中取得 workflow id。
     workflow_id = status.workflow or ""
     framework_root = root / ".yuan" / "framework"
     if not framework_root.is_dir():
