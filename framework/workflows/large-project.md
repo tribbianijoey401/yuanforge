@@ -21,14 +21,13 @@ optional_agents:
 
 ```text
 Product Analyst 建立 Problem Model
-→ 确认真正 Outcome、Problem、Facts、Constraints、Assumptions 与 Reframe
-→ 同一 Product Analyst 将已确认方向转成具体 Product Contract
-→ Recommend
+→ 确认 Outcome、Facts、Constraints、Assumptions 与 Reframe
+→ 转成具体 Product Contract
 → Confirm Product Contract
 → Plan by Slice
 → 命中 Presentation Design Signal 的 Slice 执行 Repository Capability Audit、内容/页面边界建模与 Prototype Convergence
-→ UI Designer 将 Presentation Contract 作为 `project://docs/design/` 中的 Quality Artifact 交给 Review 与实现消费
-→ Conductor 提交 Active Work、Stage、Agent 与 Current Task
+→ UI Designer 将 Presentation Contract 作为 `project://docs/design/` Quality Artifact
+→ Conductor 提交 focused Work、Stage、Agent 与 Current Task
 → Build
 → 每个 Focused Result 后由 Conductor 提交 Result 与下一状态
 → Verify
@@ -37,15 +36,16 @@ Product Analyst 建立 Problem Model
 → Distill
 ```
 
-复杂 Work 可以在 `project://docs/WORK.md` 内嵌 Task Board。出现紧急 Bug 时，保存 Goal、Progress、Changed Path、Unfinished Edit、Verification、Git Checkpoint 与 Risk，暂停原 Work；Bug 完成后检查 API、Data、Architecture、Business Rule 与 Dependency Impact，再恢复原 Work。
+复杂 Work 可以在自己的 `project://docs/works/<work-id>.md` 内嵌 Task Board。Project 也可以同时持久化其它 `ready` / `paused` / `blocked` Work；这些不是当前 Large Project 的 Task，也不得共享 Current Task。
+
+出现紧急 Bug 时，保存 Goal、Progress、Changed Path、Unfinished Edit、Verification、Git Checkpoint 与 Risk，Pause 原 Work；建立独立 Bug Work 并切 focus；Bug 完成后检查 API、Data、Architecture、Business Rule 与 Dependency Impact，再恢复原 Work。Phase 1 不允许原 Work 与 Bug Work 同时 `active`。
 
 > **Writer 语义：** `frontend-dev` 与 `backend-dev` 至少启用一个作为唯一 Implementation Writer，由 Conductor 按当前 Slice 涉及的代码域顺序切换，不并行修改同一 Workspace。命中 Presentation Design Signal 时启用 `ui-designer` 设计并持久化 Presentation Contract，Frontend Dev 仅在 Artifact 存在时消费它；`design-reviewer` 在 Plan 编码前启用；其余 `optional_agents` 仅在 Risk Signal 命中时启用。
 
-
 ## State Commit
 
-每次角色 Dispatch 前和 Focused Result 返回后，必须先回到 Conductor 更新 `project://docs/WORK.md` / `project://docs/STATUS.md`；Stage 或 Agent 的变化只有在该 Commit 落盘并通过 `framework://tools/state_guard.py` 后才成立。单 LLM Persona Switch 也不得跳过。
+每次角色 Dispatch 前和 Focused Result 返回后，必须先回到 Conductor 更新 focused `project://docs/works/<work-id>.md` 与 `project://docs/STATUS.md`；Stage 或 Agent 的变化只有在该 Commit 落盘并通过 `framework://tools/state_guard.py` 后才成立。单 LLM Persona Switch 也不得跳过。
 
 ## Pause / Resume
 
-Pause 是当前 Workflow 的正交状态，不新增 Stage。用户表达“先离开”“挂起工作”或“暂停”时，Conductor 必须先把 Current Task、已完成结果、Verification、Open Findings 和唯一 Next Action 写入 `project://docs/WORK.md`，再保留当前 Workflow 与当前 Stage，将 `project://docs/STATUS.md` 写为 `work_state: paused`、Agent state 设为 `paused`，停止继续派发或执行。用户要求继续时，将状态恢复为 `active`，从同一 Stage 的 Next Action 继续。
+Pause 是当前 Workflow 的正交状态，不新增 Stage。用户表达“先离开”“挂起工作”或“暂停”时，Conductor 必须先把 Current Task、已完成结果、Verification、Open Findings 和唯一 **Next Action** 写入 focused Work，再保留当前 Workflow 与**当前 Stage**，将 Work state 与 `project://docs/STATUS.md` projection 写为 `work_state: paused`、Agent state 设为 `paused`，停止继续派发或执行。用户要求继续时，将状态恢复为 `active`，从同一 Stage 的 Next Action 继续。
