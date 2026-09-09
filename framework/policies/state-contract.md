@@ -64,7 +64,8 @@ Phase 1 支持 **Multiple Persisted Works**，但不是并行 Work Scheduler：
 - 一个 Project 可以同时存在多个 `ready` / `paused` / `blocked` Work。
 - **最多一个 `active` Work**。
 - 如果存在 `active` Work，`STATUS.focus` 必须指向它。
-- 创建第二个 `ready` Work 不要求终止当前 Work；但切换正式执行前必须先让当前 `active` Work 完成、暂停或阻塞，再激活新 Work。
+- 创建第二个 `ready` Work 不要求终止当前 Work；但真正改变 focus 或切换正式执行前，必须先让当前 `active` Work完成、暂停或阻塞。
+- 在当前 active Work 仍保持 focus 时，可以只读查看其它 Work 的最小信息；这不构成 focus switch。
 - 同一 Workspace 仍遵循一个 Writer；Phase 1 不引入 branch/worktree scheduler、mutation overlap detector、worker pool 或后台 daemon。
 
 ## STATUS Recovery Index
@@ -108,12 +109,13 @@ agent:
 
 ## Focus and Switching
 
-Focus 表示本次 Conductor interaction 正在恢复/操作哪个 Work，不表示其它 Work 不存在。
+Focus 是 Project 的唯一恢复锚点，表示本次 Conductor interaction 正式操作哪个 Work，不表示其它 Work 不存在。
 
-- 用户继续某个 paused/blocked/ready Work：先读取该 Work 的最小恢复 Context，必要时解决 Blocker，再在正式 Dispatch 前将它切到 `active` 并同步 STATUS。
-- 用户明确开始一个独立的新工作：可创建新的 `ready` Work；如果要立即执行且已有 active Work，先为原 Work 建立可恢复 Checkpoint。
+- 若存在 `active` Work，它必须继续保持为 focus。此时可以只读查看其它 Work 的 frontmatter / Goal / Next Action，但不能改变 `STATUS.focus`。
+- 任何 focus change 都必须先让当前 `active` Work complete / pause / block，并形成可恢复 Checkpoint。
+- 当前没有 active Work 时，focus 可以指向 `ready` / `paused` / `blocked` Work 用于讨论或恢复；正式 Dispatch 前再切为 `active`。
+- 用户明确开始一个独立的新工作：可创建新的非 focused `ready` Work；如果要立即执行且已有 active Work，先按上一条收敛原 Work。
 - 与当前目标无关、尚未形成明确 Goal / Scope / Acceptance 的未来想法仍进入 BACKLOG，不为了“多 Work”把所有想法都实例化。
-- Focus 可以指向 paused / blocked / ready Work 用于讨论；只有 Dispatch 时才必须 active。
 
 ## Execution Identity
 
