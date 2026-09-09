@@ -52,12 +52,12 @@ Checkpoint 属于每个 Work 自己：Current Task、Latest Result、Verificatio
 3. 重大 Decision 写入 DECISIONS，并标记被 Supersede 的旧 Decision。
 4. 未激活 Future Item 写入 BACKLOG；其它 persisted Work 不修改。
 5. 只有有长期价值的完成摘要才进入 `project://docs/works/archive/`。
-6. 在 `Open Findings = 0` 且长期信息已归位后，向 Conductor 返回删除当前 `docs/works/<id>.md` 并更新 STATUS focus 的 Distill 提案。
+6. 在 `Open Findings = 0` 且长期信息已归位后，向 Conductor 返回删除当前 `project://docs/works/<id>.md` 并更新 STATUS focus 的 Distill 提案。
 7. 不再“清空全部 WORK / STATUS”；只完成当前 Work。没有下一个 focus 时 STATUS 回到 no active work。
 
 ## Legacy Migration
 
-Legacy v4 的 `project://docs/WORK.md` 不由 Update 自动迁移。下一次 Conductor 能可靠识别 Work id 时，把它的 Goal、Scope、Acceptance、Current Task、Latest Result、Open Findings、Work Learnings、Verification、Next Action 原语义写入 `docs/works/<id>.md`，再切换 STATUS 到新格式。无法可靠识别 identity 时不得猜测。
+Legacy v4 的 `project://docs/WORK.md` 不由 Update 自动迁移。下一次 Conductor 能可靠识别 Work id 时，把它的 Goal、Scope、Acceptance、Current Task、Latest Result、Open Findings、Work Learnings、Verification、Next Action 原语义写入 `project://docs/works/<id>.md`，再切换 STATUS 到新格式。无法可靠识别 identity 时不得猜测。
 
 ## State Ownership
 

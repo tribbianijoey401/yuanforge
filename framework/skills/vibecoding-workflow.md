@@ -28,7 +28,7 @@ version: 4.0.0
 解析逻辑定位符；确认 Core、Routing、Documents、Conductor 与四个 Primary Workflow 可读。检查 Project Document，缺失时只复制官方空模板，不覆盖已有内容。
 
 先读 STATUS：
-- 有 `focus` → 读取对应 `docs/works/<focus>.md` 的最小恢复 Context；
+- 有 `focus` → 读取对应 `project://docs/works/<focus>.md` 的最小恢复 Context；
 - 用户指定另一个 Work → 只读其 frontmatter / Goal / Next Action 后决定是否 Switch；
 - 无 `focus` 且 legacy WORK 有旧 checkpoint → compatibility resume，下一次可靠 State Commit 再迁移；
 - 不默认读取全部 persisted Work。
@@ -102,7 +102,7 @@ Switch：按 State Contract 先收敛当前 active Work，再更新 focus；Phas
 满足 Completion Checklist 后先 Distill 当前 Work：
 - 长期 Fact / Decision / Pitfall 归位；
 - 有历史价值才写 `project://docs/works/archive/` 摘要；
-- 移除完成的 `docs/works/<id>.md`，其它 Work 原样保留；
+- 移除完成的 `project://docs/works/<id>.md`，其它 Work 原样保留；
 - 用户明确继续另一个 Work则切 focus，否则 STATUS 清为 `focus: null` / `work_state: idle`，即 no active work。
 
 Legacy `project://docs/WORK.md` 不再作为新模型的 canonical Work State。

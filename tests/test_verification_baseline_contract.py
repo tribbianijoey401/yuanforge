@@ -45,7 +45,7 @@ class VerificationBaselineContractTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
 
         self.assertIn("Verification claim 必须与实际 scope 一致", skill)
-        self.assertIn("未跑全量时不声称\"全项目无回归\"", discipline)
+        self.assertRegex(discipline, r'未跑全量时不得声称[“"](?:整个|全)项目无回归[”"]')
 
 
 if __name__ == "__main__":

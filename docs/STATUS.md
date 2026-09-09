@@ -1,27 +1,18 @@
 ---
-work: 2026-09-01_quality-v0
-work_state: active
-workflow: large-project
-stage: review
+focus: null
+work: null
+work_state: idle
+workflow: null
+stage: null
 agent:
-  id: conductor
-  instance: persona-degraded
-  state: active
+  id: null
+  instance: null
+  state: null
 quality:
-  test: passed
-  review: passed
+  test: pending
+  review: pending
 ---
 
-# Current Situation
+# Project Recovery Index
 
-## Last Completed
-
-- `2026-08-11_content-driven-interface-design`：以 main 为基础手工 graft 内容驱动的 Interface Design Skill、References、条件性 Agent Contract 与 installer Framework Fingerprint；版本升至 `4.0.0-alpha.12`。Presentation Contract 只作为 `docs/design/` 中的条件性 UI Quality Artifact，不进入 Core State 或 State Guard。
-
-## Next
-
-Quality Auditor returned READY; the narrow correction is committed and pushed without changing the existing immutable tag. Real three-arm model comparison remains pending.
-
-## Blocker
-
-无。
+No focused Work. `2026-09-01_quality-v0` remains paused as a persisted checkpoint.

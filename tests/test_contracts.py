@@ -350,7 +350,8 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertTrue(guard.is_file())
         for text in (adapter, conductor, coordination):
             self.assertIn("state-contract.md", text)
-            self.assertIn("state_guard.py check", text)
+            self.assertIn("resolved-state", text)
+            self.assertIn("check <project-root>", text)
             self.assertIn("校验通过", text)
             self.assertIn("不得继续 Dispatch", text)
         self.assertIn("agent.instance", contract)
@@ -562,7 +563,11 @@ class FrameworkContractTests(unittest.TestCase):
             FRAMEWORK / "templates" / "project" / "WORK.md",
             FRAMEWORK / "templates" / "project" / "STATUS.md",
         ):
-            self.assertNotIn("review_context", path.read_text(encoding="utf-8"), path.name)
+            self.assertNotRegex(
+                path.read_text(encoding="utf-8"),
+                r"(?m)^\s*review_context\s*:",
+                path.name,
+            )
         for path in (ROOT / "docs" / "WORK.md", ROOT / "docs" / "STATUS.md", ROOT / "docs" / "MEMORY.md"):
             self.assertNotRegex(
                 path.read_text(encoding="utf-8"), r"(?m)^review_context:\s*$", path.name
@@ -582,7 +587,7 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("不要求固定五段", auditor)
 
     def test_quality_v0_benchmark_and_python_stack_reference_are_actionable(self):
-        benchmark_root = FRAMEWORK / "benchmarks" / "quality-v0"
+        benchmark_root = ROOT / "benchmarks" / "quality-v0"
         protocol = (benchmark_root / "README.md").read_text(encoding="utf-8")
         scorecard = (benchmark_root / "scorecard.md").read_text(encoding="utf-8")
         stack = (FRAMEWORK / "references" / "stacks" / "python-unittest.md").read_text(
@@ -626,7 +631,7 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertNotIn("Yuan 本仓库的 Evidence", stack)
 
     def test_quality_v0_shared_tasks_do_not_leak_engineering_answers(self):
-        task_root = FRAMEWORK / "benchmarks" / "quality-v0" / "tasks"
+        task_root = ROOT / "benchmarks" / "quality-v0" / "tasks"
         feature = (task_root / "feature.md").read_text(encoding="utf-8")
         bug = (task_root / "bug.md").read_text(encoding="utf-8")
         refactor = (task_root / "refactor.md").read_text(encoding="utf-8")
@@ -817,8 +822,11 @@ class FrameworkContractTests(unittest.TestCase):
         fingerprint = installer.framework_fingerprint(FRAMEWORK)
         self.assertRegex(fingerprint, r"^[0-9a-f]{64}$")
         self.assertEqual(fingerprint, installer.framework_fingerprint(FRAMEWORK))
-        self.assertEqual("4.0.0-alpha.13", (FRAMEWORK / "VERSION").read_text(encoding="utf-8").strip())
-        self.assertIn("version: 4.0.0-alpha.13", (ROOT / "SKILL.md").read_text(encoding="utf-8"))
+        canonical_version = (FRAMEWORK / "VERSION").read_text(encoding="utf-8").strip()
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        skill_version = re.search(r"(?m)^version:\s*(\S+)\s*$", skill)
+        self.assertIsNotNone(skill_version)
+        self.assertEqual(canonical_version, skill_version.group(1))
 
 
 if __name__ == "__main__":

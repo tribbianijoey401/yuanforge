@@ -34,7 +34,7 @@ Existing Project 的 Repository Fact 高于 Generic Reference。
 1. 运行 Installer；不覆盖已有 `project://docs/`、Override 和 Source。
 2. 使用 project-audit 从 Repository、Test、Config、Git History 与可运行行为恢复 Fact。
 3. 稳定 Product、Architecture、Decision、Backlog 与 Memory 写入长期文档。
-4. 若已有 `docs/works/*.md`，保持每个 Work 独立；若只有 legacy WORK + old STATUS，不在 Installer/Update 中猜测迁移。
+4. 若已有 `project://docs/works/*.md`，保持每个 Work 独立；若只有 legacy WORK + old STATUS，不在 Installer/Update 中猜测迁移。
 5. 下一次有可靠 Work id 的 Conductor State Commit 才执行 legacy migration，然后进入匹配 Workflow。
 
 ## Multi-Work Bootstrap Rule

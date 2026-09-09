@@ -159,6 +159,50 @@ class MultiWorkStateTests(unittest.TestCase):
 
         self.assertIn("STATE_MULTIPLE_ACTIVE_WORKS", {issue.code for issue in issues})
 
+    def test_allows_ready_nonfocused_work_while_another_work_is_active(self):
+        self.write_work(
+            "W-101",
+            work_payload("W-101", state="active", agent_state="active", current_task=True),
+        )
+        self.write_work(
+            "W-102",
+            work_payload("W-102", state="ready", agent_state="idle"),
+        )
+        self.write_status(
+            status_payload(
+                "W-101",
+                work_state="active",
+                workflow="complex-bug",
+                stage="implement",
+                agent_id="backend-dev",
+                agent_state="active",
+            )
+        )
+
+        self.assertEqual([], self.guard.validate_project_state(self.root, FRAMEWORK))
+
+    def test_allows_blocked_nonfocused_work_while_another_work_is_active(self):
+        self.write_work(
+            "W-101",
+            work_payload("W-101", state="active", agent_state="active", current_task=True),
+        )
+        self.write_work(
+            "W-102",
+            work_payload("W-102", state="blocked", agent_state="blocked", blocker=True),
+        )
+        self.write_status(
+            status_payload(
+                "W-101",
+                work_state="active",
+                workflow="complex-bug",
+                stage="implement",
+                agent_id="backend-dev",
+                agent_state="active",
+            )
+        )
+
+        self.assertEqual([], self.guard.validate_project_state(self.root, FRAMEWORK))
+
     def test_rejects_status_projection_that_diverges_from_focused_work(self):
         self.write_work(
             "W-101",

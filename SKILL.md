@@ -2,7 +2,7 @@
 name: yuanforge
 title: YuanForge Vibecoding 元框架入口
 description: 用 YuanForge 元框架进行 vibecoding 软件开发。当用户要开发功能、加需求、修 Bug、调试、重构、写测试、做 UI/界面设计、审查代码、规划项目，或说"vibecoding""用 yuan""元框架"，以及启动需要跨会话记忆的大型项目迭代时使用。轻任务按需加载方法论直接执行；大任务建立 docs/ 状态文档支持多会话持续推进。
-version: 4.0.0-alpha.13
+version: 4.0.0-alpha.14
 ---
 
 # YuanForge — Vibecoding 元框架（伞形入口）
@@ -48,9 +48,10 @@ version: 4.0.0-alpha.13
 
 ## 第三步（仅重模式）：建立持久状态
 
-1. 项目根无七类文档时，按 `skill://framework/templates/project/` 创建：PRODUCT / ARCHITECTURE / DECISIONS / BACKLOG / WORK / STATUS / MEMORY（已有则不覆盖，非破坏合并）。
-2. 读 `skill://AGENTS.md`（完整 Adapter 协议）+ `skill://framework/policies/core.md` 与 `skill://framework/policies/routing.md`，选定 Workflow（small-change / complex-bug / new-feature / large-project）。
-3. 之后每次角色推进遵循 Conductor 状态提交纪律（WORK 与 STATUS 同步维护）；`skill://framework/tools/` 下的 State Guard 等工具可选启用。
+1. 项目根缺少官方 Project Document 时，按 `skill://framework/templates/project/` 只补缺失的 PRODUCT / ARCHITECTURE / DECISIONS / BACKLOG / WORK / STATUS / MEMORY；不覆盖已有内容，也不因为初始化强制创建空 Work。
+2. 新 Work 的 canonical state 是 `project://docs/works/<work-id>.md`。`project://docs/STATUS.md` 只保存 `focus` 与 focused Work 的 recovery projection；`project://docs/WORK.md` 只保留 legacy single-work compatibility。
+3. 读 `skill://AGENTS.md`（完整 Adapter 协议）+ `skill://framework/policies/core.md`、`skill://framework/policies/routing.md` 与 `skill://framework/policies/state-contract.md`，选定 Workflow（small-change / complex-bug / new-feature / large-project）。
+4. 正式 Dispatch 前，Conductor 在同一 State Commit 写 focused Work 与 STATUS projection，并执行 `python -B <resolved-state_guard.py> check <project-root>`。只有 `STATE_VALID` 才能继续；State Guard 是 formal State Commit 的 mandatory gate，不是可选工具。
 
 ## 平台适配
 

@@ -92,6 +92,32 @@ class ObservationEvidence:
     gaps: list[dict[str, Any]]
 
 
+def load_observation_evidence(root: Path) -> ObservationEvidence:
+    """Load durable observation data for CLI signal calculation.
+
+    This is intentionally separate from ``ObservationService`` so ``--signals``
+    can inspect the existing read-only observation record without starting a
+    watcher or creating a new session.
+    """
+    insight_dir = root / ".yuan" / "insight"
+    cache = _read_json(insight_dir / "cache" / "current.json")
+    transitions = read_transitions(insight_dir / "traces" / "current.jsonl")
+    session_id = cache.get("session_id")
+    gaps = (
+        read_transitions(insight_dir / "gaps" / f"{session_id}.jsonl")
+        if session_id
+        else []
+    )
+    return ObservationEvidence(
+        coverage=str(cache.get("coverage") or "UNKNOWN"),
+        mode=str(cache.get("observation_mode") or "unknown"),
+        transitions=transitions,
+        current_work_id=cache.get("current_work_id"),
+        session_id=session_id,
+        gaps=gaps,
+    )
+
+
 @dataclass
 class ObservationUpdate:
     snapshot: Snapshot

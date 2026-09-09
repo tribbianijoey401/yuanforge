@@ -54,7 +54,7 @@ Conductor
 - 需要 Reviewer → 只向 selected Reviewer **原样**转发；不得摘要、重新编译、合并或用另一份 Context 替代。
 - Review 完成后立即丢弃 Context。
 
-兼容性表述保持明确：`review_context` **不得写入 WORK / STATUS / Memory / Project Truth**；在 Multi-Work 模型中同样不得写入 `docs/works/*.md`，也不得跨 Work relay。
+兼容性表述保持明确：`review_context` **不得写入 WORK / STATUS / Memory / Project Truth**；在 Multi-Work 模型中同样不得写入 `project://docs/works/*.md`，也不得跨 Work relay。
 
 每次 Dispatch 前，Conductor 先把目标 Agent、Agent state、当前 Stage、Current Task 与 Next Action 提交到 focused Work，并把 `STATUS.md` 更新为该 Work 的派生 projection。Specialist 返回后，Conductor 先判断 Done Conditions、提交 Latest Result / Verification / Open Findings，再决定 Stage 或 Agent 变化。只有完成这次 State Commit 才能继续下一次 Dispatch。
 
