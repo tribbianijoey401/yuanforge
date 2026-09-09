@@ -59,6 +59,29 @@ def read_transitions(path: Path) -> list[dict[str, Any]]:
     return transitions
 
 
+def _source_available(snapshot: Snapshot, relative: str) -> bool:
+    return snapshot.files.get(relative) not in {None, "MISSING", "UNREADABLE"}
+
+
+def _required_sources_available(snapshot: Snapshot) -> bool:
+    """Check only the state sources required by the observed layout."""
+    if not _source_available(snapshot, "docs/STATUS.md"):
+        return False
+    source = snapshot.work.get("source")
+    work_id = snapshot.work.get("id")
+    if source == "legacy":
+        return _source_available(snapshot, "docs/WORK.md")
+    if source == "multi-work" and work_id:
+        return _source_available(snapshot, f"docs/works/{work_id}.md")
+    # Multi-work with focus:null has no required focused Work file.
+    return True
+
+
+def _multi_work_still_persisted(snapshot: Snapshot, work_id: str) -> bool:
+    """Whether a canonical multi-work file still exists after a focus change."""
+    return f"docs/works/{work_id}.md" in snapshot.files
+
+
 @dataclass
 class ObservationEvidence:
     coverage: str
@@ -76,24 +99,6 @@ class ObservationUpdate:
     trace_path: Path | None = None
     archived_path: Path | None = None
     pruned: list[str] | None = None
-
-
-def load_observation_evidence(root: Path) -> ObservationEvidence:
-    insight_dir = root / ".yuan" / "insight"
-    cache = _read_json(insight_dir / "cache" / "current.json")
-    transitions = read_transitions(insight_dir / "traces" / "current.jsonl")
-    session_id = cache.get("session_id")
-    gaps: list[dict[str, Any]] = []
-    if session_id:
-        gaps = read_transitions(insight_dir / "gaps" / f"{session_id}.jsonl")
-    return ObservationEvidence(
-        coverage=str(cache.get("coverage") or "UNKNOWN"),
-        mode=str(cache.get("observation_mode") or "unknown"),
-        transitions=transitions,
-        current_work_id=cache.get("current_work_id"),
-        session_id=session_id,
-        gaps=gaps,
-    )
 
 
 class ObservationService:
@@ -135,11 +140,8 @@ class ObservationService:
             baseline = build_snapshot(self.root, _utc_now())
             previous_cache = _read_json(self.cache_path)
             self.insight_dir, self.session_id = start_session(self.root, baseline)
-            self.current_work_id = baseline.status.get("work")
-            required_sources_available = all(
-                baseline.files.get(path) not in {"MISSING", "UNREADABLE"}
-                for path in ("docs/WORK.md", "docs/STATUS.md")
-            )
+            self.current_work_id = baseline.work.get("id")
+            required_sources_available = _required_sources_available(baseline)
             self.coverage = (
                 "UNKNOWN"
                 if not required_sources_available
@@ -160,12 +162,17 @@ class ObservationService:
                     self.coverage = "PARTIAL"
 
             stale_work = previous_cache.get("current_work_id")
-            if stale_work and not self.current_work_id:
+            if stale_work and stale_work != self.current_work_id:
+                stale_completed = (
+                    baseline.work.get("source") != "multi-work"
+                    or not _multi_work_still_persisted(baseline, str(stale_work))
+                )
                 archive_trace(
                     self.insight_dir,
                     str(stale_work),
                     coverage="PARTIAL",
                     gaps=self._current_gaps(),
+                    summarize=stale_completed,
                 )
 
             self.previous = baseline
@@ -199,8 +206,8 @@ class ObservationService:
 
             before = self.previous
             after = event.snapshot
-            before_work = self.current_work_id or before.status.get("work")
-            after_work = after.status.get("work")
+            before_work = self.current_work_id or before.work.get("id")
+            after_work = after.work.get("id")
             facts = diff_snapshots(before, after)
             transition: dict[str, Any] | None = None
             trace_path: Path | None = None
@@ -221,22 +228,28 @@ class ObservationService:
                 trace_path = append_transition(self.insight_dir, transition)
 
             if before_work and after_work != before_work:
+                # Legacy single-work used work-id disappearance as completion.
+                # Multi-work can change focus while W1 remains persisted, so that
+                # transition only rotates the trace; it must not create a Work Summary.
+                completed = (
+                    before.work.get("source") != "multi-work"
+                    or not _multi_work_still_persisted(after, str(before_work))
+                )
                 archived = archive_trace(
                     self.insight_dir,
                     str(before_work),
                     coverage=self.coverage,
                     gaps=self._current_gaps(),
+                    summarize=completed,
                 )
-                pruned = prune_traces(self.insight_dir, keep=50)
+                if completed:
+                    pruned = prune_traces(self.insight_dir, keep=50)
 
-            required_sources_available = all(
-                after.files.get(path) not in {"MISSING", "UNREADABLE"}
-                for path in ("docs/WORK.md", "docs/STATUS.md")
-            )
+            required_sources_available = _required_sources_available(after)
             if not required_sources_available:
                 self.coverage = "UNKNOWN"
             elif after_work and after_work != before_work:
-                # 原生 Observer 活跃期间观察到新 Work 起点时 Coverage 才能为 FULL。
+                # 原生 Observer 活跃期间观察到新 focused Work 起点时 Coverage 才能为 FULL。
                 self.coverage = "FULL" if self.watcher.native else "PARTIAL"
             elif not after_work:
                 self.coverage = "FULL" if self.watcher.native else "PARTIAL"
@@ -326,8 +339,6 @@ class ObservationService:
 
     def stop(self) -> None:
         self._stop.set()
-        # Close first so a native wait (or a large fallback interval) wakes
-        # immediately; then join the background loop with a fixed bound.
         watcher = self.watcher
         if watcher is not None:
             watcher.close()
