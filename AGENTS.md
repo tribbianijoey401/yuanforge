@@ -128,7 +128,7 @@ Canonical State 永远在 `project://docs/works/W-102.md`。STATUS 的 `work/wor
 - focused `project://docs/works/<work-id>.md` 已存在，或 legacy checkpoint 已按兼容规则恢复；
 - 正式 Dispatch 前 focused Work 已写为 `state: active`，并有 Workflow、Stage、**当前 Agent**、Current Task 与 Verification；
 - `project://docs/STATUS.md` 在**同一逻辑步骤**同步 `focus` 与 `work_state: active`、Workflow、Stage、当前 Agent projection；
-- 执行 `python -B <resolved-state_guard.py> check <project-root>` 且**校验通过**。
+- 执行 `python -B <resolved-state_guard.py> check <project-root>`（canonical alias：`state_guard.py check`）且**校验通过**。
 
 任何一项不满足，只允许只读诊断或修复 Yuan 状态。State Guard 未输出 `STATE_VALID` 时**不得继续 Dispatch**。
 
