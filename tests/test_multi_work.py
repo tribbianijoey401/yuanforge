@@ -1,4 +1,4 @@
-"""Multi-Work Phase 1 persisted-state contract tests."""
+"""Multi-Work Phase 2 persisted-state contract tests."""
 
 from __future__ import annotations
 
@@ -30,6 +30,9 @@ def work_payload(
     stage: str = "implement",
     agent_id: str = "backend-dev",
     agent_state: str = "active",
+    agent_instance: str | None = None,
+    execution_mode: str | None = None,
+    execution_workspace: str | None = None,
     current_task: bool = False,
     next_action: bool = False,
     blocker: bool = False,
@@ -37,6 +40,12 @@ def work_payload(
     current = "\n## Current Task\n\n- Agent: backend-dev\n- Done: focused change verified\n" if current_task else ""
     next_section = "\n## Next Action\n\n继续 focused verification。\n" if next_action else ""
     blocker_section = "\n## Blocker\n\n等待外部 Authority。\n" if blocker else ""
+    instance = f"  instance: {agent_instance}\n" if agent_instance is not None else ""
+    execution = (
+        f"execution:\n  mode: {execution_mode}\n  workspace: {execution_workspace}\n"
+        if execution_mode is not None or execution_workspace is not None
+        else ""
+    )
     return f"""---
 id: {work_id}
 state: {state}
@@ -44,8 +53,8 @@ workflow: {workflow}
 stage: {stage}
 agent:
   id: {agent_id}
-  state: {agent_state}
-quality:
+{instance}  state: {agent_state}
+{execution}quality:
   test: pending
   review: pending
 ---
@@ -70,6 +79,7 @@ def status_payload(
     workflow: str | None = None,
     stage: str | None = None,
     agent_id: str | None = None,
+    agent_instance: str | None = None,
     agent_state: str | None = None,
 ) -> str:
     null = "null"
@@ -78,6 +88,7 @@ def status_payload(
     workflow_text = workflow if workflow is not None else null
     stage_text = stage if stage is not None else null
     agent_id_text = agent_id if agent_id is not None else null
+    agent_instance_text = agent_instance if agent_instance is not None else null
     agent_state_text = agent_state if agent_state is not None else null
     return f"""---
 focus: {focus_text}
@@ -87,7 +98,7 @@ workflow: {workflow_text}
 stage: {stage_text}
 agent:
   id: {agent_id_text}
-  instance: null
+  instance: {agent_instance_text}
   state: {agent_state_text}
 quality:
   test: pending
@@ -158,6 +169,57 @@ class MultiWorkStateTests(unittest.TestCase):
         issues = self.guard.validate_project_state(self.root, FRAMEWORK)
 
         self.assertIn("STATE_MULTIPLE_ACTIVE_WORKS", {issue.code for issue in issues})
+
+    def test_allows_two_active_works_with_independent_isolated_execution(self):
+        for work_id, workspace, instance in (
+            ("W-101", "platform://workspace/one", "subagent-one"),
+            ("W-102", "platform://workspace/two", "subagent-two"),
+        ):
+            self.write_work(work_id, work_payload(
+                work_id, state="active", agent_state="active", current_task=True,
+                agent_instance=instance, execution_mode="isolated", execution_workspace=workspace,
+            ))
+        self.write_status(status_payload("W-101", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_instance="subagent-one", agent_state="active"))
+        self.assertEqual([], self.guard.validate_project_state(self.root, FRAMEWORK))
+
+    def test_rejects_concurrent_active_works_without_execution_identity(self):
+        for work_id in ("W-101", "W-102"):
+            self.write_work(work_id, work_payload(work_id, state="active", agent_state="active", current_task=True, agent_instance=f"subagent-{work_id}"))
+        self.write_status(status_payload("W-101", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_state="active"))
+        codes = {issue.code for issue in self.guard.validate_project_state(self.root, FRAMEWORK)}
+        self.assertIn("STATE_ACTIVE_WORK_ISOLATION_REQUIRED", codes)
+        self.assertIn("STATE_ACTIVE_WORKSPACE_MISSING", codes)
+
+    def test_rejects_concurrent_active_works_with_same_workspace(self):
+        for work_id, instance in (("W-101", "subagent-one"), ("W-102", "subagent-two")):
+            self.write_work(work_id, work_payload(work_id, state="active", agent_state="active", current_task=True, agent_instance=instance, execution_mode="isolated", execution_workspace="platform://workspace/shared"))
+        self.write_status(status_payload("W-101", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_state="active"))
+        codes = {issue.code for issue in self.guard.validate_project_state(self.root, FRAMEWORK)}
+        self.assertIn("STATE_ACTIVE_WORKSPACE_CONFLICT", codes)
+
+    def test_rejects_concurrent_active_works_with_same_agent_instance(self):
+        for work_id, workspace in (("W-101", "platform://workspace/one"), ("W-102", "platform://workspace/two")):
+            self.write_work(work_id, work_payload(work_id, state="active", agent_state="active", current_task=True, agent_instance="subagent-one", execution_mode="isolated", execution_workspace=workspace))
+        self.write_status(status_payload("W-101", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_state="active"))
+        codes = {issue.code for issue in self.guard.validate_project_state(self.root, FRAMEWORK)}
+        self.assertIn("STATE_ACTIVE_AGENT_INSTANCE_CONFLICT", codes)
+
+    def test_rejects_persona_degraded_as_concurrent_execution(self):
+        for work_id, workspace in (("W-101", "platform://workspace/one"), ("W-102", "platform://workspace/two")):
+            self.write_work(work_id, work_payload(work_id, state="active", agent_state="active", current_task=True, agent_instance="persona-degraded", execution_mode="isolated", execution_workspace=workspace))
+        self.write_status(status_payload("W-101", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_state="active"))
+        self.assertIn("STATE_PARALLEL_EXECUTION_UNAVAILABLE", {issue.code for issue in self.guard.validate_project_state(self.root, FRAMEWORK)})
+
+    def test_allows_focus_switch_between_isolated_active_works(self):
+        for work_id, workspace, instance in (
+            ("W-101", "platform://workspace/one", "subagent-one"),
+            ("W-102", "platform://workspace/two", "subagent-two"),
+        ):
+            self.write_work(work_id, work_payload(work_id, state="active", agent_state="active", current_task=True, agent_instance=instance, execution_mode="isolated", execution_workspace=workspace))
+        self.write_status(status_payload("W-101", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_instance="subagent-one", agent_state="active"))
+        self.assertEqual([], self.guard.validate_project_state(self.root, FRAMEWORK))
+        self.write_status(status_payload("W-102", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_instance="subagent-two", agent_state="active"))
+        self.assertEqual([], self.guard.validate_project_state(self.root, FRAMEWORK))
 
     def test_allows_ready_nonfocused_work_while_another_work_is_active(self):
         self.write_work(
@@ -262,8 +324,8 @@ class MultiWorkStateTests(unittest.TestCase):
 
         for text in (contract, documents, conductor):
             self.assertIn("docs/works/", text)
-            self.assertIn("Phase 1", text)
-            self.assertIn("最多一个", text)
+            self.assertIn("Phase 2", text)
+            self.assertIn("isolated", text)
         self.assertIn("Work 本身作为执行隔离边界", contract)
         self.assertIn("STATUS.focus", contract)
         self.assertIn("Legacy", contract)

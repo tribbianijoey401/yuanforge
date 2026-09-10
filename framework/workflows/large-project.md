@@ -38,7 +38,7 @@ Product Analyst 建立 Problem Model
 
 复杂 Work 可以在自己的 `project://docs/works/<work-id>.md` 内嵌 Task Board。Project 也可以同时持久化其它 `ready` / `paused` / `blocked` Work；这些不是当前 Large Project 的 Task，也不得共享 Current Task。
 
-出现紧急 Bug 时，保存 Goal、Progress、Changed Path、Unfinished Edit、Verification、Git Checkpoint 与 Risk，Pause 原 Work；建立独立 Bug Work 并切 focus；Bug 完成后检查 API、Data、Architecture、Business Rule 与 Dependency Impact，再恢复原 Work。Phase 1 不允许原 Work 与 Bug Work 同时 `active`。
+出现紧急 Bug 时，保存 Goal、Progress、Changed Path、Unfinished Edit、Verification、Git Checkpoint 与 Risk，默认 Pause 原 Work；建立独立 Bug Work 并切 focus。仅当两者都有 State Guard 验证的独立 `isolated` execution identity 时可同时 `active`；Bug 完成后检查 API、Data、Architecture、Business Rule 与 Dependency Impact，再恢复原 Work。
 
 > **Writer 语义：** `frontend-dev` 与 `backend-dev` 至少启用一个作为唯一 Implementation Writer，由 Conductor 按当前 Slice 涉及的代码域顺序切换，不并行修改同一 Workspace。命中 Presentation Design Signal 时启用 `ui-designer` 设计并持久化 Presentation Contract，Frontend Dev 仅在 Artifact 存在时消费它；`design-reviewer` 在 Plan 编码前启用；其余 `optional_agents` 仅在 Risk Signal 命中时启用。
 

@@ -38,7 +38,7 @@ Mentor 式 Requirement Discovery
 
 五维 Requirement 是 Product Analyst 的内部 Coverage Model，不是固定问卷。
 
-独立 Feature 可以拥有自己的 `project://docs/works/<work-id>.md`。如果另一个 Work 正在 active，当前 Feature 可先作为 `ready` persisted Work；正式执行前先 Pause / Block / Complete 原 active Work。
+独立 Feature 可以拥有自己的 `project://docs/works/<work-id>.md`。如果另一个 Work 正在 active，当前 Feature 默认作为 `ready` persisted Work；仅在双方具有独立 `isolated` execution identity 时可并发正式执行。
 
 > **Writer 语义：** `frontend-dev` 与 `backend-dev` 至少启用一个作为唯一 Implementation Writer，由 Conductor 按 Feature 涉及的代码域选择。跨 Module 时才启用 `architect`；命中 Presentation Design Signal 时启用 `ui-designer`；其余 `optional_agents` 仅在 Risk Signal 命中时启用。
 

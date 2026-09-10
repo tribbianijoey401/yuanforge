@@ -34,7 +34,7 @@ Scope、Ambiguity 或 Risk 增长时立即升级 Workflow。
 
 每次角色 Dispatch 前和 Focused Result 返回后，必须先回到 Conductor 更新 focused `project://docs/works/<work-id>.md` 与 `project://docs/STATUS.md` 的 focus projection；Stage 或 Agent 的变化只有在该 Commit 落盘并通过 `framework://tools/state_guard.py` 后才成立。单 LLM Persona Switch 也不得跳过。
 
-Phase 1 最多一个 `active` Work；切换到另一个 Work 前先收敛当前 active Work。
+Phase 2 单 active Work 保持此规则；多个 active Work 只在 State Guard 确认每条 lane 都是独立 `isolated` execution 后允许，focus 切换不完成任何 Work。
 
 ## Pause / Resume
 

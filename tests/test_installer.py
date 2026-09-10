@@ -190,6 +190,22 @@ stage: implement
                 work.read_text(encoding="utf-8"),
             )
 
+    def test_update_blocks_nonfocused_canonical_active_work(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-phase2-active-update-") as parent:
+            project = Path(parent) / "project"
+            works = project / "docs" / "works"
+            works.mkdir(parents=True)
+            (project / "docs" / "STATUS.md").write_text(
+                "---\nfocus: W-1\nwork: W-1\nwork_state: paused\n---\n",
+                encoding="utf-8",
+            )
+            (works / "W-1.md").write_text("---\nid: W-1\nstate: paused\n---\n", encoding="utf-8")
+            (works / "W-2.md").write_text("---\nid: W-2\nstate: active\n---\n", encoding="utf-8")
+            result = self.run_command(str(SYNC), "update", str(project))
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn("UPDATE_BLOCKED_ACTIVE_WORK", result.stdout + result.stderr)
+            self.assertTrue((works / "W-2.md").is_file())
+
     def test_update_allows_paused_work_and_preserves_checkpoint(self):
         with tempfile.TemporaryDirectory(prefix="yuan-vnext-paused-update-") as parent:
             project = Path(parent) / "project"

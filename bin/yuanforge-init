@@ -121,8 +121,27 @@ def read_update_work_state(target: Path) -> str | None:
 
 
 def check_update_work_precondition(target: Path) -> tuple[bool, str | None]:
-    """Update 只阻止已明确标记为 active 的 Work；不解释旧 Project 内容。"""
+    """Update blocks every explicitly active canonical Work without migrating it."""
     state = read_update_work_state(target)
+    active_works: list[str] = []
+    works_dir = target / "docs" / "works"
+    if works_dir.is_dir():
+        for path in sorted(works_dir.glob("*.md")):
+            try:
+                text = path.read_text(encoding="utf-8")
+            except (OSError, UnicodeError):
+                continue
+            if not text.startswith("---"):
+                continue
+            parts = text.split("---", 2)
+            if len(parts) >= 3 and re.search(r"^state:\s*active\s*$", parts[1], re.MULTILINE | re.IGNORECASE):
+                active_works.append(path.stem)
+    if active_works:
+        return False, (
+            "UPDATE_BLOCKED_ACTIVE_WORK: canonical active Work(s)="
+            + ", ".join(active_works)
+            + "。请先完成、Pause 或 Block 所有 active Work 后再 Update。"
+        )
     if state != "active":
         return True, state
     return False, (

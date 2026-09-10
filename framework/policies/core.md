@@ -7,10 +7,10 @@ Yuan 是运行在 Codex、Hermes 等 Agent Platform 上的 AI Software Engineeri
 ## Always-on Rules
 
 1. 用户只描述 Outcome、Scope 与 Constraint；Routing 只选择 Workflow 和 Agent，Agent 根据 Contract 选择 Skill，Skill 根据 Signal 选择 References。
-2. 一个 Project 可以持久化多个 Work；`project://docs/works/<work-id>.md` 是单个 Work 的执行隔离边界。Phase 1 最多一个 Work 为 `active`，其它 Work 可以 `ready` / `paused` / `blocked`；未形成独立 Work Contract 的 Future Request 进入 Backlog。
-3. `project://docs/STATUS.md` 只保存当前 `focus` 与 focused Work 的短 Recovery Projection。Focus 不等于唯一 Work；Canonical Work State 永远在对应 Work 文件。没有 focus 时 `work_state: idle` 表示 no active work。
+2. 一个 Project 可以持久化多个 Work；`project://docs/works/<work-id>.md` 是单个 Work 的执行隔离边界。Phase 2 中单 active Work 保持兼容；多个 active Work 只在每条 lane 都有唯一 `execution.mode: isolated`、Platform workspace 与真实 `agent.instance` 时成立；其它 Work 可以 `ready` / `paused` / `blocked`。
+3. `project://docs/STATUS.md` 只保存当前 `focus` 与 focused Work 的短 Recovery Projection。Focus 是当前 interaction，不等于唯一 active Work；Canonical Work State 永远在对应 Work 文件。没有 focus 时 `work_state: idle` 表示 no active work。
 4. 用户表达先离开、挂起或暂停时，先保存当前 focused Work 的可恢复 Checkpoint，并将 Work state 与 STATUS projection 设为 `paused`；暂停不归档、暂停时保留全文、不得归档或清空该 Work，不继续派发。下次 Session 从原 Workflow / Stage 的 Next Action 恢复。
-5. 同一时间只有一个 Implementation Writer；Multi-Work Phase 1 不引入多个并行 Writer、后台 Scheduler、worker pool 或自动 worktree/branch 调度。
+5. 每个 execution.workspace 只有一个 Implementation Writer；Phase 2 不引入 Scheduler、worker pool、后台 daemon、自动 worktree/branch、merge queue 或 mutation-overlap runtime。isolated lane 的 integration 仍串行。
 6. 修改前先定义 Verification；无法自动化时使用可重复 Manual Acceptance 并说明限制。
 7. 只加载当前 focused Work 相关 Context；需要选择 Work 时最多读取候选 Work 的最小 metadata，不预加载全部历史、Agent、Skill 或 References。
 8. 用户主要确认 Product Scope、Acceptance Criteria、Business Rule 与关键体验；普通实现细节不重复确认。

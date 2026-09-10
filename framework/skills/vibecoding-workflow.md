@@ -95,7 +95,7 @@ Pause：保存 Current Task、Latest Result、Verification、Open Findings、唯
 
 Block：Work 与 STATUS projection 设为 `blocked`，记录 Blocker，Agent state `blocked`。Blocked Work 不阻止用户选择其它 persisted Work。
 
-Switch：按 State Contract 先收敛当前 active Work，再更新 focus；Phase 1 不允许多个 active Work。
+Switch：单 active Work 按 State Contract 先收敛再更新 focus；多个 State Guard 验证的 isolated active Work 可切换 focus，且不构成 completion。Framework 不调度或创建这些 execution lane。
 
 ### 9. Close or Continue
 

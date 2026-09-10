@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
 
-from .diff import diff_snapshots, to_transition
+from .diff import diff_snapshots, diff_work_snapshots, to_transition
 from .loader import Snapshot, build_snapshot
 from .trace import (
     append_transition,
@@ -240,7 +240,30 @@ class ObservationService:
             archived: Path | None = None
             pruned: list[str] = []
 
-            if facts:
+            # New multi-work snapshots route a semantic diff to the Work whose
+            # canonical file changed. STATUS remains only the focused projection,
+            # so a non-focused lane can never be written into the focused trace.
+            work_ids = sorted(set(before.works) | set(after.works))
+            if work_ids:
+                for work_id in work_ids:
+                    work_facts = diff_work_snapshots(before, after, work_id)
+                    if not work_facts:
+                        continue
+                    self.transition_index += 1
+                    local_transition = to_transition(
+                        transition_id=f"T-{self.transition_index:04d}",
+                        session_id=self.session_id or "UNKNOWN",
+                        observed_at=after.observed_at,
+                        before=before,
+                        after=after,
+                        facts=work_facts,
+                        work_id=work_id,
+                    )
+                    local_transition["work_id"] = work_id
+                    local_path = append_transition(self.insight_dir, local_transition, work_id=work_id)
+                    if transition is None:
+                        transition, trace_path = local_transition, local_path
+            elif facts:
                 self.transition_index += 1
                 transition = to_transition(
                     transition_id=f"T-{self.transition_index:04d}",

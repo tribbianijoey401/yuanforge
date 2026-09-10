@@ -28,7 +28,7 @@ Conductor
 Next Agent
 ```
 
-一个 Project 可以有多个 persisted Work，但一次 interaction 只有一个 `STATUS.focus`。Phase 1 最多一个 Work 为 `active`；Multi-Work 不改变 Manager Model，也不引入并行 Work Scheduler。
+一个 Project 可以有多个 persisted Work，但一次 interaction 只有一个 `STATUS.focus`。Phase 2 允许多个 active Work，但仅限各自具有 Guard 验证的独立 execution identity；focus 表示当前 interaction，不等于唯一 active Work。Multi-Work 不改变 Manager Model，也不引入并行 Work Scheduler。
 
 Agent A 不直接依赖 Agent B 的完整输出。只有 Conductor 负责把 Agent Focused Result 转成当前 focused Work 的正式 State：
 
@@ -123,10 +123,11 @@ Resume Project + focused Work
 
 `STATUS.focus` 是唯一恢复锚点，表示当前 Conductor interaction 正式操作的 Work。
 
-- 如果存在 `active` Work，它必须保持为 `STATUS.focus`。在不改变 focus 的前提下，可以只读查看其它 Work 的最小元数据；这不构成 Switch。
-- 任何真正的 focus change 都必须先让当前 `active` Work 完成、Pause 或 Block，并形成可恢复 Checkpoint。
+- 单 active Work 时，它必须保持为 `STATUS.focus`；在不改变 focus 的前提下，可以只读查看其它 Work 的最小元数据。
+- 多个合法 isolated active Work 时，`STATUS.focus` 可在这些 Work 间切换，且不得把切换当 Completion、Pause 或 Archive。
+- 其它 focus change 仍须先让当前单 active Work 完成、Pause 或 Block，并形成可恢复 Checkpoint。
 - 当前没有 active Work 时，focus 可以指向 `ready` / `paused` / `blocked` Work 用于讨论或恢复；正式 Dispatch 前再切为 `active`。
-- Phase 1 最多一个 `active` Work；不得把 Multi-Work 解释为同时推进多个 Writer Work。
+- 多个 active Work 必须各有 `execution.mode: isolated`、唯一 Platform workspace 与真实独立 `agent.instance`；不得把 Persona 切换解释为并发 Writer，也不得引入 Scheduler。
 - 切换 Work 不复制上一 Work 的 Current Task、Latest Result、Open Findings、Work Learnings 或 transient `review_context`。
 
 ### Legacy migration

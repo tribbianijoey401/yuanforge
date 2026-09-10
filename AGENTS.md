@@ -69,7 +69,7 @@ project://docs/works/
 
 `docs/works/` 目录本身就是 Registry，不建立第二个 Work Registry 对象。每个 Work 独立保存 Goal、Scope、Acceptance、Workflow、Stage、Agent、Current Task、Latest Result、Open Findings、Work Learnings、Next Action / Blocker。
 
-### Phase 1 状态
+### Phase 2 状态
 
 Work state 只有：
 
@@ -77,15 +77,16 @@ Work state 只有：
 ready | active | paused | blocked
 ```
 
-Phase 1：
+Phase 2：
 
 - 可以同时存在多个 persisted Work；
-- **最多一个 `active` Work**；
-- 如果存在 active Work，它必须保持为 `STATUS.focus`；
+- 单 active Work 时保持 Phase 1 行为，`execution` 可省略；
+- 多个 active Work 时，每个都必须有 `execution.mode: isolated`、唯一 Platform workspace、唯一真实独立 `agent.instance`；`persona-degraded` 不得伪装成并发；
+- `STATUS.focus` 必须指向某一个 active Work，而不是唯一 active Work；
 - 其它 Work 可以 `ready` / `paused` / `blocked`；
 - `STATUS.focus` 表示本次 interaction 正在正式恢复/操作哪个 Work；
 - Focus 不代表其它 Work 被关闭；
-- Multi-Work 不等于并行 Scheduler，不引入 Worker Pool、后台 Daemon、branch/worktree 自动调度或多个并行 Writer。
+- Multi-Work 不等于 Scheduler：不引入 Worker Pool、后台 Daemon、自动 branch/worktree、merge queue 或 mutation-overlap runtime；每个 workspace 仍只有一个 Writer，integration 串行。
 
 ### Create / Backlog
 
@@ -95,10 +96,10 @@ Phase 1：
 
 ### Focus / Switch
 
-`STATUS.focus` 是唯一恢复锚点。
+`STATUS.focus` 是唯一当前 interaction 恢复锚点。
 
-- 如果当前存在 active Work，可以只读查看其它 Work 的最小元数据，但不改变 focus。
-- 任何真正的 focus change 都必须先把当前 active Work完成、Pause 或 Block，并形成可恢复 Checkpoint。
+- 单 active Work 时，可只读查看其它 Work，且真正切换前须完成、Pause 或 Block 当前 Work。
+- 多个 Guard-validated isolated active Work 时，focus 可直接在 active Work 间切换；切换不完成、暂停、归档任一 Work。
 - 当前没有 active Work 时，focus 可以指向 `ready` / `paused` / `blocked` Work用于讨论或恢复；正式 Dispatch 前才切为 `active`。
 - 紧急 Bug 可以成为独立 Work：Pause 当前 active Work → 建立并激活 Bug Work → 完成 Bug → 再恢复原 Work。
 - Work 切换时不得携带上一 Work 的 Current Task、Open Findings、Work Learnings 或 transient `review_context`。
@@ -135,7 +136,7 @@ Canonical State 永远在 `project://docs/works/W-102.md`。STATUS 的 `work/wor
 
 任何一项不满足，只允许只读诊断或修复 Yuan 状态。State Guard 未输出 `STATE_VALID` 时**不得继续 Dispatch**。
 
-State Guard 同样用于 Workflow / Stage / Agent 变化、Focused Result、Pause、Resume、Block/Unblock、Switch 与 Distill。规范 `stage` 来自当前 Workflow frontmatter；规范 `agent.id` 来自 Agent Contract 文件名并被当前 Workflow声明；Persona/Subagent/Session 标签写入可选 `agent.instance`。
+State Guard 同样用于 Workflow / Stage / Agent 变化、Focused Result、Pause、Resume、Block/Unblock、Switch 与 Distill。规范 `stage` 来自当前 Workflow frontmatter；规范 `agent.id` 来自 Agent Contract 文件名并被当前 Workflow声明；单 active Work 的 `agent.instance` 可选，但并发 active Work 必须使用真实独立 instance 和 Platform execution workspace。
 
 Platform 的 Task、Todo、Plan、Thread、Subagent 状态或聊天 Summary 都不是 Yuan Work State，不能替代 persisted Work / STATUS。
 
@@ -151,7 +152,7 @@ Conductor 不直接加载 References；Agent 只加载自己声明的 Skill；Sk
 
 ## Work and Verification
 
-- 一个 Project 可以有多个 persisted Works，但 Phase 1 最多一个 `active` Work。
+- 一个 Project 可以有多个 persisted Works；多个 `active` Work 仅可在 Phase 2 isolation contract 被 State Guard 验证后存在。
 - 新 Work 激活时，focused Work 与 STATUS projection 必须在**同一逻辑步骤**写入；STATUS 至少投影 Work id、`work_state: active`、Workflow、Stage 和**当前 Agent**。
 - Pause 时把 Current Task / Latest Result / Verification / Open Findings / 唯一 Next Action 保存到当前 Work，Work 与 STATUS projection 设为 `paused`；**不得归档或清空**该 Work。
 - Block 时记录 Blocker，Work / agent 都设为 `blocked`；Blocked Work 不阻止用户在之后切换到另一个 persisted Work。
@@ -195,7 +196,7 @@ Framework Update 不自动迁移 Project-owned State。下一次 Conductor 能�
 
 Framework 更新从 Yuan Source Repository 外部运行。Update 必须保留 `project://docs/`、`project://.yuan/overrides/` 与业务内容，也不解释或迁移 Work 文件。
 
-安全检查继续读取 `STATUS.work_state`：因为它是 focused Work 的 projection，明确 `active` 时必须先完成、Pause 或 Block；`idle` / `paused` / `blocked` / `ready`、旧格式、缺失或无法判定的状态按 Installer compatibility 规则处理。
+安全检查读取 `STATUS.work_state` 并扫描 canonical `docs/works/*.md`：任一明确 `active` Work 都必须先完成、Pause 或 Block；不能因非 focused isolated lane 未投影到 STATUS 而允许 Update。旧格式、缺失或无法判定状态按 Installer compatibility 规则处理，Update 不迁移 Project-owned State。
 
 ## Precedence
 

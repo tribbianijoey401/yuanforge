@@ -68,11 +68,12 @@ def update_session(
 def append_transition(
     insight_dir: Path,
     transition: dict,
+    work_id: str | None = None,
 ) -> Path:
-    """把 Transition 追加到当前 focused Work 的 JSONL Trace。"""
+    """Append to a Work-local trace; no id retains legacy focused current.jsonl."""
     traces = insight_dir / "traces"
     traces.mkdir(parents=True, exist_ok=True)
-    trace_path = traces / "current.jsonl"
+    trace_path = traces / f"{work_id}.jsonl" if work_id else traces / "current.jsonl"
     with trace_path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(transition, ensure_ascii=False) + "\n")
     return trace_path
@@ -97,9 +98,15 @@ def archive_trace(
         return None
     traces = insight_dir / "traces"
     current = traces / "current.jsonl"
-    if not current.is_file() or current.stat().st_size == 0:
-        return None
     archive_path = traces / f"{work_id}.jsonl"
+    if not current.is_file() or current.stat().st_size == 0:
+        if not archive_path.is_file() or archive_path.stat().st_size == 0:
+            return None
+        if summarize:
+            from .history import write_work_summary
+
+            write_work_summary(insight_dir, work_id, archive_path, coverage=coverage, gaps=gaps)
+        return archive_path
     if archive_path.exists():
         with archive_path.open("ab") as destination, current.open("rb") as source:
             destination.write(source.read())

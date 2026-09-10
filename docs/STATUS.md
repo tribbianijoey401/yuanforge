@@ -1,18 +1,18 @@
 ---
-focus: null
-work: null
-work_state: idle
-workflow: null
-stage: null
+focus: 2026-09-10_multi-work-phase2
+work: 2026-09-10_multi-work-phase2
+work_state: paused
+workflow: large-project
+stage: verify
 agent:
-  id: null
-  instance: null
-  state: null
+  id: tester
+  instance: phase2-contract-writer
+  state: paused
 quality:
-  test: pending
+  test: passed
   review: pending
 ---
 
 # Project Recovery Index
 
-No focused Work. `2026-09-01_quality-v0` remains paused as a persisted checkpoint.
+Focused Work: `2026-09-10_multi-work-phase2` is paused pending independent review. `2026-09-01_quality-v0` remains paused as a persisted checkpoint.

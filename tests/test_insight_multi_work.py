@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT / "insight"))
 from yuan_insight.observer import ObservationService  # noqa: E402
 
 
-def write_work(root: Path, work_id: str, state: str) -> None:
+def write_work(root: Path, work_id: str, state: str, *, instance: str | None = None, workspace: str | None = None) -> None:
     if state == "active":
         agent_state = "active"
         extra = "\n## Current Task\n\n完成当前实现。\n"
@@ -25,6 +25,11 @@ def write_work(root: Path, work_id: str, state: str) -> None:
         extra = "\n## Next Action\n\n从当前断点继续。\n"
     else:
         raise ValueError(state)
+
+    execution = (
+        f"execution:\n  mode: isolated\n  workspace: {workspace}\n"
+        if workspace else ""
+    )
 
     path = root / "docs" / "works" / f"{work_id}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -36,9 +41,9 @@ workflow: complex-bug
 stage: implement
 agent:
   id: backend-dev
-  instance: null
+  instance: {instance or 'null'}
   state: {agent_state}
-quality:
+{execution}quality:
   test: pending
   review: pending
 ---
@@ -58,7 +63,7 @@ quality:
     )
 
 
-def write_status(root: Path, focus: str | None, state: str = "idle") -> None:
+def write_status(root: Path, focus: str | None, state: str = "idle", instance: str | None = None) -> None:
     if focus is None:
         payload = """---
 focus: null
@@ -68,7 +73,7 @@ workflow: null
 stage: null
 agent:
   id: null
-  instance: null
+  instance: {instance or 'null'}
   state: null
 quality:
   test: pending
@@ -165,6 +170,25 @@ class InsightMultiWorkTests(unittest.TestCase):
         try:
             self.assertNotEqual("UNKNOWN", service.coverage)
             self.assertIsNone(service.current_work_id)
+        finally:
+            service.stop()
+
+    def test_nonfocused_isolated_active_work_writes_its_own_trace(self):
+        write_work(self.root, "W-401", "active", instance="subagent-one", workspace="platform://workspace/one")
+        write_work(self.root, "W-402", "active", instance="subagent-two", workspace="platform://workspace/two")
+        write_status(self.root, "W-401", "active", instance="subagent-one")
+        service = ObservationService(self.root, poll_interval=0.01, debounce_window=0.01)
+        service.start()
+        try:
+            write_work(self.root, "W-402", "active", instance="subagent-two", workspace="platform://workspace/two")
+            work = self.root / "docs" / "works" / "W-402.md"
+            work.write_text(work.read_text(encoding="utf-8") + "\n## Latest Result\n\nW-402 advanced independently.\n", encoding="utf-8")
+            update = wait_for_update(service)
+            self.assertIsNotNone(update)
+            w2_trace = self.root / ".yuan" / "insight" / "traces" / "W-402.jsonl"
+            self.assertTrue(w2_trace.is_file())
+            self.assertIn('"work_id": "W-402"', w2_trace.read_text(encoding="utf-8"))
+            self.assertFalse((self.root / ".yuan" / "insight" / "traces" / "W-401.jsonl").exists())
         finally:
             service.stop()
 

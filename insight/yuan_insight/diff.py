@@ -67,6 +67,17 @@ def diff_snapshots(before: Snapshot, after: Snapshot) -> list[dict[str, Any]]:
     return facts
 
 
+def diff_work_snapshots(before: Snapshot, after: Snapshot, work_id: str) -> list[dict[str, Any]]:
+    """Return Work-local semantic facts, excluding another lane's STATUS projection."""
+    before_work = before.works.get(work_id, {})
+    after_work = after.works.get(work_id, {})
+    facts = _changes(before_work, after_work, prefix="work")
+    path = f"docs/works/{work_id}.md"
+    if before.files.get(path) != after.files.get(path):
+        facts.insert(0, {"kind": "files_changed", "sources_changed": [path]})
+    return facts
+
+
 def to_transition(
     transition_id: str,
     session_id: str,
@@ -74,12 +85,22 @@ def to_transition(
     before: Snapshot,
     after: Snapshot,
     facts: list[dict[str, Any]],
+    work_id: str | None = None,
 ) -> dict[str, Any]:
     """把 Facts 组装成 Transition（底层存储单位）。"""
     changed = sorted(
         path for path in set(before.files) | set(after.files)
         if before.files.get(path) != after.files.get(path)
     )
+    work_state = after.works.get(work_id or "", {})
+    state = {
+        "work": work_id or after.status.get("work"),
+        "work_state": work_state.get("state", after.status.get("work_state")),
+        "workflow": work_state.get("workflow", after.status.get("workflow")),
+        "stage": work_state.get("stage", after.status.get("stage")),
+        "agent": work_state.get("agent", after.status.get("agent")),
+        "execution": work_state.get("execution", {}),
+    }
     return {
         "id": transition_id,
         "session_id": session_id,
@@ -87,12 +108,6 @@ def to_transition(
         "sources_changed": changed,
         "before_hash": before.fingerprint(),
         "after_hash": after.fingerprint(),
-        "state": {
-            "work": after.status.get("work"),
-            "work_state": after.status.get("work_state"),
-            "workflow": after.status.get("workflow"),
-            "stage": after.status.get("stage"),
-            "agent": after.status.get("agent"),
-        },
+        "state": state,
         "facts": facts,
     }

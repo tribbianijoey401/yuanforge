@@ -1,6 +1,6 @@
 # Persisted State Contract
 
-本文件是 Yuan Project State 的唯一语义契约。Phase 1 Multi-Work 模型把 **Work 本身作为执行隔离边界**：
+本文件是 Yuan Project State 的唯一语义契约。Phase 2 Multi-Work 模型把 **Work 本身作为执行隔离边界**：
 
 ```text
 Project
@@ -24,8 +24,9 @@ Project
 | Work `agent.state` | 本契约 | `idle` / `active` / `paused` / `completed` / `blocked` |
 | `STATUS.focus` | `project://docs/works/*.md` | null 或一个真实 Work 文件名 stem |
 | `STATUS.work/...` | focused Work | 仅为恢复投影，不是第二份 Truth Source |
+| `execution` | active Work frontmatter | 单 active Work 可省略；并发 active Work 必须提供 Platform 已分配的隔离执行身份 |
 
-`agent.instance` 是可选自由文本，用于 Persona、Subagent、Session 或执行通道标签，不参与路由。
+`agent.instance` 是可选自由文本，用于 Persona、Subagent、Session 或执行通道标签，不参与路由。它在只有一个 active Work 时可省略；有多个 active Work 时必须是每条并发 lane 的真实、唯一 independent execution instance，`persona-degraded` 不是独立实例。
 
 ## Work File Contract
 
@@ -57,16 +58,15 @@ Work body 保存 Goal、Scope、Acceptance、Current Task、Latest Result、Open
 - `blocked`：保留 Workflow / Stage，`agent.state: blocked`，且必须有可观察 Blocker。
 - Completion 不是长期 active-store 状态。Acceptance、Verification、Review 与 `Open Findings = 0` 满足后先 Distill；有长期历史价值时写精炼摘要到 `project://docs/works/archive/`，然后移除当前 `project://docs/works/<id>.md`。其它 Work 不受影响。
 
-## Phase 1 Concurrency Boundary
+## Phase 2 Concurrency Boundary
 
-Phase 1 支持 **Multiple Persisted Works**，但不是并行 Work Scheduler：
+Phase 2 支持 **Multiple Persisted Works** 与受约束的并发 active Work，但不是并行 Work Scheduler：
 
-- 一个 Project 可以同时存在多个 `ready` / `paused` / `blocked` Work。
-- **最多一个 `active` Work**。
-- 如果存在 `active` Work，`STATUS.focus` 必须指向它。
-- 创建第二个 `ready` Work 不要求终止当前 Work；但真正改变 focus 或切换正式执行前，必须先让当前 `active` Work完成、暂停或阻塞。
-- 在当前 active Work 仍保持 focus 时，可以只读查看其它 Work 的最小信息；这不构成 focus switch。
-- 同一 Workspace 仍遵循一个 Writer；Phase 1 不引入 branch/worktree scheduler、mutation overlap detector、worker pool 或后台 daemon。
+- 一个 Project 可以同时存在多个 `ready` / `paused` / `blocked` Work；单个 active Work 完全兼容 Phase 1，`execution` 可省略。
+- 两个或以上 `active` Work 时，每一个都必须声明 `execution.mode: isolated`、唯一非空的 `execution.workspace`，以及唯一的真实 `agent.instance`；State Guard 拒绝缺失、重复或 `persona-degraded` 伪并发。
+- Framework 只验证 Platform 提供的 identity，绝不分配 workspace、创建 worktree/branch、调度 worker、合并输出或判定 mutation overlap。
+- `STATUS.focus` 必须是某个 active Work，且 `STATUS.work/...` 仍只投影该 focused Work；它表示当前 interaction，不再表示唯一 active Work。
+- 同一 execution.workspace 始终只有一个 Writer。integration 仍串行且由 Conductor 明确提交。
 
 ## STATUS Recovery Index
 
@@ -111,10 +111,10 @@ agent:
 
 Focus 是 Project 的唯一恢复锚点，表示本次 Conductor interaction 正式操作哪个 Work，不表示其它 Work 不存在。
 
-- 若存在 `active` Work，它必须继续保持为 focus。此时可以只读查看其它 Work 的 frontmatter / Goal / Next Action，但不能改变 `STATUS.focus`。
-- 任何 focus change 都必须先让当前 `active` Work complete / pause / block，并形成可恢复 Checkpoint。
+- 单 active Work 时，focus switch 仍须先 complete / pause / block 当前 Work。
+- 多个合法 isolated active Work 时，focus 可在这些 active Work 间切换；切换只更新 STATUS projection，不暂停、归档或完成任一 Work。
 - 当前没有 active Work 时，focus 可以指向 `ready` / `paused` / `blocked` Work 用于讨论或恢复；正式 Dispatch 前再切为 `active`。
-- 用户明确开始一个独立的新工作：可创建新的非 focused `ready` Work；如果要立即执行且已有 active Work，先按上一条收敛原 Work。
+- 用户明确开始一个独立的新工作：可创建新的非 focused `ready` Work；若要与现有 active Work 并发，必须先满足本节 isolation contract。
 - 与当前目标无关、尚未形成明确 Goal / Scope / Acceptance 的未来想法仍进入 BACKLOG，不为了“多 Work”把所有想法都实例化。
 
 ## Execution Identity
@@ -130,8 +130,18 @@ agent:
   state: active
 ```
 
+并发 lane 还必须由 Platform 提供不可复用的 mutable workspace：
+
+```yaml
+execution:
+  mode: isolated
+  workspace: platform://workspace/W-102
+```
+
 - `agent.id` 决定 Agent Contract、Skill Assignment 和 Insight Registry 映射。
 - `agent.instance` 不得提升为动态 Agent Registry 条目。
+- `execution.mode` 当前唯一允许并发的值是 `isolated`；`shared` 不能用于多个 active Work。
+- `execution.workspace` 是 identity，不是 Framework 要创建、扫描或管理的目录。
 - Writer 的 transient `review_context` 只属于当前 Work 的当前 execution chain；不得跨 Work relay，也不得写入任何 Work、STATUS、Memory 或 Project Truth。
 
 ## State Commit Gate

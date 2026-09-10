@@ -5,6 +5,13 @@
 > `framework://policies/state-contract.md` to this body. `project://docs/WORK.md`
 > is retained only as a legacy v4 compatibility file and is not the multi-work
 > canonical state source.
+>
+> Phase 2 keeps a single active Work compatible with Phase 1: omit `execution`
+> unless concurrent execution is actually Platform-provided. When two or more
+> Works are active, every such Work must include `execution.mode: isolated` and
+> a unique `execution.workspace`, plus a unique real `agent.instance`. The
+> Framework validates identities only; it never creates worktrees or schedules
+> the lanes.
 
 ## Goal
 
