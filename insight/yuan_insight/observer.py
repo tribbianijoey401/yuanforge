@@ -82,6 +82,21 @@ def _multi_work_still_persisted(snapshot: Snapshot, work_id: str) -> bool:
     return f"docs/works/{work_id}.md" in snapshot.files
 
 
+def _evidence_trace_path(insight_dir: Path, work_id: str | None) -> Path:
+    """Focused multi-work consumers read only their focused Work's evidence."""
+    return insight_dir / "traces" / f"{work_id}.jsonl" if work_id else insight_dir / "traces" / "current.jsonl"
+
+
+def _uses_multi_work_layout(root: Path) -> bool:
+    """Only STATUS focus marks the canonical multi-work evidence layout."""
+    try:
+        text = (root / "docs" / "STATUS.md").read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        return False
+    parts = text.split("---", 2)
+    return len(parts) >= 3 and any(line.startswith("focus:") for line in parts[1].splitlines())
+
+
 @dataclass
 class ObservationEvidence:
     coverage: str
@@ -101,7 +116,11 @@ def load_observation_evidence(root: Path) -> ObservationEvidence:
     """
     insight_dir = root / ".yuan" / "insight"
     cache = _read_json(insight_dir / "cache" / "current.json")
-    transitions = read_transitions(insight_dir / "traces" / "current.jsonl")
+    work_id = cache.get("current_work_id")
+    transitions = read_transitions(_evidence_trace_path(
+        insight_dir,
+        str(work_id) if work_id and _uses_multi_work_layout(root) else None,
+    ))
     session_id = cache.get("session_id")
     gaps = (
         read_transitions(insight_dir / "gaps" / f"{session_id}.jsonl")
@@ -112,7 +131,7 @@ def load_observation_evidence(root: Path) -> ObservationEvidence:
         coverage=str(cache.get("coverage") or "UNKNOWN"),
         mode=str(cache.get("observation_mode") or "unknown"),
         transitions=transitions,
-        current_work_id=cache.get("current_work_id"),
+        current_work_id=work_id,
         session_id=session_id,
         gaps=gaps,
     )
@@ -294,6 +313,24 @@ class ObservationService:
                 if completed:
                     pruned = prune_traces(self.insight_dir, keep=50)
 
+            # Canonical Work removal is completion regardless of focus. A
+            # non-focused lane has its own trace and must produce its own summary.
+            removed_work_ids = sorted(set(before.works) - set(after.works))
+            for work_id in removed_work_ids:
+                if work_id == before_work:
+                    # The focused completion path above already finalized it.
+                    continue
+                completed_path = archive_trace(
+                    self.insight_dir,
+                    work_id,
+                    coverage=self.coverage,
+                    gaps=self._current_gaps(),
+                    summarize=True,
+                )
+                if completed_path:
+                    archived = archived or completed_path
+                    pruned = prune_traces(self.insight_dir, keep=50)
+
             required_sources_available = _required_sources_available(after)
             if not required_sources_available:
                 self.coverage = "UNKNOWN"
@@ -325,9 +362,10 @@ class ObservationService:
 
     def evidence(self) -> ObservationEvidence:
         with self._lock:
-            transitions = read_transitions(
-                self.insight_dir / "traces" / "current.jsonl"
-            )
+            multi_work = bool(self.latest_snapshot and self.latest_snapshot.work.get("source") == "multi-work")
+            transitions = read_transitions(_evidence_trace_path(
+                self.insight_dir, self.current_work_id if multi_work else None
+            ))
             gaps = self._current_gaps()
             return ObservationEvidence(
                 coverage=self.coverage,

@@ -172,14 +172,14 @@ class MultiWorkStateTests(unittest.TestCase):
 
     def test_allows_two_active_works_with_independent_isolated_execution(self):
         for work_id, workspace, instance in (
-            ("W-101", "platform://workspace/one", "subagent-one"),
-            ("W-102", "platform://workspace/two", "subagent-two"),
+            ("W-101", "platform://workspace/one", "subagent:agent-a"),
+            ("W-102", "platform://workspace/two", "subagent:agent-b"),
         ):
             self.write_work(work_id, work_payload(
                 work_id, state="active", agent_state="active", current_task=True,
                 agent_instance=instance, execution_mode="isolated", execution_workspace=workspace,
             ))
-        self.write_status(status_payload("W-101", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_instance="subagent-one", agent_state="active"))
+        self.write_status(status_payload("W-101", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_instance="subagent:agent-a", agent_state="active"))
         self.assertEqual([], self.guard.validate_project_state(self.root, FRAMEWORK))
 
     def test_rejects_concurrent_active_works_without_execution_identity(self):
@@ -189,6 +189,15 @@ class MultiWorkStateTests(unittest.TestCase):
         codes = {issue.code for issue in self.guard.validate_project_state(self.root, FRAMEWORK)}
         self.assertIn("STATE_ACTIVE_WORK_ISOLATION_REQUIRED", codes)
         self.assertIn("STATE_ACTIVE_WORKSPACE_MISSING", codes)
+
+    def test_rejects_channel_only_agent_instances_for_concurrent_work(self):
+        for work_id, instance, workspace in (
+            ("W-101", "subagent", "platform://workspace/one"),
+            ("W-102", "background-process", "platform://workspace/two"),
+        ):
+            self.write_work(work_id, work_payload(work_id, state="active", agent_state="active", current_task=True, agent_instance=instance, execution_mode="isolated", execution_workspace=workspace))
+        self.write_status(status_payload("W-101", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_instance="subagent", agent_state="active"))
+        self.assertIn("STATE_ACTIVE_AGENT_INSTANCE_IDENTITY_REQUIRED", {issue.code for issue in self.guard.validate_project_state(self.root, FRAMEWORK)})
 
     def test_rejects_concurrent_active_works_with_same_workspace(self):
         for work_id, instance in (("W-101", "subagent-one"), ("W-102", "subagent-two")):
@@ -331,6 +340,12 @@ class MultiWorkStateTests(unittest.TestCase):
         self.assertIn("Legacy", contract)
         self.assertIn("不引入并行 Work Scheduler", conductor)
         self.assertIn("focus: null", status_template)
+
+    def test_canonical_activation_allows_isolated_concurrency_and_serializes_otherwise(self):
+        workflow_skill = (FRAMEWORK / "skills" / "vibecoding-workflow.md").read_text(encoding="utf-8")
+        self.assertIn("Platform", workflow_skill)
+        self.assertIn("execution.mode: isolated", workflow_skill)
+        self.assertIn("Serialize", workflow_skill)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ workflow: large-project
 stage: verify
 agent:
   id: tester
-  instance: phase2-contract-writer
+  instance: review-fix-writer
   state: paused
 quality:
   test: passed
@@ -32,13 +32,13 @@ quality:
 
 ## Acceptance
 
-- [ ] 单 active Work 没有 execution 字段继续通过。
-- [ ] 两个 active Work 只在不同 isolated workspace、不同真实 agent.instance 下通过。
-- [ ] 缺 execution、workspace 重复、instance 重复或 persona-degraded 伪并发均被拒绝。
-- [ ] STATUS.focus 是 active Work 中当前 interaction 的 projection，不再表示唯一 active Work。
-- [ ] Insight 在 non-focused active Work 变化时写入该 Work 自己的 trace。
-- [ ] Update 在任何 active Work 存在时被阻止。
-- [ ] Framework、Installer、Insight、legacy 及 full regression 全绿。
+- [x] 单 active Work 没有 execution 字段继续通过。
+- [x] 两个 active Work 只在不同 isolated workspace、不同真实 agent.instance 下通过。
+- [x] 缺 execution、workspace 重复、instance 重复或 persona-degraded 伪并发均被拒绝。
+- [x] STATUS.focus 是 active Work 中当前 interaction 的 projection，不再表示唯一 active Work。
+- [x] Insight 在 non-focused active Work 变化时写入该 Work 自己的 trace，focused consumer 只读取 focused trace。
+- [x] Update 在任何 active Work 或 canonical Work state 不可判定时被阻止。
+- [x] Framework、Installer、Insight、legacy 及 full regression 全绿。
 
 ## Assumptions and Risks
 
@@ -58,9 +58,9 @@ quality:
 
 ## Current Task
 
-**Agent:** tester (phase2-contract-writer)
+**Agent:** tester (review-fix-writer)
 
-**Task:** 保留 Phase 2 implementation checkpoint，等待独立 Review。
+**Task:** 保留已验证的 Phase 2 review-fix checkpoint，等待独立 Review。
 
 **Done conditions:**
 
@@ -68,11 +68,11 @@ quality:
 
 ## Latest Result
 
-完成 Phase 2 vertical slice：Guard contract 已由 Framework 文档约束；Insight 增加 Snapshot.works 与 per-work trace；Installer 扫描任一 canonical active Work。
+F-01 至 F-08 已闭合：canonical activation 改为条件 isolation；并发 instance 改为 stable identity；Insight 以 focused trace 消费并按任意 removed Work 生成 summary；Installer canonical state fail-closed。Focused suites green，full discovery 150 tests，static/Guard/Framework checks green。
 
 ## Open Findings
 
-- 无阻塞 Finding；尚待用户指定的独立 Review。
+- 无。F-01 至 F-08 已修复并有 regression evidence；独立 Review 仍 pending。
 
 ## Work Learnings
 
@@ -80,7 +80,7 @@ quality:
 
 ## Next Action
 
-等待独立 Review；若需要修正，先恢复此 Work 并从 review Finding 继续。
+等待独立 Review；若有 Finding，恢复此 Work 并从 Finding 继续。
 
 ## Blocker
 

@@ -81,7 +81,7 @@ Phase 2：
 
 - 可以同时存在多个 persisted Work；
 - 单 active Work 时保持 Phase 1 行为，`execution` 可省略；
-- 多个 active Work 时，每个都必须有 `execution.mode: isolated`、唯一 Platform workspace、唯一真实独立 `agent.instance`；`persona-degraded` 不得伪装成并发；
+- 多个 active Work 时，每个都必须有 `execution.mode: isolated`、唯一 Platform workspace、唯一真实独立 `agent.instance`（如 `subagent:<id>`）；纯 `subagent` / `background-process` channel label 与 `persona-degraded` 不得伪装成并发；
 - `STATUS.focus` 必须指向某一个 active Work，而不是唯一 active Work；
 - 其它 Work 可以 `ready` / `paused` / `blocked`；
 - `STATUS.focus` 表示本次 interaction 正在正式恢复/操作哪个 Work；
@@ -101,7 +101,7 @@ Phase 2：
 - 单 active Work 时，可只读查看其它 Work，且真正切换前须完成、Pause 或 Block 当前 Work。
 - 多个 Guard-validated isolated active Work 时，focus 可直接在 active Work 间切换；切换不完成、暂停、归档任一 Work。
 - 当前没有 active Work 时，focus 可以指向 `ready` / `paused` / `blocked` Work用于讨论或恢复；正式 Dispatch 前才切为 `active`。
-- 紧急 Bug 可以成为独立 Work：Pause 当前 active Work → 建立并激活 Bug Work → 完成 Bug → 再恢复原 Work。
+- 紧急 Bug 默认 Pause 当前 active Work；若双方均有独立 isolation identity，则可建立并激活 Bug Work 而不 Pause 原 Work。
 - Work 切换时不得携带上一 Work 的 Current Task、Open Findings、Work Learnings 或 transient `review_context`。
 
 ## STATUS Recovery Index
@@ -153,7 +153,7 @@ Conductor 不直接加载 References；Agent 只加载自己声明的 Skill；Sk
 ## Work and Verification
 
 - 一个 Project 可以有多个 persisted Works；多个 `active` Work 仅可在 Phase 2 isolation contract 被 State Guard 验证后存在。
-- 新 Work 激活时，focused Work 与 STATUS projection 必须在**同一逻辑步骤**写入；STATUS 至少投影 Work id、`work_state: active`、Workflow、Stage 和**当前 Agent**。
+- 新 Work 激活时，focused Work 与 STATUS projection 必须在**同一逻辑步骤**写入；已有 active Work 时先验证所有 lane 的 isolation identity，合法则可并发激活，非法才 Serialize。STATUS 至少投影 Work id、`work_state: active`、Workflow、Stage 和**当前 Agent**。
 - Pause 时把 Current Task / Latest Result / Verification / Open Findings / 唯一 Next Action 保存到当前 Work，Work 与 STATUS projection 设为 `paused`；**不得归档或清空**该 Work。
 - Block 时记录 Blocker，Work / agent 都设为 `blocked`；Blocked Work 不阻止用户在之后切换到另一个 persisted Work。
 - Resume 从 STATUS.focus + 对应 Work 的 Next Action 恢复。

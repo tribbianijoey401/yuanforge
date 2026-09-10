@@ -206,6 +206,17 @@ stage: implement
             self.assertIn("UPDATE_BLOCKED_ACTIVE_WORK", result.stdout + result.stderr)
             self.assertTrue((works / "W-2.md").is_file())
 
+    def test_update_blocks_unknown_canonical_work_state_but_keeps_legacy_compatibility(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-unknown-canonical-") as parent:
+            project = Path(parent) / "project"
+            works = project / "docs" / "works"
+            works.mkdir(parents=True)
+            (works / "W-bad.md").write_text("# malformed canonical work\n", encoding="utf-8")
+            result = self.run_command(str(SYNC), "update", str(project))
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn("UPDATE_BLOCKED_WORK_STATE_UNKNOWN", result.stdout + result.stderr)
+            self.assertTrue((works / "W-bad.md").is_file())
+
     def test_update_allows_paused_work_and_preserves_checkpoint(self):
         with tempfile.TemporaryDirectory(prefix="yuan-vnext-paused-update-") as parent:
             project = Path(parent) / "project"

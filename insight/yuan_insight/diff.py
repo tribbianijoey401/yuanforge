@@ -92,7 +92,7 @@ def to_transition(
         path for path in set(before.files) | set(after.files)
         if before.files.get(path) != after.files.get(path)
     )
-    work_state = after.works.get(work_id or "", {})
+    work_state = after.works.get(work_id or "") or before.works.get(work_id or "", {})
     state = {
         "work": work_id or after.status.get("work"),
         "work_state": work_state.get("state", after.status.get("work_state")),
@@ -105,7 +105,7 @@ def to_transition(
         "id": transition_id,
         "session_id": session_id,
         "observed_at": observed_at,
-        "sources_changed": changed,
+        "sources_changed": [f"docs/works/{work_id}.md"] if work_id else changed,
         "before_hash": before.fingerprint(),
         "after_hash": after.fingerprint(),
         "state": state,

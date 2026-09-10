@@ -29,6 +29,7 @@ PERSISTED_WORK_STATES = _phase1.PERSISTED_WORK_STATES
 AGENT_STATES = _phase1.AGENT_STATES
 WORK_ID_PATTERN = _phase1.WORK_ID_PATTERN
 EXECUTION_MODES = ("shared", "isolated")
+CHANNEL_ONLY_INSTANCES = {"subagent", "background-process", "persona-degraded"}
 
 parse_frontmatter = _phase1.parse_frontmatter
 resolve_framework_root = _phase1.resolve_framework_root
@@ -135,6 +136,15 @@ def _concurrent_active_issues(project_root: Path, status: dict[str, Any]) -> lis
                     instance,
                     "independent subagent/background execution instance",
                     "Serialize this Work because one-LLM persona switching is not concurrent execution.",
+                ))
+            elif instance in CHANNEL_ONLY_INSTANCES:
+                isolation_ok = False
+                issues.append(_issue(
+                    "STATE_ACTIVE_AGENT_INSTANCE_IDENTITY_REQUIRED",
+                    f"{prefix}.agent.instance",
+                    instance,
+                    "a stable Platform execution identity such as subagent:<id> or background-process:<id>",
+                    "Persist the Platform-provided instance id; a channel label alone is insufficient for concurrent Work.",
                 ))
             if instance in instances:
                 isolation_ok = False

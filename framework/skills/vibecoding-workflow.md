@@ -56,7 +56,7 @@ version: 4.0.0
 
 正式 Dispatch 前：
 
-- 如果另一个 Work 仍 `active`，先完成、Pause 或 Block，并保存 Checkpoint；
+- 若没有其它 `active` Work，正常激活；若已有 active Work，先检查 Platform 是否已经提供每条 lane 的真实 independent execution identity、唯一 `execution.mode: isolated` workspace 与唯一 `agent.instance`。条件全部成立时可直接激活目标 Work，并保留其它 active Work；否则必须 Serialize：完成、Pause 或 Block 现有 Work 后再激活；
 - focused Work 写入 `state: active`、Workflow、Stage、当前 Agent、Current Task 与 Verification；
 - STATUS `focus` 指向该 Work，并同步 `work_state: active`、Workflow、Stage、当前 Agent等 recovery projection；
 - 两者在**同一逻辑步骤**提交。

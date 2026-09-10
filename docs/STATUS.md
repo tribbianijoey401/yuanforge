@@ -6,7 +6,7 @@ workflow: large-project
 stage: verify
 agent:
   id: tester
-  instance: phase2-contract-writer
+  instance: review-fix-writer
   state: paused
 quality:
   test: passed
@@ -15,4 +15,4 @@ quality:
 
 # Project Recovery Index
 
-Focused Work: `2026-09-10_multi-work-phase2` is paused pending independent review. `2026-09-01_quality-v0` remains paused as a persisted checkpoint.
+Focused Work: `2026-09-10_multi-work-phase2` is paused pending independent review after narrow Phase 2 review fixes. `2026-09-01_quality-v0` remains paused as a persisted checkpoint.

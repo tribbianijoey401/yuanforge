@@ -26,7 +26,7 @@ Project
 | `STATUS.work/...` | focused Work | 仅为恢复投影，不是第二份 Truth Source |
 | `execution` | active Work frontmatter | 单 active Work 可省略；并发 active Work 必须提供 Platform 已分配的隔离执行身份 |
 
-`agent.instance` 是可选自由文本，用于 Persona、Subagent、Session 或执行通道标签，不参与路由。它在只有一个 active Work 时可省略；有多个 active Work 时必须是每条并发 lane 的真实、唯一 independent execution instance，`persona-degraded` 不是独立实例。
+`agent.instance` 是当前实际 execution instance 的稳定 identity，不参与路由。单 active Work 为兼容可保留 `subagent` / `background-process` 等 channel label；有多个 active Work 时必须是每条 lane 的真实、唯一 independent identity，使用 `subagent:<platform-instance-id>` 或 `background-process:<process-or-job-id>`。纯 `subagent`、纯 `background-process` 与 `persona-degraded` 都不能证明并发隔离。
 
 ## Work File Contract
 

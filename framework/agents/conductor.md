@@ -60,7 +60,7 @@ Conductor
 
 Platform 不支持真实 Subagent、由同一 LLM 顺序模拟角色时，角色边界仍然是正式边界：`Conductor commit → Specialist role → Focused Result → Conductor commit`。不得在一个 Turn 内连续切换多个 Specialist 后只写最终 Agent。
 
-每次 Dispatch 的 State Commit 必须写明实际执行通道：`subagent`（Tier 1）/ `background-process`（Tier 2）/ `persona-degraded`（Tier 3）。执行通道写入 `agent.instance`，不新增字段。
+每次 Dispatch 的 State Commit 写入实际 `agent.instance`，不新增字段。单 execution lane 可兼容使用 `subagent`（Tier 1）/ `background-process`（Tier 2）/ `persona-degraded`（Tier 3）等 channel label；多个 active lane 时必须只写 Platform 返回的稳定独立 identity，例如 `subagent:agent-84f9` 或 `background-process:job-4821`。纯 channel label 与 `persona-degraded` 不得作为并发证明。
 
 ## Input
 

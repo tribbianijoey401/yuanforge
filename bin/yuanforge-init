@@ -130,11 +130,16 @@ def check_update_work_precondition(target: Path) -> tuple[bool, str | None]:
             try:
                 text = path.read_text(encoding="utf-8")
             except (OSError, UnicodeError):
-                continue
+                return False, f"UPDATE_BLOCKED_WORK_STATE_UNKNOWN: 无法读取 canonical Work：{path.stem}。"
             if not text.startswith("---"):
-                continue
+                return False, f"UPDATE_BLOCKED_WORK_STATE_UNKNOWN: canonical Work frontmatter 无法解析：{path.stem}。"
             parts = text.split("---", 2)
-            if len(parts) >= 3 and re.search(r"^state:\s*active\s*$", parts[1], re.MULTILINE | re.IGNORECASE):
+            if len(parts) < 3:
+                return False, f"UPDATE_BLOCKED_WORK_STATE_UNKNOWN: canonical Work frontmatter 不完整：{path.stem}。"
+            state_match = re.search(r"^state:\s*([^#\r\n]+)", parts[1], re.MULTILINE | re.IGNORECASE)
+            if not state_match or not state_match.group(1).strip().strip("'\""):
+                return False, f"UPDATE_BLOCKED_WORK_STATE_UNKNOWN: canonical Work state 不可判定：{path.stem}。"
+            if state_match.group(1).strip().strip("'\"").lower() == "active":
                 active_works.append(path.stem)
     if active_works:
         return False, (
