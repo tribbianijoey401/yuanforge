@@ -347,6 +347,34 @@ class MultiWorkStateTests(unittest.TestCase):
         self.assertIn("execution.mode: isolated", workflow_skill)
         self.assertIn("Serialize", workflow_skill)
 
+    def test_focused_completion_hands_off_projection_to_remaining_active_work(self):
+        for work_id, workspace, instance in (
+            ("W-101", "platform://workspace/one", "subagent:one"),
+            ("W-102", "platform://workspace/two", "subagent:two"),
+        ):
+            self.write_work(work_id, work_payload(work_id, state="active", agent_state="active", current_task=True, agent_instance=instance, execution_mode="isolated", execution_workspace=workspace))
+        self.write_status(status_payload("W-101", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_instance="subagent:one", agent_state="active"))
+        (self.root / "docs" / "works" / "W-101.md").unlink()
+        self.write_status(status_payload("W-102", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_instance="subagent:two", agent_state="active"))
+        self.assertEqual([], self.guard.validate_project_state(self.root, FRAMEWORK))
+
+    def test_focused_completion_uses_stable_active_work_order_for_handoff(self):
+        for work_id, workspace, instance in (
+            ("W-101", "platform://workspace/one", "subagent:one"),
+            ("W-102", "platform://workspace/two", "subagent:two"),
+            ("W-103", "platform://workspace/three", "subagent:three"),
+        ):
+            self.write_work(work_id, work_payload(work_id, state="active", agent_state="active", current_task=True, agent_instance=instance, execution_mode="isolated", execution_workspace=workspace))
+        (self.root / "docs" / "works" / "W-101.md").unlink()
+        self.write_status(status_payload("W-102", work_state="active", workflow="complex-bug", stage="implement", agent_id="backend-dev", agent_instance="subagent:two", agent_state="active"))
+        self.assertEqual([], self.guard.validate_project_state(self.root, FRAMEWORK))
+
+    def test_completion_and_emergency_bug_contracts_are_conditionally_concurrent(self):
+        conductor = (FRAMEWORK / "agents" / "conductor.md").read_text(encoding="utf-8")
+        self.assertIn("Serialize", conductor)
+        self.assertIn("isolated workspace", conductor)
+        self.assertIn("稳定字典序首个", conductor)
+
 
 if __name__ == "__main__":
     unittest.main()

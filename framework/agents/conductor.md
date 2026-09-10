@@ -149,7 +149,7 @@ Framework Update 本身不迁移 Project-owned Work。
 - 每次 Commit 落盘后运行 `python -B <resolved-state-guard-path> check <project-root>`（即 `state_guard.py check`）。只有 `STATE_VALID` 表示**校验通过**；失败时修正同一次 Commit，校验通过前**不得继续 Dispatch**。
 - 当前 Acceptance 的必要补全进入当前 Work。
 - 用户明确要建立另一个独立 Work 时创建 `ready` Work；仅 Deferred / Future Idea 进入 BACKLOG。
-- 紧急 Bug 可以成为独立 Work：先 Pause 当前 active Work，建立 Bug Work 并切 focus；Bug 完成后可恢复原 Work。
+- 紧急 Bug 默认 Serialize：Pause 当前 active Work，再建立 Bug Work 并切 focus；但双方已有唯一 isolated workspace 与真实 independent `agent.instance`、并且同一 State Commit 通过 Guard 时，可保持原 Work active 并并发激活 Bug Work。Bug 完成后按 focus handoff 规则恢复锚点。
 - Scope 或 Risk 明显增长时升级当前 Work 的 Workflow，并记录原因。
 - 重大 Product/Architecture Decision 发生变化时先展示变化并等待用户确认。
 
@@ -210,7 +210,7 @@ Focused Result 只保留 outcome、summary、skills_applied、verification、ris
 4. `Open Findings = 0`；不影响当前 Acceptance 的改善项已进入 BACKLOG 或被明确丢弃。
 5. Completion 之前已执行 Distill：稳定事实、Decision、Pitfall 与 Future Work 已去重写入正确的长期 Project Document。
 6. Distill 后移除当前 active Work 文件；只有有长期历史价值时写精炼摘要到 `project://docs/works/archive/`。其它 persisted Work 原样保留。
-7. 若用户下一步明确继续另一个 Work，STATUS focus 切向它；否则将 STATUS 清为 `focus: null` / `work_state: idle`，即 **no active work**。
+7. 移除完成 Work 后先扫描 remaining active Work：用户明确指定继续目标时使用该目标；否则使用 Work id 的稳定字典序首个。若存在 remaining active Work，STATUS 必须完整投影该 Work（focus/work/work_state/workflow/stage/agent/quality）；只有没有任何 active Work 时才清为 `focus: null` / `work_state: idle`。
 8. 用户收到可执行的验收步骤或足够清晰的完成摘要。
 
 为 legacy contract/search compatibility，`project://docs/WORK.md` 仍可出现在旧 Project 与迁移说明中，但新 Work 的 canonical State 永远是 `project://docs/works/<work-id>.md`。

@@ -217,6 +217,22 @@ stage: implement
             self.assertIn("UPDATE_BLOCKED_WORK_STATE_UNKNOWN", result.stdout + result.stderr)
             self.assertTrue((works / "W-bad.md").is_file())
 
+    def test_update_blocks_invalid_canonical_work_state_before_replacing_framework(self):
+        with tempfile.TemporaryDirectory(prefix="yuan-vnext-invalid-canonical-") as parent:
+            project = Path(parent) / "project"
+            works = project / "docs" / "works"
+            works.mkdir(parents=True)
+            bad = works / "W-bad.md"
+            bad.write_text("---\nid: W-bad\nstate: typo-state\n---\n", encoding="utf-8")
+            stale = project / ".yuan" / "framework" / "stale.txt"
+            stale.parent.mkdir(parents=True)
+            stale.write_text("must remain\n", encoding="utf-8")
+            result = self.run_command(str(SYNC), "update", str(project))
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn("UPDATE_BLOCKED_WORK_STATE_UNKNOWN", result.stdout + result.stderr)
+            self.assertTrue(stale.is_file())
+            self.assertTrue(bad.is_file())
+
     def test_update_allows_paused_work_and_preserves_checkpoint(self):
         with tempfile.TemporaryDirectory(prefix="yuan-vnext-paused-update-") as parent:
             project = Path(parent) / "project"

@@ -103,7 +103,7 @@ Switch：单 active Work 按 State Contract 先收敛再更新 focus；多个 St
 - 长期 Fact / Decision / Pitfall 归位；
 - 有历史价值才写 `project://docs/works/archive/` 摘要；
 - 移除完成的 `project://docs/works/<id>.md`，其它 Work 原样保留；
-- 用户明确继续另一个 Work则切 focus，否则 STATUS 清为 `focus: null` / `work_state: idle`，即 no active work。
+- 移除完成 Work 后先扫描 remaining active Work：用户明确指定继续目标时使用该目标；否则选择 Work id 的稳定字典序首个，并完整同步其 STATUS projection。只有没有任何 active Work 时，才将 STATUS 清为 `focus: null` / `work_state: idle`，即 no active work。
 
 Legacy `project://docs/WORK.md` 不再作为新模型的 canonical Work State。
 

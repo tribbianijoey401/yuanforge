@@ -65,6 +65,7 @@ REQUIRED_AGENT_HEADINGS = (
 )
 
 UPDATE_SAFE_WORK_STATES = {"idle", "paused"}
+CANONICAL_WORK_STATES = {"ready", "active", "paused", "blocked"}
 INSIGHT_MANAGED_ENTRIES = {"tool", "yuan.py"}
 
 
@@ -139,7 +140,10 @@ def check_update_work_precondition(target: Path) -> tuple[bool, str | None]:
             state_match = re.search(r"^state:\s*([^#\r\n]+)", parts[1], re.MULTILINE | re.IGNORECASE)
             if not state_match or not state_match.group(1).strip().strip("'\""):
                 return False, f"UPDATE_BLOCKED_WORK_STATE_UNKNOWN: canonical Work state 不可判定：{path.stem}。"
-            if state_match.group(1).strip().strip("'\"").lower() == "active":
+            canonical_state = state_match.group(1).strip().strip("'\"").lower()
+            if canonical_state not in CANONICAL_WORK_STATES:
+                return False, f"UPDATE_BLOCKED_WORK_STATE_UNKNOWN: canonical Work state 不合法：{path.stem}={canonical_state}。"
+            if canonical_state == "active":
                 active_works.append(path.stem)
     if active_works:
         return False, (

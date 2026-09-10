@@ -262,7 +262,7 @@ class FrameworkContractTests(unittest.TestCase):
                 f"{path.name} required_agents 必须包含 conductor",
             )
 
-    def test_completion_contract_clears_active_state_after_distill(self):
+    def test_completion_contract_hands_off_or_clears_state_after_distill(self):
         conductor = (FRAMEWORK / "agents" / "conductor.md").read_text(encoding="utf-8")
         adapter = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
         for text in (conductor, adapter):
@@ -270,7 +270,9 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertIn("Distill", text)
             self.assertIn("WORK.md", text)
             self.assertIn("STATUS.md", text)
-            self.assertIn("no active work", text)
+            self.assertIn("focus: null", text)
+        self.assertIn("remaining active Work", conductor)
+        self.assertIn("稳定字典序首个", conductor)
 
     def test_pause_contract_preserves_work_and_is_resumable(self):
         core = (FRAMEWORK / "policies" / "core.md").read_text(encoding="utf-8")

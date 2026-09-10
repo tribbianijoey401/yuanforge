@@ -39,6 +39,8 @@ quality:
 - [x] Insight 在 non-focused active Work 变化时写入该 Work 自己的 trace，focused consumer 只读取 focused trace。
 - [x] Update 在任何 active Work 或 canonical Work state 不可判定时被阻止。
 - [x] Framework、Installer、Insight、legacy 及 full regression 全绿。
+- [x] focused Work completion with remaining active Work produces valid focus handoff.
+- [x] stale Insight cache cannot attribute prior Work evidence to current focus.
 
 ## Assumptions and Risks
 
@@ -60,7 +62,7 @@ quality:
 
 **Agent:** tester (review-fix-writer)
 
-**Task:** 保留已验证的 Phase 2 review-fix checkpoint，等待独立 Review。
+**Task:** 保留已验证的 final Phase 2 correctness checkpoint，等待独立 Review。
 
 **Done conditions:**
 
@@ -68,11 +70,11 @@ quality:
 
 ## Latest Result
 
-F-01 至 F-08 已闭合：canonical activation 改为条件 isolation；并发 instance 改为 stable identity；Insight 以 focused trace 消费并按任意 removed Work 生成 summary；Installer canonical state fail-closed。Focused suites green，full discovery 150 tests，static/Guard/Framework checks green。
+F-09 至 F-12 已闭合：focused completion handoff 使用用户指定或稳定 Work id 顺序；emergency Bug 默认为 Serialize、isolation valid 时可 concurrent；Installer 拒绝 invalid canonical state；stale cache 与 STATUS focus mismatch 返回空 evidence/PARTIAL。Focused suites与 full discovery green。
 
 ## Open Findings
 
-- 无。F-01 至 F-08 已修复并有 regression evidence；独立 Review 仍 pending。
+- 无。F-09 至 F-12 已修复并有 regression evidence；独立 Review 仍 pending。
 
 ## Work Learnings
 

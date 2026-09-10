@@ -162,7 +162,7 @@ Conductor 不直接加载 References；Agent 只加载自己声明的 Skill；Sk
 - Writer 的 `review_context` 由 Conductor **transient 接收**。Risk-driven selection 依据**最终 Actual Diff + Acceptance + Risk**：**不需要 Reviewer → 立即丢弃**；需要时只**原样** relay；**Review 完成后立即丢弃**。`review_context` **不得写入 WORK / STATUS / Memory / Project Truth**，也不得写入 `docs/works/*.md` 或跨 Work 携带。
 - 只有 Acceptance、Verification、Risk-driven Review、Known Issue 披露和 **Open Findings = 0** 全部满足时才进入 **Distill**。
 - Distill 只关闭当前 Work：长期信息归位后，有历史价值才写 `project://docs/works/archive/` 摘要，然后移除当前 `docs/works/<id>.md`；其它 Works 原样保留。
-- 当前 Work 完成后若没有下一个 focus，将 STATUS 清为 `focus: null` / `work_state: idle`，即 **no active work**。
+- 当前 Work 完成后先扫描 remaining active Works：用户明确指定时使用其 Work，否则使用 Work id 的稳定字典序首个，并完整同步 STATUS projection；只有不存在 active Work 时才清为 `focus: null` / `work_state: idle`。
 
 ## Legacy Single-Work Compatibility
 

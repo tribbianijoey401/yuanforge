@@ -56,7 +56,7 @@ Work body 保存 Goal、Scope、Acceptance、Current Task、Latest Result、Open
 - `active`：当前正式执行的 Work；必须有 Workflow、Stage、当前 Agent 与 Current Task。
 - `paused`：保留 Workflow / Stage，`agent.state: paused`，且必须有唯一 Next Action。
 - `blocked`：保留 Workflow / Stage，`agent.state: blocked`，且必须有可观察 Blocker。
-- Completion 不是长期 active-store 状态。Acceptance、Verification、Review 与 `Open Findings = 0` 满足后先 Distill；有长期历史价值时写精炼摘要到 `project://docs/works/archive/`，然后移除当前 `project://docs/works/<id>.md`。其它 Work 不受影响。
+- Completion 不是长期 active-store 状态。Acceptance、Verification、Review 与 `Open Findings = 0` 满足后先 Distill；有长期历史价值时写精炼摘要到 `project://docs/works/archive/`，然后移除当前 `project://docs/works/<id>.md`。移除 focused Work 后若仍有 active Work，STATUS 必须 handoff 并完整投影其中一个 active Work（用户指定优先，否则 Work id 字典序首个）；只有没有 active Work 时才能 `focus: null` / `work_state: idle`。其它 Work 不受影响。
 
 ## Phase 2 Concurrency Boundary
 

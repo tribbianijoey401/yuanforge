@@ -15,6 +15,7 @@ from typing import Any, Callable
 
 from .diff import diff_snapshots, diff_work_snapshots, to_transition
 from .loader import Snapshot, build_snapshot
+from .parsers.status import load_status
 from .trace import (
     append_transition,
     archive_trace,
@@ -117,10 +118,18 @@ def load_observation_evidence(root: Path) -> ObservationEvidence:
     insight_dir = root / ".yuan" / "insight"
     cache = _read_json(insight_dir / "cache" / "current.json")
     work_id = cache.get("current_work_id")
-    transitions = read_transitions(_evidence_trace_path(
-        insight_dir,
-        str(work_id) if work_id and _uses_multi_work_layout(root) else None,
-    ))
+    coverage = str(cache.get("coverage") or "UNKNOWN")
+    if _uses_multi_work_layout(root):
+        focus = load_status(root / "docs" / "STATUS.md").focus
+        if not focus or focus != work_id:
+            # The current focus was not observed by this durable cache. Do not
+            # attribute a prior Work's evidence to it.
+            transitions = []
+            coverage = "PARTIAL"
+        else:
+            transitions = read_transitions(_evidence_trace_path(insight_dir, str(focus)))
+    else:
+        transitions = read_transitions(_evidence_trace_path(insight_dir, None))
     session_id = cache.get("session_id")
     gaps = (
         read_transitions(insight_dir / "gaps" / f"{session_id}.jsonl")
@@ -128,7 +137,7 @@ def load_observation_evidence(root: Path) -> ObservationEvidence:
         else []
     )
     return ObservationEvidence(
-        coverage=str(cache.get("coverage") or "UNKNOWN"),
+        coverage=coverage,
         mode=str(cache.get("observation_mode") or "unknown"),
         transitions=transitions,
         current_work_id=work_id,
@@ -363,12 +372,18 @@ class ObservationService:
     def evidence(self) -> ObservationEvidence:
         with self._lock:
             multi_work = bool(self.latest_snapshot and self.latest_snapshot.work.get("source") == "multi-work")
-            transitions = read_transitions(_evidence_trace_path(
-                self.insight_dir, self.current_work_id if multi_work else None
-            ))
+            observed_focus = self.latest_snapshot.status.get("focus") if self.latest_snapshot else None
+            if multi_work and observed_focus != self.current_work_id:
+                transitions = []
+                coverage = "PARTIAL"
+            else:
+                transitions = read_transitions(_evidence_trace_path(
+                    self.insight_dir, self.current_work_id if multi_work else None
+                ))
+                coverage = self.coverage
             gaps = self._current_gaps()
             return ObservationEvidence(
-                coverage=self.coverage,
+                coverage=coverage,
                 mode=self.observation_mode,
                 transitions=transitions,
                 current_work_id=self.current_work_id,

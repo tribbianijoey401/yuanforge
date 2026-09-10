@@ -208,13 +208,35 @@ class InsightMultiWorkTests(unittest.TestCase):
         evidence = load_observation_evidence(self.root)
         self.assertEqual(["W-2"], [item["work_id"] for item in evidence.transitions])
 
+    def test_stale_cached_work_does_not_supply_evidence_for_new_focus(self):
+        insight = self.root / ".yuan" / "insight"
+        (self.root / "docs" / "STATUS.md").write_text("---\nfocus: W-2\n---\n", encoding="utf-8")
+        (insight / "cache").mkdir(parents=True)
+        (insight / "traces").mkdir()
+        (insight / "cache" / "current.json").write_text('{"current_work_id":"W-1","coverage":"FULL"}', encoding="utf-8")
+        (insight / "traces" / "W-1.jsonl").write_text('{"work_id":"W-1"}\n', encoding="utf-8")
+        (insight / "traces" / "W-2.jsonl").write_text('{"work_id":"W-2"}\n', encoding="utf-8")
+        evidence = load_observation_evidence(self.root)
+        self.assertEqual([], evidence.transitions)
+        self.assertEqual("PARTIAL", evidence.coverage)
+
+    def test_focus_null_does_not_resurrect_stale_cached_work_evidence(self):
+        insight = self.root / ".yuan" / "insight"
+        (self.root / "docs" / "STATUS.md").write_text("---\nfocus: null\n---\n", encoding="utf-8")
+        (insight / "cache").mkdir(parents=True)
+        (insight / "traces").mkdir()
+        (insight / "cache" / "current.json").write_text('{"current_work_id":"W-1","coverage":"FULL"}', encoding="utf-8")
+        (insight / "traces" / "W-1.jsonl").write_text('{"work_id":"W-1"}\n', encoding="utf-8")
+        evidence = load_observation_evidence(self.root)
+        self.assertEqual([], evidence.transitions)
+        self.assertEqual("PARTIAL", evidence.coverage)
+
     def test_service_evidence_reads_current_work_trace(self):
-        write_work(self.root, "W-1", "active")
-        write_status(self.root, "W-1", "active")
+        write_work(self.root, "W-2", "active")
+        write_status(self.root, "W-2", "active")
         service = ObservationService(self.root, poll_interval=0.01, debounce_window=0.01)
         service.start()
         try:
-            service.current_work_id = "W-2"
             trace = service.insight_dir / "traces" / "W-2.jsonl"
             trace.parent.mkdir(exist_ok=True)
             trace.write_text('{"work_id":"W-2"}\n', encoding="utf-8")
