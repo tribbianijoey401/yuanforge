@@ -18,9 +18,9 @@ version: 4.0.0
 3. 把每条信息写入唯一对应 Document，不跨文件复制。
 4. 对 Memory 去重：相同 Cause 更新现有条目；不同 Cause 才新增条目。
 5. 为 Bug 只保留 Signal、Minimal Reproduction、Verified Cause、Fix Rule 和 Regression Evidence。
-6. Work 未完成时，向 Conductor 返回 `project://docs/STATUS.md` Current State 与 Next Action 的 `work_updates`。
-7. Work 完成且摘要有长期价值时写入 `project://docs/work/archive/`；否则无需创建 Archive。
-8. 确认 Acceptance、Verification、Review 和 `Open Findings = 0` 后，向 Conductor 返回同时清理 `project://docs/WORK.md` / `project://docs/STATUS.md` 的 Distill 提案。只有 Conductor 正式提交 no active work；Distill 是 Completion 的一部分，不在报告完成后延迟执行。
+6. Work 未完成时，向 Conductor 返回当前 `project://docs/works/<work-id>.md` 的可恢复 Checkpoint（Current Task、Latest Result、Verification、Open Findings、Next Action / Blocker）以及对应 STATUS projection 的 `work_updates`。
+7. Work 完成且摘要有长期价值时写入 `project://docs/works/archive/`；否则无需创建 Archive。
+8. 确认 Acceptance、Verification、Review 和 `Open Findings = 0` 后，向 Conductor 返回删除当前 `project://docs/works/<work-id>.md` 的 Distill 提案，并按 remaining active Works 更新 STATUS：仍有 active Work 时 handoff 并完整投影一个 remaining active Work；没有 active Work 时才提交 `focus: null / work_state: idle`。Legacy `project://docs/WORK.md` 只做 compatibility，不作为新 Multi-Work Completion 的清理目标。Distill 是 Completion 的一部分，不在报告完成后延迟执行。
 
 ## Exclusions
 

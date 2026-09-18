@@ -262,6 +262,23 @@ class FrameworkContractTests(unittest.TestCase):
                 f"{path.name} required_agents 必须包含 conductor",
             )
 
+
+    def test_memory_skills_follow_phase2_multi_work_completion_contract(self):
+        project_memory = (FRAMEWORK / "skills" / "project-memory.md").read_text(encoding="utf-8")
+        distill = (FRAMEWORK / "skills" / "distill-workspace.md").read_text(encoding="utf-8")
+
+        self.assertIn("多个 active Work", project_memory)
+        self.assertIn("execution.mode: isolated", project_memory)
+        self.assertIn("remaining active Work", project_memory)
+        self.assertNotIn("Phase 1 最多一个 active Work", project_memory)
+
+        self.assertIn("project://docs/works/archive/", distill)
+        self.assertIn("project://docs/works/<work-id>.md", distill)
+        self.assertIn("remaining active Works", distill)
+        self.assertIn("focus: null / work_state: idle", distill)
+        self.assertNotIn("project://docs/work/archive/", distill)
+        self.assertNotIn("同时清理 `project://docs/WORK.md` / `project://docs/STATUS.md`", distill)
+
     def test_completion_contract_hands_off_or_clears_state_after_distill(self):
         conductor = (FRAMEWORK / "agents" / "conductor.md").read_text(encoding="utf-8")
         adapter = (ROOT / "AGENTS.md").read_text(encoding="utf-8")

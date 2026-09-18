@@ -37,7 +37,7 @@ version: 4.0.0
 
 `project://docs/works/` 本身就是 registry，不建立第二个 Work Registry 对象。需要帮助用户选择 Work 时，可读取 active-store 中每个文件的 frontmatter + Goal 摘要，但不得默认加载完整 body。
 
-Phase 1 最多一个 active Work；其它 Work 可以 ready / paused / blocked。
+Phase 2 单 active Work 保持 Phase 1 compatibility；多个 active Work 只在每条 lane 都具有 `execution.mode: isolated`、唯一 Platform workspace 与唯一真实 `agent.instance` 时成立。`STATUS.focus` 只是当前 interaction / recovery anchor，不表示唯一 active Work；其它 Work 仍可为 ready / paused / blocked。
 
 ## Checkpoint
 
@@ -53,7 +53,7 @@ Checkpoint 属于每个 Work 自己：Current Task、Latest Result、Verificatio
 4. 未激活 Future Item 写入 BACKLOG；其它 persisted Work 不修改。
 5. 只有有长期价值的完成摘要才进入 `project://docs/works/archive/`。
 6. 在 `Open Findings = 0` 且长期信息已归位后，向 Conductor 返回删除当前 `project://docs/works/<id>.md` 并更新 STATUS focus 的 Distill 提案。
-7. 不再“清空全部 WORK / STATUS”；只完成当前 Work。没有下一个 focus 时 STATUS 回到 no active work。
+7. 不再“清空全部 WORK / STATUS”；只完成当前 Work。移除 focused Work 后若仍有 active Work，STATUS 必须 handoff 并完整投影一个 remaining active Work（用户已明确目标时优先，否则使用稳定 Work id 顺序）；只有不存在 active Work 时才回到 `focus: null / work_state: idle`。
 
 ## Legacy Migration
 
