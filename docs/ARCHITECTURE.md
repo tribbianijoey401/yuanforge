@@ -124,24 +124,25 @@ ready | active | paused | blocked
 
 Completion 不是 active-store 的长期状态。一个 Work 满足 Acceptance、Verification、Risk-driven Review、Known Issue disclosure 与 `Open Findings = 0` 后先 Distill；有长期历史价值时写精炼摘要，再移除对应 `docs/works/<id>.md`。其它 Work 原样保留。
 
-### Phase 1 concurrency boundary
+### Phase 2 concurrency boundary
 
-Phase 1 是：
+Phase 2 是：
 
 ```text
 Multiple Persisted Works
 + one focused interaction
-+ at most one active Work
-+ one Implementation Writer
++ one or more active Works only with real execution isolation
++ one Implementation Writer per workspace
 ```
 
 因此：
 
-- 可以同时保存多个 `ready` / `paused` / `blocked` Work；
-- 最多一个 `active` Work；有 active Work 时 `STATUS.focus` 必须指向它；
-- 查看另一个 ready/paused/blocked Work 不等于并发执行；
-- 正式切换执行前必须先让当前 active Work complete / pause / block；
-- Phase 1 不建设 Scheduler、Worker Pool、后台 Daemon、mutation overlap detector 或自动 branch/worktree manager。
+- 单 active Work 保持 Phase 1 compatibility，`execution` 可以省略；
+- 多个 `active` Work 只在每条 lane 都声明 `execution.mode: isolated`、唯一 Platform workspace 与唯一真实 `agent.instance` 时合法；纯 `subagent` / `background-process` channel label 与 `persona-degraded` 不能作为并发证明；
+- 有 active Work 时 `STATUS.focus` 必须指向其中一个 active Work。多个合法 isolated active Work 之间可以切换 focus，切换本身不构成 Pause、Completion 或 Archive；
+- focused Work 完成并移除后，如果仍有 active Work，STATUS 必须 handoff 并完整投影一个 remaining active Work；用户已明确目标时优先该 Work，否则使用 Work id 的稳定字典序首个。只有不存在 active Work 时才允许 `focus: null / work_state: idle`；
+- Yuan 只验证 Agent Platform 已提供的 execution identity 与 workspace isolation，不创建 Scheduler、Worker Pool、后台 Daemon、自动 branch/worktree、merge queue 或 mutation-overlap runtime；
+- isolated execution 可以并发，但向共享目标的 Integration 仍由 Conductor 串行收敛。
 
 Work 是 execution isolation boundary；Task 是 Work 内部可判定步骤；Attempt 是 Task 的一次执行尝试。这些是功能关系，不要求把它们都升级成新的持久化对象。
 
@@ -173,9 +174,9 @@ Guard 动态从 Workflow frontmatter 与 Agent Contract 取得 Canonical Workflo
 - Work 文件名 stem 与 frontmatter `id` 一致；
 - persisted Work state 合法；
 - active / paused / blocked 对 Current Task / Next Action / Blocker 的要求；
-- Phase 1 不允许多个 active Work；
-- active Work 必须被 focus；
-- STATUS projection 与 focused Work 一致。
+- 单 active Work 保持 legacy/Phase 1 compatibility；
+- 多 active Work 必须全部满足 `execution.mode: isolated`、唯一 workspace、唯一真实 `agent.instance`，并拒绝 channel-only identity 与 `persona-degraded` 伪并发；
+- 存在 active Work 时 focus 必须落在某个 active Work；STATUS projection 与 focused Work 一致。
 
 Conductor 是 `docs/works/*.md` / `STATUS.md` 的唯一正式 State Writer。每个 Dispatch 前、Specialist Focused Result 返回后以及 Create / Focus / Activate / Pause / Resume / Block / Switch / Distill 都执行 State Commit；Guard 未输出 `STATE_VALID` 时不得继续 Dispatch。Specialist 只返回 `work_updates`。
 
@@ -189,20 +190,29 @@ Legacy Project 如果 STATUS 没有 `focus` 字段，Guard 继续按旧 `WORK.md
 - `.yuan/overrides/`；
 - Project Source、Test、Config 和其他业务文件。
 
-Update 不迁移或解释 Project-owned 内容。它只读取 STATUS 的 focused Work projection 做最小安全判断：明确 `active` 时停止并要求先 complete / pause / block；旧格式、缺失或无法判定的状态按 compatibility 规则放行。更新后的 Check 只报告问题，不自动修复。
+Update 不迁移或解释 Project-owned 内容。对 canonical Multi-Work Project，它在写入前扫描全部 `docs/works/*.md`：任一 Work 为 `active` 都阻止 Update；canonical Work 无法读取、frontmatter/state 无法判定或 state 不属于 `ready | active | paused | blocked` 时同样 fail closed，并返回明确的 Update blocker。只有没有 canonical Work registry 的 legacy Project 才继续使用旧 compatibility 判断。更新后的 Check 只报告问题，不自动修复。
 
 ## Insight Multi-Work Observation
 
-Insight 是只读 Sidecar。Snapshot 读取 `STATUS.focus` 后只把 focused Work 装入当前语义 Snapshot，同时对 `docs/works/*.md` 维护 content hash，以观察 Work create/remove/switch。Windows watcher 递归观察 Project Root；Linux inotify 同时监听 `docs/` 和动态 `docs/works/`。
+Insight 是只读 Sidecar。Phase 2 保留 `Snapshot.work` 作为 focused Work compatibility view，同时维护 `Snapshot.works`，为每个 persisted Work 建立语义视图；文件变化按 Work 归属生成 semantic diff，而不是只靠 focused Work 或全局 file hash 推断。
+
+Multi-Work trace 使用：
+
+```text
+.yuan/insight/traces/<work-id>.jsonl
+```
+
+因此 non-focused active Work 的变化写入自己的 trace，不污染 focused Work。Legacy single-work Project 继续兼容 `traces/current.jsonl`。
 
 Insight 明确区分：
 
 ```text
 focus switch != Work completion
+canonical Work removal = Work completion
 ```
 
-W1 → W2 时，W1 的当前 Trace 只轮转/保存，不写完成 Summary；只有 canonical `docs/works/W1.md` 在 Distill 后真正移除，才生成 W1 Summary。之后 Resume W1 时新的 Trace 可以继续追加到该 Work 的历史 Trace。
+focus 在多个 isolated active Work 间切换时不生成 Completion Summary。任意 canonical Work 在 Distill 后真正移除时，不论它是否 focused，都使用该 Work 的最后已知状态完成自己的 trace/summary lifecycle。
 
-Coverage 只要求当前布局真实需要的状态源：Multi-Work 有 focus 时要求 `STATUS.md + focused Work file`；`focus:null` 只要求 STATUS；legacy 模式才要求 `WORK.md + STATUS.md`。因此旧 compatibility 文件不会成为新 Multi-Work Dashboard 的假必需依赖。
+CLI/Dashboard 的当前 Evidence 仍以 focused Work 为消费边界：Multi-Work 下只读取 `traces/<focus>.jsonl`。如果 durable observer cache 的 `current_work_id` 与当前 `STATUS.focus` 不一致，说明 focus change 不在已证明的 observation coverage 内；此时不把旧 Work trace 归因给新 focus，而返回空 transitions 并把 Coverage 降为 PARTIAL。
 
-Transition index、Trace、Gap 和 Coverage 全部位于 `.yuan/insight/`，不写回 Project State。Insight 复用 Framework State Guard 的问题码，不维护第二套状态词汇，也不自动改写状态。
+Coverage 只要求当前布局真实需要的状态源：Multi-Work 有 focus 时要求 `STATUS.md + focused Work file`；`focus:null` 只要求 STATUS；legacy 模式才要求 `WORK.md + STATUS.md`。Transition、Trace、Summary、Gap 与 Coverage 全部位于 `.yuan/insight/`，不写回 Project State。Insight 复用 Framework State Guard 的问题码，不维护第二套状态词汇，也不自动改写状态。

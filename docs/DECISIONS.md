@@ -53,9 +53,9 @@
 
 ## D-009：Update 只检查 Work 状态，不迁移 Project 内容
 
-- **Status**：Confirmed
-- **Decision**：Update 继续只替换全部官方受管资产并原样保留 Project-owned 文件；写入前只阻止明确的 `STATUS.work_state: active`。旧格式、缺失或无法判定的状态直接放行，不需要迁移 Document 或传递额外参数。未完成 Work 可保存 Checkpoint 后标记为 `paused`，下次 Session 原地恢复。每次 Update 必须逐项输出实际保留的 Yuan-known 路径及原因。
-- **Reason**：Update 不应猜测或重写项目事实，但也不能在 Active Work 尚未形成可恢复点时改变 Framework Contract。
+- **Status**：Superseded by D-014
+- **Historical Decision**：Update 只替换官方受管资产并保留 Project-owned 文件；早期规则只阻止 focused `STATUS.work_state: active`，无法判定时偏向 compatibility 放行。
+- **Reason**：该规则在 single-work 阶段避免 Installer 猜测 Project Truth；Phase 2 出现 non-focused active lane 后，安全判断必须覆盖全部 canonical Work，因此由 D-014 取代。
 
 ## D-010：Yuan 路径使用三种逻辑定位符
 
@@ -74,6 +74,19 @@
 - **Status**：Confirmed
 - **Decision**：完整内容驱动设计只在 Presentation Design Signal（高影响 UI、新产品、重要改版、数据密集界面、关键旅程或没有可复用设计）命中时触发。UI Designer 把 provisional/frozen Presentation Contract 持久化在 `project://docs/design/`，UX Reviewer 与 Frontend Dev 仅消费该 Artifact；它不进入 `STATUS.md`、State Contract 或 State Guard。freeze 依赖真实 canonical source 与可重新定位的 upstream reference；stable fact ID 若存在则复用，但 Yuan 不为 UI Contract 新建全局 Fact ID Protocol。
 - **Reason**：设计追溯与可实现性需要可定位 Artifact，但将其作为所有 Project 的 Core State 会把局部 UI 质量流程扩张为全局状态机，并不必要地阻塞普通 UI Work。
+
+## D-013：Multi-Work Phase 2 只验证 Platform-provided execution isolation
+
+- **Status**：Confirmed
+- **Decision**：一个 Project 可以有多个 persisted Work；单 active Work 保持 compatibility。多个 `active` Work 只在每条 lane 都具有 `execution.mode: isolated`、唯一 Platform workspace 与唯一真实 `agent.instance` 时成立。纯 channel label 与 `persona-degraded` 不能作为并发证明。STATUS.focus 只是当前 interaction/recovery anchor；合法 active Works 可以独立推进，但共享目标的 Integration 仍由 Conductor 串行收敛。Yuan 不分配 workspace、不创建 Scheduler/Worker Pool，也不自动创建 branch/worktree 或 merge queue。
+- **Reason**：并发价值来自 Agent Platform 已提供的独立 execution environment；Yuan 的职责是用最小可验证 State/Evidence 约束它，而不是复制一套 Runtime。
+
+## D-014：Framework Update 对 canonical Multi-Work state fail closed
+
+- **Status**：Confirmed
+- **Decision**：Framework Update 不迁移 Project-owned Work，但写入前必须扫描全部 canonical `docs/works/*.md`。任一 Work 为 `active` 时阻止 Update；canonical Work 无法读取、frontmatter/state 无法可靠判定或 state 非 `ready | active | paused | blocked` 时同样阻止。没有 canonical Work registry 的 legacy Project 继续按 compatibility 路径处理。
+- **Reason**：Phase 2 下 non-focused active Work 不一定投影到 STATUS；只看 focused projection 会在 execution lane 仍运行时替换 Framework。无法证明“没有 active lane”时 fail closed，比猜测 Project State 更安全。
+- **Supersedes**：D-009 中“只检查 focused STATUS.active、unknown 放行”的部分。
 
 ## Historical Decision
 
